@@ -1,0 +1,10 @@
+*.o
+*.obj
+*.rar
+*.tar.gz
+Build/daemon/*
+Project*
+build/*
+project/*
+Pro*
+avWare/*

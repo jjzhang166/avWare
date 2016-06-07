@@ -1,0 +1,24 @@
+/*use laptop camera for capture */
+#cmakedefine HAVE_CapCamera
+
+/*use screen for capture*/
+#cmakedefine HAVE_CapScreen
+
+/*use intel media sdk for encodeing*/
+#cmakedefine HAVE_EncIntelGPU
+
+/*use ffmpeg for encodeing */
+#cmakedefine HAVE_EncFfmpeg
+
+/*use memory pool for stream buffer*/
+#cmakedefine HAVE_MemPool
+
+/*Have Sensor Input Stream*/
+#cmakedefine HAVE_SensorInput
+
+/*Have HDMI Input Stream*/
+#cmakedefine HAVE_HdmiInput
+
+/*Have QT UI*/
+#cmakedefine WITH_UI
+

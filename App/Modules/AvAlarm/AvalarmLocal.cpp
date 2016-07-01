@@ -14,10 +14,11 @@
 ******************************************************************/
 #include "AvAlarm/AvalarmLocal.h"
 #include "Apis/LibEncode.h"
+#include "CAvObject.h"
 
 
-PATTERN_SINGLETON_IMPLEMENT(CAvAlmLocal)
-CAvAlmLocal::CAvAlmLocal()
+SINGLETON_IMPLEMENT(CAvAlmLocal)
+CAvAlmLocal::CAvAlmLocal() :CThread(__FUNCTION__)
 {
 }
 
@@ -122,7 +123,6 @@ av_bool CAvAlmLocal::Initialize()
 	bRet = AvGetIoAlmCaps(&m_AlmIoCaps);
 
 	bRet = avGetMdAlmCaps(&m_AlmMdCaps);
-	CThread::SetThreadName(std::string("CAvAlmLocal"));
 	CThread::run();
 	return av_true;
 }

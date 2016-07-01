@@ -22,9 +22,11 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#include <fcntl.h>
 #if defined(__cplusplus)
 #include <map>
 #include <list>
+#include <queue>
 #endif
 
 #include <sys/types.h>
@@ -142,6 +144,10 @@ typedef unsigned long long int  av_u64, av_ulonglong;
 #define ConfMaxIoAlarmIn		1
 #endif
 
+#ifndef ConfMaxDecodeChn
+#define ConfMaxDecodeChn		32
+#endif
+
 #ifndef ConfMaxUser
 #define ConfMaxUser 10
 #endif
@@ -201,7 +207,7 @@ typedef struct{
 
 typedef void av_mutex;
 typedef void av_sem;
-
+typedef void av_cond;
 
 
 #if defined(WIN32)

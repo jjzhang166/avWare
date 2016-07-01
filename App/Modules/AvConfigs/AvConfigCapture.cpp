@@ -85,7 +85,7 @@ template<> void ProcessValue<ConfigCoverFormats>(CAvConfigBase &ConfBase, AvConf
 	
 	C_EncodeCaps EncodeCaps;
 	CAvDevice::GetCaptureCaps(index, EncodeCaps);
-	assert(EncodeCaps.MaxCover <= ConfMaxCover);
+	//assert(EncodeCaps.MaxCover <= ConfMaxCover);
 	for (int i = 0; i < ConfMaxCover; i++){
 		ConfBase.Process("Index", CoverTable[i], CoverFormats.CHLFormats[i].index, i, i, i);
 		ConfBase.Process("Enable", CoverTable[i], (int &)CoverFormats.CHLFormats[i].enable, (int)av_false, (int)av_false, (int)av_true);
@@ -173,4 +173,44 @@ template<> void ProcessValue<ConfigCaptureFormats>(CAvConfigBase &ConfBase, AvCo
 
 
 }
+#if 0
 
+union{
+	C_ProtoOnvifFormats OnvifFormats;
+	C_ProtoMoonFormats  MoonFormats;
+	C_ProtoRtmpFormats  RtmpFormats;
+	C_ProtoRtspFormats	RtspFormats;
+};
+#endif
+template<> void ProcessValue<ConfigProtoFormats>(CAvConfigBase &ConfBase, AvConfigValue &ConfValue, ConfigProtoFormats &ProtocolFormats, int index, int diff)
+{
+	AvConfigValue &ProtoTable = ConfValue["Formats"];
+	ConfBase.Process("IsEnable", ProtoTable, (int&)ProtocolFormats.IsEnable, (int)av_false, (int)av_false, (int)av_true);
+	ConfBase.Process("DigitalChannel", ProtoTable, ProtocolFormats.DigitalChannel, index, index, index);
+	ConfBase.Process("ShowWindowsId", ProtoTable, ProtocolFormats.ShowWindowsId, index, 0);
+	ConfBase.Process("ProtoMode", ProtoTable, (int &)ProtocolFormats.ProtoMode, (int)ProtocolMoon, (int)ProtocolOnvif, (int)ProtocolMoon);
+	ConfBase.Process("UsrName", ProtoTable, ProtocolFormats.UsrName, "");
+	ConfBase.Process("Passwd", ProtoTable, ProtocolFormats.Passwd, "");
+
+	switch (ProtocolFormats.ProtoMode)
+	{
+	case ProtocolOnvif:
+		ConfBase.Process("Url", ProtoTable, ProtocolFormats.OnvifFormats.Url, "");
+		break;
+	case ProtocolRtmp:
+		ConfBase.Process("MainUrl", ProtoTable, ProtocolFormats.RtmpFormats.MainUrl, "");
+		ConfBase.Process("SubUrl", ProtoTable, ProtocolFormats.RtmpFormats.SubUrl, "");
+		break;
+	case ProtocolRtsp:
+		ConfBase.Process("MainUrl", ProtoTable, ProtocolFormats.RtspFormats.MainUrl, "");
+		ConfBase.Process("SubUrl", ProtoTable, ProtocolFormats.RtspFormats.SubUrl, "");
+		break;
+	case ProtocolMoon:
+		ConfBase.Process("Url", ProtoTable, ProtocolFormats.MoonFormats.Url, "");
+		ConfBase.Process("Port", ProtoTable, ProtocolFormats.MoonFormats.Port, 0, 0);
+		break;
+	default:
+		break;
+	}
+
+}

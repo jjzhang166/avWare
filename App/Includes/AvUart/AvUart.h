@@ -17,7 +17,7 @@
 #include "Apis/AvWareType.h"
 #include "Apis/LibSystem.h"
 #include "AvConfigs/AvConfigDevice.h"
-#include "CObject.h"
+#include "CAvObject.h"
 
 
 typedef struct {
@@ -30,7 +30,7 @@ typedef struct {
 class CAvUart
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvUart)
+	SINGLETON_DECLARE(CAvUart)
 public:
 	av_bool Initialize();
 	av_bool Write(av_uchar index, av_buf &buf);

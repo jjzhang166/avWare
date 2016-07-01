@@ -18,16 +18,16 @@
 
 #include "AvPacket/AvPacket.h"
 #include "Apis/AvWareType.h"
-#include "CObject.h"
-class CAvExtInterFaceTest :public CObject
+#include "CAvObject.h"
+class CAvExtInterFaceTest :public CAvObject
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvExtInterFaceTest);
+	SINGLETON_DECLARE(CAvExtInterFaceTest);
 	
 	av_bool Start();
 	av_bool Stop();
 private:
-	av_void OnStream(av_uchar Channel, av_uchar Slave, CPacket &packet);
+	av_void OnStream(av_uchar Channel, av_uchar Slave, CAvPacket *AvPacket);
 
 private:
 	CAvExtInterFaceTest();

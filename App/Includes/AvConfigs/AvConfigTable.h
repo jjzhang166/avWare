@@ -19,8 +19,7 @@
 #include <string>
 #include <vector>
 #include "jsoncpp/json.h"
-
-#include"CObject.h"
+#include"CAvObject.h"
 #include "Apis/AvWareType.h"
 #include "AvThread/AvThread.h"
 
@@ -32,12 +31,12 @@ class AvConfigObserver
 	friend class CAvConfigBase;
 public:
 	//注意 为了把回调的结果取回来 这里第二个参数int是引用
-	typedef void (CObject::*CallBack)(void*, int&);
+	typedef void (CAvObject::*CallBack)(void *, int&);
 	AvConfigObserver() :m_pObj(NULL), m_cb(NULL){ };
 	
-	void Call(CObject *pObj , int arg){ (m_pObj->*m_cb)(pObj, arg); };
+	void Call(CAvObject *pObj , int arg){ (m_pObj->*m_cb)(pObj, arg); };
 
-	CObject * m_pObj;
+	CAvObject * m_pObj;
 	CallBack m_cb;
 };
 typedef AvConfigObserver::CallBack AvConfigCallBack;
@@ -82,7 +81,7 @@ enum AvConfigReqState{
 	CONF_REQ_APPLY_NOT_SAVE		= 0x1 << 3, //将参数设置到系统中但是不保存配置表
 };
 
-class CAvConfigBase : public CObject
+class CAvConfigBase : public CAvObject
 {
 public:
 	typedef enum teConfigValueStatus{
@@ -102,7 +101,7 @@ public:
 	inline void			set_valid(av_bool valid) { m_valid = valid; }
 
 	//参数与配置表数据之间的转换,包含参数有合法性检查和参数默认值定义
-	void				Process(AvConfigKey key, AvConfigValue &table, int		&val,			int			def,			int				min = -2147483648,	int				max = 2147483647	);
+	void				Process(AvConfigKey key, AvConfigValue &table, int		&val, int			def, int				min = -2147483647, int				max = 2147483647);
 	void				Process(AvConfigKey key, AvConfigValue &table, int		&val,			int			def,			std::list<int> ValidValueList);
 	void				Process(AvConfigKey key, AvConfigValue &table, bool		&val,			bool		def																						);
 	void				Process(AvConfigKey key, AvConfigValue &table, char		&val,			char		def,			char			min = -128,			char			max = 127			);
@@ -134,9 +133,9 @@ public:
 	virtual int			get_id(void) = 0;
 	virtual void		ProcessValue(AvConfigValue &val, int index) = 0;
 
-	virtual void		Attach(CObject *pObj, AvConfigCallBack cb) = 0;
-	virtual void		Detach(CObject *pObj, AvConfigCallBack cb) = 0;
-	virtual av_bool		IsAttached(CObject *pObj, AvConfigCallBack cb) = 0;
+	virtual void		Attach(CAvObject *pObj, AvConfigCallBack cb) = 0;
+	virtual void		Detach(CAvObject *pObj, AvConfigCallBack cb) = 0;
+	virtual av_bool		IsAttached(CAvObject *pObj, AvConfigCallBack cb) = 0;
 	virtual void		Notify(CAvConfigBase *pObj, int require) = 0;
 
 private:
@@ -200,7 +199,7 @@ public:
 		return Compare((compare*)&m_env_config[index], (compare*)&m_use_config[index]);
 	}
 
-	virtual void Attach(CObject *pObj, AvConfigCallBack cb)
+	virtual void  Attach(CAvObject *pObj, AvConfigCallBack cb)
 	{
 		m_mutex.Enter();
 		std::vector<AvConfigObserver>::iterator it;
@@ -215,9 +214,9 @@ public:
 		node.m_pObj = pObj;
 		m_observer.push_back(node);
 		m_mutex.Leave();	
-	}			
+	}
 
-	virtual void Detach(CObject *pObj, AvConfigCallBack cb)
+	virtual void Detach(CAvObject *pObj, AvConfigCallBack cb)
 	{
 		m_mutex.Enter();
 		std::vector<AvConfigObserver>::iterator it;
@@ -231,7 +230,7 @@ public:
 		m_mutex.Leave();	
 	}
 
-	virtual av_bool IsAttached(CObject *pObj, AvConfigCallBack cb)
+	virtual av_bool IsAttached(CAvObject *pObj, AvConfigCallBack cb)
 	{
 		av_bool ret = av_false;
 		m_mutex.Enter();

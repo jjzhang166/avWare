@@ -35,6 +35,8 @@ av_bool CAvCapture::Initialize(av_char Channel)
 	AvCaptureGetCaps(m_Channel, &m_EncodeCaps);
 	AvCaptureInCaps(m_Channel, &m_CaptureInCaps);
 
+
+#if 0
 	{
 		m_ConfigCapture.Update(m_Channel);
 		m_ConfigCapture.Attach(this, (AvConfigCallBack)&CAvCapture::OnConfigCaptureModify);
@@ -51,6 +53,7 @@ av_bool CAvCapture::Initialize(av_char Channel)
 		m_ConfigWaterMark.Update(m_Channel);
 		m_ConfigWaterMark.Attach(this, (AvConfigCallBack)&CAvCapture::OnConfigCoverModify);
 	}
+#endif
 	StartEnv();
 	StartConf();
 

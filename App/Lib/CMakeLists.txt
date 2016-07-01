@@ -15,40 +15,40 @@ add_library(MemPool STATIC ${MemPoolSRC_LIST} ${MemPoolINC_LIST})
 
 include_directories(Onvif)
 
-include_directories(NormTools)
+include_directories(Common)
 
-set (NormToolsSRC_JSONCPP_LIST
-		NormTools/JsonCppSrc/json_tool.h
-		NormTools/JsonCppSrc/json_reader.cpp
-		NormTools/JsonCppSrc/json_valueiterator.inl
-		NormTools/JsonCppSrc/json_value.cpp
-		NormTools/JsonCppSrc/json_writer.cpp
-		NormTools/JsonCppSrc/version.h.in
+set (CommonSRC_JSONCPP_LIST
+		Common/JsonCppSrc/json_tool.h
+		Common/JsonCppSrc/json_reader.cpp
+		Common/JsonCppSrc/json_valueiterator.inl
+		Common/JsonCppSrc/json_value.cpp
+		Common/JsonCppSrc/json_writer.cpp
+		Common/JsonCppSrc/version.h.in
 )
-set(NormToolsINC_JSONCPP_LIST
-		NormTools/jsoncpp/json.h
-		NormTools/jsoncpp/autolink.h
-		NormTools/jsoncpp/value.h
-		NormTools/jsoncpp/reader.h
-		NormTools/jsoncpp/writer.h
-		NormTools/jsoncpp/features.h
-		NormTools/jsoncpp/version.h
-		NormTools/jsoncpp/config.h
+set(CommonINC_JSONCPP_LIST
+		Common/jsoncpp/json.h
+		Common/jsoncpp/autolink.h
+		Common/jsoncpp/value.h
+		Common/jsoncpp/reader.h
+		Common/jsoncpp/writer.h
+		Common/jsoncpp/features.h
+		Common/jsoncpp/version.h
+		Common/jsoncpp/config.h
 	)
 
-set(NormToolsSRC_LIST 
-		NormTools/base64.cpp
-		NormTools/md5.cpp
-		${NormToolsSRC_JSONCPP_LIST}
+set(CommonSRC_LIST 
+		Common/base64.cpp
+		Common/md5.cpp
+		${CommonSRC_JSONCPP_LIST}
 	)
 	
-set(NormToolsINC_LIST 
-		NormTools/base64.h
-		NormTools/md5.h
-		${NormToolsINC_JSONCPP_LIST}
+set(CommonINC_LIST 
+		Common/base64.h
+		Common/md5.h
+		${CommonINC_JSONCPP_LIST}
 	)
 	
-add_library(NormTools STATIC ${NormToolsSRC_LIST} ${NormToolsINC_LIST})
+add_library(LibCommon STATIC ${CommonSRC_LIST} ${CommonINC_LIST})
 
 include_directories(Smtp)
 set(SmtpSRC_LIST 
@@ -132,7 +132,7 @@ add_library(LibFtp STATIC ${FtpSRC_LIST} ${FtpINC_LIST})
 
 include_directories(Rtsp)
 
-
+include_directories(Rtmp)
 
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../)

@@ -15,7 +15,7 @@
 #include "AvUser/AvUser.h"
 
 
-PATTERN_SINGLETON_IMPLEMENT(CAvUser);
+SINGLETON_IMPLEMENT(CAvUser);
 
 CAvUser::CAvUser()
 {

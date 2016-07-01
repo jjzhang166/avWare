@@ -13,7 +13,7 @@
 |  หตร๗:
 ******************************************************************/
 #include "AvNetService/AvRtsp.h"
-#include "AvCapture/AvCapture.h"
+#include "AvCapture/AvManCapture.h"
 CAvRtspServerMedia::CAvRtspServerMedia()
 {
 
@@ -24,22 +24,21 @@ CAvRtspServerMedia::~CAvRtspServerMedia()
 
 bool CAvRtspServerMedia::StartMedia()
 {
-	CAvCapture *pAvCapture = g_MCapture.GetAvCaptureInstance(0);
-	pAvCapture->StreamStart(CHL_MAIN_T, this, (CAvCapture::OnStreamSigNalFunc)&CAvRtspServerMedia::OnStream);
+	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(0);
+	pCapture->Start(CHL_MAIN_T, this, (Capture::SIG_PROC_ONDATA)&CAvRtspServerMedia::OnStream);
 	return true;
 }
 bool CAvRtspServerMedia::StopMedia()
 {
-	CAvCapture *pAvCapture = g_MCapture.GetAvCaptureInstance(0);
-	pAvCapture->StreamStop(CHL_MAIN_T, this, (CAvCapture::OnStreamSigNalFunc)&CAvRtspServerMedia::OnStream);
-
+	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(0);
+	pCapture->Stop(CHL_MAIN_T, this, (Capture::SIG_PROC_ONDATA)&CAvRtspServerMedia::OnStream);
 	return true;
 }
 
 
-av_void CAvRtspServerMedia::OnStream(av_uchar Channel, av_uchar Slave, CPacket &packet)
+av_void CAvRtspServerMedia::OnStream(av_int Channel, av_int Slave, CAvPacket *AvPacket)
 {
-	switch (packet.GetCompFormat())
+	switch (AvPacket->Comp())
 	{
 	case AvComp_AAC:
 		break;
@@ -48,10 +47,10 @@ av_void CAvRtspServerMedia::OnStream(av_uchar Channel, av_uchar Slave, CPacket &
 	case AvComp_MJPEG:
 		break;
 	case AvComp_H265:
-		PushVideoStreamFrame(CRtspMedia::RTSP_MEDIA_ENCODEC_H265, packet.GetRawData(), packet.GetRawDataLen());
+		PushVideoStreamFrame(CRtspMedia::RTSP_MEDIA_ENCODEC_H265, (const char *)AvPacket->GetRawBuffer(), AvPacket->GetRawLength());
 		break;
 	case AvComp_H264:
-		PushVideoStreamFrame(CRtspMedia::RTSP_MEDIA_ENCODEC_H264, packet.GetRawData(), packet.GetRawDataLen());
+		PushVideoStreamFrame(CRtspMedia::RTSP_MEDIA_ENCODEC_H264, (const char *)AvPacket->GetRawBuffer(), AvPacket->GetRawLength());
 		break;
 	default:
 		break;
@@ -61,7 +60,7 @@ av_void CAvRtspServerMedia::OnStream(av_uchar Channel, av_uchar Slave, CPacket &
 
 
 
-PATTERN_SINGLETON_IMPLEMENT(CAvRtspServer)
+SINGLETON_IMPLEMENT(CAvRtspServer)
 
 CAvRtspServer::CAvRtspServer()
 {

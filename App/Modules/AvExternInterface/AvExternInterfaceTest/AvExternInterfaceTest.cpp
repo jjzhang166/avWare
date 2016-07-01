@@ -13,15 +13,14 @@
 |  หตร๗:
 ******************************************************************/
 #include "AvExternInterfaceTest.h"
-#include "AvCapture/AvCapture.h"
-PATTERN_SINGLETON_IMPLEMENT(CAvExtInterFaceTest)
+#include "AvCapture/AvManCapture.h"
+SINGLETON_IMPLEMENT(CAvExtInterFaceTest)
 
 
 av_bool CAvExtInterFaceTest::Start()
 {
-	CAvCapture *pAvCapture = g_MCapture.GetAvCaptureInstance(0);
-	pAvCapture->StreamStart(1, this, (CAvCapture::OnStreamSigNalFunc)&CAvExtInterFaceTest::OnStream);
-	pAvCapture->StreamStart(0, this, (CAvCapture::OnStreamSigNalFunc)&CAvExtInterFaceTest::OnStream);
+	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(0);
+	pCapture->Start(CHL_MAIN_T, this, (Capture::SIG_PROC_ONDATA)&CAvExtInterFaceTest::OnStream);
 	return av_true;
 }
 av_bool CAvExtInterFaceTest::Stop()
@@ -29,13 +28,21 @@ av_bool CAvExtInterFaceTest::Stop()
 	return av_true;
 }
 
-av_void CAvExtInterFaceTest::OnStream(av_uchar Channel, av_uchar Slave, CPacket &packet)
+av_void CAvExtInterFaceTest::OnStream(av_uchar Channel, av_uchar Slave, CAvPacket *AvPacket)
 {
 	av_msg("CAvExtInterFaceTest::OnStream have data %d %d\n", Channel, Slave);
-	if (0 && packet.GetSlave() == CHL_MAIN_T){
+	if (0 && AvPacket->Slave() == CHL_MAIN_T){
+		static int cnt = 0;
+		cnt++;
+		if (cnt < 200) return;
 		static FILE *fp = NULL;
-		if (fp == NULL) fp = fopen("avExtinterText.h264", "wb");
-		fwrite(packet.GetRawData(), packet.GetRawDataLen(), 1, fp);
+		if (fp == NULL) fp = fopen("/tmp/avExtinterText.h264", "wb");
+		fwrite(AvPacket->GetRawBuffer(), AvPacket->GetRawLength(), 1, fp);
+
+		if (cnt > 500){
+			fclose(fp);
+			av_error("avExtinterText write over\n");
+		}
 	}
 
 

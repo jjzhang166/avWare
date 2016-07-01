@@ -31,7 +31,7 @@
 class CAvAlarm:public CThread
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvAlarm);
+	SINGLETON_DECLARE(CAvAlarm);
 private:
 	CAvAlarm();
 	~CAvAlarm();
@@ -99,8 +99,8 @@ public:
 	typedef TSignal1<AlmMsg &>::SigProc OnAvAlarmSigNalFunc;
 	av_bool Initialize();
 
-	av_bool Start(CObject *obj, OnAvAlarmSigNalFunc proc);
-	av_bool Stop(CObject *obj, OnAvAlarmSigNalFunc proc);
+	av_bool Start(CAvObject *obj, OnAvAlarmSigNalFunc proc);
+	av_bool Stop(CAvObject *obj, OnAvAlarmSigNalFunc proc);
 
 private:
 	av_void ThreadProc();

@@ -49,7 +49,7 @@ public:
 	}
 };
 
-PATTERN_SINGLETON_IMPLEMENT(CAvConfigManager);
+SINGLETON_IMPLEMENT(CAvConfigManager);
 
 CMutex CAvConfigManager::m_mutex;
 
@@ -117,6 +117,10 @@ void CAvConfigManager::Initialize()
 
 	m_name_configIndex.insert(ConfIndexValueType("NetComm", CONF_NET_COMM));
 	LoadConfig("NetComm", m_ConfigNetComm);
+
+	m_name_configIndex.insert(ConfIndexValueType("NetProtocol", CONF_NETPROTOCOL));
+	LoadConfig("NetProtocol", m_ConfigNetProtocol);
+
 
 	//User Manager
 	m_name_configIndex.insert(ConfIndexValueType("UserManager", CONF_USER_MANAGER));

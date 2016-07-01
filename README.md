@@ -1,39 +1,31 @@
-﻿#AvWare
+﻿#深圳市恩港科技开发有限公司
+avWare 是深圳市恩港科技开发有限公司，推出的一套开源代码，主要用途是音视频采集、
+转发、解码、存储于一体的跨平台(海思，安霸，WINDOWS，LINUX)软件。应用背景： 开
+源应用安霸方案20倍 200万 宽动态日夜型网络高清机芯GR-CN2020U-A2W 开源应用安霸方
+案20倍 200万 星光级宽动态日夜型网络高清机芯GR-CN2020U-A2WS <br/>
 
-vs2013 及linux HISI 下都可以使用cmake 来创建工程文件。
-
-cmake 版本最好是最新版本的。
-
-vs2013要安装pthread相关库及头文件。
-
-#2016年4月21日9:42:44
-同步更新LINUX
-LINUX X86上编译请先参照 Doc/linux_env.txt 文件，将系统所需库安装完整
+详细见公司网站:www.graceport.cn
 
 
-cmake -DCMAKE_BUILD_TYPE=Debug(或Release)
-cmake -DCMAKE_BUILD_TYPE=Release ../
+#面向对象
+* 即将进入本行业的开发者
+* 在校学生，想了解学习流媒体相关
+* 公司想引入此方面的技术
 
-默认rellease 版本
 
+#系统结构图
+![输入图片说明](git@git.oschina.net:GracePort/avWare.git/Documents/system.jpg "在这里输入图片标题")
 
-build:
-
-在top 目录下 
-
-mkdir ProjectHisi;
-
-cd ProjectHisi
-
-cmake ../
-
-make -j4
-
-#2016年3月7日18:25:23
-windwos 及 linux都可以读取 cam 及 screen 的数据。。然后进行H264编码。
-windows下编码支持 intel编码。及ffmpeg 编码。。
-linux只支持ffmpeg 软编码。
+#运行环境
+* 海思IPC芯片 [H3518E,H3518C,H3518A,H3616C,H3516A,H3516D]
+* 海思NVR芯片	[H3520D, H3535, H3536]
+* Windows 平台[Windows 7 及其以上版本]
+* Linux 平台  [理论上可以在任何linux平台运行，但由于avWare需要依赖些库文件，因此最好在ubuntu上进行开发，目前我们使用的是linuxmint-17.3-cinnamon-32bit.iso、Ubuntu14.04同时也推荐您使用linuxmint系统，以方便我们提供支持]
 
 
 
-
+#联系方式
+公司网站：	http://www.graceport.cn/
+源码网站：	http://git.oschina.net/GracePort/avWare
+邮箱：		zhousheng@graceport.cn
+电话：		15012490142

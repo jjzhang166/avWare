@@ -14,84 +14,40 @@
 ******************************************************************/
 #ifndef _AVCAPTURE_H_
 #define _AVCAPTURE_H_
-#include <map>
 #include "AvPacket/AvPacket.h"
 #include "Apis/AvWareType.h"
-#include "Apis/LibEncode.h"
-#include "CObject.h"
 #include "Signals.h"
-#include "AvConfigs/AvConfigCapture.h"
+#include "CAvObject.h"
 
 
-class CAvCapture:public CThread
+class Capture:public CThread
 {
 public:
+	Capture() { };
+	virtual ~Capture(){};
 
-	CAvCapture();
-	~CAvCapture();
-	av_bool Initialize(av_char Channel);
-
-	av_bool CaptureCreate();
-	av_bool CaptureDestroy();
-
-	av_bool CaptureStart(av_uchar Slave);
-	av_bool CaptureStop(av_uchar Slave);
-	
-	
-	av_bool CaptureGetDspInfo();
-	av_bool CaptureGetCaps();
-	av_u32  CaptureGetChanannels();
-	
-	//以下用于码流分发管理
 public:
-	typedef TSignal3<av_uchar, av_uchar, CPacket &>::SigProc OnStreamSigNalFunc;
-	av_bool StreamStart(av_uchar Slave, CObject *obj, OnStreamSigNalFunc proc);
-	av_bool StreamStop(av_uchar Slave, CObject *obj, OnStreamSigNalFunc proc);
-private:
-	TSignal3<av_uchar, av_uchar, CPacket &> m_StreamSignal[CHL_NR_T];
+	typedef TSignal3 <av_int, av_int, CAvPacket *>::SigProc SIG_PROC_ONDATA;
+	virtual av_bool Initialize(av_int Channel) = 0;
+	virtual av_bool Start(av_int Slave) = 0;
+	virtual av_bool Stop(av_int Slave) = 0;
 
-private:
-	av_bool StartEnv();
-	av_bool StartConf(av_bool loadDefault = av_false);
-	av_void OnConfigEncodeModify(CAvConfigEncode *ConfigEncode, int &result);
-	av_void OnConfigImageModify(CAvConfigImage *ConfigImage, int &result);
-	av_void OnConfigCoverModify(CAvConfigCover *ConfigCover, int &result);
-	av_void OnConfigWaterMarkingModify(CAvConfigWaterMarking *ConfigWaterMarking, int &result);
-	av_void OnConfigCaptureModify(CAvConfigCapture *ConfigCapture, int &result);
-private:
-	void ThreadProc();
+	virtual av_bool Start(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnData) = 0;
+	virtual av_bool Stop(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnData) = 0;
 
+	virtual av_bool SetProfile(av_int Slave, C_EncodeFormats &Formats) = 0;
+	virtual av_bool GetProfile(av_int Slave, C_EncodeFormats &Fromats) = 0;
+	virtual av_bool GetCaps(C_EncodeCaps &Caps) = 0;
 
+	virtual av_bool SetTime(av_timeval &atv) = 0;
+	virtual av_bool SetIFrame(av_int Slave = CHL_MAIN_T) = 0;
 private:
-	C_EncodeCaps			 m_EncodeCaps;
-	C_CaptureInCaps			 m_CaptureInCaps;
-	av_uchar				 m_Channel;
-	E_CaptureSynchronizeStat m_LastCaptureSyncStat;
 
-	CAvConfigEncode			m_ConfigEncode;
-	CAvConfigImage			m_ConfigImage;
-	CAvConfigCover			m_ConfigCover;
-	CAvConfigWaterMarking	m_ConfigWaterMark;
-	CAvConfigCapture		m_ConfigCapture;
 };
 
-class CMCapture
-{
-public:
-	PATTERN_SINGLETON_DECLARE(CMCapture);
-private:
-	CMCapture();
-	~CMCapture();
-public:
-	av_bool Initialize();
-	CAvCapture *GetAvCaptureInstance(av_uchar iChannel);
 
-private:
-	std::map <av_uchar, CAvCapture *>  m_MCaptureMap;
-	av_uchar m_MaxCaptureChannels;
-};
 
-#define g_MCapture (*CMCapture::instance())
+
 
 #endif
 

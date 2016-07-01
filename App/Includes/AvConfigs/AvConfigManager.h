@@ -28,10 +28,10 @@ class CTimer;
 
 std::string getString(const AvConfigValue &val);
 
-class CAvConfigManager : public CObject
+class CAvConfigManager : public CAvObject
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvConfigManager);
+	SINGLETON_DECLARE(CAvConfigManager);
 	CAvConfigManager();
 	virtual ~CAvConfigManager();
 	void Initialize();
@@ -66,6 +66,7 @@ private:
 	CAvConfigAlarmIo			m_ConfigAlarmIo;
 	CAvConfigAlarmMd			m_ConfigAlarmMd;
 	CAvConfigNetComm			m_ConfigNetComm;
+	CAvConfigProtocol			m_ConfigNetProtocol;
 	CAvConfigImage				m_ConfigImage;
 
 	CAvConfigCapture			m_ConfigCapture;

@@ -38,6 +38,8 @@ typedef enum _AvConfigIndex{
 
 	CONF_ALARM_IO				= 400,
 	CONF_ALARM_MD				= 401,
+
+	CONF_NETPROTOCOL			= 501
 }AvConfigIndex;
 
 #endif //AVWARE_AVCONFIG_CONFIGINDEX_H_

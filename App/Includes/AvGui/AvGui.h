@@ -17,14 +17,13 @@
 
 #include "Apis/AvWareType.h"
 #include "Apis/LibSystem.h"
-#include "CObject.h"
-
+#include "CAvObject.h"
 
 
 class CAvGui
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvGui);
+	SINGLETON_DECLARE(CAvGui);
 	CAvGui();
 	av_bool Initialize();
 	av_bool exec();

@@ -13,13 +13,13 @@
 |  หตร๗:
 ******************************************************************/
 #include "Apis/AvWareType.h"
-#include "CObject.h"
+#include "CAvObject.h"
 #include "WebService/LibWebService.h"
 
 class CAvWebSer:public CWebService
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvWebSer);
+	SINGLETON_DECLARE(CAvWebSer);
 	av_bool Start();
 	av_bool Stop();
 

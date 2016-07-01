@@ -13,7 +13,7 @@
 |  หตร๗:
 ******************************************************************/
 #include "AvMemoryPool/AvMemoryPool.h"
-PATTERN_SINGLETON_IMPLEMENT(CAvMemoryPool)
+SINGLETON_IMPLEMENT(CAvMemoryPool)
 
 #define SYNC_MEM 0x98763
 #define AssertMem(head) assert (head->sync == SYNC_MEM)

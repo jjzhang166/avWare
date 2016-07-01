@@ -15,7 +15,7 @@
 #ifndef _AVTIMER_H_
 #define _AVTIMER_H_
 #include "Apis/AvWareType.h"
-#include "CObject.h"
+#include "CAvObject.h"
 #include "AvThread/AvThread.h"
 #include "AvThread/AvThreadPool.h"
 
@@ -64,7 +64,7 @@ private:
 class CTimerManage :public CThread
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CTimerManage);
+	SINGLETON_DECLARE(CTimerManage);
 private:
 	~CTimerManage();
 	CTimerManage();
@@ -82,7 +82,7 @@ private:
 	CMutex m_MutexList;
 };
 
-#define g_TimerManager (*CTimerManage::instance())
+#define g_AvTimerManager (*CTimerManage::instance())
 
 
 #endif

@@ -21,7 +21,7 @@
 class CAvDdnsCli : public CTimer
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvDdnsCli);
+	SINGLETON_DECLARE(CAvDdnsCli);
 private:
 	CAvDdnsCli();
 	virtual ~CAvDdnsCli();

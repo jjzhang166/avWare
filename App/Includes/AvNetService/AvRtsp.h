@@ -15,7 +15,7 @@
 #ifndef _AV_RTSP_H_
 #define _AV_RTSP_H_
 #include "Apis/AvWareType.h"
-#include "CObject.h"
+#include "CAvObject.h"
 #include "Rtsp/LibRtspServer.h"
 #include "AvPacket/AvPacket.h"
 
@@ -31,13 +31,13 @@ public:
 
 
 private:
-	av_void OnStream(av_uchar Channel, av_uchar Slave, CPacket &packet);
+	av_void OnStream(av_int Channel, av_int Slave, CAvPacket *AvPacket);
 };
 
 class CAvRtspServer:public CRtspServer
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvRtspServer)
+	SINGLETON_DECLARE(CAvRtspServer)
 	CAvRtspServer();
 	~CAvRtspServer();
 	av_bool Start(int ServicePort = 554);

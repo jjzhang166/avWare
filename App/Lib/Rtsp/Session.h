@@ -37,7 +37,7 @@ typedef enum {
 
 
 
-class CRtspSession:public CObject
+class CRtspSession:public CAvObject
 {
 
 public:
@@ -68,8 +68,8 @@ private:
 class CRtspSessionSer :public CRtspSession
 {
 public:
-	typedef CRtspMedia *(CObject::*COBJCREATEMEDIAPROC)(std::string url);
-	typedef bool(CObject::*COBJDESTORYMEDIAPROC)(CRtspMedia *media);
+	typedef CRtspMedia *(CAvObject::*COBJCREATEMEDIAPROC)(std::string url);
+	typedef bool(CAvObject::*COBJDESTORYMEDIAPROC)(CRtspMedia *media);
 
 	typedef CRtspMedia *(*CREATEMEDIAPROC)(std::string url);
 	typedef bool(*DESTORYMEDIAPROC)(CRtspMedia *media);
@@ -88,8 +88,8 @@ public:
 
 	int OnData(char *buffer, int buflen);
 public:
-	bool SetCreateMediaProc(COBJCREATEMEDIAPROC proc, CObject *obj);
-	bool SetDestoryMediaProc(COBJDESTORYMEDIAPROC proc, CObject *obj);
+	bool SetCreateMediaProc(COBJCREATEMEDIAPROC proc, CAvObject *obj);
+	bool SetDestoryMediaProc(COBJDESTORYMEDIAPROC proc, CAvObject *obj);
 
 	bool SetCreateMediaProc(CREATEMEDIAPROC proc);
 	bool SetDestoryMediaProc(DESTORYMEDIAPROC proc);
@@ -118,8 +118,8 @@ private:
 	CRtspMedia   *m_Media;
 	static int			 m_RtpPortPool;
 
-	static CObject		 *m_CreateMediaObj;
-	static CObject		 *m_DestoryMediaObj;
+	static CAvObject		 *m_CreateMediaObj;
+	static CAvObject		 *m_DestoryMediaObj;
 
 	static COBJCREATEMEDIAPROC  m_CreateMediaProc;
 	static COBJDESTORYMEDIAPROC m_DestoryMediaProc;

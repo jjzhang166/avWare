@@ -18,18 +18,18 @@
 
 
 #include "Apis/AvWareType.h"
-#include "CObject.h"
+#include "CAvObject.h"
 #include "ProtoHeader/Proto.h"
 #include "AvPacket/AvPacket.h"
 #include "AvCapture/AvNetCapture.h"
 
-class CStream :public CObject
+class CStream :public CAvObject
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CStream);
+	SINGLETON_DECLARE(CStream);
 	CStream();
 	~CStream();
-	int OnVideoData(av_uchar Channel, av_uchar Slave, CPacket &packet);
+	int OnVideoData(av_uchar Channel, av_uchar Slave, CAvPacket *packet);
 
 private:
 	int m_VideoCount[PROTO_MAX_CHANNEL][Proto_MAX_SLAVE];
@@ -37,10 +37,10 @@ private:
 #define g_LocalStream (*CStream::instance())
 
 
-class CAvMoon :public CProtoMoon, public CAvNetCapture
+class CAvMoon :public CProtoMoon
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvMoon);
+	SINGLETON_DECLARE(CAvMoon);
 
 public:
 	int StartMoon();
@@ -48,6 +48,7 @@ public:
 
 	//next for client
 public:
+#if 0
 	av_bool Connect(C_ConnectArgs &ConArgs);
 	av_bool DisConnect();
 	av_bool StartRemoteStream(av_ushort Channel, av_uchar Slave);
@@ -58,7 +59,7 @@ public:
 	//以下两个函数需要走搜索 相关接口。
 	av_bool SearchDevice(std::list<C_DeviceList> &DeviceList);
 	av_bool SetNetParam(C_NetParam &NetParam);
-
+#endif
 private:
 	int OnRemoteGetDeviceCaps(C_DeviceCaps &DeviceCaps, int status);
 	int OnRemoteGetDeviceStatus(C_DevStatusInfo &DevStatusInfo, int status);

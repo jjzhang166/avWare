@@ -23,11 +23,11 @@
 #include "Apis/LibLocalAlm.h"
 #include "AvAlarm/AvAlarm.h"
 
-class CAvAlmLocal:public CThread
+class CAvAlmLocal :public CThread
 {
 
 public:
-	PATTERN_SINGLETON_DECLARE(CAvAlmLocal);
+	SINGLETON_DECLARE(CAvAlmLocal);
 	av_bool Initialize();
 	av_bool AlarmOutCtrl(av_bool bOpen = av_true);
 private:

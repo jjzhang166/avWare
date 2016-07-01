@@ -79,11 +79,20 @@ template<> void ProcessValue<ConfigNetComm>(CAvConfigBase &av_conf, AvConfigValu
 
 	C_NetCommCaps NetCommCaps;
 	CAvDevice::GetNetCommCaps(NetCommCaps);
+
+	E_NetComm_Mode MaxGetMode = NetCommGetMode_NR;
+	E_NetComm_Mode MinGetMode = NetCommGetMode_MANUAL;
+
+	av_findMaxMask(MaxGetMode, NetCommCaps.NetCommGetModeMask[index], E_NetComm_Mode);
+	av_findMinMask(MinGetMode, NetCommCaps.NetCommGetModeMask[index], E_NetComm_Mode);
+
 	if (AvMask(index) & NetCommCaps.NetCommMask){
 		av_conf.Process("Support", val, (int &)config.Support, (int)av_true, (int)av_true, (int)av_true);
+		av_conf.Process("GetMode", val, (int &)config.GetMode, (int)MinGetMode, (int)MinGetMode, (int)MaxGetMode);
 	}
 	else{
 		av_conf.Process("Support", val, (int &)config.Support, (int)av_false, (int)av_false, (int)av_false);
+		av_conf.Process("GetMode", val, (int &)config.GetMode, (int)NetCommGetMode_NR, (int)NetCommGetMode_NR, (int)NetCommGetMode_NR);
 	}
 	AvConfigValue &Attribute = val["Attribute"];
 	switch (index)

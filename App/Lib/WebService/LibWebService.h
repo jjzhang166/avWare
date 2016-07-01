@@ -27,7 +27,7 @@
 #include <unistd.h>
 #endif
 #include "WebHttpTask.h"
-#include "CObject.h"
+#include "CAvObject.h"
 
 #define DefWebServicePort 80
 #define DefWebServiceRooDir "./webroot"
@@ -35,7 +35,7 @@
 
 
 
-class CWebService:public CObject
+class CWebService:public CAvObject
 {
 public:
 	CWebService();

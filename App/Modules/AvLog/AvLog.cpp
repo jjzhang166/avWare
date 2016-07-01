@@ -15,7 +15,7 @@
 #include "AvLog/AvLog.h"
 #include "Apis/LibSystem.h"
 
-PATTERN_SINGLETON_IMPLEMENT(CAvLog)
+SINGLETON_IMPLEMENT(CAvLog)
 
 #pragma pack(push)
 #pragma pack(4)

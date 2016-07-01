@@ -16,13 +16,13 @@
 #define _AVAUDIO_H_
 #include "Apis/AvWareType.h"
 #include "AvThread/AvThread.h"
-#include "CObject.h"
+#include "CAvObject.h"
 #include "Signals.h"
 
 class CAudioPlay
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAudioPlay);
+	SINGLETON_DECLARE(CAudioPlay);
 private:
 	CAudioPlay();
 	~CAudioPlay();
@@ -43,7 +43,7 @@ private:
 class CAudioCapture:public CThread
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAudioCapture);
+	SINGLETON_DECLARE(CAudioCapture);
 private:
 	CAudioCapture();
 	~CAudioCapture();
@@ -61,8 +61,8 @@ public:
 
 public:
 	typedef TSignal3<av_uchar, av_uchar, av_buf &>::SigProc OnStreamSigNalFunc;
-	av_bool StreamStart(av_uchar Slave, CObject *obj, OnStreamSigNalFunc proc);
-	av_bool StreamStop(av_uchar Slave, CObject *obj, OnStreamSigNalFunc proc);
+	av_bool StreamStart(av_uchar Slave, CAvObject *obj, OnStreamSigNalFunc proc);
+	av_bool StreamStop(av_uchar Slave, CAvObject *obj, OnStreamSigNalFunc proc);
 private:
 	TSignal3<av_uchar, av_uchar, av_buf &> m_StreamSignal;
 

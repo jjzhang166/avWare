@@ -13,13 +13,14 @@
 |  หตร๗:
 ******************************************************************/
 #include <cstdio>
+
 #include "AvPacket/AvPacket.h"
 #include "Apis/AvWareType.h"
 #include "Apis/LibEncode.h"
 #include "AvDevice/AvDevice.h"
 #include "AvWatchDog/AvWatchDog.h"
 #include "AvGui/AvGui.h"
-#include "AvCapture/AvCapture.h"
+#include "AvCapture/AvManCapture.h"
 #include "AvNetService/AvNetService.h"
 #include "Apis/LibSystem.h"
 #include "AvDecode/AvDecode.h"
@@ -39,6 +40,7 @@
 #include "AvNetService/AvDdns.h"
 #include "AvNetService/AvFtp.h"
 #include "AvConfigs/AvConfigManager.h"
+#include "AvRecord/AvRecord.h"
 
 
 
@@ -61,13 +63,14 @@ int main(int argc, char *argv[])
 	g_AvConfigManager.Initialize();
 	g_AvDevice.Initialize();
 	g_AvMemoryPool.Initialize();
-	g_TimerManager.Initialize();
+	g_AvTimerManager.Initialize();
+	g_AvPacketManager.Initialize();
 	g_AvGui.Initialize();
 	g_AvLog.Initialize();
-	//g_AvWatchDog.Initialize();
 	g_AvUart.Initialize();
 	g_AvDecode.Initialize();
-	g_MCapture.Initialize();
+	g_AvManCapture.Initialize();
+	g_AvRecord.Initialize();
 	g_AvAudioCapture.Initialize();
 	g_AvAlarm.Initialize();
 	g_AvNetService.Initialize();
@@ -77,7 +80,6 @@ int main(int argc, char *argv[])
 	g_AvThreadPool.Dump();
 	
 	g_AvGui.exec();
-
 	while (1) av_msleep(1000);
 
 	return 0;

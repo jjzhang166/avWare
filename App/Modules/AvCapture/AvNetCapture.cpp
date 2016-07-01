@@ -13,15 +13,93 @@
 |  หตร๗:
 ******************************************************************/
 #include "AvCapture/AvNetCapture.h"
-
+#include "AvConfigs/AvConfigCapture.h"
 CAvNetCapture::CAvNetCapture()
 {
-
+	m_ProtoHandle = NULL;
+	m_Channel = 0;
 }
 CAvNetCapture::~CAvNetCapture()
 {
 
 }
+
+av_bool CAvNetCapture::Initialize(av_int Channel)
+{
+	m_Channel = Channel;
+	return av_true;
+}
+av_bool CAvNetCapture::Start(av_int Slave)
+{
+	
+	return av_true;
+}
+av_bool CAvNetCapture::Stop(av_int Slave)
+{
+	return av_true;
+}
+
+av_bool CAvNetCapture::Start(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnData)
+{
+	int ret = 0;
+	ret = m_StreamSignal[Slave].Attach(obj, pOnData);
+	if (ret < 0) {
+		return av_false;
+	}
+	else{
+		return SetIFrame(Slave);
+	}
+}
+av_bool CAvNetCapture::Stop(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnData)
+{
+	int ret = 0;
+	ret = m_StreamSignal[Slave].Detach(obj, pOnData);
+	if (ret < 0) {
+		return av_false;
+	}
+	else{
+		return av_true;
+	}
+}
+
+av_bool CAvNetCapture::SetProfile(av_int Slave, C_EncodeFormats &Formats)
+{
+	return av_true;
+}
+av_bool CAvNetCapture::GetProfile(av_int Slave, C_EncodeFormats &Fromats)
+{
+	return av_true;
+}
+av_bool CAvNetCapture::GetCaps(C_EncodeCaps &Caps)
+{
+	return av_true;
+}
+
+av_bool CAvNetCapture::SetTime(av_timeval &atv)
+{
+	return av_true;
+}
+av_bool CAvNetCapture::SetIFrame(av_int Slave)
+{
+	return av_true;
+}
+
+av_bool CAvNetCapture::LoadConfigs()
+{
+	CAvConfigProtocol NetProtocol;
+	NetProtocol.Update();
+	ConfigProtoFormats &Formats = NetProtocol.GetConfig(m_Channel);
+	
+
+	return av_true;
+}
+
+void CAvNetCapture::ThreadProc()
+{
+
+}
+
+#if 0
 av_bool CAvNetCapture::StreamData(av_u16 Channel, av_uchar Slave, CPacket &Packet)
 {
 	CGuard m(m_MediaMutex);
@@ -45,7 +123,7 @@ av_bool CAvNetCapture::AlarmMsg(CAvAlarm::AlmMsg &Msg)
 	return av_true;
 }
 
-av_bool CAvNetCapture::StreamStart(av_uchar Slave, CObject *obj, OnStreamSigNalFunc proc)
+av_bool CAvNetCapture::StreamStart(av_uchar Slave, CAvObject *obj, OnStreamSigNalFunc proc)
 {
 	int ret = 0;
 	ret = m_StreamSignal[Slave].Attach(obj, proc);
@@ -56,7 +134,7 @@ av_bool CAvNetCapture::StreamStart(av_uchar Slave, CObject *obj, OnStreamSigNalF
 		return av_true;
 	}
 }
-av_bool CAvNetCapture::StreamStop(av_uchar Slave, CObject *obj, OnStreamSigNalFunc proc)
+av_bool CAvNetCapture::StreamStop(av_uchar Slave, CAvObject *obj, OnStreamSigNalFunc proc)
 {
 	int ret = 0;
 	ret = m_StreamSignal[Slave].Detach(obj, proc);
@@ -67,3 +145,4 @@ av_bool CAvNetCapture::StreamStop(av_uchar Slave, CObject *obj, OnStreamSigNalFu
 		return av_true;
 	}
 }
+#endif

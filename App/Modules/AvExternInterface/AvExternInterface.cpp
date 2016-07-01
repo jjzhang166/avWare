@@ -16,7 +16,7 @@
 #include "AvExternInterfaceTest/AvExternInterfaceTest.h"
 #include "AvMoon/AvMoon.h"
 
-PATTERN_SINGLETON_IMPLEMENT(CAvExtInterFace)
+SINGLETON_IMPLEMENT(CAvExtInterFace)
 
 av_bool CAvExtInterFace::Initialize()
 {

@@ -15,12 +15,12 @@
 #ifndef _AVUSER_H_
 #define _AVUSER_H_
 #include "Apis/AvWareType.h"
-#include "CObject.h"
+#include "CAvObject.h"
 
 class CAvUser
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvUser)
+	SINGLETON_DECLARE(CAvUser)
 private:
 	CAvUser();
 	~CAvUser();

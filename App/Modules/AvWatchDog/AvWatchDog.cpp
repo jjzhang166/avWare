@@ -16,7 +16,7 @@
 #include "Apis/AvWareType.h"
 #include "Apis/LibSystem.h"
 
-PATTERN_SINGLETON_IMPLEMENT(CWatchDog);
+SINGLETON_IMPLEMENT(CWatchDog);
 
 CWatchDog::CWatchDog() :CThread(__FUNCTION__)
 {

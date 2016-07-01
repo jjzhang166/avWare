@@ -16,14 +16,19 @@
 #define _AVNETCAPTURE_H_
 
 #include "Apis/AvWareType.h"
-#include "CObject.h"
+#include "CAvObject.h"
 #include "AvAlarm/AvAlarm.h"
 #include "AvPacket/AvPacket.h"
 #include "AvThread/AvThread.h"
+#include "AvCapture/AvCapture.h"
 
 #define MAX_DEQUE_SIZE  8
-class CAvNetCapture
+
+class CAvNetProto:public CAvObject
 {
+public:
+	CAvNetProto();
+	~CAvNetProto();
 public:
 	typedef enum {
 		Moon,
@@ -57,8 +62,8 @@ public:
 	inline static std::string GetNetProtoMsgCmdString(E_NetProtocolType e)
 	{
 		static std::string sNetProtoMsgCmdString[NetProtoMsgCmd_Nr + 1] =
-		{ "GetDeviceCaps", "GetEncodeCaps", "GetEncodeProfile", "SetEncodeProfile" 
-		"Reboot", "SetSystemTime", "NetProtoMsgCmd_Nr"};
+		{ "GetDeviceCaps", "GetEncodeCaps", "GetEncodeProfile", "SetEncodeProfile"
+		"Reboot", "SetSystemTime", "NetProtoMsgCmd_Nr" };
 		return sNetProtoMsgCmdString[e];
 	};
 
@@ -85,7 +90,7 @@ public:
 	typedef struct{
 		av_u32 systemTime;
 	}C_NetProtoSystemTime;
-	
+
 
 	typedef struct {
 		av_u16 Channel;
@@ -121,64 +126,52 @@ public:
 	}C_NetParam;
 
 public:
-	CAvNetCapture();
-	virtual ~CAvNetCapture();
-	av_bool StreamData(av_u16 Channel, av_uchar Slave, CPacket &Packet);
-	av_bool AlarmMsg(CAvAlarm::AlmMsg &Msg);
-	av_bool OnDeviceInfoAck(C_DeviceInfo &DeviceInfo, E_NetProtoMsgStatus StatusCode);
-
-	//以下用于码流分发管理
-public:
-	typedef TSignal3<av_u16, av_uchar, CPacket &>::SigProc OnStreamSigNalFunc;
-	av_bool StreamStart(av_uchar Slave, CObject *obj, OnStreamSigNalFunc proc);
-	av_bool StreamStop(av_uchar Slave, CObject *obj, OnStreamSigNalFunc proc);
+	virtual av_bool Connect()		= 0;
+	virtual av_bool Disconnect()	= 0;
+	virtual av_bool GetStream()		= 0;
+	virtual av_bool ForceIFrame()	= 0;
 private:
-	TSignal3<av_u16, av_uchar, CPacket &> m_StreamSignal[CHL_NR_T];
 
-
-
-public:
-	virtual av_bool Connect(C_ConnectArgs &ConArgs) = 0;
-	virtual av_bool DisConnect() = 0;
-	virtual av_bool StartRemoteStream(av_ushort Channel, av_uchar Slave) = 0;
-	virtual av_bool StopRemoteStream() = 0;
-	virtual av_bool GetDeviceInfo(C_DeviceInfo &DeviceInfo) = 0;
-	virtual av_bool SetDeviceInfo(C_DeviceInfo &DeviceInfo) = 0;
-
-	//以下两个函数需要走搜索 相关接口。
-	virtual av_bool SearchDevice(std::list<C_DeviceList> &DeviceList) = 0;
-	virtual av_bool SetNetParam(C_NetParam &NetParam) = 0;
-
-private:
-	std::deque <CPacket *> m_MediaDeque[CHL_NR_T];
-	CMutex				   m_MediaMutex;
 };
 
 
-class CMNetCapture
+
+class CAvNetCapture:public Capture
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CMNetCapture);
-private:
-	CMNetCapture();
-	~CMNetCapture();
+	CAvNetCapture();
+	virtual ~CAvNetCapture();
 
 public:
-	av_bool Initialize();
-	CAvNetCapture *GetAvNetCaptureInstance(av_u16 iLocalChannel);
+	av_bool Initialize(av_int Channel);
+	av_bool Start(av_int Slave);
+	av_bool Stop(av_int Slave);
+
+	av_bool Start(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnData);
+	av_bool Stop(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnData);
+
+	av_bool SetProfile(av_int Slave, C_EncodeFormats &Formats);
+	av_bool GetProfile(av_int Slave, C_EncodeFormats &Fromats);
+	av_bool GetCaps(C_EncodeCaps &Caps);
+
+	av_bool SetTime(av_timeval &atv);
+	av_bool SetIFrame(av_int Slave = CHL_MAIN_T);
+
+public:
+	av_bool LoadConfigs();
+private:
+	TSignal3<av_int, av_int, CAvPacket *> m_StreamSignal[CHL_NR_T];
+
 
 private:
-	std::map <av_u16, CAvNetCapture *>  m_MNetCaptureMap;
+	void ThreadProc();
+
+
 private:
+	av_int		m_Channel; 
+	CAvNetProto *m_ProtoHandle;
 
 };
-
-
-
-
-
-
-
 
 
 

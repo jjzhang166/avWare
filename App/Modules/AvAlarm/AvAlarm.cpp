@@ -19,7 +19,7 @@
 #include "AvDevice/AvDevice.h"
 
 
-PATTERN_SINGLETON_IMPLEMENT(CAvAlarm)
+SINGLETON_IMPLEMENT(CAvAlarm)
 
 CAvAlarm::CAvAlarm() :CThread(__FUNCTION__), m_AlarmMsg(ALARM_QUEUE_MSG_NAME)
 {
@@ -38,7 +38,7 @@ av_bool CAvAlarm::Initialize()
 	return av_true;
 }
 
-av_bool CAvAlarm::Start(CObject *obj, OnAvAlarmSigNalFunc proc)
+av_bool CAvAlarm::Start(CAvObject *obj, OnAvAlarmSigNalFunc proc)
 {
 	int ret = 0;
 	ret = m_AlarmSignal.Attach(obj, proc);
@@ -49,7 +49,7 @@ av_bool CAvAlarm::Start(CObject *obj, OnAvAlarmSigNalFunc proc)
 		return av_true;
 	}
 }
-av_bool CAvAlarm::Stop(CObject *obj, OnAvAlarmSigNalFunc proc)
+av_bool CAvAlarm::Stop(CAvObject *obj, OnAvAlarmSigNalFunc proc)
 {
 	int ret = 0;
 	ret = m_AlarmSignal.Detach(obj, proc);
@@ -70,6 +70,7 @@ av_void CAvAlarm::ThreadProc()
 	av_bool AlarmMsgRet = av_false;
 	while (m_Loop == av_true)
 	{
+
 		AlarmMsgRet = m_AlarmMsg.QmRcv((av_char *)&AlmMsgData, len, av_false);
 		if (AlarmMsgRet == av_true){
 			CAvAlmTask *AlmTask = new CAvAlmTask;

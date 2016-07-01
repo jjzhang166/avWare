@@ -15,7 +15,7 @@
 #include "AvDecode/AvDecode.h"
 
 
-PATTERN_SINGLETON_IMPLEMENT(CAvDecode);
+SINGLETON_IMPLEMENT(CAvDecode);
 CAvDecode::CAvDecode()
 {
 }

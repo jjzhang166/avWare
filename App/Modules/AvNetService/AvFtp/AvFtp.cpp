@@ -34,7 +34,7 @@ av_bool CAvFtp::Stop()
 {
 	if (m_login == av_true)
 	{
-		m_Ftp.FtpQuit();
+		m_Ftp.AVFtpQuit();
 		m_login = av_false;
 	}
 	
@@ -54,7 +54,7 @@ av_bool CAvFtp::SetConf(std::string Server, std::string Port, std::string Usrnam
 	m_Usrname = Usrname;
 	m_Passwd = Passwd;
 
-	m_Ftp.FtpSetConf(m_ServerIP, atoi(m_Port.c_str()), m_Usrname, m_Passwd);
+	m_Ftp.AVFtpSetConf(m_ServerIP, atoi(m_Port.c_str()), m_Usrname, m_Passwd);
 	
 	return av_true;
 
@@ -72,7 +72,7 @@ av_bool CAvFtp::Upload(std::string SendFile)
 	
 	if (m_login == av_false)
 	{
-		ret = m_Ftp.FtpLogin();
+		ret = m_Ftp.AVFtpLogin();
 		if (ret < 0)
 		{
 			av_msg("ftp login error...\n");
@@ -104,14 +104,14 @@ av_bool CAvFtp::Upload(std::string SendFile)
 		return av_false;
 	}
 
-	ret = m_Ftp.FtpType(FTT_BINEARY);
+	ret = m_Ftp.AVFtpType(FTT_BINEARY);
 	if (ret < FTP_OK)
 	{
 		av_error("FtpType error...\n");
 		return av_false;
 	}
 	
-	ret = m_Ftp.FtpPassive();
+	ret = m_Ftp.AVFtpPassive();
 	if (ret < FTP_OK)
 	{
 		av_error("FtpPassive error...\n");
@@ -127,14 +127,14 @@ av_bool CAvFtp::Upload(std::string SendFile)
 	filename = SendFile.substr(pos+1);
 	av_msg("filename = %s\n", filename.c_str());
 
-	ret = m_Ftp.FtpAppend(filename.c_str());
+	ret = m_Ftp.AVFtpAppend(filename.c_str());
 	if (ret < FTP_OK)
 	{
 		av_error("FtpAppend error...\n");
 		return av_false;
 	}
 
-	ret = m_Ftp.FtpStor(SendFile.c_str());
+	ret = m_Ftp.AVFtpStor(SendFile.c_str());
 	if (ret < FTP_OK)
 	{
 		av_error("FtpStor error...\n");
@@ -149,18 +149,18 @@ av_bool CAvFtp::Upload(std::string SendFile)
 			av_error("fread error...\n");
 			return av_false;
 		}
-		ret = m_Ftp.FtpSendData(buffer, readlen);
+		ret = m_Ftp.AVFtpSendData(buffer, readlen);
 		if (ret < FTP_OK)
 		{
 			av_error("ftp send data error...\n");
-			m_Ftp.FtpCloseData();
+			m_Ftp.AVFtpCloseData();
 			return av_false;
 		}
 
 		len += readlen;
 	}
 
-	m_Ftp.FtpCloseData();
+	m_Ftp.AVFtpCloseData();
 
 	fclose(fp);
 	
@@ -172,7 +172,7 @@ av_bool CAvFtp::Upload(std::string FileName, av_uchar *data, av_u32 datalen)
 
 	if (m_login == av_false)
 	{
-		ret = m_Ftp.FtpLogin();
+		ret = m_Ftp.AVFtpLogin();
 		if (ret < 0)
 		{
 			av_error("ftp login error...\n");
@@ -182,43 +182,43 @@ av_bool CAvFtp::Upload(std::string FileName, av_uchar *data, av_u32 datalen)
 		m_login = av_true;
 	}
 
-	ret = m_Ftp.FtpType(FTT_BINEARY);
+	ret = m_Ftp.AVFtpType(FTT_BINEARY);
 	if (ret < FTP_OK)
 	{
 		av_error("FtpType error...\n");
 		return av_false;
 	}
 	
-	ret = m_Ftp.FtpPassive();
+	ret = m_Ftp.AVFtpPassive();
 	if (ret < FTP_OK)
 	{
 		av_error("FtpPassive error...\n");
 		return av_false;
 	}
 
-	ret = m_Ftp.FtpAppend(FileName.c_str());
+	ret = m_Ftp.AVFtpAppend(FileName.c_str());
 	if (ret < FTP_OK)
 	{
 		av_error("FtpAppend error...\n");
 		return av_false;
 	}
 
-	ret = m_Ftp.FtpStor(FileName.c_str());
+	ret = m_Ftp.AVFtpStor(FileName.c_str());
 	if (ret < FTP_OK)
 	{
 		av_error("FtpStor error...\n");
 		return av_false;
 	}
 
-	ret = m_Ftp.FtpSendData((const char *)data, (int &)datalen);
+	ret = m_Ftp.AVFtpSendData((const char *)data, (int &)datalen);
 	if (ret < FTP_OK)
 	{
 		av_error("ftp send data error...\n");
-		m_Ftp.FtpCloseData();
+		m_Ftp.AVFtpCloseData();
 		return av_false;
 	}
 
-	m_Ftp.FtpCloseData();
+	m_Ftp.AVFtpCloseData();
 
 	return av_true;
 }
@@ -229,7 +229,7 @@ av_bool CAvFtp::Mkdir(std::string dirName)
 
 	if (m_login == av_false)
 	{
-		ret = m_Ftp.FtpLogin();
+		ret = m_Ftp.AVFtpLogin();
 		if (ret < 0)
 		{
 			av_msg("ftp login error...\n");
@@ -239,7 +239,7 @@ av_bool CAvFtp::Mkdir(std::string dirName)
 		m_login = av_true;
 	}
 	
-	ret = m_Ftp.FtpMkDirRecursion((char *)dirName.c_str());
+	ret = m_Ftp.AVFtpMkDirRecursion((char *)dirName.c_str());
 	if (ret < FTP_OK)
 	{
 		av_msg("FtpMkDirRecursion error...\n");
@@ -254,7 +254,7 @@ av_bool CAvFtp::CdDir(std::string dirName)
 
 	if (m_login == av_false)
 	{
-		ret = m_Ftp.FtpLogin();
+		ret = m_Ftp.AVFtpLogin();
 		if (ret < 0)
 		{
 			av_msg("ftp login error...\n");
@@ -264,24 +264,24 @@ av_bool CAvFtp::CdDir(std::string dirName)
 		m_login = av_true;
 	}
 
-	ret = m_Ftp.FtpReturnRoot();
+	ret = m_Ftp.AVFtpReturnRoot();
 	if (ret < FTP_OK)
 	{
 		av_msg("FtpReturnRoot error...\n");
 		return av_false;
 	}
 
-	ret = m_Ftp.FtpChangePath((char *)dirName.c_str());
+	ret = m_Ftp.AVFtpChangePath((char *)dirName.c_str());
 	if (ret < FTP_OK)
 	{
-		ret = m_Ftp.FtpMkDirRecursion((char *)dirName.c_str());
+		ret = m_Ftp.AVFtpMkDirRecursion((char *)dirName.c_str());
 		if (ret < FTP_OK)
 		{
 			av_msg("FtpMkDirRecursion error...\n");
 			return av_false;
 		}
 
-		ret = m_Ftp.FtpChangePath((char *)dirName.c_str());
+		ret = m_Ftp.AVFtpChangePath((char *)dirName.c_str());
 		if (ret < FTP_OK)
 		{
 			av_msg("FtpChangePath error...\n");

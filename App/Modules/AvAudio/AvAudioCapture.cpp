@@ -14,9 +14,9 @@
 ******************************************************************/
 #include "AvAudio/AvAudio.h"
 #include "Apis/LibEncode.h"
-PATTERN_SINGLETON_IMPLEMENT(CAudioCapture);
+SINGLETON_IMPLEMENT(CAudioCapture);
 
-CAudioCapture::CAudioCapture() :CThread("CAudioCapture")
+CAudioCapture::CAudioCapture() :CThread(__FUNCTION__)
 {
 
 }
@@ -70,7 +70,7 @@ av_bool CAudioCapture::AudioSetFormat()
 }
 
 
-av_bool CAudioCapture::StreamStart(av_uchar Slave, CObject *obj, OnStreamSigNalFunc proc)
+av_bool CAudioCapture::StreamStart(av_uchar Slave, CAvObject *obj, OnStreamSigNalFunc proc)
 {
 	int ret = 0;
 	ret = m_StreamSignal.Attach(obj, proc);
@@ -81,7 +81,7 @@ av_bool CAudioCapture::StreamStart(av_uchar Slave, CObject *obj, OnStreamSigNalF
 		return av_true;
 	}
 }
-av_bool CAudioCapture::StreamStop(av_uchar Slave, CObject *obj, OnStreamSigNalFunc proc)
+av_bool CAudioCapture::StreamStop(av_uchar Slave, CAvObject *obj, OnStreamSigNalFunc proc)
 {
 	int ret = 0;
 	ret = m_StreamSignal.Detach(obj, proc);

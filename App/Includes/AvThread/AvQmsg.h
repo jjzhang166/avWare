@@ -18,9 +18,10 @@
 #include "AvThread/AvThread.h"
 #include "AvThread/AvQueue.h"
 
+
 //释放 对象不能将消息队列释放掉，释放消息一定要使用QmRelease
 //之所以为什么不将QmRelease放在 析构函数里，也正是因为如此
-class CAvQmsg:public CObject
+class CAvQmsg:public CAvObject
 {
 public:
 	CAvQmsg(std::string QmsgName, av_u32 QmsgSize = 8);
@@ -41,6 +42,30 @@ private:
 };
 
 
+template<class T>
+class CAvMsgQ
+{
+public:
+	CAvMsgQ();
+	~CAvMsgQ();
+public:
+	av_bool MsgQSnd(T &Msg);
+	av_bool MsgQRcv(T &Msg, av_bool wait = av_true);
+
+private:
+	CSemaphore m_SemSignal;
+	int AcceptMsgType;
+
+private:
+	typedef struct {
+		CSemaphore *SemSignal;
+		int AcceptMsgType;
+	}M;
+	static std::queue<T> s_MsgQ;
+	static CMutex s_MsgQMutex;
+	static std::list<M> s_Msg;
+	
+};
 
 
 #endif

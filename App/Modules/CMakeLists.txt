@@ -36,12 +36,17 @@ add_library(AvPacket STATIC ${AvPacketSRC_LIST} ${AvPacketHeader_LIST})
 
 #AvCapture
 set(AvCaptureSRC_LIST 
-		AvCapture/AvCapture.cpp
+#		AvCapture/AvCapture.cpp
 		AvCapture/AvNetCapture.cpp
+		AvCapture/AvDevCapture.cpp
+		AvCapture/AvManCapture.cpp
 	)
 set(AvCaptureHeader_LIST
 		${project_headers_pach}/AvCapture/AvCapture.h
 		${project_headers_pach}/AvCapture/AvNetCapture.h
+		${project_headers_pach}/AvCapture/AvDevCapture.h
+		${project_headers_pach}/AvCapture/AvManCapture.h
+		
 	)
 add_library(AvCapture STATIC ${AvCaptureSRC_LIST} ${AvCaptureHeader_LIST})
 
@@ -162,7 +167,7 @@ set(AvMemoryPoolHeader_LIST
 	)
 add_library(AvMemoryPool STATIC ${AvMemoryPoolSRC_LIST} ${AvMemoryPoolHeader_LIST})
 
-#AvMemoryPool
+#AvUser
 set(AvUserSRC_LIST 
 		AvUser/AvUser.cpp
 	)
@@ -170,6 +175,24 @@ set(AvUserHeader_LIST
 		${project_headers_pach}/AvUser/AvUser.h
 	)
 add_library(AvUser STATIC ${AvUserSRC_LIST} ${AvUserHeader_LIST})
+
+#AvPreview
+set(AvPreviewSRC_LIST 
+		AvPreview/AvPreview.cpp
+	)
+set(AvPreviewHeader_LIST 
+		${project_headers_pach}/AvPreview/AvPreview.h
+	)
+add_library(AvPreview STATIC ${AvPreviewSRC_LIST} ${AvPreviewHeader_LIST})
+
+#AvRecord
+set(AvRecordSRC_LIST 
+		AvRecord/AvRecord.cpp
+	)
+set(AvRecordHeader_LIST 
+		${project_headers_pach}/AvRecord/AvRecord.h
+	)
+add_library(AvRecord STATIC ${AvRecordSRC_LIST} ${AvRecordHeader_LIST})
 
 
 #AvConfigs

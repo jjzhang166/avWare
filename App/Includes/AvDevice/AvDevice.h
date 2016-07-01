@@ -16,25 +16,32 @@
 #define _AVDEVICE_H_
 
 #include "Apis/AvWareType.h"
-#include "CObject.h"
+#include "CAvObject.h"
 #include "Apis/LibSystem.h"
 #include "Apis/LibEncode.h"
 #include "AvConfigs/AvConfigNetService.h"
-class CAvDevice:public CObject
+class CAvDevice:public CAvObject
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvDevice);
+	SINGLETON_DECLARE(CAvDevice);
 	av_bool Initialize();
 	
+public:
+	static av_bool GetEnv(std::string &key, std::string &value);
+	static av_bool SetEnv(std::string &key, std::string &value);
+
+private:
+	static CMutex m_SEnvMutex;
+	static std::map<std::string, std::string> m_SEnv;
 
 public:
-	static av_bool GetDspCaps(C_DspCaps &DspCaps);
-	static av_bool GetCaptureCaps(av_ushort Channel, C_EncodeCaps &EncodeCaps);
-	static av_bool GetDecodeCaps(av_ushort Channel);
-	static av_bool GetSerialCaps(C_SerialCaps &SerialCaps);
-	static av_bool GetNetCommCaps(C_NetCommCaps &NetCommCaps);
-	static av_bool GetImageCaps(av_ushort Channel, C_ImageQualityCaps &ImageCaps);
-	static av_bool GetCaputreInCaps(av_ushort Channel, C_CaptureInCaps &CaptureInCaps);
+	static av_bool GetDspCaps		(C_DspCaps &DspCaps);
+	static av_bool GetCaptureCaps	(av_ushort Channel, C_EncodeCaps &EncodeCaps);
+	static av_bool GetDecodeCaps	(av_ushort Channel);
+	static av_bool GetSerialCaps	(C_SerialCaps &SerialCaps);
+	static av_bool GetNetCommCaps	(C_NetCommCaps &NetCommCaps);
+	static av_bool GetImageCaps		(av_ushort Channel, C_ImageQualityCaps &ImageCaps);
+	static av_bool GetCaputreInCaps	(av_ushort Channel, C_CaptureInCaps &CaptureInCaps);
 
 private:
 	av_void OnConfigsNetComm(CAvConfigNetComm *NetComm, int &result);
@@ -57,7 +64,7 @@ public:
 	static av_bool GetMemLoadInfo(C_MemoryLoadInfo &MemLoadInfo);
 	static av_bool GetNetLoadInfo(C_NetLoadInfo &NetLoadInfo);
 	static av_bool GetCpuLoadInfo(C_CpuLoadInfo &CpuLoadInfo);
-
+	static av_bool GetStartUpGuid(std::string &guid);
 private:
 	CAvDevice();
 	~CAvDevice();
@@ -66,8 +73,8 @@ private:
 
 
 private:
-	static C_DeviceFactoryInfo m_FactoryInfo;
-
+	static C_DeviceFactoryInfo	m_FactoryInfo;
+	static std::string			m_SStartGUID;
 };
 
 #define g_AvDevice (*CAvDevice::instance())

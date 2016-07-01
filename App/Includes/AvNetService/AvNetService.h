@@ -16,13 +16,13 @@
 #define _AVNETSERVICE_H_
 #include "Apis/AvWareType.h"
 
-#include "CObject.h"
+#include "CAvObject.h"
 
 
 class CAvNetService
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvNetService);
+	SINGLETON_DECLARE(CAvNetService);
 
 	av_bool Initialize();
 	av_bool Start();

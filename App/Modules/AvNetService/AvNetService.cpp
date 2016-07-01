@@ -22,7 +22,7 @@
 
 
 
-PATTERN_SINGLETON_IMPLEMENT(CAvNetService);
+SINGLETON_IMPLEMENT(CAvNetService);
 CAvNetService::CAvNetService()
 {
 }
@@ -40,18 +40,24 @@ av_bool CAvNetService::Initialize()
 av_bool CAvNetService::Start()
 {
 	av_bool ret = av_false;
-	ret = g_AvRtmp.Start();
+
 	ret = g_AvOnvifSer.Start();
 	ret = g_AvRtspServer.Start();
 	ret = g_AvWebSer.Start();
+	//AvRtmp *rtmp = new AvRtmp(AvRtmp::RTMP_PUSH);
+	//rtmp->Start(0, 1, std::string("rtmp://172.16.8.1/live/pc"));
+
+
 	ret = g_AvDdnsCli.Start();
 	ret = g_AvNtpCli.Start();
+
+
+	
 	return ret;
 }
 av_bool CAvNetService::Stop()
 {
 	av_bool ret = av_false;
-	ret = g_AvRtmp.Stop();
 	ret = g_AvOnvifSer.Stop();
 	ret = g_AvRtspServer.Stop();
 	ret = g_AvWebSer.Stop();

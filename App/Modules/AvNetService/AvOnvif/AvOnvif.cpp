@@ -18,27 +18,16 @@ Company Name:深圳市恩港科技开发有限公司(GracePort)
 Function	:ONVIFCallback
 Author		:FootMan
 Email		:FootMan@graceport.cn
-BugList:
-1.配置表中没有网卡选择 
-2.没有DHCP使能
-3.第三方协议NetProtocol(RTSP/ONVIF/HTTP) 端口配置表没有找到,URL配置没有找到
-4.Onvif中H265的编码类型暂时用的H264,编码方式默认为Baseline
-5.缺少编码PROFILE配置:HIGHT BASELINE  MAIN,现在获取中写死Baseline
-6.缺少VBR中画质配置选项
-7.未找到视频编码能力配置(包括BITRATE/GOP/QULITY/RESLUTION/PROFILE/ENCODING,取值范围)
-8.未找到音频参数配置(包括音频 BITRATE,SampleRate,encoding)
-9.未找到时区参数配置(CST/UTC等等),NTP中的GM时区是否进行UTC转换
-10.设置当前时间包括时区 系统函数实现，还是配置实现?
-11.未找到系统用户管理配置(包括用户名 密码 权限等配置)
-12.未找到图像参数配置选项包括(Brightness/ColorSaturation/Contrast/Sharpness)
-13.未找到图像参数能力选项包括(Brightness/ColorSaturation/Contrast/Sharpness)范围
-14.未找到设备信息配置 包括设备类型, 支持通道个数(IPC等于1),每个通道的stream路数
-	是否支持音频编码/视频编码/云台/视频分析(一般指移动侦测)
 **************************************/
 #include "Apis/AvWareType.h"
 #include "AvNetService/AvOnvif.h"
 #include "Apis/LibEncode.h"
 
+#include "AvConfigs/AvConfigDevice.h"
+#include "AvConfigs/AvConfigNetService.h"
+#include "AvConfigs/AvConfigCapture.h"
+#include "AvDevice/AvDevice.h"
+#include "AvCapture/AvCapture.h"
 //	AvComp_G711A,
 //	AvComp_G711U,
 //	AvComp_AAC,
@@ -152,15 +141,21 @@ static int GetResWidthAndHight(av_capture_size ImageSize, int *width, int *heigh
 }
 static int	GetDeviceInfo(DeviceInfo_S *info)
 {
-	//未找到设备信息配置
+	C_DeviceFactoryInfo FactoryInfo;
+	CAvDevice::GetDeviceInfo(FactoryInfo);
+	if(NULL == info){
+		return -1;
+	}
+	memset(info,0,sizeof(DeviceInfo_S));
 	strcat(info->city,"shenzhen");
 	strcat(info->country,"china");
 	strcat(info->name,"IPC");
-	strcat(info->facturer,"EnGang");
-	strcat(info->model,"IPCAM");
-	strcat(info->SerialNumber,"IPCAM-HDMI-00112233");
 	strcat(info->softwareVer,"Build V1.0");
 	info->devType = ENUM_DEVTYPE_IPC;
+	snprintf(info->facturer,sizeof(info->facturer),"%s",FactoryInfo.FactoryName);
+	snprintf(info->model,sizeof(info->model),"%s",FactoryInfo.ProductModel);
+	snprintf(info->SerialNumber,sizeof(info->SerialNumber),"%s",FactoryInfo.SerialNumber);
+
 	return 0;
 }
 
@@ -172,30 +167,30 @@ static int	SetDeviceInfo(DeviceInfo_S *info)
 
 static int	GetDeviceCab(DeviceCab_S *info)
 {
-	//未配置能力
 	printf("GetDeviceCab\r\n");
 	info->chnelCount = 1;
 	info->streamCount= 2;
-	info->AnalyticsEnable = 1;
-	info->AudioEnable = 1;
-	info->PtzEnable = 1;
-	info->VideoEnable = 1;
+	info->AnalyticsEnable = 0;
+	info->AudioEnable = 0;
+	info->PtzEnable = 0;
+	info->VideoEnable = 0;
 	return 0;
 }
 
 static int	GetNetWorkInfo(NetWorkInfo_S *info)
 {
-	//网卡名字写死
-	//DHCP写死
-// 	CAvConfigsNetWork ConfigNet;
-// 	ConfigNet.Update();
-// 	snprintf(info->mac,sizeof(info->mac),"%s",ConfigNet.m_network.mac);
-// 	AvAddr2StrAddr(ConfigNet.m_network.ipaddr,	info->ip);
-// 	AvAddr2StrAddr(ConfigNet.m_network.dns1,	info->dns);
-// 	AvAddr2StrAddr(ConfigNet.m_network.gateway,	info->gateway);
-// 	snprintf(info->hostName,sizeof(info->hostName),"%s",ConfigNet.m_network.host);
-// 	strcat(info->ethernetName,"eth0");
-// 	info->DhcpEnable = ENUM_ENABLED_FALSE;
+	C_DeviceFactoryInfo FactoryInfo;
+	CAvConfigNetComm NetComm;
+	NetComm.Update();
+	ConfigNetComm &ConfigNet = NetComm.GetConfig(NetCommT_Lan0);
+	CAvDevice::GetDeviceInfo(FactoryInfo);
+	snprintf(info->ip,sizeof(info->ip),"%s",ConfigNet.LanAttr.IpAddr);
+	snprintf(info->dns,sizeof(info->dns),"%s",ConfigNet.LanAttr.Dns1);
+	snprintf(info->gateway,sizeof(info->gateway),"%s",ConfigNet.LanAttr.Gateway);
+	snprintf(info->hostName,sizeof(info->hostName),"%s",ConfigNet.LanAttr.Host);
+	snprintf(info->mac,sizeof(info->mac),"%s",FactoryInfo.ProductMacAddr);
+	strcat(info->ethernetName,"eth0");
+	info->DhcpEnable = ENUM_ENABLED_FALSE;	
 	return 0;
 }
 
@@ -217,74 +212,67 @@ static int	SetNetWorkInfo(NetWorkInfo_S *info)
 
 static int	GetNetProtocolInfo(NetProtocolInfo *info)
 {
-	//函数全部写死
-	//netprotocol 没有配置
-// 	CAvConfigsNetWork ConfigNet;
-// 	ConfigNet.Update();
-// 	char address[16] = {0};
-// 	info->rtspPort = 554;
-// 	info->onvifPort = 80;
-// 
-// 	AvAddr2StrAddr(ConfigNet.m_network.ipaddr, address);
-// 	sprintf(info->rtspUrl[0][0],"rtsp://%s:%d/channel/1",address,info->rtspPort);
-// 	sprintf(info->rtspUrl[0][1],"rtsp://%s:%d/channel/2",address,info->rtspPort);
+	CAvConfigNetComm NetComm;
+	NetComm.Update();
+	ConfigNetComm &ConfigNet = NetComm.GetConfig(NetCommT_Lan0);
+ 	info->rtspPort = 554;
+ 	info->onvifPort = 8080; 
+ 	sprintf(info->rtspUrl[0][0],"rtsp://%s:%d/channel/1",ConfigNet.LanAttr.IpAddr,info->rtspPort);
+ 	sprintf(info->rtspUrl[0][1],"rtsp://%s:%d/channel/2",ConfigNet.LanAttr.IpAddr,info->rtspPort);
 	return 0;
 }
 static int	SetNetProtocolInfo(NetProtocolInfo *info)
 {	
-	//无法配置 
 	printf("rtsp port = %d\r\n",info->rtspPort);
 	return 0;
 }
 static int	GetVideoEncode(int chn, int streamId, VedioEncode_S *info)
 {
-	//profile 和 画质参数写死
-// 	CAvConfigsCapture ConfigCaputure;
-// 	ConfigCaputure.Update(chn,streamId);
-// 	memset(info,0,sizeof(VedioEncode_S));
-// 	info->bitrate =  (int)ConfigCaputure.m_ConfigFormats.BitRateValue;
-// 	info->cvbrMode = (int)ConfigCaputure.m_ConfigFormats.BitRateCtrl;
-// 	info->encoding = AVCompToOnvifEncoding(ConfigCaputure.m_ConfigFormats.Comp);//VideoEncoding__H264;
-// 	info->frameRate = (int)ConfigCaputure.m_ConfigFormats.FrameRate;
-// 	info->gop = (int)ConfigCaputure.m_ConfigFormats.Gop;
-// 	info->h264Profile = H264Profile__Main;//写死
-// 	info->qulity = 10;//写死
-// 	av_msg("ConfigCaputure.m_ConfigFormats.ImageSelfHeigh = %d",ConfigCaputure.m_ConfigFormats.ImageSelfHeigh);
-// 	av_msg("ConfigCaputure.m_ConfigFormats.ImageSelfWidth = %d",ConfigCaputure.m_ConfigFormats.ImageSelfWidth);
-// 	av_msg("ConfigCaputure.m_ConfigFormats.ImageSize = %d",ConfigCaputure.m_ConfigFormats.ImageSize);
-// 	if(CaptureSize_Self != ConfigCaputure.m_ConfigFormats.ImageSize){
-// 		GetResWidthAndHight(ConfigCaputure.m_ConfigFormats.ImageSize,&info->reslution.width,&info->reslution.height);
-// 	}else{
-// 		info->reslution.width = ConfigCaputure.m_ConfigFormats.ImageSelfWidth;
-// 		info->reslution.height =  ConfigCaputure.m_ConfigFormats.ImageSelfHeigh;
-// 	}
+	CAvConfigEncode Encode;
+	Encode.Update();
+	ConfigEncodeFormats &Formats = Encode.GetConfig(chn);
 		
+	memset(info,0,sizeof(VedioEncode_S));
+	info->bitrate = Formats.CHLFormats[streamId].Formats.BitRateValue;
+	info->cvbrMode = Formats.CHLFormats[streamId].Formats.BitRateCtrl;
+	info->encoding =  AVCompToOnvifEncoding(Formats.CHLFormats[streamId].Formats.Comp);
+	info->frameRate = (int)Formats.CHLFormats[streamId].Formats.FrameRate;
+	info->gop = (int)Formats.CHLFormats[streamId].Formats.Gop;
+	info->h264Profile = H264Profile__Main;
+	info->qulity = (int)Formats.CHLFormats[streamId].Formats.Qlevel;
+	if(CaptureSize_Self != Formats.CHLFormats[streamId].Formats.ImageSize){
+ 		GetResWidthAndHight(Formats.CHLFormats[streamId].Formats.ImageSize,&info->reslution.width,&info->reslution.height);
+ 	}else{
+ 		info->reslution.width = Formats.CHLFormats[streamId].Formats.ImageSelfWidth;
+ 		info->reslution.height =  Formats.CHLFormats[streamId].Formats.ImageSelfHeigh;
+ 	}
 	return 0;
 }
 
 static int	SetVideoEncode(int chn, int streamId, VedioEncode_S *info)
 {
+	//profile qulity
+	CAvConfigEncode Encode;
+	Encode.Update();
+	ConfigEncodeFormats &Formats = Encode.GetConfig(chn);
 
-	//profile 和 画质参数未配置	
-// 	CAvConfigsCapture ConfigCaputure;
-// 	ConfigCaputure.Update(chn,streamId);
-// 	ConfigCaputure.m_ConfigFormats.BitRateValue = (av_u32)info->bitrate;
-// 	ConfigCaputure.m_ConfigFormats.BitRateCtrl = (av_bitrate_ctrl)info->cvbrMode;
-// 	ConfigCaputure.m_ConfigFormats.FrameRate = info->frameRate;
-// 	ConfigCaputure.m_ConfigFormats.Gop = info->gop;
-// 	ConfigCaputure.m_ConfigFormats.ImageSize = GetResEnum(info->reslution.width,info->reslution.height);
-// 	if(CaptureSize_Self ==  ConfigCaputure.m_ConfigFormats.ImageSize){
-// 		ConfigCaputure.m_ConfigFormats.ImageSelfHeigh = info->reslution.height;
-// 		ConfigCaputure.m_ConfigFormats.ImageSelfWidth =  info->reslution.width;
-// 	}
-// 	ConfigCaputure.m_ConfigFormats.Comp = OnvifEncodingToAV(info->encoding);
-// 	ConfigCaputure.Submit();
+ 	Formats.CHLFormats[streamId].Formats.BitRateValue = (av_u32)info->bitrate;
+ 	Formats.CHLFormats[streamId].Formats.BitRateCtrl = (av_bitrate_ctrl)info->cvbrMode;
+ 	Formats.CHLFormats[streamId].Formats.FrameRate = info->frameRate;
+ 	Formats.CHLFormats[streamId].Formats.Gop = info->gop;
+	Formats.CHLFormats[streamId].Formats.Qlevel = info->qulity;
+ 	Formats.CHLFormats[streamId].Formats.ImageSize = GetResEnum(info->reslution.width,info->reslution.height);
+ 	if(CaptureSize_Self ==  Formats.CHLFormats[streamId].Formats.ImageSize){
+ 		Formats.CHLFormats[streamId].Formats.ImageSelfHeigh = info->reslution.height;
+ 		Formats.CHLFormats[streamId].Formats.ImageSelfWidth =  info->reslution.width;
+ 	}
+ 	Formats.CHLFormats[streamId].Formats.Comp = OnvifEncodingToAV(info->encoding);
+ 	Encode.SettingUp();
 	return 0;
 }
 
 static int	GetVideoEncodeCab(int chn, int streamId, VedioEncodeCab_S *info)
 {
-	//未找到能力配置选项
 	info->bitrateRange.max = 8192;
 	info->bitrateRange.min = 512;
 	info->encodingCab = (VideoEncoding_E)(VideoEncoding__JPEG | VideoEncoding__H264 | VideoEncoding__H265);
@@ -314,24 +302,19 @@ static int	GetVideoEncodeCab(int chn, int streamId, VedioEncodeCab_S *info)
 
 static int	GetAudioEncode(int chn, int streamId, AudioEncode_S *info)
 {
-	//音频参数写死,未获取到配置
-// 	CAvConfigsAudio ConfigsAudio;
-// 	ConfigsAudio.Update((av_uchar)chn,(av_uchar)streamId);
-// 	info->Bitrate = 8;
-// 	info->Encoding = AudioEncoding__G711;
-// 	info->SampleRate = 8000;
+ 	info->Bitrate = 8;
+ 	info->Encoding = AudioEncoding__G711;
+ 	info->SampleRate = 8000;
 	return 0;
 }
 
 static int	SetAudioEncode(int chn, int streamId, AudioEncode_S *info)
 {
-	//音频参数不可设置
 	return 0;
 }
 
 static int	GetSystemTime(SystemTime_S *info)
 {
-	//未找到时区参数配置
 	time_t timer;   
 	struct tm* t_tm;   
 	time(&timer);   
@@ -348,13 +331,25 @@ static int	GetSystemTime(SystemTime_S *info)
 
 static int	SetSystemTime(SystemTime_S *info)
 {
-	//系统函数实现，还是配置实现?
+	
+	struct tm t;
+	t.tm_year = info->year - 1900;
+	t.tm_mon = info->month;
+	t.tm_mday = info->day;
+	t.tm_hour = info->hour;
+	t.tm_min = info->min;
+	t.tm_sec = info->sec;
+
+
+	av_timeval timev;
+	timev.tv_sec = (av_int)mktime(&t);
+	timev.tv_usec = 0;
+	CAvDevice::SetSysTime(timev);
 	return 0;
 }
 
 static int	GetUsrInfo(int *usrNum, UsrInfo_S *info)//最多50个
 {
-	//未找到相关配置,写死
 	*usrNum = 3;
 	info[0].userLevel = ENUM_USRLEVEL_Operator;
 	sprintf(info[0].usrname,"test1");
@@ -367,36 +362,75 @@ static int	GetUsrInfo(int *usrNum, UsrInfo_S *info)//最多50个
 
 static int	GetImagingParam(ImagingParam_S *info)
 {
-	//未找到图像参数配置选项
-	info->Brightness = 30;
-	info->ColorSaturation = 40;
-	info->Contrast = 50;
-	info->Sharpness = 60;
+	CAvConfigImage ConfigImage;
+	ConfigImage.Update();
+	ConfigImageFormats ImageFomats = ConfigImage.GetConfig();
+
+	info->Brightness = ImageFomats.Brightness;
+	info->ColorSaturation = ImageFomats.Saturation;
+	info->Contrast = ImageFomats.Contrast;
+	info->Sharpness = ImageFomats.Hue;
 	return 0;
 }
 
 static int	SetImagingParam(ImagingParam_S *info)
 {
-	//未找到图像参数配置选项
-	printf("info->Brightness = %d",info->Brightness);
+	CAvConfigImage ConfigImage;
+	ConfigImage.Update();
+	ConfigImageFormats ImageFomats = ConfigImage.GetConfig();
+	ImageFomats.Brightness = info->Brightness;
+	ImageFomats.Saturation = info->ColorSaturation;
+	ImageFomats.Contrast = info->Contrast;
+	ImageFomats.Hue = info->Sharpness;
+
+	ConfigImage.SettingUp();
 	return 0;
 }
 
 static int	GetImagingCab(ImagingCab_S *info)
 {
-	//未找到图像参数能力选项
-	info->Brightness.max = 100;
-	info->Brightness.min = 0;
-	info->ColorSaturation.max = 100;
-	info->ColorSaturation.min = 0;
-	info->Contrast.max = 100;
-	info->Contrast.min = 0;
-	info->Sharpness.max = 100;
-	info->Sharpness.min = 0;
+	C_ImageQualityCaps ImageQualityCaps;
+	CAvDevice::GetImageCaps(0, ImageQualityCaps);
+	/*Brightness[0], Contrast[1], Saturation[2], Hue[3]*/
+	if (ImageQualityCaps.SupportMask & (0x01 << 0)){
+		info->Brightness.max = ImageQualityCaps.MaxRange;
+		info->Brightness.min = 0;
+	}
+	else{
+		info->Brightness.max = 0;
+		info->Brightness.min = 0;
+	}
+
+	if (ImageQualityCaps.SupportMask & (0x01 << 1)){
+		info->ColorSaturation.max = ImageQualityCaps.MaxRange;
+		info->ColorSaturation.min = 0;
+	}
+	else{
+		info->ColorSaturation.max = 0;
+		info->ColorSaturation.min = 0;
+	}
+
+	if (ImageQualityCaps.SupportMask & (0x01 << 2)){
+		info->Contrast.max = ImageQualityCaps.MaxRange;
+		info->Contrast.min = 0;
+	}
+	else{
+		info->Contrast.max = 0;
+		info->Contrast.min = 0;
+	}
+
+	if (ImageQualityCaps.SupportMask & (0x01 << 3)){
+		info->Sharpness.max = ImageQualityCaps.MaxRange;
+		info->Sharpness.min = 0;
+	}
+	else{
+		info->Sharpness.max = 0;
+		info->Sharpness.min = 0;
+	}
 	return 0;
 }
 
-PATTERN_SINGLETON_IMPLEMENT(CAvOnvifSer)
+SINGLETON_IMPLEMENT(CAvOnvifSer)
 
 av_bool CAvOnvifSer::InitCbfun()
 {

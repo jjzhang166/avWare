@@ -14,7 +14,7 @@
 ******************************************************************/
 #include "AvNetService/AvWeb.h"
 
-PATTERN_SINGLETON_IMPLEMENT(CAvWebSer)
+SINGLETON_IMPLEMENT(CAvWebSer)
 
 CAvWebSer::CAvWebSer()
 {

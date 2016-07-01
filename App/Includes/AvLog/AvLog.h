@@ -15,7 +15,7 @@
 #ifndef _AVLOG_H_
 #define _AVLOG_H_
 #include "Apis/AvWareType.h"
-#include "CObject.h"
+#include "CAvObject.h"
 #include "AvThread/AvThread.h"
 #include "AvFile/AvFile.h"
 
@@ -89,7 +89,7 @@ public:
 #pragma pack(pop)
 
 public:
-	PATTERN_SINGLETON_DECLARE(CAvLog);
+	SINGLETON_DECLARE(CAvLog);
 
 private:
 	CAvLog();

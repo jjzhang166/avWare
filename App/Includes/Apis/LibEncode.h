@@ -92,6 +92,21 @@ typedef enum
 	avFrameT_Audio,
 	avFrameT_NR,
 }av_frame_type;
+typedef enum {
+	nal_unit_type_nr		= 0x01 << 0,
+	nal_unit_type_p			= 0x01 << 1,
+	nal_unit_type_dataA		= 0x01 << 2,
+	nal_unit_type_dataB		= 0x01 << 3,
+	nal_unit_type_dataC		= 0x01 << 4,
+	nal_unit_type_idr		= 0x01 << 5,
+	nal_unit_type_sei		= 0x01 << 6,
+	nal_unit_type_sps		= 0x01 << 7,
+	nal_unit_type_pps		= 0x01 << 8,
+	nal_unit_type_delimiter = 0x01 << 9,
+	nal_unit_type_nalend	= 0x01 << 10,
+	nal_unit_type_streamend = 0x01 << 11,
+	nal_unit_type_pading	= 0x01 << 12,
+}av_nal_unit_type;
 
 typedef enum{
 	avStreamT_V,

@@ -16,7 +16,7 @@
 #define _AVMEMORYPOOL_H_
 
 #include "Apis/AvWareType.h"
-#include "CObject.h"
+#include "CAvObject.h"
 #include "MemPool/CMemoryPool.h"
 
 #define D_AVMEMORYPOOL_SIZE 1024*1024*8 //8M
@@ -26,7 +26,7 @@
 class CAvMemoryPool
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvMemoryPool);
+	SINGLETON_DECLARE(CAvMemoryPool);
 private:
 	CAvMemoryPool();
 	~CAvMemoryPool();

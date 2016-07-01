@@ -103,6 +103,7 @@ typedef struct {
 	av_bool Enable;//打开或者关闭
 	av_bool Support;//硬件上是否支持
 	E_NetComm_Type type;
+	E_NetComm_Mode GetMode;
 	char Ifrname[32];
 	union 
 	{

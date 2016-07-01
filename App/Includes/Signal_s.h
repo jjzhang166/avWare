@@ -1,17 +1,4 @@
-/*******************************************************************
-|  Copyright(c) 2015-2016 Graceport Technology Development Co.,Ltd
-|  All rights reserved.
-|
-|  版本: 1.0
-|  作者: Knight [knight@graceport.cn]
-|  日期: 2016年6月6日
-|  说明:
-|
-|  版本: 1.1
-|  作者:
-|  日期:
-|  说明:
-******************************************************************/
+
 
 #define SIGNAL_NODE MACRO_JOIN(TSigNode,SIGNAL_NUMBER)
 #define SIGNAL_SIGNAL MACRO_JOIN(TSignal,SIGNAL_NUMBER)
@@ -30,11 +17,11 @@
 #include <string.h>
 #include <vector>
 #include "AvThread/AvThread.h"
-#include "CObject.h"
+#include "CAvObject.h"
 
 template <SIGNAL_CLASS_TYPES> class SIGNAL_NODE
 {
-	typedef void (CObject::*SigProc)(SIGNAL_TYPES);
+	typedef void (CAvObject::*SigProc)(SIGNAL_TYPES);
 public:
 	SIGNAL_NODE( ) 
 		:m_pObj(NULL),m_pProc(NULL),m_Status(SIGNAL_NODE_EMPTY)
@@ -46,7 +33,7 @@ public:
 		(m_pObj->*m_pProc)(SIGNAL_ARGS);
 	};
 
-	CObject * 	m_pObj;
+	CAvObject * 	m_pObj;
 	SigProc	m_pProc;
 	int	m_Status;	//added by jili,0x00:Empty; 0x01:New; 0x02:Delete;0x03:Normal
 };
@@ -54,7 +41,7 @@ public:
 template <SIGNAL_CLASS_TYPES> class SIGNAL_SIGNAL
 {
 public:
-	typedef void (CObject::*SigProc)(SIGNAL_TYPES);
+	typedef void (CAvObject::*SigProc)(SIGNAL_TYPES);
 	typedef SIGNAL_NODE <  SIGNAL_TYPES > MySignalNode;
 private:
 	int m_nMaxSlots;
@@ -106,7 +93,7 @@ public:
 			
 			if(m_Vector[i].m_Status == SIGNAL_NODE_EMPTY)
 			{
-				m_Vector[i].m_pObj   = (CObject*)pObj;
+				m_Vector[i].m_pObj = (CAvObject*)pObj;
 				m_Vector[i].m_pProc  = pProc;
 				m_Vector[i].m_Status = SIGNAL_NODE_NORMAL;
 				ret = calcSize();
@@ -178,7 +165,7 @@ public:
 template <SIGNAL_CLASS_TYPES> class SIGNAL_SIGNAL_S
 {
 public:
-	typedef void (CObject::*SigProc)(SIGNAL_TYPES);
+	typedef void (CAvObject::*SigProc)(SIGNAL_TYPES);
 	typedef SIGNAL_NODE <  SIGNAL_TYPES > MySignalNode;
 private:
 	int m_nMaxSlots;
@@ -230,7 +217,7 @@ public:
 
 			if(m_Vector[i].m_Status == SIGNAL_NODE_EMPTY)
 			{
-				m_Vector[i].m_pObj   = (CObject*)pObj;
+				m_Vector[i].m_pObj = (CAvObject*)pObj;
 				m_Vector[i].m_pProc  = pProc;
 				m_Vector[i].m_Status = SIGNAL_NODE_NORMAL;
 				ret = calcSize();

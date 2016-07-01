@@ -16,7 +16,7 @@
 #include "AvNetService/AvUpnp.h"
 
 
-PATTERN_SINGLETON_IMPLEMENT(CAvUpnpCli)
+SINGLETON_IMPLEMENT(CAvUpnpCli)
 
 CAvUpnpCli::CAvUpnpCli():CTimer("AvUpnpCli")
 {

@@ -16,12 +16,12 @@
 #define _AVWATCHDOG_H_
 
 #include "Apis/AvWareType.h"
-#include "CObject.h"
+#include "CAvObject.h"
 #include "AvThread/AvThread.h"
 class CWatchDog :public CThread
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CWatchDog);
+	SINGLETON_DECLARE(CWatchDog);
 	
 	av_bool Initialize();
 	void ThreadProc();

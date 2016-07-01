@@ -15,7 +15,7 @@
 #include "AvNetService/AvNtp.h"
 #include "AvNetService/AvNtpCli.h"
 
-PATTERN_SINGLETON_IMPLEMENT(CAvNtpCli)
+SINGLETON_IMPLEMENT(CAvNtpCli)
 
 CAvNtpCli::CAvNtpCli():CTimer("AvNtpCli")
 {

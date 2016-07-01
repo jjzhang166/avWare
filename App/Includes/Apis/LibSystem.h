@@ -178,6 +178,7 @@ typedef struct{
 
 typedef struct{
 	av_u32 NetCommMask;
+	av_u32 NetCommGetModeMask[ConfMaxNetComm];
 }C_NetCommCaps;
 
 #define NetCommMaxStringLen 32
@@ -265,6 +266,16 @@ av_bool AvSetDeviceInfo(C_DeviceFactoryInfo *FactoryInfo);
 av_uint AvGetDeviceStartUp();
 av_bool AvSystemBeep(av_uint dwFrequence, av_uint dwDuration);
 
+/*
+UpgradeStart = 1,
+UpgradeRecvData = 2,
+UpgradeWipePartition = 3,
+UpgradeWriteData = 4,
+UpgradeOver = 5,
+Rebootting = 6,
+ModifyOver = 7,
+HaveNoResource = 8,
+*/
 av_bool AvSystemUpgradeFile(const av_char * UpgradeFilePath, av_uint *Progress/*0-7表示百分比 ; 8-15 动作WipePartition=1;WriteData=2*/);
 av_bool AvSystemUpgradeMemory(av_uchar *ptr, av_uint length, av_uint *Progress/*0-7表示百分比 ; 8-15 动作*/);
 av_bool AvGetMemLoadInfo(C_MemoryLoadInfo *MemLoadInfo);

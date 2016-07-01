@@ -16,7 +16,7 @@
 
 
 
-PATTERN_SINGLETON_IMPLEMENT(CAvGui);
+SINGLETON_IMPLEMENT(CAvGui);
 int m_AppArgc = 0;
 CAvGui::CAvGui()
 {

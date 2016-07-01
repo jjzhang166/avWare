@@ -145,9 +145,9 @@ typedef struct _DHCP_CLIENT_T
 	struct dhcpMessage 	dhcprecvpacket;
 }DHCP_CLIENT_T;
 
-u_char DhcpGetOption(u_char *src,u_char opt, void *ptr, u_char size);
+u_char AVDhcpGetOption(u_char *src,u_char opt, void *ptr, u_char size);
 
-u_char *DhcpSetOption(u_char * dst, u_char opt, u_char *src, u_char size);
+u_char *AVDhcpSetOption(u_char * dst, u_char opt, u_char *src, u_char size);
 int UdpOutput(struct dhcpMessage *pDhcppacket, 
 			   u_int32_t source_ip, 
 			   int source_port,
@@ -164,18 +164,18 @@ extern int UdpRawSocket(int ifindex);
 u_int16_t checksum(void *addr, int count);
 unsigned long random_xid(unsigned char *szMac);
 
-extern int Dhcp_InitSessionCtx(DHCP_SESSION_CTX * pclientctx, char * eth_name);
-int Dhcp_BackInfo(DHCP_CLIENT_T * pdhcp_client_in);
+extern int AVDhcp_InitSessionCtx(DHCP_SESSION_CTX * pclientctx, char * eth_name);
+int AVDhcp_BackInfo(DHCP_CLIENT_T * pdhcp_client_in);
 	
 int UdpInput( int sockfd,struct dhcpMessage *pRecvPacket);
-int DHCP_Receive(int iRawsocket,u_char xtype, DHCP_CLIENT_T * pdhcp_client_in, int time_out_in );
-int DHCP_Discover(DHCP_CLIENT_T * pdhcp_client_in);
-int DHCP_Request(u_long serverid,DHCP_CLIENT_T * pdhcp_client_in);
-int DHCP_Release(DHCP_CLIENT_T * pdhcp_client_in);
+int AVDHCP_Receive(int iRawsocket,u_char xtype, DHCP_CLIENT_T * pdhcp_client_in, int time_out_in );
+int AVDHCP_Discover(DHCP_CLIENT_T * pdhcp_client_in);
+int AVDHCP_Request(u_long serverid,DHCP_CLIENT_T * pdhcp_client_in);
+int AVDHCP_Release(DHCP_CLIENT_T * pdhcp_client_in);
 //!0--success
 //!-1 -- failed
-int DHCP_AddLease(int iRawsocket, DHCP_CLIENT_T * pdhcp_client_in);
-extern int DhcpClient(int iRawsocket, DHCP_CLIENT_T * pdhcp_client_in);
+int AVDHCP_AddLease(int iRawsocket, DHCP_CLIENT_T * pdhcp_client_in);
+extern int AVDhcpClient(int iRawsocket, DHCP_CLIENT_T * pdhcp_client_in);
 
 //static char dhcp_hostname[32];
 

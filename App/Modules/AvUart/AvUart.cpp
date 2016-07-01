@@ -42,7 +42,7 @@ static av_32 BuildCmdCheckSum(char *CmdBuffer, av_32 start_idx, av_32 stop_idx)
 }
 
 
-PATTERN_SINGLETON_IMPLEMENT(CAvUart)
+SINGLETON_IMPLEMENT(CAvUart)
 
 static av_bool PtzCmd2Buffer(av_32 cmd, av_uchar VSpeed, av_uchar HSpeed, av_buf &buf)
 {

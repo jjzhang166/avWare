@@ -23,7 +23,7 @@
 class CAvUpnpCli : public CTimer
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvUpnpCli);
+	SINGLETON_DECLARE(CAvUpnpCli);
 private:
 	CAvUpnpCli();
 	virtual ~CAvUpnpCli();

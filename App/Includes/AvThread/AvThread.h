@@ -16,7 +16,7 @@
 #define _AVTHREAD_H_
 #include <string>
 #include "Apis/AvWareType.h"
-#include "CObject.h"
+#include "CAvObject.h"
 #include "Apis/LibSystem.h"
 
 #if defined(WIN32)
@@ -70,7 +70,28 @@ private:
 	CMutex &m_Mutex;
 };
 
-
+// class CCond
+// {
+// public:
+// 	inline CCond():m_hCond(0){
+// 		
+// 	}
+// 	inline ~CCond(){
+// 
+// 	}
+// 
+// 	inline av_bool CondWait(){
+// 
+// 	}
+// 	inline av_bool CondSignal(){
+// 
+// 	}
+// 	inline av_bool Cond
+// 
+// 
+// private:
+// 	av_cond *m_hCond;
+// };
 
 class CSemaphore
 {
@@ -114,7 +135,7 @@ private:
 	} while (0)
 #endif
 
-class CThread:public CObject
+class CThread:public CAvObject
 {
 public:
 	enum CThreadStatus{

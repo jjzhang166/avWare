@@ -14,14 +14,14 @@
 ******************************************************************/
 #ifndef _AVONVIF_H_
 #define _AVONVIF_H_
-#include "CObject.h"
+#include "CAvObject.h"
 #include "Apis/AvWareType.h"
 #include "Onvif/onvifAPI.h"
 
 class CAvOnvifSer
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvOnvifSer);
+	SINGLETON_DECLARE(CAvOnvifSer);
 	CAvOnvifSer();
 	~CAvOnvifSer();
 public:

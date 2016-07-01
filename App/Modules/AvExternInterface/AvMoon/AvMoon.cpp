@@ -13,16 +13,16 @@
 |  说明:
 ******************************************************************/
 #include "AvMoon.h"
-#include "AvCapture/AvCapture.h"
+#include "AvCapture/AvManCapture.h"
 #include "AvUart/AvUart.h"
 #include "AvConfigs/AvConfigNetService.h"
 #include "AvPacket/AvPacket.h"
 #include "AvDevice/AvDevice.h"
+#include "Apis/AvWareType.h"
 
 
 
-
-PATTERN_SINGLETON_IMPLEMENT(CStream);
+SINGLETON_IMPLEMENT(CStream);
 CStream::CStream()
 {
 	memset(m_VideoCount, 0x00, sizeof(m_VideoCount));
@@ -33,10 +33,10 @@ CStream::~CStream()
 	av_msg("%s\n", __FUNCTION__);
 }
 
-int CStream::OnVideoData(av_uchar Channel, av_uchar Slave, CPacket &packet)
+int CStream::OnVideoData(av_uchar Channel, av_uchar Slave, CAvPacket *AvPacket)
 {
 
-	if (av_false == packet.IsVideo()){
+	if (AvPacket->IsVideoFrame() == av_false){
 		return 0;
 	}
 	C_VideoAttr VideoAttr = { 0 };
@@ -52,9 +52,11 @@ int CStream::OnVideoData(av_uchar Channel, av_uchar Slave, CPacket &packet)
 	VideoAttr.FrameSec = 0;
 	VideoAttr.FrameUsec = 0;
 
+
+
 	g_StreamManager.StreamVideoReset(Channel, Slave);
 	g_StreamManager.StreamVideoAttr(Channel, Slave, VideoAttr);
-	g_StreamManager.StreamVideoAppend(Channel, Slave, packet.GetRawData(), packet.GetRawDataLen(), 0x01);
+	g_StreamManager.StreamVideoAppend(Channel, Slave, (char *)AvPacket->GetRawBuffer(), AvPacket->GetRawLength(), 0x01);
 
 	return 0;
 }
@@ -64,9 +66,9 @@ int CStream::OnVideoData(av_uchar Channel, av_uchar Slave, CPacket &packet)
 int OpenStream(int Channel, int Slave, StreamContent AudioVideo)
 {
 	av_msg("%s\n", __FUNCTION__);
-	CAvCapture *pAvCapture = g_MCapture.GetAvCaptureInstance(Channel);
+	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(Channel);
 
-	pAvCapture->StreamStart((av_uchar)Slave, &(g_LocalStream), (CAvCapture::OnStreamSigNalFunc)&CStream::OnVideoData);
+	pCapture->Start((av_uchar)Slave, &(g_LocalStream), (Capture::SIG_PROC_ONDATA)&CStream::OnVideoData);
 
 	return 0;
 }
@@ -74,16 +76,16 @@ int OpenStream(int Channel, int Slave, StreamContent AudioVideo)
 int CloseStream(int Channel, int Slave, StreamContent AudioVideo)
 {
 	av_msg("%s\n", __FUNCTION__);
-	CAvCapture *pAvCapture = g_MCapture.GetAvCaptureInstance(Channel);
+	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(Channel);
 
-	pAvCapture->StreamStop((av_uchar)Slave, &(g_LocalStream), (CAvCapture::OnStreamSigNalFunc)&CStream::OnVideoData);
+	pCapture->Stop((av_uchar)Slave, &(g_LocalStream), (Capture::SIG_PROC_ONDATA)&CStream::OnVideoData);
 
 	return 0;
 }
 
 
 
-PATTERN_SINGLETON_IMPLEMENT(CAvMoon)
+SINGLETON_IMPLEMENT(CAvMoon)
 
 CAvMoon * CAvMoon::m_SearchService = NULL;
 CAvMoon::CAvMoon()
@@ -117,7 +119,7 @@ int CAvMoon::StopMoon()
 	return 0;
 }
 
-
+#if 0
 av_bool CAvMoon::Connect(C_ConnectArgs &ConArgs)
 {
 	MoonConnect(ConArgs.address.c_str(), atoi(ConArgs.port.c_str()), ConArgs.username.c_str(), ConArgs.passwd.c_str());
@@ -150,6 +152,7 @@ av_bool CAvMoon::SetDeviceInfo(C_DeviceInfo &DeviceInfo)
 	return av_true;
 }
 
+
 //以下两个函数需要走搜索 相关接口。
 av_bool CAvMoon::SearchDevice(std::list<C_DeviceList> &DeviceList)
 {
@@ -178,7 +181,7 @@ av_bool CAvMoon::SetNetParam(C_NetParam &NetParam)
 {
 	return av_true;
 }
-
+#endif
 
 
 int CAvMoon::OnRemoteGetDeviceCaps(C_DeviceCaps &DeviceCaps, int status)
@@ -270,17 +273,18 @@ int CAvMoon::OnRemoteGetSysTimeProfile(int status)
 int CAvMoon::OnRemoteStreamData(CStreamPacket *pStream)
 {
 	av_msg("%s\n", __FUNCTION__);
-	CPacket packet;
-
 	char *Streamdata;
 	int  StreamLen;
 	pStream->StreamPacketGet(Streamdata, StreamLen);
 
 
-	packet.LoadData(Streamdata, StreamLen);
+	CAvPacket *AvPacket = g_AvPacketManager.GetAvPacket(StreamLen);
 
-	CAvNetCapture::StreamData(0,1, packet);
+	AvPacket->PutBuffer((av_uchar *)Streamdata, StreamLen);
+	AvPacket->PutBufferOver();
 
+
+	AvPacket->Release();
 	return 0;
 }
 int CAvMoon::OnRemoteStreamStart(C_StreamStart &StreamStart, COMMAND_E ReqOrResp)
@@ -1329,14 +1333,46 @@ int CAvMoon::LocalGetManufacturerInfo(C_ManufacturerInfo &FacInfo)
 	sprintf(FacInfo.HardWareVersion, "%s", DeviceFacInfo.HardWareVersion);
 	sprintf(FacInfo.FacManufacturer, "%s", DeviceFacInfo.FactoryName);
 	sprintf(FacInfo.FacProductionSerialNo, "%s", DeviceFacInfo.SerialNumber);
-	sprintf(FacInfo.ProtocolUniqueCode, "%s", DeviceFacInfo.ProductMacAddr);
+
+	FacInfo.FacChip = (Chip)0xff;
+	FacInfo.FacSenSor = (Sensor)0xff;
+
+	std::string guid;
+	CAvDevice::GetStartUpGuid(guid);
+	sprintf(FacInfo.ProtocolUniqueCode, "%s", guid.c_str());
 
 	return 0;
 }
 int CAvMoon::LocalSetManufacturerInfo(C_ManufacturerInfo &FacInfo)
 {
 	av_msg("%s\n", __FUNCTION__);
+	C_DeviceFactoryInfo DeviceFacInfo;
+	
+	DeviceFacInfo.MaxChannel = FacInfo.ChannelMax;
+	DeviceFacInfo.FActoryTime = FacInfo.FacTime;
+	sprintf(DeviceFacInfo.ProductModel, "%s", FacInfo.FacProductionModel);
+	sprintf(DeviceFacInfo.HardWareVersion, "%s", FacInfo.HardWareVersion);
+	sprintf(DeviceFacInfo.FactoryName, "%s", FacInfo.FacManufacturer);
+	sprintf(DeviceFacInfo.SerialNumber, "%s", FacInfo.FacProductionSerialNo);
+	char buffer[32];
+	int bufferlen = 0;
+	for (int i = 0; i < strlen(DeviceFacInfo.SerialNumber); i++){
+		if (bufferlen == 0 && DeviceFacInfo.SerialNumber[i] != '-') continue;
+		if (bufferlen != 0 && DeviceFacInfo.SerialNumber[i] == '-'){
+			break;
+		}
+		else{
+			if (bufferlen == 0){
+				i++;
+			}
+		}
+		buffer[bufferlen] = toupper(DeviceFacInfo.SerialNumber[i]);
+		bufferlen++;
+		buffer[bufferlen] = '\0';
+	}
+	sprintf(DeviceFacInfo.ProductMacAddr, "%s", buffer);
 
+	CAvDevice::SetDeviceInfo(DeviceFacInfo);
 	return 0;
 }
 
@@ -1533,6 +1569,34 @@ int CAvMoon::LocalFirmwareUpgrade(C_FirmwareUpgrade &FirmwareUpgrade)
 int CAvMoon::LocalFirmwareData(unsigned char *data, int datalen, unsigned int status, unsigned int *Progress)
 {
 	av_msg("%s\n", __FUNCTION__);
+	static int firmwarefd = -1;
+	static int firmwarelen = 0;
+	static std::string FilePatch;
+	firmwarelen += datalen;
+
+#if defined(WIN32)
+	FilePatch.assign("firmwware.bin");
+	if (firmwarefd == -1) firmwarefd = open(FilePatch.c_str(), O_WRONLY | O_CREAT | O_BINARY);
+#else
+	FilePatch.assign("/tmp/firmware.bin");
+	if (firmwarefd == -1) firmwarefd = open(FilePatch.c_str(), O_WRONLY | O_CREAT, 0x666);
+#endif
+
+	if (PROTO_STATUS_ING == status){
+		write(firmwarefd, data, datalen);
+	}
+	else if (PROTO_STATUS_END == status){
+		write(firmwarefd, data, datalen);
+		close(firmwarefd);
+		CAvDevice::SystemUpgrade(FilePatch, *Progress);
+	}
+	else if (PROTO_STATUS_BEGIN == status){
+		write(firmwarefd, data, datalen);
+	}
+	else{
+
+	}
+
 	return 0;
 }
 

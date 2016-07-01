@@ -14,4 +14,4 @@
 ******************************************************************/
 #include "AvAudio/AvAudio.h"
 
-PATTERN_SINGLETON_IMPLEMENT(CAudioPlay);
+SINGLETON_IMPLEMENT(CAudioPlay);

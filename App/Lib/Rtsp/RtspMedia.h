@@ -15,7 +15,7 @@
 #ifndef _RTSP_H_
 #define _RTSP_H_
 #include <string>
-#include "CObject.h"
+#include "CAvObject.h"
 #include "RTP.h"
 #include "RSock.h"
 #include "RTCP.h"
@@ -23,8 +23,7 @@
 
 #if defined (_AV_WARE_)
 #include "AvPacket/AvPacket.h"
-#endif
-
+#else
 typedef enum {
 	nal_unit_type_nr = 0x01 << 0,
 	nal_unit_type_p = 0x01 << 1,
@@ -40,6 +39,7 @@ typedef enum {
 	nal_unit_type_streamend = 0x01 << 11,
 	nal_unit_type_pading = 0x01 << 12,
 }nal_unit_type;
+#endif
 
 
 typedef enum 
@@ -137,7 +137,7 @@ typedef struct {
 int GetH264FrameSliceInfo(unsigned char *FrameData, unsigned int Datalen, FrameSliceInfo *SliceInfo);
 int GetH265FrameSliceInfo(unsigned char *FrameData, unsigned int Datalen, FrameSliceInfo *SliceInfo);
 
-class CRtspMedia :public CObject, public CRTP, public CRTCP
+class CRtspMedia :public CAvObject, public CRTP, public CRTCP
 {
 
 public:
@@ -218,7 +218,7 @@ public:
 	int PushAudioStream();
 	int PushVideoStreamFrame(CRtspMedia::RTSP_MEDIA_ENCODEC codeC, const char *data, int len);
 #ifdef _AV_WARE_
-	int PushVideoStreamFrame(CPacket &packet);
+	int PushVideoStreamFrame(CAvPacket *AvPacket);
 #endif
 
 private:

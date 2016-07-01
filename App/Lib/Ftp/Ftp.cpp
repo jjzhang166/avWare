@@ -62,43 +62,40 @@ CFtp::~CFtp()
 {
 
 }
-int CFtp::FtpLogin()
+int CFtp::AVFtpLogin()
 {
 	int ret  = FTP_ERROR;
     char recv_buf[1500];
 	int state = 0;
 	char tmpBuf[256];
 
-    ret = FtpConnect();
+    ret = AVFtpConnect();
     if(ret < 0)
     {
         printf("ftp>: Connect Ftp Server Failed-->!\n");
         return FTP_CONNECT_FAILED;
     }
 
-	ret = FtpSendAndGet("USER ", m_Username.c_str(), recv_buf, state);
+	ret = AVFtpSendAndGet("USER ", m_Username.c_str(), recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     FTP_ASSERT_RETURN( (state == 331), FTP_AUTH_FAILED);
 
 	memset(recv_buf, 0, sizeof(recv_buf));
     state = 0;
-    ret = FtpSendAndGet("PASS ", m_Passwd.c_str(), recv_buf, state);
+    ret = AVFtpSendAndGet("PASS ", m_Passwd.c_str(), recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     FTP_ASSERT_RETURN( (state == 230), FTP_AUTH_FAILED);
 
-	/************************************************************************/
-    /* SYST:查出服务类型, REST:从文件一偏移位置下载                         */
-    /************************************************************************/
     login_success = true;
     
-    ret = FtpPwd( tmpBuf );
+    ret = AVFtpPwd( tmpBuf );
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
 
     Initial_dir = tmpBuf;
     return FTP_OK;
 }
 
-int CFtp::FtpQuit()
+int CFtp::AVFtpQuit()
 {
 	char recv_buf[1500];
     int state;
@@ -108,7 +105,7 @@ int CFtp::FtpQuit()
 
 	if(login_success)
     {
-        ret = FtpSendAndGet("QUIT", "", recv_buf, state);
+        ret = AVFtpSendAndGet("QUIT", "", recv_buf, state);
         if( state != 221 ||  ret < FTP_OK )
         {
             printf("CFtpProtocol>: FtpQuit failed, socket[%d]\n", m_Ctrlsocket);
@@ -130,7 +127,7 @@ int CFtp::FtpQuit()
     return ret;
 }
 
-int CFtp::FtpSetConf(std::string Server, int Port, std::string Usrname, std::string Passwd)
+int CFtp::AVFtpSetConf(std::string Server, int Port, std::string Usrname, std::string Passwd)
 {
 	if (0 == Server.size() || 0 == Usrname.size() || 0 == Passwd.size() || Port < 0)
 	{
@@ -146,7 +143,7 @@ int CFtp::FtpSetConf(std::string Server, int Port, std::string Usrname, std::str
 	return FTP_OK;
 }
 
-int CFtp::FtpCloseData()
+int CFtp::AVFtpCloseData()
 {
 	int ret = FTP_ERROR;
     int state;
@@ -164,14 +161,14 @@ int CFtp::FtpCloseData()
     }
 
     state = -1;
-    ret = FtpSendAndGet("", "", recv_buf, state);
+    ret = AVFtpSendAndGet("", "", recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     FTP_ASSERT_RETURN( (state == 226), FTP_ERROR);    //验证返回码
 
     return FTP_OK;
 }
 
-int CFtp::FtpSendData(const char * buf, int& buflen)
+int CFtp::AVFtpSendData(const char * buf, int& buflen)
 {
 	struct timeval timetmp;
     int ret;
@@ -235,15 +232,15 @@ int CFtp::FtpSendData(const char * buf, int& buflen)
 	return FTP_OK;
 }
 
-int CFtp::FtpRecvData(char * buf, int& buflen)
+int CFtp::AVFtpRecvData(char * buf, int& buflen)
 {
-	FtpRecv(m_Datasocket, buf, buflen, FTP_RECV_TIME);
+	AVFtpRecv(m_Datasocket, buf, buflen, FTP_RECV_TIME);
 
 	return 0;
 }
 
 
-int CFtp::FtpConnect()
+int CFtp::AVFtpConnect()
 {
 	struct sockaddr_in sin;    
     int on = 1;
@@ -285,14 +282,14 @@ int CFtp::FtpConnect()
 	}
 
 	set_nonblock(TRUE, m_Ctrlsocket);
-	iRetCode = FtpSendAndGet("", "", recv_buf, state);
+	iRetCode = AVFtpSendAndGet("", "", recv_buf, state);
     FTP_ASSERT_RETURN( (iRetCode >= FTP_OK), iRetCode);
     FTP_ASSERT_RETURN( (state == 220), FTP_ERROR);
 	
     return FTP_OK;
 }
 
-int CFtp::FtpSend(char * buf, int buflen)
+int CFtp::AVFtpSend(char * buf, int buflen)
 {
 	int ret = -1;
     int sendlen = 0;
@@ -334,7 +331,7 @@ int CFtp::FtpSend(char * buf, int buflen)
 	return FTP_OK;
 }
 
-int CFtp::FtpRecv(char * buf, int &buflen, int timeout)
+int CFtp::AVFtpRecv(char * buf, int &buflen, int timeout)
 {
 	struct timeval timetmp;
     int ret;
@@ -374,9 +371,7 @@ int CFtp::FtpRecv(char * buf, int &buflen, int timeout)
 		//printf("bbbbbbbbbbbb ret = %d\n",ret);
         FTP_ASSERT_RETURN( (ret > 0), FTP_ERROR);
         buflen = ret;
-//#ifdef FTP_DBG_PROTOCOL
         printf("ftp>:recv: %s\n", buf);
-//#endif
         return FTP_OK;
     }
     else if(ret == 0)
@@ -387,7 +382,7 @@ int CFtp::FtpRecv(char * buf, int &buflen, int timeout)
     return FTP_ERROR;
 }
 
-int CFtp::FtpRecv(int ftp_sock, char * buf, int &buflen, int timeout)
+int CFtp::AVFtpRecv(int ftp_sock, char * buf, int &buflen, int timeout)
 {
 	struct timeval timetmp;
     int ret;
@@ -410,7 +405,7 @@ int CFtp::FtpRecv(int ftp_sock, char * buf, int &buflen, int timeout)
         buflen = recv(ftp_sock, buf, FTP_MAX_LEN-1, 0);
         FTP_ASSERT_RETURN( (buflen >= 0), FTP_ERROR);
 #ifdef _DEBUG
-        //FTP_Printf("ftp>:recv: %s\n", buf);
+        
 #endif
         return FTP_OK;
     }
@@ -422,7 +417,7 @@ int CFtp::FtpRecv(int ftp_sock, char * buf, int &buflen, int timeout)
     return FTP_ERROR;
 }
 
-int CFtp::FtpSendAndGet( const char * strCommand, const char * param, char * Response, int &ReponseState )
+int CFtp::AVFtpSendAndGet( const char * strCommand, const char * param, char * Response, int &ReponseState )
 {
 	int ret;
 	int buflen = 0;
@@ -432,7 +427,7 @@ int CFtp::FtpSendAndGet( const char * strCommand, const char * param, char * Res
     {
         char send_buf[1500];
         sprintf(send_buf, "%s%s\r\n", strCommand, param);
-        ret = FtpSend( (char*)send_buf, (int)strlen(send_buf) );
+        ret = AVFtpSend( (char*)send_buf, (int)strlen(send_buf) );
         if(ret < 0)
         {
             printf("ftp>: ftp send failed, error[%d], content[%s]\n", ret, send_buf);
@@ -441,7 +436,7 @@ int CFtp::FtpSendAndGet( const char * strCommand, const char * param, char * Res
         }
     }
 
-	ret = FtpRecv(Response, buflen, FTP_RECV_TIME);
+	ret = AVFtpRecv(Response, buflen, FTP_RECV_TIME);
     if(ret < 0)
     {
         printf("ftp>: ftp recv failed: ");
@@ -466,7 +461,7 @@ int CFtp::FtpSendAndGet( const char * strCommand, const char * param, char * Res
 	return FTP_OK;
 }
 
-int CFtp::FtpChangePath(char * szPath)
+int CFtp::AVFtpChangePath(char * szPath)
 {
 	int state;
     int ret = FTP_ERROR;
@@ -478,27 +473,27 @@ int CFtp::FtpChangePath(char * szPath)
     }
 
     state = 0;
-    ret = FtpSendAndGet("CWD ", szPath, recv_buf, state);
+    ret = AVFtpSendAndGet("CWD ", szPath, recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     FTP_ASSERT_RETURN( (state == 250), FTP_ERROR);
     return FTP_OK;
 }
 
-int CFtp::FtpMkDir(char * szDir)
+int CFtp::AVFtpMkDir(char * szDir)
 {
 	char recv_buf[1500];
     int state;
     int ret = FTP_ERROR;
 
     state = 0;
-    ret = FtpSendAndGet("MKD ", szDir, recv_buf, state);
+    ret = AVFtpSendAndGet("MKD ", szDir, recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     FTP_ASSERT_RETURN( (state == 257 || state == 550), FTP_ERROR); //550状态:示执行请求操作,说明目录已存在
 
     return FTP_OK;
 }
 
-int CFtp::FtpMkDirRecursion(char * szDir)
+int CFtp::AVFtpMkDirRecursion(char * szDir)
 {
 	int ret = FTP_ERROR;
     int count = 0; //记录目录的级数
@@ -538,7 +533,7 @@ int CFtp::FtpMkDirRecursion(char * szDir)
 			int i =0;
 		    do		 
             {
-				ret = FtpChangePath(p2);
+				ret = AVFtpChangePath(p2);
 				if((!ret)&& (!changePath_flag))
 				{
 					printf(" ftp changed path [%s]\n",p2);
@@ -546,18 +541,18 @@ int CFtp::FtpMkDirRecursion(char * szDir)
 					changePath_flag = 1;
 					break;
 				}
-	    		ret = FtpMkDir(p2);
+	    		ret = AVFtpMkDir(p2);
 	  			printf(" ftp maked path [%s]\n",p2);
 				i++;		
             }while( ret != FTP_OK  && i < 4 );
 	        FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
             if(*p1 == 0)
             {
-                break; //字符串分析完了, 目录也建完了
+                break; 
             }
 			if(!changePath_flag)
 			{
-            	ret = FtpChangePath(p2);
+            	ret = AVFtpChangePath(p2);
 	            FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
 			}
             count++;
@@ -565,17 +560,16 @@ int CFtp::FtpMkDirRecursion(char * szDir)
         }
     }
 
-	//退回到初始建立目录的地方
     while (count--)
     {
-        ret = FtpChangePath((char *)"..");
+        ret = AVFtpChangePath((char *)"..");
         FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     }
 
 	return FTP_OK;
 }
 
-int CFtp::FtpPassive()
+int CFtp::AVFtpPassive()
 {
 	char recv_buf[1500];
     int state;
@@ -584,7 +578,6 @@ int CFtp::FtpPassive()
 	char * buf_ptr;
     int port_num;
     
-    //进入passive模式前,先关闭其它的数据连接, 本ftp协议目前只支持一条数据连接
     if(m_Datasocket != -1)
     {
         FTP_close(m_Datasocket);
@@ -592,9 +585,9 @@ int CFtp::FtpPassive()
     }
 
     state = 0;
-    ret = FtpSendAndGet("PASV", "", recv_buf, state);
+    ret = AVFtpSendAndGet("PASV", "", recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
-    FTP_ASSERT_RETURN( (state == 227), FTP_ERROR);    //验证返回码
+    FTP_ASSERT_RETURN( (state == 227), FTP_ERROR); 
 
 	buf_ptr = strrchr(recv_buf, ',');
     *buf_ptr = '\0';
@@ -604,7 +597,6 @@ int CFtp::FtpPassive()
     *buf_ptr = '\0';
     port_num += atoi(buf_ptr + 1) * 256;
 
-	//开始建立数据连接
     struct sockaddr_in szTmpAddr;
     int on = 1;
     m_Datasocket = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
@@ -637,7 +629,6 @@ int CFtp::FtpPassive()
         return -1;
     }
 
-	/*数据端口地址*/
     memset(&szTmpAddr, 0,sizeof(struct sockaddr_in));
     szTmpAddr.sin_port   = htons(port_num);
     szTmpAddr.sin_family = AF_INET;
@@ -661,43 +652,43 @@ int CFtp::FtpPassive()
     return FTP_OK;
 }
 
-int CFtp::FtpList()
+int CFtp::AVFtpList()
 {
 	char recv_buf[1500];
     int state;
     int ret = FTP_ERROR;
 
-    FtpPassive();
+    AVFtpPassive();
 
     state = 0;
-    ret = FtpSendAndGet("list", "", recv_buf, state);
+    ret = AVFtpSendAndGet("list", "", recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     FTP_ASSERT_RETURN( (state == 150), FTP_ERROR);    //验证返回码
     
     char buf[FTP_MAX_LEN];
     int buf_len = 0;
-    ret = FtpRecv(m_Datasocket, buf, buf_len, FTP_RECV_TIME);
+    ret = AVFtpRecv(m_Datasocket, buf, buf_len, FTP_RECV_TIME);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     
     state = -1; //标识不发送,只接收
-    ret = FtpSendAndGet("", "", recv_buf, state);
+    ret = AVFtpSendAndGet("", "", recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     FTP_ASSERT_RETURN( (state == 226), FTP_ERROR);    //验证返回码
 
     return FTP_OK;
 }
 
-int CFtp::FtpReturnRoot()
+int CFtp::AVFtpReturnRoot()
 {
 	int ret = FTP_ERROR;
 
-    ret = FtpChangePath( (char*)Initial_dir.c_str() );
+    ret = AVFtpChangePath( (char*)Initial_dir.c_str() );
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
 
     return FTP_OK;
 }
 
-int CFtp::FtpSize(const char *filename)
+int CFtp::AVFtpSize(const char *filename)
 {
 	char recv_buf[1500];
     int state;
@@ -705,7 +696,7 @@ int CFtp::FtpSize(const char *filename)
     int file_size = 0;
 
     state = 0;
-    ret = FtpSendAndGet("size ", filename, recv_buf, state);
+    ret = AVFtpSendAndGet("size ", filename, recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
 
 	if(550 == state)//文件不存在
@@ -723,27 +714,26 @@ int CFtp::FtpSize(const char *filename)
     return file_size;
 }
 
-int CFtp::FtpRename(const char * sourc, const char * dst)
+int CFtp::AVFtpRename(const char * sourc, const char * dst)
 {
 	char recv_buf[1500];
     int state;
     int ret = FTP_ERROR;
 
-    //文件正常传送完毕， 把文件名改回原来的真实文件名
     state = 0;
-    ret = FtpSendAndGet("RNFR ", sourc, recv_buf, state);
+    ret = AVFtpSendAndGet("RNFR ", sourc, recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     FTP_ASSERT_RETURN( (state == 350), FTP_ERROR);
 
     state = 0;
-    ret = FtpSendAndGet("RNTO ", dst, recv_buf, state);
+    ret = AVFtpSendAndGet("RNTO ", dst, recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     FTP_ASSERT_RETURN( (state == 250), FTP_ERROR);
     
     return FTP_OK;
 }
 
-int CFtp::FtpRest(int offset)
+int CFtp::AVFtpRest(int offset)
 {
 	char recv_buf[1500];
     int state;
@@ -753,21 +743,21 @@ int CFtp::FtpRest(int offset)
     sprintf(buf, "%d", offset);
 
     state = 0;
-    ret = FtpSendAndGet("rest ", buf, recv_buf, state);
+    ret = AVFtpSendAndGet("rest ", buf, recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     FTP_ASSERT_RETURN( (state == 350), FTP_ERROR);    //验证返回码
     
     return FTP_OK;
 }
 
-int CFtp::FtpAppend(const char *filename)
+int CFtp::AVFtpAppend(const char *filename)
 {
 	char recv_buf[1500];
     int state;
     int ret = FTP_ERROR;
 
     state = 0;
-    ret = FtpSendAndGet("appe ", filename, recv_buf, state);
+    ret = AVFtpSendAndGet("appe ", filename, recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     if( (state < 100) &&(state >= 200) )
     {
@@ -777,14 +767,14 @@ int CFtp::FtpAppend(const char *filename)
     return FTP_OK;
 }
 
-int CFtp::FtpStor(const char *filename)
+int CFtp::AVFtpStor(const char *filename)
 {
 	char recv_buf[1500];
     int state;
     int ret = FTP_ERROR;
 
     state = 0;
-    ret = FtpSendAndGet("stor ", filename, recv_buf, state);
+    ret = AVFtpSendAndGet("stor ", filename, recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     if( (state < 100) &&(state >= 200) )
     {
@@ -794,14 +784,14 @@ int CFtp::FtpStor(const char *filename)
     return FTP_OK;
 }
 
-int CFtp::FtpRetr( const char *filename )
+int CFtp::AVFtpRetr( const char *filename )
 {
     char recv_buf[1500];
     int state;
     int ret = FTP_ERROR;
 
     state = 0;
-    ret = FtpSendAndGet("retr ", filename, recv_buf, state);
+    ret = AVFtpSendAndGet("retr ", filename, recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     if( (state < 100) &&(state >= 200) )
     {
@@ -811,7 +801,7 @@ int CFtp::FtpRetr( const char *filename )
     return FTP_OK;
 }
 
-int CFtp::FtpType( const FTP_TRAN_TYPE_E type_in )
+int CFtp::AVFtpType( const FTP_TRAN_TYPE_E type_in )
 {
     char recv_buf[1500];
     int state;
@@ -820,7 +810,7 @@ int CFtp::FtpType( const FTP_TRAN_TYPE_E type_in )
     if(type_in == FTT_BINEARY)
     {
         state = 0;
-        ret = FtpSendAndGet("TYPE ", "I", recv_buf, state);
+        ret = AVFtpSendAndGet("TYPE ", "I", recv_buf, state);
         FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
         FTP_ASSERT_RETURN( (state == 200), FTP_ERROR);    //验证返回码
     }
@@ -833,13 +823,13 @@ int CFtp::FtpType( const FTP_TRAN_TYPE_E type_in )
     return FTP_OK;
 }
 
-int CFtp::FtpPwd( char * cur_dir )
+int CFtp::AVFtpPwd( char * cur_dir )
 {
 	char recv_buf[1500];
     int state;
     int ret = FTP_ERROR;
 
-    ret = FtpSendAndGet("PWD", "", recv_buf, state);
+    ret = AVFtpSendAndGet("PWD", "", recv_buf, state);
     FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
     FTP_ASSERT_RETURN( (state == 257), FTP_ERROR);
 

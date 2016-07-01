@@ -17,12 +17,12 @@
 #include "Apis/AvWareType.h"
 #include "AvThread/AvQueue.h"
 #include "AvThread/AvThread.h"
-#include "CObject.h"
+#include "CAvObject.h"
 
 class CThreadPool
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CThreadPool);
+	SINGLETON_DECLARE(CThreadPool);
 private:
 	CThreadPool();
 	~CThreadPool();

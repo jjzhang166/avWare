@@ -17,7 +17,7 @@
 
 
 #include "Apis/AvWareType.h"
-#include "CObject.h"
+#include "CAvObject.h"
 #define WebPrintf av_msg
 #define WebPerror av_error
 
@@ -29,7 +29,7 @@
 
 
 
-#include "CObject.h"
+#include "CAvObject.h"
 #define RECV_BUF_SIZE 2*1024
 
 
@@ -48,9 +48,9 @@ typedef enum __EnFileType
 	EnFileType_Default,
 } EnFileType;
 
-typedef int(CObject::*WebCallBack)(std::string InBuf, std::string &OutBuf);
+typedef int(CAvObject::*WebCallBack)(std::string InBuf, std::string &OutBuf);
 
-class CWorkTask:public CObject
+class CWorkTask:public CAvObject
 {   
 public:   
  	CWorkTask();
@@ -59,7 +59,7 @@ public:
 	int SetSocket(int fdSock);//将socket传进来
 	int SetWebAttr(std::string WebRoot, std::string WebIndex);
 
-	int SetCallBack(CObject *obj, WebCallBack proc);
+	int SetCallBack(CAvObject *obj, WebCallBack proc);
 	int GetSocket();
 	int HandleConnect(int fdSock,int iTimeout = 5000000);
 	int ParseAndHandReq(int fdSock, char *pData, int iLen);
@@ -83,7 +83,7 @@ private:
 	std::string m_WebRoot;
 	std::string m_IndexHtml;
 
-	CObject *m_CbObj;
+	CAvObject *m_CbObj;
 	WebCallBack  m_CbProc;
 };   
 

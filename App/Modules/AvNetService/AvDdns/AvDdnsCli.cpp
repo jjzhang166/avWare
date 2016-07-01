@@ -16,7 +16,7 @@
 #include "AvNetService/AvDdns.h"
 
 
-PATTERN_SINGLETON_IMPLEMENT(CAvDdnsCli)
+SINGLETON_IMPLEMENT(CAvDdnsCli)
 
 CAvDdnsCli::CAvDdnsCli():CTimer("AvDdnsCli")
 {

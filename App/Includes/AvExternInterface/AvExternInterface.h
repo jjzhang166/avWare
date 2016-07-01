@@ -15,13 +15,13 @@
 #ifndef _AVEXTERNINTERFACE_H_
 #define _AVEXTERNINTERFACE_H_
 
-#include "CObject.h"
+#include "CAvObject.h"
 #include "Apis/AvWareType.h"
 
 class CAvExtInterFace
 {
 public:
-	PATTERN_SINGLETON_DECLARE(CAvExtInterFace);
+	SINGLETON_DECLARE(CAvExtInterFace);
 	
 public:
 	av_bool Initialize();

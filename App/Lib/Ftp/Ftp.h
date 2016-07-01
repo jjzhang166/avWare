@@ -81,39 +81,39 @@ public:
 	CFtp();
 	virtual ~CFtp();
 
-	int FtpLogin();
-	int FtpQuit();
+	int AVFtpLogin();
+	int AVFtpQuit();
 
-	int FtpSetConf(std::string Server, int Port, std::string Usrname, std::string Passwd);
+	int AVFtpSetConf(std::string Server, int Port, std::string Usrname, std::string Passwd);
 
-	int FtpSendData(const char * buf, int& buflen);
-	int FtpRecvData(char * buf, int& buflen);
-	int FtpCloseData();
+	int AVFtpSendData(const char * buf, int& buflen);
+	int AVFtpRecvData(char * buf, int& buflen);
+	int AVFtpCloseData();
 
-	int FtpChangePath(char * szPath);
-	int FtpMkDir(char * szDir);
-	int FtpMkDirRecursion(char * szDir);//递归建立目录结构
-	int FtpList();//打印ftp服务器文件列表, 测试使用
-	int FtpReturnRoot();//近回到刚登录的时侯，进入的目录
+	int AVFtpChangePath(char * szPath);
+	int AVFtpMkDir(char * szDir);
+	int AVFtpMkDirRecursion(char * szDir);//递归建立目录结构
+	int AVFtpList();//打印ftp服务器文件列表, 测试使用
+	int AVFtpReturnRoot();//近回到刚登录的时侯，进入的目录
 
-	int FtpSize(const char *filename);//返回文件的大小， 或者错误
-	int FtpRename(const char * sourc, const char * dst);
-	int FtpRest(int offset);
+	int AVFtpSize(const char *filename);//返回文件的大小， 或者错误
+	int AVFtpRename(const char * sourc, const char * dst);
+	int AVFtpRest(int offset);
 
-	int FtpAppend(const char *filename);/*请求追加文件*/
-	int FtpStor(const char *filename);/*请求上传文件*/
-	int FtpRetr(const char *filename);//请求下载文件
-	int FtpType(const FTP_TRAN_TYPE_E type_in);
-	int FtpPassive();
-	int FtpPwd( char * cur_dir );
+	int AVFtpAppend(const char *filename);/*请求追加文件*/
+	int AVFtpStor(const char *filename);/*请求上传文件*/
+	int AVFtpRetr(const char *filename);//请求下载文件
+	int AVFtpType(const FTP_TRAN_TYPE_E type_in);
+	int AVFtpPassive();
+	int AVFtpPwd( char * cur_dir );
 
 private:
 
-	int FtpConnect();
-	int FtpSend(char * buf, int buflen);
-	int FtpRecv(char * buf, int &buflen, int timeout);//timeout:单位为毫秒
-	int FtpRecv(int ftp_sock, char * buf, int &buflen, int timeout);//timeout:单位为毫秒
-	int FtpSendAndGet( const char * strCommand, const char * param, char * Response, int &ReponseState );
+	int AVFtpConnect();
+	int AVFtpSend(char * buf, int buflen);
+	int AVFtpRecv(char * buf, int &buflen, int timeout);//timeout:单位为毫秒
+	int AVFtpRecv(int ftp_sock, char * buf, int &buflen, int timeout);//timeout:单位为毫秒
+	int AVFtpSendAndGet( const char * strCommand, const char * param, char * Response, int &ReponseState );
 
 	int m_Ctrlsocket;
 	int m_Datasocket;

@@ -14,7 +14,7 @@ avWare 是深圳市恩港科技开发有限公司，推出的一套开源代码�
 
 
 #系统结构图
-![输入图片说明](git@git.oschina.net:GracePort/avWare.git/Documents/system.jpg "在这里输入图片标题")
+![输入图片说明](http://files.git.oschina.net/group1/M00/00/71/ZxV3cFd2BqKAbdlHAABd5hqmaGU392.jpg?token=dfcf13c39b7bcc9d19e2645e2e56ae4b&ts=1467352773&attname=system.jpg "在这里输入图片标题")
 
 #运行环境
 * 海思IPC芯片 [H3518E,H3518C,H3518A,H3616C,H3516A,H3516D]

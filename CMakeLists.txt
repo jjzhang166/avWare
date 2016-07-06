@@ -13,11 +13,11 @@ elseif (UNIX)
 	option (HAVE_MemPool "use memory pool for stream buffer " OFF)
 	option (WITH_UI "Build avWare With Ui On Qt5" OFF)
 	#COMPILER
-	#set (COMPILER LINUX)
+	set (COMPILER LINUX)
 	#set (COMPILER AMBA)
 	#set (COMPILER HISI16C)
 	#set (COMPILER HISI16A)
-	set (COMPILER HISI3535)
+	#set (COMPILER HISI3535)
 	
 	set(CMAKE_SYSTEM_NAME Linux)
 	if (COMPILER MATCHES "HISI16C")

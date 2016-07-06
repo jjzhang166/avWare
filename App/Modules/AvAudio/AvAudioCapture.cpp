@@ -50,23 +50,23 @@ av_void CAudioCapture::ThreadProc()
 
 av_bool CAudioCapture::AudioCreate()
 {
-	return AvAudioEncodeCreate();
+	return av_true;
 }
 av_bool CAudioCapture::AudioDestroy()
 {
-	return AvAudioEncodeDestroy();
+	return av_true;
 }
 av_bool CAudioCapture::AudioStart()
 {
-	return AvAudioEncodeStart();
+	return av_true;
 }
 av_bool CAudioCapture::AudioStop()
 {
-	return AvAudioEncodeStop();
+	return av_true;
 }
 av_bool CAudioCapture::AudioSetFormat()
 {
-	return AvAudioEncodeSetFormat();
+	return av_true;
 }
 
 

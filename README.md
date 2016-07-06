@@ -25,7 +25,7 @@ avWare 是深圳市恩港科技开发有限公司，推出的一套开源代码�
 
 
 #联系方式
-公司网站：	http://www.graceport.cn/
-源码网站：	http://git.oschina.net/GracePort/avWare
-邮箱：		zhousheng@graceport.cn
-电话：		15012490142
+公司网站：	http://www.graceport.cn/ <br/>
+源码网站：	http://git.oschina.net/GracePort/avWare <br/>
+邮箱：   	zhousheng@graceport.cn <br/>
+电话：   	15012490142 <br/>

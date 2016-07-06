@@ -12,7 +12,7 @@
 |  日期:
 |  说明:
 ******************************************************************/
-#include "AvAlarm/AvalarmLocal.h"
+#include "AvAlarm/AvAlarmLocal.h"
 #include "Apis/LibEncode.h"
 #include "CAvObject.h"
 

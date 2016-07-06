@@ -1,6 +1,6 @@
 #include "Ddns_Global.h"
 #include "Ddns_Net.h"
-#include "Base64.h"
+#include "base64.h"
 #include "NetDdns.h"
 
 #define FORMAT_DYNDNS 		"GET /nic/update?hostname=%s&myip=&wildcard=NOCHG&mx=NOCHG&backmx=NOCHG HTTP/1.0\r\n" \

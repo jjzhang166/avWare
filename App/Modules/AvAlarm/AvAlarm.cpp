@@ -13,7 +13,7 @@
 |  หตร๗:
 ******************************************************************/
 #include "AvAlarm/AvAlarm.h"
-#include "AvAlarm/AvalarmLocal.h"
+#include "AvAlarm/AvAlarmLocal.h"
 #include "AvNetService/AvSmtp.h"
 #include "AvNetService/AvFtp.h"
 #include "AvDevice/AvDevice.h"

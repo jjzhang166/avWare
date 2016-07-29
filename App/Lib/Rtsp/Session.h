@@ -44,11 +44,6 @@ public:
 	CRtspSession();
 	virtual ~CRtspSession();
 
-public:
-
-// 	virtual int SendRtpOverTcp() = 0;
-// 	virtual int SendRtpOverUdp() = 0;
-
 protected:
 	virtual int PduRtsp(const char *data, int len) = 0;
 	virtual int OnOptions(CRtspPdu &pdu) = 0;
@@ -110,10 +105,14 @@ public:
 	virtual int OnError(CRtspPdu &pdu);
 
 private:
+	unsigned int m_Session;
 	unsigned int m_RemoteAddr;
 	unsigned int m_RemotePort;
 	int			 m_sock;
-	int			 m_MediaSock[MediaNr];
+
+	int			 m_RtpScok[CRtspMedia::RTSP_MEDIA_Nr];
+	int			 m_RtcpSock[CRtspMedia::RTSP_MEDIA_Nr];
+	
 	CRBuffer	 m_RBuffer;
 	CRtspMedia   *m_Media;
 	static int			 m_RtpPortPool;

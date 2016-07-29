@@ -56,7 +56,7 @@ int CStream::OnVideoData(av_uchar Channel, av_uchar Slave, CAvPacket *AvPacket)
 
 	g_StreamManager.StreamVideoReset(Channel, Slave);
 	g_StreamManager.StreamVideoAttr(Channel, Slave, VideoAttr);
-	g_StreamManager.StreamVideoAppend(Channel, Slave, (char *)AvPacket->GetRawBuffer(), AvPacket->GetRawLength(), 0x01);
+	g_StreamManager.StreamVideoAppend(Channel, Slave, (char *)AvPacket->GetBuffer(), AvPacket->GetLength(), 0x01);
 
 	return 0;
 }
@@ -816,6 +816,8 @@ int CAvMoon::LocalSetCaptureProfile(C_CaptureProfile &CaptureProfile)
 
 int CAvMoon::LocalGetEnCodeCaps(C_EnCodeCaps &EnCodeCaps)
 {
+
+
 	av_msg("%s\n", __FUNCTION__);
 	C_EncodeCaps Caps = { 0 };
 	CAvDevice::GetCaptureCaps(EnCodeCaps.Channel, Caps);
@@ -824,7 +826,9 @@ int CAvMoon::LocalGetEnCodeCaps(C_EnCodeCaps &EnCodeCaps)
 		if (1 << CaptureSize_300W & Caps.ImageSizeMask){
 			EnCodeCaps.CapResolutionMask |= ProtoMask(Resolution_Res2048_1536);
 		}
-
+		if (1 << CaptureSize_400W & Caps.ImageSizeMask){
+			EnCodeCaps.CapResolutionMask |= ProtoMask(Resolution_Res2560_1440);
+		}
 		if (1 << CaptureSize_500W & Caps.ImageSizeMask){
 			EnCodeCaps.CapResolutionMask |= ProtoMask(Resolution_Res2592_1944);
 		}
@@ -1146,6 +1150,9 @@ int CAvMoon::LocalSetEnCodeProfile(C_EnCodeProfile &EnCodeProfile)
 			break;
 		case Resolution_Res2048_1536:
 			Formats.CHLFormats[ch].Formats.ImageSize = CaptureSize_300W;
+			break;
+		case Resolution_Res2560_1440:
+			Formats.CHLFormats[ch].Formats.ImageSize = CaptureSize_400W;
 			break;
 		case Resolution_Res2592_1944:
 			Formats.CHLFormats[ch].Formats.ImageSize = CaptureSize_500W;

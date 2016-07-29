@@ -20,12 +20,16 @@
 #include "Apis/LibSystem.h"
 #include "Apis/LibEncode.h"
 #include "AvConfigs/AvConfigNetService.h"
+
+
+
+
 class CAvDevice:public CAvObject
 {
 public:
 	SINGLETON_DECLARE(CAvDevice);
-	av_bool Initialize();
-	
+	av_bool Initialize();//这个函数一定要在加载配置表之前运行；
+	av_bool InitializeConfigs();//这个函数一定要放在加载完配置表之后 
 public:
 	static av_bool GetEnv(std::string &key, std::string &value);
 	static av_bool SetEnv(std::string &key, std::string &value);
@@ -42,6 +46,8 @@ public:
 	static av_bool GetNetCommCaps	(C_NetCommCaps &NetCommCaps);
 	static av_bool GetImageCaps		(av_ushort Channel, C_ImageQualityCaps &ImageCaps);
 	static av_bool GetCaputreInCaps	(av_ushort Channel, C_CaptureInCaps &CaptureInCaps);
+public:
+	static av_bool GetACaptureCaps	(E_AUDIO_CHL Chl,C_AudioCaps &AudioCaps);
 
 private:
 	av_void OnConfigsNetComm(CAvConfigNetComm *NetComm, int &result);

@@ -19,23 +19,11 @@ class CRTP
 {
 public:
 #define RTP_MAX_RTP_PACKET 10
-	typedef enum {
-		RTP_OVER_TCP,
-		RTP_OVER_UDP,
-		RTP_OVER_MUL,
-	}RTP_OVER_E;
 #pragma pack(1)
 	typedef struct {
 		char *base;
 		int	  len;
 	}RTP_PACKET_T;
-#if 0
-	typedef struct {
-		unsigned char	Magic;
-		unsigned char	Channel;
-		unsigned short	Length;
-	}Interleaved;
-#endif
 	typedef struct {
 		unsigned short CsrcCount : 4;
 		unsigned short Extension : 1;
@@ -66,19 +54,18 @@ public:
 	void FuIndicatorHeader(unsigned short Indicator/*F-TYPE------LAYERID-----TID---*/, unsigned char FuHead/*S-E-R-TYPE-----*/);
 	void FuIndicatorHeader(unsigned char siglePacketFuHead);
 	void SequenceNmAdd();
-	void SetRtpOver(RTP_OVER_E roe);
-	void SetRtpPort(int RtpPort);
-	void SetRtpSock(int sock);
-	void SetInterleaved(unsigned char Channel, unsigned short length);
+	void SetInterleaved(unsigned short length);
 	void SetMarker(unsigned char Marker);
 	void SetTimestamp(unsigned long timestamp);
+	void SetTimestampInterval(unsigned long timeInterval);
 	void SetPayload(int Payload);
 	void SetRtpHeadOver();
+	void SetSyncSourceIdentCode(unsigned int ssrc);
 	void LoadData(char *data, int len);
 	void RtpBufReset();
 
 public:
-	virtual int SendRtpPacket(const RTP_PACKET_T *packet, int packetcnt);
+	virtual int SendRtpPacket();
 	virtual int OnFrameRecv(unsigned char *data, int len);
 public:
 	
@@ -94,20 +81,28 @@ public:
 	virtual int RtpUnPakcetJpegFua();
 	virtual int RtpUnPacketAudioFua();
 
-protected:
+public:
+	void SetSequenceInitial(unsigned int Seq);
+	void SetSock(int sock);
+	int		   Sock();
+	void SetInterChnPort(unsigned int InterChnPort);
+	unsigned int InterChnPort();
+
+private:
 	unsigned int m_Interleaved;
 	RtpHead		 m_RtpHead;
-	RTP_OVER_E   m_RtpOver;
 	RTP_PACKET_T m_RtpBuf[RTP_MAX_RTP_PACKET];
 	int			 m_RtpBufCnt;
-	int			 m_RtpPort;
-	int			 m_RtpSock;
 
 	unsigned char m_FuIndicatorHeader[3];
 	unsigned int m_FuIndicatorHeaderLen;
 
-	unsigned int m_TempSeq;
-	unsigned int m_TempTimeStamp;
+	unsigned int	m_Sequence;
+	unsigned int	m_TimeStamp;
+
+	int				m_Sock;
+
+	unsigned int	m_InterChnPort;
 };
 
 

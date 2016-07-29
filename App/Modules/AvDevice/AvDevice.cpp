@@ -24,6 +24,11 @@ std::string CAvDevice::m_SStartGUID;
 av_bool CAvDevice::Initialize()
 {
 	av_msg("%s Started\n", __FUNCTION__);
+	AvSystemInit();
+	return av_true;
+}
+av_bool CAvDevice::InitializeConfigs()
+{
 	Start();
 	return av_true;
 }
@@ -76,11 +81,11 @@ av_bool CAvDevice::Start()
 	C_DeviceFactoryInfo FactoryInfo;
 	GetDeviceInfo(FactoryInfo);
 
-	AvSystemInit();
 
+	AvGpioInit();
 	{
 		//## Set NetWork
-		m_ConfigNetComm.Update(0);
+		m_ConfigNetComm.Update();
 		m_ConfigNetComm.Attach(this, (AvConfigCallBack)&CAvDevice::OnConfigsNetComm);
 
 		C_NetCommCaps NetCommCaps;
@@ -108,7 +113,6 @@ av_bool CAvDevice::Start()
 				default:
 					break;
 				}
-
 				av_bool ret = avNetCommSet(Formats.type, &NetCommAttr);
 				if (ret != av_true){
 					av_error("Set %d NetCommDev Error\n", i);
@@ -137,6 +141,7 @@ av_bool CAvDevice::Start()
 		m_SStartGUID.clear();
 		m_SStartGUID.assign(guid);
 	}
+
 	return av_true;
 }
 av_bool CAvDevice::Stop()
@@ -185,6 +190,11 @@ av_bool CAvDevice::GetCaputreInCaps(av_ushort Channel, C_CaptureInCaps &CaptureI
 {
 	memset(&CaptureInCaps, 0x00, sizeof(C_CaptureInCaps));
 	return AvCaptureInCaps((av_char)Channel, &CaptureInCaps);
+}
+av_bool CAvDevice::GetACaptureCaps(E_AUDIO_CHL Chl, C_AudioCaps &AudioCaps)
+{
+	memset(&AudioCaps, 0x00, sizeof(C_AudioCaps));
+	return AvACaptureCaps(Chl, &AudioCaps);
 }
 av_void CAvDevice::OnConfigsNetComm(CAvConfigNetComm *NetComm, int &result)
 {

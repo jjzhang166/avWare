@@ -117,10 +117,14 @@ public:
 	CRTCP();
 	virtual ~CRTCP();
 public:
-	virtual av_bool RtcpGetPacket(RTCP_TYPE type, std::string &Packet) = 0;
-	virtual RTCP_TYPE RtcpParsePacket(std::string &Packet) = 0;
-private:
+	virtual av_bool RtcpGetPacket(RTCP_TYPE type, std::string &Packet);
+	virtual RTCP_TYPE RtcpParsePacket(std::string &Packet);
 	
+public:
+	void SetSock(int sock);
+	int Sock();
+private:
+	int m_Sock;
 };
 
 

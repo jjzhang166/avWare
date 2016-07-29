@@ -24,6 +24,18 @@ extern "C" {
 #define DF_MAX_URLSTRLEN 			128
 #define DF_MAX_SUPPORTRESLUTION		32 
 
+#ifndef KEY_FALSE
+#define KEY_FALSE				-1
+#endif
+
+#ifndef KEY_TRUE
+#define KEY_TRUE				0
+#endif
+
+#ifndef KEY_PROBE
+#define KEY_PROBE				1
+#endif
+
 typedef enum _ENUM_DEVTYPE_E{
 	ENUM_DEVTYPE_IPC = 0x00,
 	ENUM_DEVTYPE_NVR,
@@ -44,7 +56,7 @@ typedef struct _DeviceInfo_S{
 	char 				name[128];//名字
 	ENUM_DEVTYPE_E		devType;//设备类型
 }DeviceInfo_S;
-
+//-1 关闭 0 打开 
 typedef struct _DeviceCab_S{
 	int 	AnalyticsEnable;
 	int 	VideoEnable;
@@ -76,6 +88,11 @@ typedef struct _IntRange_S{
 	int max;
 	int min;
 }IntRange_S;
+
+typedef struct _FloatRange_S{
+	float max;
+	float min;
+}FloatRange_S;
 
 typedef enum _VideoEncoding_E{
 	 VideoEncoding__NULL  = 0,
@@ -137,6 +154,7 @@ typedef struct _NetProtocolInfo_S{
 	int 	onvifPort;
 	int		rtspPort;
 	char	rtspUrl[DF_MAX_CHN][DF_MAX_STREAM][DF_MAX_URLSTRLEN];//char *rtspUrl[chnelCount*streamCount];
+	char	snapUrl[DF_MAX_CHN][DF_MAX_STREAM][DF_MAX_URLSTRLEN];
 }NetProtocolInfo;
 
 
@@ -177,6 +195,29 @@ typedef struct _ImagingParam_S{
 //	int			Iris;	
 //	int			Focus;		
 }ImagingParam_S;
+
+typedef struct _PtzMoveRange{
+	FloatRange_S x;
+	FloatRange_S y;
+}PtzMoveRange;
+
+typedef struct _PtzCab_S{
+	PtzMoveRange	absolutePos;
+	FloatRange_S	absoluteZoom;
+	PtzMoveRange	relationPos;
+	FloatRange_S	relationZoom;
+	PtzMoveRange	continuePos;
+	FloatRange_S	continueZoom;
+	IntRange_S		ptzTimeOut;
+	int				maxPreset;
+	int				homeSupported;
+	int				tourSupported;
+}PtzCab_S;
+
+typedef struct _PtzConfig_S{
+	int timeOut;
+}PtzConfig_S;
+
 typedef struct _OnvifApiSerHandle_S{
 	int (*pGetDeviceInfo)(DeviceInfo_S *info);
 	int (*pSetDeviceInfo)(DeviceInfo_S *info);
@@ -196,6 +237,9 @@ typedef struct _OnvifApiSerHandle_S{
 	int	(*pGetImagingParam)(ImagingParam_S *info);	
 	int	(*pSetImagingParam)(ImagingParam_S *info);
 	int	(*pGetImagingCab)(ImagingCab_S *info);
+	int (*pGetPtzCab)(PtzCab_S *info);
+	int (*pGetPtzConfig)(PtzConfig_S *info);
+	int (*pSetPtzConfig)(PtzConfig_S *info);
 }OnvifSerHandle_S;
 
 int ONVIFAPI_Init(OnvifSerHandle_S *handle);//初始化

@@ -55,6 +55,7 @@
 #define HTTPHEAD_RTSP_TRANSPORT		"Transport"
 
 
+
 class RtspHttp
 {
 public:
@@ -85,8 +86,8 @@ public:
 	std::string _x_url;
 	std::string _x_version;
 	std::string _x_method;
-	std::string _x_username;
-	std::string _x_password;
+	std::string _x_authorization;
+
 
 	std::string _x_transport;
 	};

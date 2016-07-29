@@ -43,13 +43,21 @@ private:
 	av_int SendMetaPacket(av_comp_t Vcomp, av_int PicWidth, av_int PicHight, av_int FrameRate, 
 						  av_comp_t Acomp, av_int ASampleRate, av_int ABits);
 	av_int SendRtmpData(unsigned int nPacketType,	unsigned char *predata,  unsigned int presize, 
-													unsigned char *loaddata, unsigned int loaddatasize);
+													unsigned char *loaddata, unsigned int loaddatasize,
+													unsigned char headerType = RTMP_PACKET_SIZE_LARGE);
 	av_int SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type nalType, CAvPacket *AvPacket);
 private:
 	av_int SendAacSpac();
-	av_int SendAacData(CAvPacket *Packet);
+	av_int SendAudioData(CAvPacket *Packet);
+private:
+	av_u32		m_AudioCfgSampleRate;
+	av_u32		m_AudioCfgSampleBits;
+	av_comp_t	m_AudioComp;
+	av_u32		m_AudioChannels;
+
 
 private:
+	av_bool			m_GetIFrame;
 	RTMP  *			m_RtmpHandle;
 	E_RTMP_MODE		m_RtmpMode;
 	av_uchar		m_Channel;
@@ -59,7 +67,11 @@ private:
 	av_int			m_CacheBufferLen;
 	av_int			m_PicWidth;
 	av_int			m_PicHeigh;
-	av_uint			m_nTimestamp;
+	av_uint			m_nVTimestamp;
+	av_uint			m_nATimestamp;
+
+	av_u64			m_nVBasePts;
+	av_u64			m_nABasePts;
 private:
 	std::queue<CAvPacket *> m_Avpacket;
 	CMutex	m_Mutex;

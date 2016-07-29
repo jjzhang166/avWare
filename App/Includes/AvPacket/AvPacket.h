@@ -20,85 +20,6 @@
 #include "Apis/LibEncode.h"
 #include "AvThread/AvTimer.h"
 
-#if 0
-class CPacket
-{
-public:
-	friend class CAvPacketManager;
-
-public:
-	CPacket();
-	~CPacket();
-	CPacket(const CPacket &packet);
-public:
-	CPacket& operator=(const CPacket &packet);
-public:
-	av_u32 AddRef();
-	av_u32 ReleaseRef();
-private:
-	int m_Ref;
-
-public:
-	//指针赋值
-	av_bool LoadData(char *data, int len);
-	//数据搬移
-	av_bool FillInData(char *data, int len);
-
-	inline av_bool UnLoadData();
-public:
-	inline av_char* GetData()				{ return m_Data; }
-	inline av_u32   GetDataLen()			{ return m_DataLen; }
-	
-	//去头
-	inline av_char* GetRawData()			{return		m_RawData;	}
-	inline av_u32   GetRawDataLen()			{return		m_RawLen;	}
-
-
-public:
-	//包解析
-	inline av_u16			GetImageWidth()	{ return m_ImageWidth; }
-	inline av_u16			GetImageHeigh()	{ return m_ImageHeigh; }
-
-	inline av_u64			GetTimeStamp()	{ return m_TimeStamp; }
-	inline av_uchar			GetChannel()	{ return m_Channel; }
-	inline av_uchar			GetSlave()		{ return m_Slave; }
-	inline av_comp_t		GetCompFormat()	{ return m_CompFormat;}
-	inline av_bool			IsVideo()		{ return avFrameT_Audio == m_Frameformat ? av_false : av_true;}
-	inline av_frame_type	GetFrameFormat(){ return m_Frameformat; }
-	inline av_uchar			GetFrameRate()	{ return m_FrameRate; }
-
-private:
-	inline av_void			Reset();
-	inline av_bool			SplitHead();
-private:
-	av_u64		m_TimeStamp;
-	av_u16		m_ImageWidth;
-	av_u16		m_ImageHeigh;
-	av_uchar	m_Channel;
-	av_uchar	m_Slave;
-	av_comp_t   m_CompFormat;
-	av_bool		m_IsVideo;
-	av_frame_type m_Frameformat;
-	av_uchar	m_FrameRate;
-
-private:
-	av_bool m_BDataNew;
-	av_u32  m_DataSize;
-	
-	av_char *m_Data;
-	av_u32  m_DataLen;
-
-	av_char *m_RawData;
-	av_u32  m_RawLen;
-	
-	av_char *m_HeadData;
-	av_u32  m_HeadLen;
-
-};
-#endif
-
-
-
 class CAvPacket
 {
 	friend class CAvPacketManager;
@@ -159,7 +80,8 @@ public:
 	av_u32			Refer();
 private:
 	av_u32			m_Refer;
-
+public:
+	av_stream_type  StreamType();
 public:
 	av_u64			TimeStamp();
 	av_u32			ImageWidth();
@@ -169,16 +91,25 @@ public:
 	av_comp_t		Comp();
 	av_frame_type   FrameType();
 	av_ushort		FrameRate();
-
+public:
+	av_u32			SampleRate();
+	av_u32			SampleBits();
+	av_u32			MediaPropertyMask();
 private:
+	av_stream_type	m_StreamType;
 	av_u64			m_TimeStamp;
-	av_u32			m_ImageWidth;
-	av_u32			m_ImageHeigh;
 	av_short		m_Channel;
 	av_short		m_Slave;
+
 	av_comp_t		m_Comp;
+	av_u32			m_ImageWidth;
+	av_u32			m_ImageHeigh;
 	av_frame_type	m_FrameType;
 	av_ushort		m_FrameRate;
+
+	av_u32			m_SampleRate;
+	av_u32			m_SampleBits;
+	av_u32			m_MediaPropertyMask;
 };
 
 

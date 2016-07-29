@@ -82,6 +82,7 @@ typedef struct{
 }ConfigProtoFormats;
 
 
+typedef C_AudioProfile ConfigAudioFormats;
 
 typedef C_ImageFormats ConfigImageFormats;
 
@@ -100,8 +101,7 @@ typedef TAvConfig<ConfigWaterMarkingFormats, 0, ConfMaxCaptureChn>CAvConfigWater
 
 typedef TAvConfig<ConfigProtoFormats, 0, ConfMaxDecodeChn>CAvConfigProtocol;
 
-
-
+typedef TAvConfig<ConfigAudioFormats, 0, 2>CAvConfigAudio;
 
 
 

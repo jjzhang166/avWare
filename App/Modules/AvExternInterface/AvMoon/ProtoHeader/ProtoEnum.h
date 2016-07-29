@@ -120,21 +120,23 @@ enum Resolution {
 	Resolution_Res1920_1080 = 8,
 	///300w
 	Resolution_Res2048_1536 = 9,
+	///400W
+	Resolution_Res2560_1440 = 10,
 	///500w
-	Resolution_Res2592_1944 = 10,
+	Resolution_Res2592_1944 = 11,
 	///600w
-	Resolution_Res3072_2048 = 11,
+	Resolution_Res3072_2048 = 12,
 	///800w
-	Resolution_Res3840_2160 = 12,
+	Resolution_Res3840_2160 = 13,
 	///4k
-	Resolution_Res4096_2160 = 13,
+	Resolution_Res4096_2160 = 14,
 	///8k
-	Resolution_Res7680_4320 = 14,
-	Resolution_LAST = 15
+	Resolution_Res7680_4320 = 15,
+	Resolution_LAST = 16
 };
 
 inline const char **EnumNamesResolution() {
-	static const char *names[] = { "NONE", "Res320_160", "Res320_240", "Res640_320", "Res640_480", "Res704_576", "Res1280_720", "Res1280_960", "Res1920_1080", "Res2048_1536", "Res2592_1944", "Res3072_2048", "Res3840_2160", "Res4096_2160", "Res7680_4320", "LAST", nullptr };
+	static const char *names[] = { "NONE", "Res320_160", "Res320_240", "Res640_320", "Res640_480", "Res704_576", "Res1280_720", "Res1280_960", "Res1920_1080", "Res2048_1536", "Res2560_1440", "Res2592_1944", "Res3072_2048", "Res3840_2160", "Res4096_2160", "Res7680_4320", "LAST", nullptr };
 	return names;
 }
 

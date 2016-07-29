@@ -29,7 +29,6 @@ template<> void ProcessValue<ConfigEncodeFormats>(CAvConfigBase &ConfBase, AvCon
 	av_findMaxMask(CompMax, EncodeCaps.CompMask, av_comp_t);
 	av_findMinMask(CompMin, EncodeCaps.CompMask, av_comp_t);
 
-
 	for (int i = CHL_MAIN_T; i < CHL_NR_T; i++){
 		AvConfigValue &VideoTable = StreamTable[i]["Video"];
 		if (i == CHL_MAIN_T){
@@ -214,3 +213,30 @@ template<> void ProcessValue<ConfigProtoFormats>(CAvConfigBase &ConfBase, AvConf
 	}
 
 }
+template<> void ProcessValue<ConfigAudioFormats>(CAvConfigBase &ConfBase, AvConfigValue &ConfValue, ConfigAudioFormats &AudioFormats, int index, int diff)
+{
+	AvConfigValue &AudioTable = ConfValue["Formats"];
+	C_AudioCaps AudioCaps;
+	CAvDevice::GetACaptureCaps((E_AUDIO_CHL)index, AudioCaps);
+	av_comp_t		CompMax = AvComp_NR;
+	av_comp_t		CompMin = AvComp_MJPEG;
+	av_findMaxMask(CompMax, AudioCaps.CompMask, av_comp_t);
+	av_findMinMask(CompMin, AudioCaps.CompMask, av_comp_t);
+
+	E_SampleRate	SampleRateMax = ASampleRate_2822400;
+	E_SampleRate	SampleRateMin = ASampleRate_8000;
+	av_findMaxMask(SampleRateMax, AudioCaps.SampleRateMask, E_SampleRate);
+	av_findMinMask(SampleRateMin, AudioCaps.SampleRateMask, E_SampleRate);
+
+	E_SampleBits	SampleBitsMax = ASampleBits_24;
+	E_SampleBits	SampleBitsMin = ASampleBits_8;
+	av_findMaxMask(SampleBitsMax, AudioCaps.SampleBitsMask, E_SampleBits);
+	av_findMinMask(SampleBitsMin, AudioCaps.SampleBitsMask, E_SampleBits);
+
+	ConfBase.Process("nMaxChannels", AudioTable, AudioFormats.Channels, 0 == AudioCaps.nMaxChannels ? 0 : 1, 0 == AudioCaps.nMaxChannels ? 0 : 1, AudioCaps.nMaxChannels);
+	ConfBase.Process("Comp", AudioTable, (int &)AudioFormats.Comp, (int)CompMin, (int)CompMin, (int)CompMax);
+	ConfBase.Process("Samplebits", AudioTable, (int &)AudioFormats.Samplebits, (int)SampleBitsMin, (int)SampleBitsMin, (int)SampleBitsMax);
+	ConfBase.Process("SampleRate", AudioTable, (int &)AudioFormats.SampleRate, (int)SampleRateMin, (int)SampleRateMin, (int)SampleRateMax);
+	ConfBase.Process("Volume", AudioTable, AudioFormats.Volume, 50, 0, 99);
+}
+

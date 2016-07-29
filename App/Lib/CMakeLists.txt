@@ -11,7 +11,7 @@ set(MemPoolINC_LIST
 	)
 	
 add_library(MemPool STATIC ${MemPoolSRC_LIST} ${MemPoolINC_LIST})
-
+set_property(TARGET MemPool PROPERTY FOLDER "AvLibs")
 
 include_directories(Onvif)
 
@@ -35,20 +35,35 @@ set(CommonINC_JSONCPP_LIST
 		Common/jsoncpp/version.h
 		Common/jsoncpp/config.h
 	)
+set (CommonSRC_GTKUTF8_LIST
+		Common/gtkutf8.c)
+set (CommonINC_GTKUTF8_LIST
+		Common/gtkutf8.h)
 
-set(CommonSRC_LIST 
+set(CommonSRC_BASE64_LIST 
 		Common/base64.cpp
 		Common/md5.cpp
-		${CommonSRC_JSONCPP_LIST}
+		
 	)
 	
-set(CommonINC_LIST 
+set(CommonINC_BASE64_LIST 
 		Common/base64.h
 		Common/md5.h
+		
+	)
+set (CommonSRC_LIST
+	${CommonSRC_JSONCPP_LIST}
+	${CommonSRC_BASE64_LIST}
+	${CommonSRC_GTKUTF8_LIST}
+	)
+set (CommonINC_LIST
 		${CommonINC_JSONCPP_LIST}
+	${CommonINC_BASE64_LIST}
+	${CommonINC_GTKUTF8_LIST}
 	)
 	
 add_library(LibCommon STATIC ${CommonSRC_LIST} ${CommonINC_LIST})
+set_property(TARGET LibCommon PROPERTY FOLDER "AvLibs")
 
 include_directories(Smtp)
 set(SmtpSRC_LIST 
@@ -58,6 +73,7 @@ set(SmtpINC_LIST
 		Smtp/CSmtp.h
 	)
 add_library(LibSmtp STATIC ${SmtpSRC_LIST} ${SmtpINC_LIST})
+set_property(TARGET LibSmtp PROPERTY FOLDER "AvLibs")
 
 include_directories(Upnp)
 set(UpnpSRC_LIST
@@ -95,6 +111,7 @@ set(UpnpINC_LIST
 		Upnp/miniupnpctypes.h
 	)
 add_library(LibUpnp STATIC ${UpnpSRC_LIST} ${UpnpINC_LIST})	
+set_property(TARGET LibUpnp PROPERTY FOLDER "AvLibs")
 
 if (WIN32)
 
@@ -120,6 +137,7 @@ set(DdnsINC_LIST
 		Ddns/NetDdns.h
 )
 add_library(LibDdns STATIC ${DdnsSRC_LIST} ${DdnsINC_LIST})
+set_property(TARGET LibDdns PROPERTY FOLDER "AvLibs")
 
 include_directories(Ftp)
 set(FtpSRC_LIST
@@ -129,10 +147,77 @@ set(FtpINC_LIST
 		Ftp/Ftp.h
 )
 add_library(LibFtp STATIC ${FtpSRC_LIST} ${FtpINC_LIST})
+set_property(TARGET LibFtp PROPERTY FOLDER "AvLibs")
+
 
 include_directories(Rtsp)
 
 include_directories(Rtmp)
 
+set(LUAINC_LIST 
+		Lua/lua.h
+		Lua/llex.h
+		Lua/luaconf.h
+		Lua/ltm.h
+		Lua/lcode.h
+		Lua/lvm.h
+		Lua/lparser.h
+		Lua/ldo.h
+		Lua/lgc.h
+		Lua/lstate.h
+		Lua/lualib.h
+		Lua/lobject.h
+		Lua/ltable.h
+		Lua/lstring.h
+		Lua/lundump.h
+		Lua/lzio.h
+		Lua/ldebug.h
+		Lua/lapi.h
+		Lua/lfunc.h
+		Lua/lprefix.h
+		Lua/lmem.h
+		Lua/lopcodes.h
+		Lua/lualib.h
+		Lua/lctype.h
+		Lua/lua.hpp
+	)
+set(LUASRC_LIST 
+		Lua/lapi.c
+		Lua/lcode.c
+		Lua/lctype.c
+		Lua/ldebug.c
+		Lua/ldo.c
+		Lua/ldump.c
+		Lua/lfunc.c
+		Lua/lgc.c
+		Lua/llex.c
+		Lua/lmem.c
+		Lua/lobject.c
+		Lua/lopcodes.c
+		Lua/lparser.c
+		Lua/lstate.c
+		Lua/lstring.c
+		Lua/ltable.c
+		Lua/ltm.c
+		Lua/lundump.c
+		Lua/lvm.c
+		Lua/lzio.c
+		Lua/lauxlib.c
+		Lua/lbaselib.c
+		Lua/lbitlib.c
+		Lua/lcorolib.c
+		Lua/ldblib.c
+		Lua/liolib.c
+		Lua/lmathlib.c
+		Lua/loslib.c
+		Lua/lstrlib.c
+		Lua/ltablib.c
+		Lua/lutf8lib.c
+		Lua/loadlib.c
+		Lua/linit.c
+	)
+add_library(Lua STATIC ${LUAINC_LIST} ${LUASRC_LIST})
+#add_library(Lua SHARED ${LUAINC_LIST} ${LUASRC_LIST})
+set_property(TARGET Lua PROPERTY FOLDER "AvLibs")
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../)

@@ -60,7 +60,8 @@ public:
 	std::string		m_UserAgent;
 	std::string		m_Version;
 	std::string		m_Cseq;
-	std::string		m_sdp;
+	std::string		m_sdpVideo;
+	std::string		m_sdpAudio;
 	std::string		m_TrackId;
 	std::string		m_TransPtl;
 	std::string		m_TransMulticastAddr;
@@ -68,8 +69,8 @@ public:
 	std::string		m_CliRtcpPort;
 	std::string		m_SerRtpPort;
 	std::string		m_SerRtcpPort;
-	std::string		m_MediaEncodec;
-
+	std::string		m_MediaEncodecVideo;
+	std::string		m_MediaEncodecAudio;
 private:
 
 	RTSP_SER_CLI_E  m_ServiceType;

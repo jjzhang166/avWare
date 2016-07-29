@@ -148,7 +148,7 @@ static int	GetDeviceInfo(DeviceInfo_S *info)
 	}
 	memset(info,0,sizeof(DeviceInfo_S));
 	strcat(info->city,"shenzhen");
-	strcat(info->country,"china");
+	strcat(info->country,"China");
 	strcat(info->name,"IPC");
 	strcat(info->softwareVer,"Build V1.0");
 	info->devType = ENUM_DEVTYPE_IPC;
@@ -217,8 +217,8 @@ static int	GetNetProtocolInfo(NetProtocolInfo *info)
 	ConfigNetComm &ConfigNet = NetComm.GetConfig(NetCommT_Lan0);
  	info->rtspPort = 554;
  	info->onvifPort = 8080; 
- 	sprintf(info->rtspUrl[0][0],"rtsp://%s:%d/channel/1",ConfigNet.LanAttr.IpAddr,info->rtspPort);
- 	sprintf(info->rtspUrl[0][1],"rtsp://%s:%d/channel/2",ConfigNet.LanAttr.IpAddr,info->rtspPort);
+ 	sprintf(info->rtspUrl[0][0],"rtsp://%s:%d/c=0&amp;s=0",ConfigNet.LanAttr.IpAddr,info->rtspPort);
+	sprintf(info->rtspUrl[0][1],"rtsp://%s:%d/c=0&amp;s=1",ConfigNet.LanAttr.IpAddr,info->rtspPort);
 	return 0;
 }
 static int	SetNetProtocolInfo(NetProtocolInfo *info)
@@ -273,37 +273,150 @@ static int	SetVideoEncode(int chn, int streamId, VedioEncode_S *info)
 
 static int	GetVideoEncodeCab(int chn, int streamId, VedioEncodeCab_S *info)
 {
+	C_DspCaps DspCaps;
+	
+	CAvDevice::GetDspCaps(DspCaps);
+	if (DspCaps.nMaxDecodeChannel <= chn && DspCaps.nMaxEncodeChannel <= chn){
+		av_error("This Device Have no %d Channel \n", chn);
+		return -1;
+	}
+	C_EncodeCaps EncodeCaps;
+	CAvDevice::GetCaptureCaps(chn, EncodeCaps);
+	if (streamId == 0){
 	info->bitrateRange.max = 8192;
 	info->bitrateRange.min = 512;
-	info->encodingCab = (VideoEncoding_E)(VideoEncoding__JPEG | VideoEncoding__H264 | VideoEncoding__H265);
+	}
+	else{
+		info->bitrateRange.max = 1024;
+		info->bitrateRange.min = 64;
+	}
+	info->encodingCab = VideoEncoding__NULL;
+
+	CAvConfigEncode ConfigEncode;
+	ConfigEncodeFormats &Formats = ConfigEncode.GetConfig(chn);
+
+	for (int i = 0; i < AvComp_NR; i++){
+		if (streamId == CHL_MAIN_T){
+			if (!(AvMask(i) & EncodeCaps.CompMask)) continue;
+		}
+		else if (streamId == CHL_SUB1_T){
+			if (!(AvMask(i) & EncodeCaps.ExtImageSizeMask[Formats.CHLFormats[CHL_MAIN_T].Formats.ImageSize])) continue;
+		}
+		else{
+			av_error("Onvif Stream id = %d  bad number\n", streamId);
+			break;
+		}
+		
+		switch (i)
+		{
+		case AvComp_MJPEG:
+			info->encodingCab = (VideoEncoding_E)(info->encodingCab | VideoEncoding__JPEG);
+			break;
+		case AvComp_H264:
+			info->encodingCab = (VideoEncoding_E)(info->encodingCab | VideoEncoding__H264);
+			break;
+		case AvComp_H265:
+			info->encodingCab = (VideoEncoding_E)(info->encodingCab | VideoEncoding__H265);
+			break;
+		case AvComp_JPEG:
+			info->encodingCab = (VideoEncoding_E)(info->encodingCab | VideoEncoding__JPEG);
+			break;
+		default:
+			break;
+		}
+	}
 	info->frameRateRange.max = 30;
-	info->frameRateRange.min = 1;
+	info->frameRateRange.min = 5;
 	info->gopRange.max = 50;
 	info->gopRange.min = 10;
+
 	info->h264ProfileCab = (H264Profile_E)(H264Profile__Baseline | H264Profile__Main | H264Profile__High);
 	info->qulityRange.max = 10;
 	info->qulityRange.min = 1;
+	int pos = 0;
+	for (int i = CaptureSize_8K; i > CaptureSize_Self; i--){
+		if (!(AvMask(i) & EncodeCaps.ImageSizeMask)) continue;
+		switch (i)
+		{
+		case CaptureSize_QVGAEX:	//320*180
+			info->resSupport[pos].width = 320;
+			info->resSupport[pos++].height = 180;
+			break;
+		case CaptureSize_QVGA:	//320*240
+			info->resSupport[pos].width = 320;
+			info->resSupport[pos++].height = 240;
+			break;
+		case CaptureSize_VGAEX:	//640*360
+			info->resSupport[pos].width = 640;
+			info->resSupport[pos++].height = 360;
+			break;
+		case CaptureSize_VGA:	//640*480
+			info->resSupport[pos].width = 640;
+			info->resSupport[pos++].height = 480;
+			break;
+		case CaptureSize_D1:		//720*576
+			info->resSupport[pos].width = 720;
+			info->resSupport[pos++].height = 576;
+			break;
+		case CaptureSize_720P:
+			info->resSupport[pos].width = 1280;
+			info->resSupport[pos++].height = 720;
+			break;
+		case CaptureSize_960P:
+			info->resSupport[pos].width = 1280;
+			info->resSupport[pos++].height = 960;
+			break;
+		case CaptureSize_1080P:
+			info->resSupport[pos].width = 1920;
+			info->resSupport[pos++].height = 1080;
+			break;
 	
-	info->resSupport[0].width = 1920;
-	info->resSupport[0].height = 1080;
-	
-	info->resSupport[1].width = 1920;
-	info->resSupport[1].height = 960;
-
-	info->resSupport[2].width = 1280;
-	info->resSupport[2].height = 720;
-	info->resSupportNum = 3;
-	info->maxReslution.width = 1920;
-	info->maxReslution.height = 1080;
-	info->defaultReslution.height = 1080;
-	info->defaultReslution.width = 1920;
+		case CaptureSize_300W:	//2048*1536
+			info->resSupport[pos].width = 2048;
+			info->resSupport[pos++].height = 1536;
+			break;
+		case CaptureSize_400W:	//2560*1440
+			info->resSupport[pos].width = 2560;
+			info->resSupport[pos++].height = 1440;
+			break;
+		case CaptureSize_500W:	//2592*1944
+			info->resSupport[pos].width = 2592;
+			info->resSupport[pos++].height = 1944;
+			break;
+		case CaptureSize_600W:	//3072*2048
+			info->resSupport[pos].width = 3072;
+			info->resSupport[pos++].height = 2048;
+			break;
+		case CaptureSize_800W:	//3840*2160
+			info->resSupport[pos].width = 2048;
+			info->resSupport[pos++].height = 2160;
+			break;
+		case CaptureSize_4K:	//4096*2160
+			info->resSupport[pos].width = 4096;
+			info->resSupport[pos++].height = 2160;
+			break;
+		case CaptureSize_8K:	//7680*4320
+			info->resSupport[pos].width = 7680;
+			info->resSupport[pos++].height = 4320;
+			break;
+		default:
+			break;
+		}
+	}
+	info->resSupportNum = pos;
+	info->maxReslution.width = info->resSupport[0].width ;
+	info->maxReslution.height = info->resSupport[0].height;
+	info->defaultReslution.height = info->resSupport[0].width;;
+	info->defaultReslution.width = info->resSupport[0].height;;
 	return 0;
 }
 
 static int	GetAudioEncode(int chn, int streamId, AudioEncode_S *info)
 {
- 	info->Bitrate = 8;
+
+ 	info->Bitrate = 16;
  	info->Encoding = AudioEncoding__G711;
+	
  	info->SampleRate = 8000;
 	return 0;
 }
@@ -430,6 +543,49 @@ static int	GetImagingCab(ImagingCab_S *info)
 	return 0;
 }
 
+static	int	GetPtzCab(PtzCab_S *info)
+{
+	info->absolutePos.x.max = 1;
+	info->absolutePos.x.min = -1;
+	info->absolutePos.y.max = 1;
+	info->absolutePos.y.min = -1;
+	info->absoluteZoom.max = 1;
+	info->absoluteZoom.min = 0;
+
+	info->relationPos.x.max = 1;
+	info->relationPos.x.min = -1;
+	info->relationPos.y.max = 1;
+	info->relationPos.y.min = -1;
+	info->relationZoom.max = 1;
+	info->relationZoom.min = 0;
+
+	info->continuePos.x.max = 1;
+	info->continuePos.x.min = -1;
+	info->continuePos.y.max = 1;
+	info->continuePos.y.min = -1;
+	info->continueZoom.max = 1;
+	info->continueZoom.min = 0;
+
+	info->homeSupported = KEY_TRUE;
+	info->maxPreset = 80;
+	info->tourSupported = KEY_TRUE;
+	info->ptzTimeOut.max = 200;
+	info->ptzTimeOut.min = 1;
+	return 0;
+}
+
+static	int	GetPtzConfig(PtzConfig_S *info)
+{
+	info->timeOut = 100;//此处过ODT不能写死
+	return 0;
+}
+
+static	int	SetPtzConfig(PtzConfig_S *info)
+{
+	
+	return 0;
+}
+
 SINGLETON_IMPLEMENT(CAvOnvifSer)
 
 av_bool CAvOnvifSer::InitCbfun()
@@ -453,6 +609,9 @@ av_bool CAvOnvifSer::InitCbfun()
 	m_OnvifSerHandle.pSetImagingParam		= SetImagingParam;
 	m_OnvifSerHandle.pGetImagingParam		= GetImagingParam;
 	m_OnvifSerHandle.pGetImagingCab			= GetImagingCab;
+	m_OnvifSerHandle.pGetPtzCab				= GetPtzCab;
+	m_OnvifSerHandle.pGetPtzConfig			= GetPtzConfig;
+	m_OnvifSerHandle.pSetPtzConfig			= SetPtzConfig;
 	return av_true;
 }
 

@@ -14,179 +14,6 @@
 ******************************************************************/
 #include "AvPacket/AvPacket.h"
 #include "AvDevice/AvDevice.h"
-#if 0
-CPacket::CPacket()
-{
-	m_Ref = 0;
-	m_BDataNew = av_false;
-	Reset();
-}
-CPacket::~CPacket()
-{
-	Reset();
-}
-CPacket::CPacket(const CPacket &packet)
-{
-	Reset();	
-	FillInData(packet.m_Data, packet.m_DataLen);
-}
-CPacket& CPacket::operator=(const CPacket &packet)
-{
-	if (this == &packet){
-		return *this;
-	}
-
-	Reset();
-	FillInData(packet.m_Data, packet.m_DataLen);
-	return *this;
-}
-
-av_u32 CPacket::AddRef()
-{
-	return m_Ref++;
-}
-av_u32 CPacket::ReleaseRef()
-{
-	m_Ref--;
-
-	if (m_Ref <= 0){
-		delete this;
-	}
-	else{
-		return m_Ref;
-	}
-	return 0;
-}
-av_bool CPacket::LoadData(char *data, int len)
-{
-	Reset();
-	m_BDataNew = av_false;
-	m_Data = data;
-	m_DataLen = len;
-	SplitHead();
-	return av_true;
-}
-
-av_bool CPacket::FillInData(char *data, int len)
-{
-	if (m_BDataNew == av_true){
-		if (m_DataSize < (av_u32)len){
-			m_Data = (char *)realloc(m_Data, sizeof(char)*len);
-			m_DataLen = sizeof(char)*len;
-		}
-	}
-	else{
-		m_BDataNew = av_true;
-		m_Data = (char *)malloc(sizeof(char)*len);
-		m_DataSize = sizeof(char)*len;
-	}
-	memcpy(m_Data, data, len);
-	m_DataLen = len;
-	SplitHead();
-	return av_true;
-}
-
-inline av_bool CPacket::UnLoadData()
-{
-	Reset();
-	return av_true;
-}
-
-
-inline av_void CPacket::Reset()
-{
-	m_TimeStamp = 0;
-	m_ImageWidth = 0;
-	m_ImageHeigh = 0;
-	m_Channel = 0;
-	m_Slave = 0;
-	m_CompFormat = AvComp_NR;
-	m_IsVideo = av_false;
-	m_Frameformat = avFrameT_B;
-	m_FrameRate = 0;
-
-	if (av_true == m_BDataNew){
-		free(m_Data);
-	}
-
-	m_BDataNew = av_false;
-	m_DataSize = 0;
-
-	m_Data = NULL;
-	m_DataLen = 0;
-
-	m_RawData = NULL;
-	m_RawLen = 0;
-
-	m_HeadData = NULL;
-	m_HeadLen = 0;
-}
-#if 0
-typedef struct {
-	av_u16			SizeHight;
-	av_u16			SizeWidth;
-	av_u16			Sec;
-	av_u16			Msec;
-	av_uchar		Channel;
-	av_uchar		Slave : 4;
-	av_char			FrameRate : 4;
-	av_uchar		Comp : 4;
-	av_uchar		FrameType : 4;
-}C_FormatStreamHead_CPacket;
-#endif
-
-
-inline av_bool CPacket::SplitHead()
-{
-	C_FormatStreamHead *pPacketHead = (C_FormatStreamHead *)m_Data;
-	if (pPacketHead->sync != D_StreamSync_Code){
-		return av_false;
-	}
-	m_ImageHeigh = pPacketHead->SizeHight;
-	m_ImageWidth = pPacketHead->SizeWidth;
-	m_Channel = pPacketHead->Channel;
-	m_Slave = pPacketHead->Slave;
-	m_CompFormat = (av_comp_t)pPacketHead->Comp;
-	m_FrameRate = pPacketHead->FrameRate;
-	m_Frameformat = (av_frame_type)pPacketHead->FrameType;
-	m_TimeStamp = pPacketHead->pts;
-	avFrameT_Audio == m_Frameformat ? m_IsVideo = av_false : m_IsVideo = av_true;
-	m_HeadData = m_Data;
-	m_HeadLen = sizeof(C_FormatStreamHead);
-
-	m_RawData = m_Data + m_HeadLen;
-	m_RawLen = pPacketHead->Length;
-
-#if 1
-	assert(m_RawLen == (m_DataLen - m_HeadLen));
-#else
-	if (m_RawLen != (m_DataLen - m_HeadLen)){
-		av_error("Datalen= %d, headlen = %d, rawlen = %d\n", m_DataLen, m_HeadLen, m_RawLen);
-		av_error("ch = %d, slave = %d, isvideo = %d\n", m_Channel, m_Slave, IsVideo());
-	}
-#endif
-	av_bool ret = av_false;
-	if (m_ImageWidth % 2 != 0){
-		goto return_point;
-	}
-	if (m_ImageHeigh % 2 != 0){
-		goto return_point;
-	}
-	if (m_CompFormat >= AvComp_NR){
-		goto return_point;
-	}
-	if (m_FrameRate > 120){
-		goto return_point;
-	}
-	if (m_Frameformat >= avFrameT_NR){
-		goto return_point;
-	}
-	ret = av_true;
-return_point:
-	return ret;
-}
-#endif
-
 
 
 CAvPacket::CAvPacket(av_u32 MaxLength)
@@ -243,50 +70,44 @@ av_bool			CAvPacket::AppendBuffer(av_uchar *Buffer, const av_u32 Length)
 }
 av_bool	CAvPacket::PutBufferOver()
 {
-	C_FormatStreamHead *pPacketHead = (C_FormatStreamHead *)m_Buffer;
-	if (pPacketHead->sync != D_StreamSync_Code){
-		return av_false;
-	}
-	m_ImageHeigh = pPacketHead->SizeHight;
-	m_ImageWidth = pPacketHead->SizeWidth;
-	m_Channel = pPacketHead->Channel;
-	m_Slave = pPacketHead->Slave;
-	m_Comp = (av_comp_t)pPacketHead->Comp;
-	m_FrameRate = pPacketHead->FrameRate;
-	m_FrameType = (av_frame_type)pPacketHead->FrameType;
-	m_TimeStamp = pPacketHead->pts;
-	//avFrameT_Audio == m_Frameformat ? m_IsVideo = av_false : m_IsVideo = av_true;
-	m_RawBuffer = m_Buffer + sizeof(C_FormatStreamHead);
-	m_RawBufferLength = pPacketHead->Length;
 
-#if 1
-	assert(m_RawBufferLength == (m_BufferLength - sizeof(C_FormatStreamHead)));
-#else
-	if (m_RawLen != (m_DataLen - m_HeadLen)){
-		av_error("Datalen= %d, headlen = %d, rawlen = %d\n", m_DataLen, m_HeadLen, m_RawLen);
-		av_error("ch = %d, slave = %d, isvideo = %d\n", m_Channel, m_Slave, IsVideo());
-	}
-#endif
-	av_bool ret = av_false;
-	if (m_ImageWidth % 2 != 0){
-		goto return_point;
-	}
-	if (m_ImageHeigh % 2 != 0){
-		goto return_point;
-	}
-	if (m_Comp >= AvComp_NR){
-		goto return_point;
-	}
-	if (m_FrameRate > 120){
-		goto return_point;
-	}
-	if (m_FrameType >= avFrameT_NR){
-		goto return_point;
-	}
-	ret = av_true;
-return_point:
-	return ret;
+	C_AvMediaHead MediaHead;
+	av_u32 length = 0;
+	if (true == AvMediaHeadParse(m_Buffer, &MediaHead, &length)){
+		m_TimeStamp = MediaHead.pts;
+		m_Channel = MediaHead.Channel;
+		m_Slave = MediaHead.Slave;
+		m_MediaPropertyMask = MediaHead.MediaPropertyMask;
 
+		if (MediaHead.StreamType == avStreamT_V){
+			m_StreamType = avStreamT_V;
+			m_Comp = MediaHead.VHead.comp;
+			m_ImageWidth = MediaHead.VHead.ImageWidth;
+			m_ImageHeigh = MediaHead.VHead.ImageHeigh;
+			m_FrameRate = MediaHead.VHead.FrameRate;
+			m_FrameType = MediaHead.VHead.frametype;
+	}
+		else if (MediaHead.StreamType == avStreamT_A){
+			m_StreamType = avStreamT_A;
+			m_Comp = MediaHead.AHead.comp;
+			m_SampleBits = MediaHead.AHead.sampleRate;
+			m_SampleRate = MediaHead.AHead.sampleRate;
+	}
+		else {
+			assert(0);
+	}
+		m_RawBuffer = m_Buffer + length;
+		m_RawBufferLength = MediaHead.PlayLoadLength;
+		
+		if (length + MediaHead.PlayLoadLength != m_BufferLength){
+			assert(0);
+	}
+	}
+	else{
+		m_RawBuffer = m_Buffer;
+		m_RawBufferLength = m_BufferLength;
+	}
+	return av_true;
 }
 av_bool			CAvPacket::GetBuffer(av_uchar *Buffer, const av_u32 &Length)
 {
@@ -345,6 +166,7 @@ av_bool			CAvPacket::IsVideoFrame()
 av_bool			CAvPacket::GetNaluSplit()
 {
 	CGuard m(m_Mutex);
+	if (m_StreamType != avStreamT_V) return av_false;
 	if (m_IsSplitNalu == av_true) return av_true;
 
 	m_NaluInfoCount = 0;
@@ -512,6 +334,10 @@ av_bool			CAvPacket::ReSet()
 	m_NaluInfoCount = 0;
 	m_IsSplitNalu = av_false;
 
+	m_SampleRate = 0;
+	m_SampleBits = 0;
+	m_MediaPropertyMask = 0;
+	m_StreamType = avStreamT_Nr;
 	memset(m_NaluInfo, 0x00, sizeof(m_NaluInfo));
 
 	return av_true;
@@ -544,6 +370,11 @@ av_u64			CAvPacket::TimeStamp()
 {
 	return m_TimeStamp;
 }
+
+av_stream_type	CAvPacket::StreamType()
+{
+	return m_StreamType;
+}
 av_u32			CAvPacket::ImageWidth()
 {
 	return m_ImageWidth;
@@ -573,6 +404,19 @@ av_ushort		CAvPacket::FrameRate()
 	return m_FrameRate;
 }
 
+av_u32			CAvPacket::SampleRate()
+{
+	return m_SampleRate;
+}
+av_u32			CAvPacket::SampleBits()
+{
+	return m_SampleBits;
+}
+
+av_u32			CAvPacket::MediaPropertyMask()
+{
+	return m_MediaPropertyMask;
+}
 
 
 SINGLETON_IMPLEMENT(CAvPacketManager)
@@ -630,7 +474,7 @@ av_bool CAvPacketManager::PutAvPacket(CAvPacket *Packet)
 
 av_void CAvPacketManager::OnTime()
 {
-	av_msg("Clear up CAvPacketManager\n");
+	av_msg("Clear up CAvPacketManager time[%d]\n", time(NULL));
 	Dump();
 	av_u32 NodePacketUse = 0;
 	for (int i = 0; i < AVPACKET_MAX_FRAME / AVPACKET_UNIT; i++){
@@ -645,7 +489,6 @@ av_bool CAvPacketManager::Dump()
 	av_u32 total = 0;
 	av_u32 free = 0;
 	av_u32 use = 0;
-	puts("\n");
 	
 	for (int i = 0; i < AVPACKET_MAX_FRAME / AVPACKET_UNIT; i++){
 		m_AvPacketNodeInfo[i].mutex.Enter();

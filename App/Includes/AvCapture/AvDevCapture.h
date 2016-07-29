@@ -37,7 +37,6 @@ public:
 	av_bool SetTime(av_timeval &atv);
 	av_bool SetIFrame(av_int Slave = CHL_MAIN_T);
 
-
 private:
 	av_int m_Channel;
 	E_CaptureSynchronizeStat m_LastCaptureSyncStat;
@@ -46,10 +45,17 @@ public:
 	av_bool CaptureCreate();
 	av_bool CaptureDestroy();
 
-	av_bool CaptureStart(av_uchar Slave);
-	av_bool CaptureStop(av_uchar Slave);
+	av_bool VStart(av_uchar Slave);
+	av_bool VStop(av_uchar Slave);
 public:
 	av_bool LoadConfigs();
+
+public:
+
+	av_bool AStart(E_AUDIO_CHL chl);
+	av_bool AStop(E_AUDIO_CHL chl);
+	av_bool APlayPutBuffer(CAvPacket *Packet);
+	av_bool ASetProfile(E_AUDIO_CHL CHL, C_AudioProfile &aProfile);
 
 
 private:
@@ -64,6 +70,7 @@ private:
 	av_void OnConfigCoverModify(CAvConfigCover *ConfigCover, int &result);
 	av_void OnConfigWaterMarkingModify(CAvConfigWaterMarking *ConfigWaterMarking, int &result);
 	av_void OnConfigCaptureModify(CAvConfigCapture *ConfigCapture, int &result);
+	av_void OnConfigAudio(CAvConfigAudio *ConfigAudio, int &result);
 	av_void OnTest(void *args, int &result);
 private:
 	CAvConfigEncode			m_ConfigEncode;
@@ -71,7 +78,7 @@ private:
 	CAvConfigCover			m_ConfigCover;
 	CAvConfigWaterMarking	m_ConfigWaterMark;
 	CAvConfigCapture		m_ConfigCapture;
-
+	CAvConfigAudio			m_ConfigAudio[CHL_A_NUM];
 };
 
 

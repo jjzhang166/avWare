@@ -68,6 +68,7 @@ private:
 	CAvConfigNetComm			m_ConfigNetComm;
 	CAvConfigProtocol			m_ConfigNetProtocol;
 	CAvConfigImage				m_ConfigImage;
+	CAvConfigAudio				m_ConfigAudio;
 
 	CAvConfigCapture			m_ConfigCapture;
 

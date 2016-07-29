@@ -13,7 +13,6 @@
 |  说明:
 ******************************************************************/
 #include <cstdio>
-
 #include "AvPacket/AvPacket.h"
 #include "Apis/AvWareType.h"
 #include "Apis/LibEncode.h"
@@ -41,10 +40,7 @@
 #include "AvNetService/AvFtp.h"
 #include "AvConfigs/AvConfigManager.h"
 #include "AvRecord/AvRecord.h"
-
-
-
-#include "AvConfigs/AvConfigCapture.h"
+#include "AvLua/AvLua.h"
 
 int main(int argc, char *argv[])
 {
@@ -57,11 +53,25 @@ int main(int argc, char *argv[])
 	sigemptyset(&set);
 	sigaddset(&set, SIGALRM);
 	sigprocmask(SIG_BLOCK, &set, NULL);
+
+	int logAppKoFd = open("/dev/logApp", O_WRONLY);
+	if (logAppKoFd <= 0){
+
+	}
+	else{
+		dup2(logAppKoFd, STDOUT_FILENO);
+		dup2(logAppKoFd, STDERR_FILENO);
+	}
+
 #endif
+	/*
+		以下函数运行序列，不得自行调整。
+	*/
 	av_msg("AvWare Runing Start\n");
+	g_AvDevice.Initialize();
 	g_AvThreadPool.Initialize(10, av_true);
 	g_AvConfigManager.Initialize();
-	g_AvDevice.Initialize();
+	g_AvDevice.InitializeConfigs();
 	g_AvMemoryPool.Initialize();
 	g_AvTimerManager.Initialize();
 	g_AvPacketManager.Initialize();
@@ -71,7 +81,6 @@ int main(int argc, char *argv[])
 	g_AvDecode.Initialize();
 	g_AvManCapture.Initialize();
 	g_AvRecord.Initialize();
-	g_AvAudioCapture.Initialize();
 	g_AvAlarm.Initialize();
 	g_AvNetService.Initialize();
 	g_AvExtInterFace.Initialize();
@@ -79,6 +88,7 @@ int main(int argc, char *argv[])
 
 	g_AvThreadPool.Dump();
 	
+
 	g_AvGui.exec();
 	while (1) av_msleep(1000);
 

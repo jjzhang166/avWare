@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>index</title>
+	<link rel="stylesheet" href="jquery/css/jquery.ui.all.css">
+	<script src="jquery/jquery-1.9.1.min.js"></script>
+	<script src="jquery/jquery.ui.core.js"></script>
+	<script src="jquery/jquery.ui.widget.js"></script>
+	<script src="jquery/jquery.ui.mouse.js"></script>
+	<script src="jquery/jquery.ui.slider.js"></script>
+</head>
+<script>
+	$(function() {
+		var ocx =  document.getElementById('OCX');
+		ocx.AvSplitScreen(1);
+		ocx.AvAuthentication("admin", "admin");
+		ocx.AvConnect("192.168.1.90", 5000);
+		ocx.AvOpenStream(0,0);
+	});
+</script>
+<style type="text/css">
+ /*页面*/
+ *{
+  -moz-user-select:none;/*火狐*/
+  -webkit-user-select:none;/*webkit浏览器*/
+  -ms-user-select:none;/*IE10*/
+  -khtml-user-select:none;/*早期浏览器*/
+  user-select:none;
+}
+
+ *{margin:0px;padding:0px;}
+  html,body{width:100%;height:100%;margin:0px;padding:0px; background:#ffffff;}
+  #ID_INDEX_LOG{width:210px;
+				height:50px;
+				margin-top:0px; 
+				background:#2B4458;
+				border-bottom:2px inset  #2B4458;
+				border-right:2px inset  #2B4458;}
+  #ID_INDEX_HEAD{background:#2B4458;
+				height:50px;
+				top:0px;
+				position:absolute;
+				left:212px;right:0px;
+				} 	
+  #ID_INDEX_LEFT{width:210px; background:#405c74;position:absolute;bottom:0px;top:52px; min-height: 560px;} 
+  #ID_INDEX_PTZTAG{width: 210px;
+				height: 25px;
+				background: #948B8B;
+				font-size: 16px;
+				font-family: verdana;
+				color: white;
+				line-height: 25px;
+				text-align: center;
+		}		
+  #ID_INDEX_OCX{background:#000000;bottom:0px;top:50px;position:absolute;left:210px;right:0px;border:2px solid  #00BFFF;min-height: 560px;} 
+  #ID_INDEX_FIRST_NAV{border-left:2px outset   #00BFFF;}
+ /* #ID_INDEX_PTZTABLE{height: 100px;
+					width: 61%;
+					position: absolute;
+					left: 56px;
+		}*/
+	#ID_INDEX_PTZTABLE{height: 95px;
+					width: 35%;
+					position: absolute;
+					left: 3px;
+		}
+  .ptzDirect{font-size: 34px;color: #F8F8FF;cursor:pointer;}
+  .navLi{float:right;
+		list-style:none;
+		width:100px;
+		height:50px;
+		border-left:1px outset   #00BFFF;
+		text-align:center;
+		line-height: 50px;
+		font-family:verdana;font-size:80%;color:#F8F8FF;
+	}
+	.navLi:hover{ background-color:#405c74;}
+	#ID_PTZBACK{
+		width: 210px;
+		height: 250px;
+		border:2px solid  #000000;
+		background:;
+	}
+	#ID_IMAGEBACK{
+		width: 210px;
+		border:2px solid  #000000;
+		position:absolute;
+		bottom:0px;
+		top:430px;
+	}
+	a{
+		color: white;text-decoration: none;
+	}
+	
+	a:active{
+		color:blue;
+	}
+	.tagFontDiv{
+		float:left;
+		list-style:none;
+		margin-right:7px;
+		width:auto;
+		height:30px;
+		text-align:left;
+		line-height: 30px;
+		font-family:verdana;font-size:80%;color:#F8F8FF;
+	}
+
+
+ </style>
+ 
+ <!--滑动条-->
+ <style type="text/css">
+ 	#ID_PtzSpeedSlibar .ui-slider-range { background:#2B4458 ;width:50px;height:5px;}
+	#ID_PtzSpeedSlibar .ui-slider-handle {  width:10px;height:14px;}
+	
+	#ID_BrightSlibar .ui-slider-range { background:#2B4458 ;width:50px;height:5px;}
+	#ID_BrightSlibar .ui-slider-handle {  width:10px;height:14px;}
+	#ID_ChromaSlibar .ui-slider-range { background:#2B4458 ;width:50px;height:5px;}
+	#ID_ChromaSlibar .ui-slider-handle {  width:10px;height:14px;}
+	#ID_SaturationSlibar .ui-slider-range { background:#2B4458 ;width:50px;height:5px;}
+	#ID_SaturationSlibar .ui-slider-handle {  width:10px;height:14px;}
+	#ID_ContrastSlibar .ui-slider-range { background:#2B4458 ;width:50px;height:5px;}
+	#ID_ContrastSlibar .ui-slider-handle {  width:10px;height:14px;}
+	
+	
+	
+	#ID_ContrastSlibar,
+	#ID_SaturationSlibar,
+	#ID_ChromaSlibar,
+	#ID_BrightSlibar,
+	#ID_PtzSpeedSlibar{
+		float: left;
+		margin-top: 10px;
+		height:5px;
+		width:90px;
+	}
+ </style>
+ <script>
+ 	$(function() {
+		$( "#ID_PtzSpeedSlibar" ).slider({
+			orientation: "horizontal",
+			range: "min",
+			max: 10,
+			min:0,
+			value: 5,
+			slide: function( event, ui ) {
+				$( "#ID_PtzSpeedValue" ).val(ui.value );
+			}
+		});
+		$( "#ID_PtzSpeedSlibar" ).slider( "value", 5 );
+		$( "#ID_PtzSpeedValue" ).val(5);
+		
+		$( "#ID_BrightSlibar" ).slider({
+			orientation: "horizontal",
+			range: "min",
+			max: 100,
+			min:0,
+			value: 50,
+			slide: function( event, ui ) {
+				$( "#ID_BrightValue" ).val(ui.value );
+			}
+		});
+		$( "#ID_BrightSlibar" ).slider( "value", 50 );
+		$( "#ID_BrightValue" ).val(50);
+		
+		$( "#ID_ChromaSlibar" ).slider({
+			orientation: "horizontal",
+			range: "min",
+			max: 100,
+			min:0,
+			value: 50,
+			slide: function( event, ui ) {
+				$( "#ID_ChromaValue" ).val(ui.value );
+			}
+		});
+		$( "#ID_ChromaSlibar" ).slider( "value", 50 );
+		$( "#ID_ChromaValue" ).val(50);
+		
+		
+		$( "#ID_ContrastSlibar" ).slider({
+			orientation: "horizontal",
+			range: "min",
+			max: 100,
+			min:0,
+			value: 50,
+			slide: function( event, ui ) {
+				$( "#ID_ContrastValue" ).val(ui.value );
+			}
+		});
+		$( "#ID_ContrastSlibar" ).slider( "value", 50 );
+		$( "#ID_ContrastValue" ).val(50);
+		
+		
+		
+		$( "#ID_SaturationSlibar" ).slider({
+			orientation: "horizontal",
+			range: "min",
+			max: 100,
+			min:0,
+			value: 50,
+			slide: function( event, ui ) {
+				$( "#ID_SaturationValue" ).val(ui.value );
+			}
+		});
+		$( "#ID_SaturationSlibar" ).slider( "value", 50 );
+		$( "#ID_SaturationValue" ).val(50);
+	});
+ </script>
+<body width="100%" height="100%">
+	<div id="ID_INDEX_LOG" ></div>
+	<div id="ID_INDEX_HEAD" >
+		<ul>
+			<li class="navLi">退出</li>
+			<li class="navLi">P2P二维码</li>
+			<li class="navLi">插件下载</li>
+			<li class="navLi" onclick="self.location='config.html';">系统配置</li>
+		</ul>
+	</div>
+	<div id="ID_INDEX_LEFT">
+	<div id="ID_INDEX_PTZTAG">设备列表</div>
+	<iframe width="210px" height="100px" background="#2B4458" style="border-bottom:2px solid  #2B4458;">		
+	</iframe> 
+	<div id="ID_INDEX_PTZTAG">云台控制</div>
+	<div id="ID_PTZBACK">
+	<div style="width=100%;height:95px">
+	<table id="ID_INDEX_PTZTABLE">
+		<tr> 
+			<td class="ptzDirect"><img  src="./img/normal/left_up.png" onmouseover="src='./img/select/left_up.png'" onmouseout="src='./img/normal/left_up.png'"/></td>
+			<td class="ptzDirect"><img  src="./img/normal/up.png" onmouseover="src='./img/select/up.png'" onmouseout="src='./img/normal/up.png'"/></td>
+			<td class="ptzDirect"><img  src="./img/normal/right_up.png" onmouseover="src='./img/select/right_up.png'" onmouseout="src='./img/normal/right_up.png'"/></td>
+		</tr>
+		<tr> 
+			<td class="ptzDirect"><img  src="./img/normal/left.png" onmouseover="src='./img/select/left.png'" onmouseout="src='./img/normal/left.png'"/></td>
+			<td class="ptzDirect"><img  src="./img/normal/auto.png" onmouseover="src='./img/select/auto.png'" onmouseout="src='./img/normal/auto.png'"/></td>
+			<td class="ptzDirect"><img  src="./img/normal/right.png" onmouseover="src='./img/select/right.png'" onmouseout="src='./img/normal/right.png'"/></td>
+		</tr>	
+		<tr> 
+			<td class="ptzDirect"><img  src="./img/normal/left_down.png" onmouseover="src='./img/select/left_down.png'" onmouseout="src='./img/normal/left_down.png'"/></td>
+			<td class="ptzDirect"><img  src="./img/normal/down.png" onmouseover="src='./img/select/down.png'" onmouseout="src='./img/normal/down.png'"/></td>
+			<td class="ptzDirect"><img  src="./img/normal/right_down.png" onmouseover="src='./img/select/right_down.png'" onmouseout="src='./img/normal/right_down.png'"/></td>
+		</tr>	
+	</table> 
+	<table style="width:35%;height:95px;position: absolute;left: 103px;">
+			<tr> 
+			<td class="ptzDirect"><img  src="./img/normal/add.png" onmouseover="src='./img/select/add.png'" onmouseout="src='./img/normal/add.png'"/></td>
+			<td class="ptzDirect"><img  src="./img/normal/zoom.png"/></td>
+			<td class="ptzDirect"><img  src="./img/normal/reduce.png" onmouseover="src='./img/select/reduce.png'" onmouseout="src='./img/normal/reduce.png'"/></td>
+		</tr>
+		<tr> 
+			<td class="ptzDirect"><img  src="./img/normal/add.png" onmouseover="src='./img/select/add.png'" onmouseout="src='./img/normal/add.png'"/></td>
+			<td class="ptzDirect"><img  src="./img/normal/focus.png"/></td>
+			<td class="ptzDirect"><img  src="./img/normal/reduce.png" onmouseover="src='./img/select/reduce.png'" onmouseout="src='./img/normal/reduce.png'"/></td>
+		</tr>	
+		<tr> 
+			<td class="ptzDirect"><img  src="./img/normal/add.png" onmouseover="src='./img/select/add.png'" onmouseout="src='./img/normal/add.png'"/></td>
+			<td class="ptzDirect"><img  src="./img/normal/iris.png"/></td>
+			<td class="ptzDirect"><img  src="./img/normal/reduce.png" onmouseover="src='./img/select/reduce.png'" onmouseout="src='./img/normal/reduce.png'"/></td>
+		</tr>	
+	</table>
+	</div>
+	<div style="width:210px;height:30px">
+	<div class="tagFontDiv" background="">步长:(1~10)</div><div id="ID_PtzSpeedSlibar" height="20px"></div><input style="width:20px;height:15px;margin-top: 7px;margin-left: 5px;" id= "ID_PtzSpeedValue"/>	
+	</div>
+	<div style="width:210px;height:30px">
+	<div class="tagFontDiv">预置点:</div>
+	<select style="width:50px;float:left;height:17px;margin-top: 7px;margin-left:26px">
+	  <option value ="1">100</option>
+	  <option value ="2">2</option>
+	  <option value="3">3</option>
+	  <option value="4">4</option>
+	</select>
+	<input style="width:35px;height:24px;margin-top: 3px;margin-left: 5px; float:left;" type="button" value="调用"/>
+	<input style="width:35px;height:24px;margin-top: 3px;margin-left: 5px;" type="button" value="设置"/>
+	</div>
+	</div>
+	<div id="ID_INDEX_PTZTAG">图像控制</div>
+	<div id="ID_IMAGEBACK">
+	
+	<div style="width:210px;height:30px">
+	<div class="tagFontDiv" background="">亮度:</div><div id="ID_BrightSlibar" height="20px" style="margin-left:13px;"></div><input style="width:25px;height:15px;margin-top: 7px;margin-left: 5px;" id= "ID_BrightValue"/>	
+	</div>
+	<div style="width:210px;height:30px">
+	<div class="tagFontDiv" background="">色度:</div><div id="ID_ChromaSlibar" height="20px"style="margin-left:13px;"></div><input style="width:25px;height:15px;margin-top: 7px;margin-left: 5px;" id= "ID_ChromaValue"/>	
+	</div>
+	<div style="width:210px;height:30px">
+	<div class="tagFontDiv" background="">饱和度:</div><div id="ID_SaturationSlibar" height="20px"></div><input style="width:25px;height:15px;margin-top: 7px;margin-left: 5px;" id= "ID_SaturationValue"/>	
+	</div>
+	<div style="width:210px;height:30px">
+	<div class="tagFontDiv" background="">对比度:</div><div id="ID_ContrastSlibar" height="20px"></div><input style="width:25px;height:15px;margin-top: 7px;margin-left: 5px;" id= "ID_ContrastValue"/>	
+	</div>
+	</div>
+	</div>
+	<div id="ID_INDEX_OCX">
+		<object 
+		CLASSID="CLSID:A7ED535D-FD1B-482F-8FB6-1F8E4C129E38" id="OCX" name="OCX"
+		width="100%" height="100%" codebase="AvActiveX.dll#version=1.0.0"> 
+		</object> 
+	</div>
+</body>	
+</html>

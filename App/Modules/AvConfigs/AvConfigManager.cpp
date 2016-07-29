@@ -121,6 +121,10 @@ void CAvConfigManager::Initialize()
 	m_name_configIndex.insert(ConfIndexValueType("NetProtocol", CONF_NETPROTOCOL));
 	LoadConfig("NetProtocol", m_ConfigNetProtocol);
 
+	m_name_configIndex.insert(ConfIndexValueType("Audio", CONF_AUDIO));
+	LoadConfig("Audio", m_ConfigAudio);
+	
+
 
 	//User Manager
 	m_name_configIndex.insert(ConfIndexValueType("UserManager", CONF_USER_MANAGER));

@@ -19,6 +19,34 @@
 extern "C" {
 #endif
 #include "AvWareType.h"
+	typedef enum {
+		AvChip_S2L22M,
+		AvChip_S2L33M,
+		AvChip_S2L55M,
+		AvChip_S2L65,
+		AvChip_S2L66,
+
+		AvChip_H18EV100,
+		AvChip_H18EV200,
+		AvChip_H18EV201,
+		AvChip_H18C,
+		AvChip_H18A,
+		AvChip_H16CV100,
+		AvChip_H16CV200,
+		AvChip_H16A,
+		AvChip_H16D,
+		AvChip_H19,
+
+		AvChip_H20D,
+		AvChip_H35,
+		AvChip_H36,
+
+		AvChip_WIN32,
+		AvChip_WIN64,
+
+		AvChip_LIN32,
+		AvChip_LIN64,
+	}E_AvChip;
 
 	typedef struct {
 	av_u32		nMaxEncodePower;
@@ -166,15 +194,7 @@ typedef enum {
 	NetCommGetMode_PPPOE,
 	NetCommGetMode_NR,
 }E_NetComm_Mode;
-typedef struct{
-	av_addr ipaddr;
-	av_addr submask;
-	av_addr gateway;
-	av_addr dns1;
-	av_addr dns2;
-	av_char mac[32];
-	av_char host[32];
-}av_network;
+
 
 typedef struct{
 	av_u32 NetCommMask;

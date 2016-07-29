@@ -32,7 +32,7 @@ set(AvPacketHeader_LIST
 		${project_headers_pach}/AvPacket/AvPacket.h
 	)
 add_library(AvPacket STATIC ${AvPacketSRC_LIST} ${AvPacketHeader_LIST})
-
+set_property(TARGET AvPacket PROPERTY FOLDER "AvModules")
 
 #AvCapture
 set(AvCaptureSRC_LIST 
@@ -49,6 +49,7 @@ set(AvCaptureHeader_LIST
 		
 	)
 add_library(AvCapture STATIC ${AvCaptureSRC_LIST} ${AvCaptureHeader_LIST})
+set_property(TARGET AvCapture PROPERTY FOLDER "AvModules")
 
 #AvDecode
 set(AvDecodeSRC_LIST 
@@ -58,6 +59,7 @@ set(AvDecodeHeader_LIST
 		${project_headers_pach}/AvDecode/AvDecode.h
 	)
 add_library(AvDecode STATIC ${AvDecodeSRC_LIST} ${AvDecodeHeader_LIST})
+set_property(TARGET AvDecode PROPERTY FOLDER "AvModules")
 
 #AvDevice
 set(AvDeviceSRC_LIST 
@@ -67,6 +69,7 @@ set(AvDeviceHeader_LIST
 		${project_headers_pach}/AvDevice/AvDevice.h
 	)
 add_library(AvDevice STATIC ${AvDeviceSRC_LIST} ${AvDeviceHeader_LIST})
+set_property(TARGET AvDevice PROPERTY FOLDER "AvModules")
 
 #AvGui
 #set(AvGuiSRC_LIST 
@@ -88,7 +91,7 @@ set (AvNetServiceALL_LIST
 		)
 source_group_by_dir(AvNetServiceALL_LIST)
 add_library(AvNetService STATIC ${AvNetServiceALL_LIST})
-
+set_property(TARGET AvNetService PROPERTY FOLDER "AvNetService")
 
 
 #AvWatchDog
@@ -99,17 +102,17 @@ set(AvWatchDogHeader_LIST
 		${project_headers_pach}/AvWatchDog/AvWatchDog.h
 	)
 add_library(AvWatchDog STATIC ${AvWatchDogSRC_LIST} ${AvWatchDogHeader_LIST})
-
+set_property(TARGET AvWatchDog PROPERTY FOLDER "AvModules")
 
 #AvAudio
-set(AvAudioSRC_LIST 
-		AvAudio/AvAudioCapture.cpp
-		AvAudio/AvAudioPlay.cpp
-	)
-set(AvAudioHeader_LIST 
-		${project_headers_pach}/AvAudio/AvAudio.h
-	)
-add_library(AvAudio STATIC ${AvAudioSRC_LIST} ${AvAudioHeader_LIST})
+#set(AvAudioSRC_LIST 
+#		AvAudio/AvAudioCapture.cpp
+#		AvAudio/AvAudioPlay.cpp
+#	)
+#set(AvAudioHeader_LIST 
+#		${project_headers_pach}/AvAudio/AvAudio.h
+#	)
+#add_library(AvAudio STATIC ${AvAudioSRC_LIST} ${AvAudioHeader_LIST})
 
 #AvAlarm
 set(AvAlarmSRC_LIST 
@@ -121,6 +124,7 @@ set(AvAlarmHeader_LIST
 		${project_headers_pach}/AvAlarm/AvAlarmLocal.h
 	)
 add_library(AvAlarm STATIC ${AvAlarmSRC_LIST} ${AvAlarmHeader_LIST})
+set_property(TARGET AvAlarm PROPERTY FOLDER "AvModules")
 
 #UART
 set(AvUartSRC_LIST 
@@ -130,6 +134,7 @@ set(AvUartHeader_LIST
 		${project_headers_pach}/AvUart/AvUart.h
 	)
 add_library(AvUart STATIC ${AvUartSRC_LIST} ${AvUartHeader_LIST})
+set_property(TARGET AvUart PROPERTY FOLDER "AvModules")
 
 #AvLog
 set(AvLogSRC_LIST 
@@ -139,6 +144,7 @@ set(AvLogHeader_LIST
 		${project_headers_pach}/AvLog/AvLog.h
 	)
 add_library(AvLog STATIC ${AvLogSRC_LIST} ${AvLogHeader_LIST})
+set_property(TARGET AvLog PROPERTY FOLDER "AvModules")
 
 #AvLog
 set(AvFileSRC_LIST 
@@ -148,14 +154,14 @@ set(AvFileHeader_LIST
 		${project_headers_pach}/AvFile/AvFile.h
 	)
 add_library(AvFile STATIC ${AvFileSRC_LIST} ${AvFileHeader_LIST})
-
+set_property(TARGET AvFile PROPERTY FOLDER "AvModules")
 
 file(GLOB_RECURSE AvExternInterfaceSRC_LIST AvExternInterface/*.h AvExternInterface/*.hpp)
 file(GLOB_RECURSE AvExternInterfaceHeader_LIST AvExternInterface/*.c AvExternInterface/*.cpp)
 set (AvExternInterfaceALL_LIST ${AvExternInterfaceSRC_LIST} ${AvExternInterfaceHeader_LIST})
 source_group_by_dir(AvExternInterfaceALL_LIST)
 add_library(AvExternInterface STATIC ${AvExternInterfaceALL_LIST})
-
+set_property(TARGET AvExternInterface PROPERTY FOLDER "AvExternInterface")
 
 
 #AvMemoryPool
@@ -166,6 +172,7 @@ set(AvMemoryPoolHeader_LIST
 		${project_headers_pach}/AvMemoryPool/AvMemoryPool.h
 	)
 add_library(AvMemoryPool STATIC ${AvMemoryPoolSRC_LIST} ${AvMemoryPoolHeader_LIST})
+set_property(TARGET AvMemoryPool PROPERTY FOLDER "AvModules")
 
 #AvUser
 set(AvUserSRC_LIST 
@@ -175,6 +182,7 @@ set(AvUserHeader_LIST
 		${project_headers_pach}/AvUser/AvUser.h
 	)
 add_library(AvUser STATIC ${AvUserSRC_LIST} ${AvUserHeader_LIST})
+set_property(TARGET AvUser PROPERTY FOLDER "AvModules")
 
 #AvPreview
 set(AvPreviewSRC_LIST 
@@ -184,6 +192,7 @@ set(AvPreviewHeader_LIST
 		${project_headers_pach}/AvPreview/AvPreview.h
 	)
 add_library(AvPreview STATIC ${AvPreviewSRC_LIST} ${AvPreviewHeader_LIST})
+set_property(TARGET AvPreview PROPERTY FOLDER "AvModules")
 
 #AvRecord
 set(AvRecordSRC_LIST 
@@ -193,7 +202,7 @@ set(AvRecordHeader_LIST
 		${project_headers_pach}/AvRecord/AvRecord.h
 	)
 add_library(AvRecord STATIC ${AvRecordSRC_LIST} ${AvRecordHeader_LIST})
-
+set_property(TARGET AvRecord PROPERTY FOLDER "AvModules")
 
 #AvConfigs
 set(AvConfigExSRC_LIST
@@ -216,6 +225,6 @@ set(AvConfigExHeader_LIST
 		${project_headers_pach}/AvConfigs/AvConfigAlarm.h
 )
 add_library(AvConfigs STATIC ${AvConfigExSRC_LIST} ${AvConfigExHeader_LIST})
-
+set_property(TARGET AvConfigs PROPERTY FOLDER "AvModules")
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../)

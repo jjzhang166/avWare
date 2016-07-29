@@ -2,7 +2,7 @@
 #include "AvAlarm/AvAlarm.h"
 #include "AvAudio/AvAudio.h"
 #include "AvDevice/AvDevice.h"
-
+#include "Apis/LibEncode.h"
 CAvDevCapture::CAvDevCapture()
 {
 	CThread::SetThreadName(__FUNCTION__);
@@ -22,6 +22,11 @@ CAvDevCapture::CAvDevCapture()
 	m_ConfigWaterMark.Update(m_Channel);
 	m_ConfigWaterMark.Attach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigWaterMarkingModify);
 
+	m_ConfigAudio[CHL_ACAP_T].Update(CHL_ACAP_T);
+	m_ConfigAudio[CHL_ACAP_T].Attach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigAudio);
+
+	m_ConfigAudio[CHL_APLY_T].Update(CHL_APLY_T);
+	m_ConfigAudio[CHL_APLY_T].Attach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigAudio);
 }
 CAvDevCapture::~CAvDevCapture()
 {
@@ -47,18 +52,30 @@ av_bool CAvDevCapture::Initialize(av_int Channel)
 		if (!(AvMask(i) & EncodeCaps.ExtChannel))continue;
 		Start(i);
 	}
+	{
+		C_AudioCaps AudioCaps;
+		CAvDevice::GetACaptureCaps(CHL_ACAP_T, AudioCaps);
+		if (AudioCaps.nMaxChannels != 0){
+			AStart(CHL_ACAP_T);
+		}
+		CAvDevice::GetACaptureCaps(CHL_APLY_T, AudioCaps);
+		if (AudioCaps.nMaxChannels != 0){
+			AStart(CHL_APLY_T);
+		}
+	}
+
 	LoadConfigs();
 	return av_true;
 }
 
 av_bool CAvDevCapture::Start(av_int Slave)
 {
-	return CaptureStart(Slave);
+	return VStart(Slave);
 }
 av_bool CAvDevCapture::Stop(av_int Slave)
 {
 
-	return CaptureStop(Slave);
+	return VStop(Slave);
 }
 
 av_bool CAvDevCapture::Start(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnData)
@@ -119,8 +136,12 @@ av_bool CAvDevCapture::CaptureCreate()
 	m_LastCaptureSyncStat = E_Capture_VideoStart;
 
 	AvCoverCreate(m_Channel);
+	AvCoverStart(m_Channel);
 
 	AvWaterMarkingCreate(m_Channel);
+	AvWaterMarkingStart(m_Channel);
+
+	AvACreate(m_Channel);
 
 	return av_true;
 }
@@ -128,8 +149,15 @@ av_bool CAvDevCapture::CaptureDestroy()
 {
 	av_bool ret = av_true;
 
+	VStop(m_Channel);
+
+	AStop(CHL_ACAP_T);
+	AStop(CHL_APLY_T);
+
+	AvWaterMarkingStop(m_Channel);
 	AvWaterMarkingDestory(m_Channel);
 
+	AvCoverStop(m_Channel);
 	AvCoverDestroy(m_Channel);
 
 	ret = AvCaptureDestroy(m_Channel);
@@ -139,34 +167,30 @@ av_bool CAvDevCapture::CaptureDestroy()
 	return av_true;
 }
 
-av_bool CAvDevCapture::CaptureStart(av_uchar Slave)
+av_bool CAvDevCapture::VStart(av_uchar Slave)
 {
-	av_bool ret = av_true;
-
-	ret = AvCaptureStart(m_Channel, Slave);
-
-	AvCoverStart(m_Channel);
-
-	AvWaterMarkingStart(m_Channel);
-
-	if (ret != av_true){
-		return av_false;
-	}
-	return av_true;
+	return AvCaptureStart(m_Channel, Slave);
 }
-av_bool CAvDevCapture::CaptureStop(av_uchar Slave)
+av_bool CAvDevCapture::VStop(av_uchar Slave)
 {
-	av_bool ret = av_true;
+	return AvCaptureStop(m_Channel, Slave);
+}
 
-	AvWaterMarkingStop(m_Channel);
-
-	AvCoverStop(m_Channel);
-
-	ret = AvCaptureStop(m_Channel, Slave);
-	if (ret != av_true){
-		return av_false;
+av_bool CAvDevCapture::AStart(E_AUDIO_CHL chl)
+{
+	return AvAStart(m_Channel, chl);
 	}
-	return av_true;
+av_bool CAvDevCapture::AStop(E_AUDIO_CHL chl)
+{
+	return AvAStop(m_Channel, chl);
+}
+av_bool CAvDevCapture::APlayPutBuffer(CAvPacket *Packet)
+{
+	return AvAPlayPutBuffer((av_uchar *)Packet->GetRawBuffer(), Packet->GetRawLength());
+	}
+av_bool CAvDevCapture::ASetProfile(E_AUDIO_CHL CHL, C_AudioProfile &aProfile)
+{
+	return AvASetProfile(m_Channel, CHL, &aProfile);
 }
 
 av_bool CAvDevCapture::LoadConfigs()
@@ -201,6 +225,19 @@ av_bool CAvDevCapture::LoadConfigs()
 	for (int i = 0; i < CaptureCaps.MaxWaterMaring; i++){
 		AvWaterMarkingSetFormat(m_Channel, &(WaterMarkingFormats.CHLFormats[i]));
 	}
+
+	C_AudioCaps AudioCaps;
+	CAvDevice::GetACaptureCaps(CHL_ACAP_T, AudioCaps);
+	if (AudioCaps.nMaxChannels > 0){
+		ConfigAudioFormats &AudioCapFromat = m_ConfigAudio[CHL_ACAP_T].GetConfig(CHL_ACAP_T);
+		ASetProfile(CHL_ACAP_T, AudioCapFromat);
+	}
+	CAvDevice::GetACaptureCaps(CHL_APLY_T, AudioCaps);
+	if (AudioCaps.nMaxChannels > 0){
+		ConfigAudioFormats &AudioCapFromat = m_ConfigAudio[CHL_APLY_T].GetConfig(CHL_APLY_T);
+		ASetProfile(CHL_APLY_T, AudioCapFromat);
+	}
+
 
 	return av_true;
 
@@ -265,7 +302,6 @@ void CAvDevCapture::ThreadProc()
 		//以下是为了动态输入
 		if (1 && (cnt++ % 100) == 0){
 			ViStatus = AvCaptureSynchronize(m_Channel);
-			//av_msg("Get Vistatus = %d\n", ViStatus);
 			CAvAlarm::AvAlarmStat MsgStatus = CAvAlarm::AvAlm_Stat_NONE;
 			switch (ViStatus){
 			case 	E_Capture_VideoNONE:
@@ -276,21 +312,12 @@ void CAvDevCapture::ThreadProc()
 				if (m_LastCaptureSyncStat != E_Capture_VideoStart){
 					av_warning("Video In Start Captures \n");
 					CaptureCreate();
-
-
 					for (int i = CHL_MAIN_T; i < CHL_NR_T; i++){
 						if (!(AvMask(i) & EncodeCaps.ExtChannel))continue;
-						CaptureStart(i);
+						Start(i);
 					}
-
-					//StartConf(av_true);
-
-					g_AvAudioCapture.AudioCreate();
-
-					g_AvAudioCapture.AudioStart();
-
-					g_AvAudioCapture.AudioSetFormat();
-
+					AStart(CHL_ACAP_T);
+					AStart(CHL_APLY_T);
 					MsgStatus = CAvAlarm::AvAlm_Stat_Close;
 					m_LastCaptureSyncStat = E_Capture_VideoStart;
 				}
@@ -304,10 +331,10 @@ void CAvDevCapture::ThreadProc()
 			{
 				if (m_LastCaptureSyncStat != E_Capture_VideoStop){
 					av_warning("Video In Stop Captures \n");
-					g_AvAudioCapture.AudioStop();
-					CaptureStop(m_Channel);
-
-					g_AvAudioCapture.AudioDestroy();
+					for (int i = CHL_MAIN_T; i < CHL_NR_T; i++){
+						if (!(AvMask(i) & EncodeCaps.ExtChannel))continue;
+						Stop(i);
+					}
 					CaptureDestroy();
 					MsgStatus = CAvAlarm::AvAlm_Stat_Open;
 					m_LastCaptureSyncStat = E_Capture_VideoStop;
@@ -365,8 +392,6 @@ av_void CAvDevCapture::OnConfigWaterMarkingModify(CAvConfigWaterMarking *ConfigW
 			}
 		}
 	}
-
-
 }
 av_void CAvDevCapture::OnConfigCoverModify(CAvConfigCover *ConfigCover, int &result)
 {
@@ -446,6 +471,10 @@ av_void CAvDevCapture::OnConfigCaptureModify(CAvConfigCapture *ConfigCapture, in
 			result = -1;
 		}
 	}
+}
+av_void CAvDevCapture::OnConfigAudio(CAvConfigAudio *ConfigAudio, int &result)
+{
+
 }
 
 av_void CAvDevCapture::OnTest(void  *args, int &result)

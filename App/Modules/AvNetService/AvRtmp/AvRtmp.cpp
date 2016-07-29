@@ -17,6 +17,54 @@
 #include "Rtmp/rtmp.h"
 
 
+#define RTMP_AUDIO_SAMPLEBITS_NUM(SampleBits, SampleBitsNum)\
+	switch(SampleBits)\
+				{\
+	case 16:\
+		SampleBitsNum = 1;\
+		break;\
+	case 8:\
+		SampleBitsNum = 0;\
+		break;\
+	default:\
+		assert(0);\
+		break;\
+				}
+
+
+#define RTMP_AUDIO_SAMPLERATE_NUM(SampleRateValue, SampleRateNum)\
+		switch (SampleRateValue){\
+		case 96000:\
+			SampleRateNum = 0;\
+			break;\
+		case 88200:\
+			SampleRateNum = 1;\
+			break;\
+		case 64000:\
+			SampleRateNum = 2;\
+			break;\
+		case 48000:\
+			SampleRateNum = 3;\
+			break;\
+		case 44100:\
+			SampleRateNum = 4;\
+			break;\
+		case 32000:\
+			SampleRateNum = 5;\
+			break;\
+		case 24000:\
+			SampleRateNum = 6;\
+			break;\
+		case 22050:\
+			SampleRateNum = 7;\
+			break;\
+		case 1600:\
+			SampleRateNum = 8;\
+			break;\
+		default:\
+			assert(0);\
+			break;\
+}
 
 static char * put_byte(char *output, uint8_t nVal)
 {
@@ -84,11 +132,24 @@ AvRtmp::AvRtmp(E_RTMP_MODE mode) :CThread(__FUNCTION__)
 	m_RtmpMode = mode;
 	m_Channel = 0;
 	m_Slave = CHL_MAIN_T;
-	m_CacheBuffer = (av_char *)malloc(sizeof(char)*AVPACKET_MAX_FRAME);
+	m_CacheBuffer = (av_char *)malloc(sizeof(av_char)*AVPACKET_MAX_FRAME);
 	m_CacheBufferLen = AVPACKET_MAX_FRAME;
 	m_PicWidth	= 0;
 	m_PicHeigh  = 0;
-	m_nTimestamp = 0;
+	m_nVTimestamp = 0;
+	m_nATimestamp = 0;
+	m_GetIFrame = av_true;
+
+	m_nVBasePts		= 0;
+	m_nABasePts		= 0;
+
+	m_AudioCfgSampleRate = -1;
+	m_AudioCfgSampleBits = -1;
+	m_AudioComp = AvComp_NR;
+	m_AudioChannels = -1;
+
+
+
 }
 AvRtmp::~AvRtmp()
 {
@@ -108,19 +169,23 @@ av_bool AvRtmp::Start(av_uchar Channel, av_uchar Slave, std::string url)
 	m_Channel = Channel;
 	m_Slave = Slave;
 	
-	m_RtmpHandle = RTMP_Alloc();
-	RTMP_Init(m_RtmpHandle);
+	
 	sprintf(m_Url, "%s", url.c_str());
-	RTMP_SetupURL(m_RtmpHandle, m_Url);
+	m_RtmpHandle = RTMP_Alloc();
+
+	RTMP_Init(m_RtmpHandle);
+
 	m_RtmpHandle->Link.timeout = 30;
+	
+	RTMP_SetupURL(m_RtmpHandle, m_Url);
+
+
 	
 	if (m_RtmpMode == RTMP_PULL){
 
 	}
 	else if (m_RtmpMode == RTMP_PUSH){
 		RTMP_EnableWrite(m_RtmpHandle);
-		Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(m_Channel);
-		pCapture->Start(m_Slave, this, (Capture::SIG_PROC_ONDATA)&AvRtmp::OnStream);
 	}
 	else{
 		assert(0);
@@ -153,14 +218,26 @@ av_bool AvRtmp::Stop()
 
 av_void AvRtmp::OnStream(av_uchar Channel, av_uchar Slave, CAvPacket *AvPacket)
 {
-	av_msg("Get stream\n");
-	if (m_Avpacket.size() > 10){
-		av_error("%s Cache too mach frame\n", __FUNCTION__);
+	if (m_AudioCfgSampleRate != AvPacket->SampleRate() && AvPacket->StreamType() == avStreamT_A){
+		m_AudioCfgSampleRate = AvPacket->SampleRate();
+		m_AudioCfgSampleBits = AvPacket->SampleBits();
+		m_AudioComp = AvPacket->Comp();
 	}
+	if ((m_GetIFrame == av_true && AvPacket->FrameType() != avFrameT_I) || m_AudioCfgSampleRate == -1){
+		return;
+	}
+	if (m_Avpacket.size() > 100){
+		av_error("%s Cache too mach frame\n", __FUNCTION__);
+		m_GetIFrame = av_true;
+		return;
+	}
+	m_GetIFrame = av_false;
+	//保证每帧数据是I帧，并且音频已经配置完。
 	AvPacket->AddRefer();
 	m_Mutex.Enter();
 	m_Avpacket.push(AvPacket);
 	m_Mutex.Leave();
+	return;
 }
 
 av_bool AvRtmp::RtmpPullTask()
@@ -199,15 +276,15 @@ av_int AvRtmp::SendMetaPacket(av_comp_t Vcomp, av_int PicWidth, av_int PicHight,
 	p = put_amf_string(p, "onMetaData");
 	p = put_byte(p, AMF_OBJECT);
 
-	p = put_amf_string(p, "copyright");
-	p = put_byte(p, AMF_STRING);
-	p = put_amf_string(p, "firehood");
-
 	p = put_amf_string(p, "duration");
 	p = put_amf_double(p, 0);
 
 	p = put_amf_string(p, "fileSize");
 	p = put_amf_double(p, 0);
+
+	p = put_amf_string(p, "copyright");
+	p = put_byte(p, AMF_STRING);
+	p = put_amf_string(p, "firehood");
 
 #define FLV_CODECID_H264 7
 #if 0
@@ -222,22 +299,32 @@ av_int AvRtmp::SendMetaPacket(av_comp_t Vcomp, av_int PicWidth, av_int PicHight,
 	p = put_amf_double(p, PicWidth);
 	p = put_amf_string(p, "height");
 	p = put_amf_double(p, PicHight);
-	//	p =put_amf_string( p, "framerate"); 
-	//	p =put_amf_double( p, framerate);
+	p = put_amf_string(p, "framerate");
+	p = put_amf_double(p, FrameRate);
 
-#if 1
+	p = put_amf_string(p, "encoder");
+	p = put_byte(p, AMF_STRING);
+	p = put_amf_string(p, "avWare");
+
 	p = put_amf_string(p, "audiocodecid");
 	p = put_byte(p, AMF_STRING);
-	p = put_amf_string(p, "g711u");
+	if (m_AudioComp == AvComp_AAC){
+		p = put_amf_string(p, "mp4a");
+	}
+	else if (m_AudioComp == AvComp_G711A){
+		p = put_amf_string(p, "g711a");
+	}
 	p = put_amf_string(p, "audiodatarate");
 	p = put_amf_double(p, 128);
+
 	p = put_amf_string(p, "audiosamplerate");
-	p = put_amf_double(p, 8000);
+	p = put_amf_double(p, m_AudioCfgSampleRate);
+
 	p = put_amf_string(p, "audiosamplesize");
-	p = put_amf_double(p, 16);
+	p = put_amf_double(p, m_AudioCfgSampleBits);
 	p = put_amf_string(p, "audiochannels");
 	p = put_amf_double(p, 1);
-#endif
+
 	p = put_amf_string(p, "");
 	p = put_byte(p, AMF_OBJECT_END);
 	len = p - body;
@@ -245,17 +332,12 @@ av_int AvRtmp::SendMetaPacket(av_comp_t Vcomp, av_int PicWidth, av_int PicHight,
 }
 
 av_int AvRtmp::SendRtmpData(unsigned int nPacketType, unsigned char *predata, unsigned int presize,
-	unsigned char *loaddata, unsigned int loaddatasize)
+	unsigned char *loaddata, unsigned int loaddatasize, unsigned char headerType)
 {
-	//assert(predata == NULL || presize < 0);
-	//assert(loaddata == NULL || loaddatasize < 0);
-	//assert(predata != NULL && presize <= 0);
-	//assert(loaddata != NULL && presize == 0);
-
-
 	RTMPPacket* packet;
 	int nRet = 0;
 	packet = (RTMPPacket*)m_CacheBuffer;
+	memset(packet, 0, RTMP_HEAD_SIZE);
 	RTMPPacket_Reset(packet);
 	packet->m_body = (char *)packet + RTMP_HEAD_SIZE;
 	packet->m_nBodySize = presize + loaddatasize;
@@ -269,16 +351,23 @@ av_int AvRtmp::SendRtmpData(unsigned int nPacketType, unsigned char *predata, un
 	packet->m_packetType = nPacketType; /*此处为类型有两种一种是音频,一种是视频*/
 	packet->m_nInfoField2 = m_RtmpHandle->m_stream_id;
 	packet->m_nChannel = 0x04;
-	packet->m_headerType = RTMP_PACKET_SIZE_LARGE;
+	packet->m_headerType = headerType;
 	if (RTMP_PACKET_TYPE_AUDIO == nPacketType && packet->m_nBodySize != 4)
 	{
 		packet->m_headerType = RTMP_PACKET_SIZE_MEDIUM;
+		packet->m_nTimeStamp = m_nATimestamp;
 	}
-	packet->m_nTimeStamp = m_nTimestamp;
+	else{
+		packet->m_nTimeStamp = m_nVTimestamp;
+	}
+	
 
 	if (RTMP_IsConnected(m_RtmpHandle))
 	{
 		nRet = RTMP_SendPacket(m_RtmpHandle, packet, FALSE); /*TRUE为放进发送队列,FALSE是不放进发送队列,直接发送*/
+	}
+	else {
+		nRet = -1;
 	}
 	return nRet;
 }
@@ -295,17 +384,18 @@ av_int AvRtmp::SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type nalType
 	{
 	case nal_unit_type_idr:
 	{
+
 		predata[prelen++] = 0x17;// 1:Iframe  7:AVC   
 		predata[prelen++] = 0x01;// AVC NALU   
 		predata[prelen++] = 0x00;
 		predata[prelen++] = 0x00;
 		predata[prelen++] = 0x00;
 
-		predata[prelen++] = DataLen >> 24 & 0xff;
-		predata[prelen++] = DataLen >> 16 & 0xff;
-		predata[prelen++] = DataLen >> 8  & 0xff;
+		predata[prelen++] = (DataLen >> 24) & 0xff;
+		predata[prelen++] = (DataLen >> 16) & 0xff;
+		predata[prelen++] = (DataLen >> 8)  & 0xff;
 		predata[prelen++] = DataLen		  & 0xff;
-
+		//av_msg("Send idr prelen = %d, DataLen = %d\n", prelen, DataLen);
 		ret = SendRtmpData(nPacketType, predata, prelen, (unsigned char *)pData, DataLen);
 	}
 		break;
@@ -317,9 +407,9 @@ av_int AvRtmp::SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type nalType
 		predata[prelen++] = 0x00;
 		predata[prelen++] = 0x00;
 
-		predata[prelen++] = DataLen >> 24 & 0xff;
-		predata[prelen++] = DataLen >> 16 & 0xff;
-		predata[prelen++] = DataLen >>  8 & 0xff;
+		predata[prelen++] = (DataLen >> 24) & 0xff;
+		predata[prelen++] = (DataLen >> 16) & 0xff;
+		predata[prelen++] = (DataLen >> 8) & 0xff;
 		predata[prelen++] = DataLen & 0xff;
 		ret = SendRtmpData(nPacketType, predata, prelen, (unsigned char *)pData, DataLen);
 	}
@@ -332,9 +422,9 @@ av_int AvRtmp::SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type nalType
 		predata[prelen++] = 0x00;
 		predata[prelen++] = 0x00;
 
-		predata[prelen++] = DataLen >> 24 & 0xff;
-		predata[prelen++] = DataLen >> 16 & 0xff;
-		predata[prelen++] = DataLen >>  8 & 0xff;
+		predata[prelen++] = (DataLen >> 24) & 0xff;
+		predata[prelen++] = (DataLen >> 16) & 0xff;
+		predata[prelen++] = (DataLen >> 8) & 0xff;
 		predata[prelen++] = DataLen & 0xff;
 		ret = SendRtmpData(nPacketType, predata, prelen, (unsigned char *)pData, DataLen);
 	}
@@ -371,8 +461,8 @@ av_int AvRtmp::SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type nalType
 		predata[prelen++] = (LenPps)& 0xff;
 		memcpy(&predata[prelen], DataPps, LenPps);
 		prelen += LenPps;
-
-		ret = SendRtmpData(nPacketType, predata, prelen, NULL, 0);
+		//av_msg("Send sps prelen = %d, DataLen = %d\n", prelen, DataLen);
+		ret = SendRtmpData(nPacketType, predata, prelen, NULL, 0, RTMP_PACKET_SIZE_MEDIUM);
 	}
 		break;
 	case nal_unit_type_sei:
@@ -383,10 +473,11 @@ av_int AvRtmp::SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type nalType
 		predata[prelen++] = 0x00;
 		predata[prelen++] = 0x00;
 
-		predata[prelen++] = DataLen >> 24 & 0xff;
-		predata[prelen++] = DataLen >> 16 & 0xff;
-		predata[prelen++] = DataLen >> 8 & 0xff;
+		predata[prelen++] = (DataLen >> 24) & 0xff;
+		predata[prelen++] = (DataLen >> 16) & 0xff;
+		predata[prelen++] = (DataLen >> 8) & 0xff;
 		predata[prelen++] = DataLen & 0xff;
+		//av_msg("Send sei prelen = %d, DataLen = %d\n", prelen, DataLen);
 		ret = SendRtmpData(nPacketType, predata, prelen, (unsigned char *)pData, DataLen);
 	}
 		break;
@@ -400,6 +491,7 @@ av_int  AvRtmp::PushMediaData(CAvPacket *AvPacket)
 {
 	char *pData = NULL;
 	int   Len = 0;
+	int ret = 0;
 	av_nal_unit_type nalutype;
 
 	for (int i = 0; i < (int)AvPacket->GetNaluCount(); i++){
@@ -407,73 +499,184 @@ av_int  AvRtmp::PushMediaData(CAvPacket *AvPacket)
 		switch (nalutype)
 		{
 		case nal_unit_type_idr:
-			SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
+			ret = SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
 			break;
 		case nal_unit_type_p:
-			SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
+			ret = SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
 			break;
 		case nal_unit_type_sei:
-			SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
+			ret = 1;
+			//ret = SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
 			break;
 		case nal_unit_type_pps://P帧带PPS  windows intel media sdk , H264
-			SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
+			if (AvPacket->FrameType() != avFrameT_I){
+				ret = SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
+			}
 			break;
 		case nal_unit_type_sps:
 			if (m_PicHeigh != AvPacket->ImageHeigh() || m_PicWidth != AvPacket->ImageWidth()){
 				m_PicWidth = AvPacket->ImageWidth();
 				m_PicHeigh = AvPacket->ImageHeigh();
-				SendMetaPacket(AvPacket->Comp(), AvPacket->ImageWidth(), AvPacket->ImageHeigh(),
+				av_msg("##################SendMetaPacket\n");
+				ret  = SendMetaPacket(AvPacket->Comp(), AvPacket->ImageWidth(), AvPacket->ImageHeigh(),
 					AvPacket->FrameRate(), AvComp_G711A, 8000, 16);
+				SendAacSpac();
 			}
-			SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
+			ret = SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
 			break;
 
 		default:
+			ret = 1;
 			break;
 		}
+		if (ret <= 0){
+			return -1;
+		}
 	}
-	m_nTimestamp += 1000 / AvPacket->FrameRate();
+	if (m_nVBasePts != 0){
+		m_nVTimestamp = (AvPacket->TimeStamp() - m_nVBasePts)/1000;
+	}
+	else{
+		m_nVBasePts = AvPacket->TimeStamp();
+	}
 
-	return 0;
+	return 1;
 }
+
 
 av_int AvRtmp::SendAacSpac()
 {
+	// af 00 11 90   ;;aac    48000 16bits 
+	// af 00 12 10   ;;aac    44100 16bits
+	// af 00 13 90	 ;;aac    22050 16bits
+	// 72 00 04 88   ;;g711-a 8000 16bits
+
 	unsigned char preData[32];
 	int  preLen = 0;
-	/*AF 00 + AAC RAW data 0x11 0x90 || 0x12 0x10*/
-	preData[preLen++] = 0xAF;
-	preData[preLen++] = 0x00;
-	preData[preLen++] = 0x11;
-	preData[preLen++] = 0x90;
+	int SampleRate = 0;
+	int SampleBits = 0;
 
-	return SendRtmpData(RTMP_PACKET_TYPE_AUDIO, preData, preLen, NULL, 0);
+	av_uchar PreData[4];
+
+	switch (m_AudioComp)
+	{
+	case AvComp_AAC:
+	{
+		switch (m_AudioCfgSampleRate)
+		{
+		case 48000:
+			PreData[0] = 0XAF;
+			PreData[1] = 0X00;
+			PreData[2] = 0x11;
+			PreData[3] = 0x90;
+			break;
+		case 44100:
+			PreData[0] = 0xAF;
+			PreData[1] = 0x00;
+			PreData[2] = 0x12;
+			PreData[3] = 0x10;
+			break;
+		case 22050:
+			PreData[0] = 0XAF;
+			PreData[1] = 0X00;
+			PreData[2] = 0x13;
+			PreData[3] = 0x90;
+			break;
+		default:
+			assert(0);
+			break;
+		}
+	}
+		break;
+	case AvComp_G711A:
+	{
+		switch (m_AudioCfgSampleRate)
+		{
+		case 8000:
+			PreData[0] = 0x72;
+			PreData[1] = 0x00;
+			PreData[2] = 0x04;
+			PreData[3] = 0x88;
+			break;
+		default:
+			av_error("SampleRate = %d\n", m_AudioCfgSampleRate);
+			assert(0);
+
+		}
+	}
+		break;
+	case AvComp_G711U:
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+
+	return SendRtmpData(RTMP_PACKET_TYPE_AUDIO, PreData, sizeof(PreData), NULL, 0);
 }
-av_int AvRtmp::SendAacData(CAvPacket *Packet)
+
+av_int AvRtmp::SendAudioData(CAvPacket *Packet)
+{
+	int ret = 0;
+	switch (Packet->Comp())
+	{
+	case AvComp_G711A:
+	{
+		unsigned char preData[1] = { 0x72 };
+		ret = SendRtmpData(RTMP_PACKET_TYPE_AUDIO, preData, sizeof(preData),
+			(unsigned char *)Packet->GetRawBuffer() + 4, Packet->GetRawLength() - 4);
+}
+		break;
+	case AvComp_G711U:
+		break;
+	case AvComp_AAC:
 {
 	unsigned char preData[2] = { 0xAF, 0x01 };
-	return SendRtmpData(RTMP_PACKET_TYPE_AUDIO, preData, sizeof(preData), 
-	(unsigned char *)Packet->GetRawBuffer(), Packet->GetRawLength());
+		ret = SendRtmpData(RTMP_PACKET_TYPE_AUDIO, preData, sizeof(preData),
+			(unsigned char *)Packet->GetRawBuffer() + 7, Packet->GetRawLength() - 7);
+	}
+		break;
 
+	default:
+		av_warning("audio type = %d\n", Packet->Comp());
+		break;
+	}
+	if (m_nABasePts != 0){
+		m_nATimestamp = (Packet->TimeStamp() - m_nABasePts) / 1000;
+	}
+	else{
+		m_nABasePts = Packet->TimeStamp();
+	}
+
+	return 1;
 }
 av_bool AvRtmp::RtmpPushTask()
 {
 	CAvPacket *AvPacket = NULL;
+	int iRet = 0;
+
+
 	while (m_Loop == av_true)
 	{
 		while (m_Loop == av_true)
 		{
-			//link server;
-			//is error , send alarm;
-			//is right , break;
+	
 			if (!RTMP_Connect(m_RtmpHandle, NULL)){
 				av_msleep(2 * 1000);
+				av_msg("Drop clent reconnect\n");
 				continue;
 			}
 
 			if (!RTMP_ConnectStream(m_RtmpHandle, 0)){
 				av_msleep(2 * 1000);
+				av_msg("Drop ConnectStream reconnect\n");
 				continue;
+			}
+			else{
+				
+				Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(m_Channel);
+				pCapture->Start(m_Slave, this, (Capture::SIG_PROC_ONDATA)&AvRtmp::OnStream);
 			}
 			
 			break;
@@ -491,9 +694,24 @@ av_bool AvRtmp::RtmpPushTask()
 				AvPacket = m_Avpacket.front();
 				m_Avpacket.pop();
 				m_Mutex.Leave();
+				
+				if (avStreamT_V == AvPacket->StreamType()){
 				AvPacket->GetNaluSplit();
-				PushMediaData(AvPacket);
+					iRet = PushMediaData(AvPacket);
+				}
+				else if (avStreamT_A == AvPacket->StreamType()){
+					SendAudioData(AvPacket);
+				}
+				else{
+					assert(0);
+				}
+				
 				AvPacket->Release();
+
+				if (iRet <= 0){
+					RTMP_DeleteStream(m_RtmpHandle);
+					RTMP_Close(m_RtmpHandle);
+				}
 			}
 
 		}

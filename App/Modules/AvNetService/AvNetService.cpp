@@ -45,11 +45,10 @@ av_bool CAvNetService::Start()
 	ret = g_AvRtspServer.Start();
 	ret = g_AvWebSer.Start();
 	//AvRtmp *rtmp = new AvRtmp(AvRtmp::RTMP_PUSH);
-	//rtmp->Start(0, 1, std::string("rtmp://172.16.8.1/live/pc"));
-
-
-	ret = g_AvDdnsCli.Start();
-	ret = g_AvNtpCli.Start();
+	//rtmp->Start(0, 1, std::string("rtmp://192.168.1.188/live/16c"));
+	//rtmp->Start(0, 1, std::string("rtmp://push.zhidekan.me/zhidekan/jsktest001"));
+	//ret = g_AvDdnsCli.Start();
+	//ret = g_AvNtpCli.Start();
 
 
 	

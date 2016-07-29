@@ -217,12 +217,6 @@ typedef pthread_t av_thread_t;
 typedef pthread_t av_thread_t;
 #endif
 
-
-typedef union {
-	av_uchar c[4];
-	av_u32   u;
-}av_addr;
-
 //avWare func for bsp call
 extern av_void *AvMemoryPoolMalloc(size_t size);
 extern av_void *AvMemoryPoolRealloc(av_void *ptr, size_t size);
@@ -266,29 +260,6 @@ extern av_void  AvMemoryPoolFree(av_void *ptr);
 	} while (0)
 
 
-#if 0
-#define AvAddr2NetAddr(x) htonl((x))
-#define AvAddr2StrAddr(src, dest) do \
-{\
-	sprintf(dest, "%d.%d.%d.%d", src.c[0], src.c[1], src.c[2], src.c[3]);\
-} while (0)
-
-
-#define StrAddr2AvAddr(src, dest) do \
-{\
-	int addr[4];\
-	sscanf(src, "%d.%d.%d.%d", &addr[0], &addr[1], &addr[2], &addr[3]); \
-	dest.c[0] = addr[0];dest.c[1] = addr[1]; dest.c[2] = addr[2];dest.c[3] = addr[3];\
-} while (0)
-#define StrAddr2AvAddr_s(src, dest)do\
-{\
-	if (NULL != src){\
-		int addr[4];\
-		sscanf(src, "%d.%d.%d.%d", &addr[0], &addr[1], &addr[2], &addr[3]); \
-		dest.c[0] = addr[0];dest.c[1] = addr[1]; dest.c[2] = addr[2];dest.c[3] = addr[3];\
-	}\
-}while (0)
-#endif
 
 
 
@@ -305,44 +276,6 @@ extern av_void  AvMemoryPoolFree(av_void *ptr);
 #pragma warning(disable:32)
 #pragma warning(disable:34)
 #pragma warning(disable:36)
-#endif
-
-
-
-#define D_StreamSync_Code 0x06010000
-
-#pragma pack(4)
-typedef struct {
-	av_u32			sync;
-	av_u32			index;
-
-	av_u64			pts;
-
-	av_u16			SizeHight;
-	av_u16			SizeWidth;
-
-	av_uchar		Channel;
-	av_uchar		Slave;
-	av_uchar		Comp;
-	av_uchar		FrameType;
-
-	av_u32			Length;
-
-	av_uchar		FrameRate;
-	av_uchar		res[3];
-}C_FormatStreamHead;
-#pragma pack()
-
-#if defined(WIN32)
-int FormatStreamHeadSize();
-int  FormatStreamHead(int Channel, int Slave, unsigned int comp/*av_comp_t*/, unsigned int freamt,/*av_frame_type*/
-	int FrameRate, int ImageWidth, int ImageHeigh,
-	av_u64 pts, av_u32 playloadLength, char *data);
-#else
-inline  int FormatStreamHeadSize();
-inline int  FormatStreamHead(int Channel, int Slave, unsigned int comp/*av_comp_t*/, unsigned int freamt,/*av_frame_type*/
-	int FrameRate, int ImageWidth, int ImageHeigh,
-	av_u64 pts, av_u32 playloadLength, char *data);
 #endif
 
 

@@ -137,7 +137,8 @@ typedef struct {
 int GetH264FrameSliceInfo(unsigned char *FrameData, unsigned int Datalen, FrameSliceInfo *SliceInfo);
 int GetH265FrameSliceInfo(unsigned char *FrameData, unsigned int Datalen, FrameSliceInfo *SliceInfo);
 
-class CRtspMedia :public CAvObject, public CRTP, public CRTCP
+//class CRtspMedia :public CAvObject, public CRTP, public CRTCP
+class CRtspMedia :public CAvObject
 {
 
 public:
@@ -149,7 +150,11 @@ public:
 		RTSP_MEDIA_CLIENT,
 		RTSP_MEDIA_SERVER,
 	}RTSP_MEDIA_MODE;
-
+	typedef enum{
+		RTSP_MEDIA_AUDIO,
+		RTSP_MEDIA_VIDEO,
+		RTSP_MEDIA_Nr,
+	}RTSP_MEDIA_TYPE_E;
 	typedef enum{
 		RTSP_MEDIA_ENCODEC_H264,
 		RTSP_MEDIA_ENCODEC_H265,
@@ -161,43 +166,69 @@ public:
 		RTSP_MEDIA_ENCODEC_NR,
 	}RTSP_MEDIA_ENCODEC;
 	
+	typedef enum {
+		RTP_OVER_TCP,
+		RTP_OVER_UDP,
+		RTP_OVER_MUL,
+		RTP_OVER_NR,
+	}RTSP_RTP_OVER_E;
 
  	virtual bool StartMedia()		= 0;
  	virtual bool StopMedia()		= 0;
 
-	virtual bool GetMediaSdpInfo(std::string &SdpInfo);
-	virtual bool SetMediaSdpInfo(std::string &SdpInfo);
 
-	bool GetMediaEncodec(std::string &Ecodec);
-	RTSP_MEDIA_ENCODEC GetMediaEncodec();
 
-	virtual void StartSendMedia();
-	void SetSequence(unsigned int Seq);
-	void SetStartTimeStamp(unsigned int TmStamp);
-	void SetSyncSourceIdentCode(unsigned int ssrc);
-	void SetRtpSocket(int sock);
-	bool IsSetSdpOver() { return m_SdpInfo.size() > 0 ? true : false; }
-protected:
-	bool m_SendMedia;
-	RTSP_MEDIA_ENCODEC m_MediaEncodec;
-	std::string m_SdpInfo;
-#define IsSetSdp() (m_SdpInfo.size() > 0 ?true:false)
+	
 	
 
+	virtual void StartSendMedia();
+
+	void SetSequence(RTSP_MEDIA_TYPE_E type,unsigned int Seq);
+	void SetStartTimeStamp(RTSP_MEDIA_TYPE_E type, unsigned int TmStamp);
+	void SetSyncSourceIdentCode(RTSP_MEDIA_TYPE_E type, unsigned int ssrc);
+	void SetRtpSocket(RTSP_MEDIA_TYPE_E type, int sock);
+	void SetRtcpSocket(RTSP_MEDIA_TYPE_E type, int sock);
+	void SetPayLoadType(RTSP_MEDIA_TYPE_E type, int payloadt);
+	void SetInterChnPort(RTSP_MEDIA_TYPE_E type, int InterChnPort);
+	
+	void SetRtpDataOver(RTSP_RTP_OVER_E over);
+	RTSP_RTP_OVER_E GetRtpDataOver();
+
 public:
-	virtual av_bool RtcpGetPacket(RTCP_TYPE type, std::string &Packet);
-	virtual RTCP_TYPE RtcpParsePacket(std::string &Packet);
+	bool GetMediaEncodec(RTSP_MEDIA_TYPE_E type, std::string &Ecodec);
+	RTSP_MEDIA_ENCODEC GetMediaEncodec(RTSP_MEDIA_TYPE_E type);
+private:
+	RTSP_RTP_OVER_E m_RtpOver;
+
+public:
+	virtual bool GetMediaSdpInfo(RTSP_MEDIA_TYPE_E type, std::string &SdpInfo);
+	virtual bool SetMediaSdpInfo(RTSP_MEDIA_TYPE_E type, std::string &SdpInfo);
+	bool IsSetSdpOver(RTSP_MEDIA_TYPE_E type) { return m_SdpInfo[type].size() > 0 ? true : false; }
+
+protected:
+	bool m_SendMedia;
+	RTSP_MEDIA_ENCODEC m_MediaEncodec[RTSP_MEDIA_Nr];
+	std::string m_SdpInfo[RTSP_MEDIA_Nr];
+#define IsSetSdp(type) (m_SdpInfo[type].size() > 0 ?true:false)
+	
+private:
+	CRTP m_MediaRTP[RTSP_MEDIA_Nr];
+	CRTCP m_MediaRTCP[RTSP_MEDIA_Nr];
+
+public:
+	virtual av_bool RtcpGetPacket(CRTCP::RTCP_TYPE type, std::string &Packet);
+	virtual CRTCP::RTCP_TYPE RtcpParsePacket(std::string &Packet);
 
 public:
 	//“Ï≤Ω∑¢ÀÕ
-	virtual int SendRtpPacket(const RTP_PACKET_T *packet, int packetcnt);
+	virtual int SendRtpPacket(int Sock, const CRTP::RTP_PACKET_T *packet, int packetcnt);
 	virtual int OnFrameRecv(unsigned char *data, int len);
 
 	virtual int RtpPacketH264Fua(const char *nalu_data, int nalu_len);
 	virtual int RtpPacketH265Fua(const char *nalu_data, int nalu_len);
 	virtual int RtpPacketMjpegFua();
 	virtual int RtpPakcetJpegFua();
-	virtual int RtpPacketAudioFua();
+	virtual int RtpPacketAudioFua(const char *AFrame, int FrameLen, RTSP_MEDIA_ENCODEC codeC, int TimeInterl);
 
 	virtual int RtpUnPacketH264Fua();
 	virtual int RtpUnPacketH265Fua();
@@ -215,17 +246,20 @@ public:
 	virtual bool StartMedia()		= 0;
 	virtual bool StopMedia()		= 0;
 public:
-	int PushAudioStream();
-	int PushVideoStreamFrame(CRtspMedia::RTSP_MEDIA_ENCODEC codeC, const char *data, int len);
+	int PushStreamFrame(CRtspMedia::RTSP_MEDIA_ENCODEC codeC, const char *data, int len, int TimeInterl);
+	
 #ifdef _AV_WARE_
-	int PushVideoStreamFrame(CAvPacket *AvPacket);
+	int PushVideoStreamPacket(CAvPacket *AvPacket);
 #endif
 
 private:
 	int PushH264VideoStreamFrame(const char *data, int len);
 	int PushH265VideoStreamFrame(const char *data, int len);
 	int PushMjpegVideoStreamFrame(const char *data, int len);
-
+	int PushG711aAudioStreamFrame(const char *data, int len);
+	int PushG711uAudioStreamFrame(const char *data, int len);
+	int PushAacAudioStreamFrame(const char *data, int len, int TimeInterl);
+	int PushPcmAudioStreamFrame(const char *data, int len);
 private:
 	int m_FrameIndex;
 };

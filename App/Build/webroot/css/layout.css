@@ -1,0 +1,45 @@
+@charset "utf-8";
+/* CSS Document */
+
+@import url("/css/global.css");
+
+/*body*/
+#container {margin:0 auto; width:950px;}
+
+/*header*/
+#header { height:50px; background:#ff911a;}
+#header h1 { padding:10px 20px;}
+#nav { background:#FF6600; height:24px; margin-bottom:6px;}
+#nav ul li { float:left;}
+#nav ul li a { display:block; padding:4px 10px 2px 10px; color:#fff; text-decoration:none;}
+#nav ul li a:hover { text-decoration:underline;}
+
+/*main*/
+#mainContent { overflow:auto; zoom:1; margin-bottom:6px;}
+#side { width:200px; float:left;}
+.sidebox { border:1px solid #ed6400; margin-bottom:6px;}
+.sidebox h4 { background:#ff911a; padding:2px 6px; border-bottom:1px solid #ed6400; color:#fff;}
+.sidebox ul { padding:4px 6px;}
+#main{ width:742px; float:right;}
+.mainbox { border:1px solid #ed6400; margin-bottom:6px;}
+.mainbox h2 { background:#ff911a; padding:2px 6px; border-bottom:1px solid #ed6400; color:#fff;}
+.mainbox ul { padding:4px 6px;}
+
+/*footer*/
+#footer { border-top:3px solid #ccc; height:50px; text-align:center; padding:6px;}
+
+
+@charset "utf-8";
+body { margin:0 auto; font-size:12px; font-family:Verdana; line-height:1.5;}
+ul,dl,dd,h1,h2,h3,h4,h5,h6,form,p { padding:0; margin:0;}
+h1 { font-size:20px; font-family:'microsoft yahei';}
+h2 { font-size:14px;}
+h3 { font-size:14px; font-weight:normal;}
+h4 { font-size:12px;}
+h5 { font-size:12px; font-weight:normal;}
+ul { list-style:none;}
+img { border:0px;}
+a { color:#195cb5; text-decoration:none;}
+a:hover { color:#f00;}
+
+.clearfloat {clear:both;height:0;font-size: 1px;line-height: 0px;}

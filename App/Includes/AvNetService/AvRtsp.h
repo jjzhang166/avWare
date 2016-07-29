@@ -29,10 +29,16 @@ public:
 	bool StartMedia();
 	bool StopMedia();
 
+	av_bool SetMediaInfo(av_u32 Channel, av_u32 Slave);
+private:
+	av_u32		m_Channel;
+	av_u32		m_Slave;
 
 private:
 	av_void OnStream(av_int Channel, av_int Slave, CAvPacket *AvPacket);
 };
+
+
 
 class CAvRtspServer:public CRtspServer
 {
@@ -42,8 +48,6 @@ public:
 	~CAvRtspServer();
 	av_bool Start(int ServicePort = 554);
 	av_bool Stop();
-
-private:
 
 };
 

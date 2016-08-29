@@ -20,19 +20,51 @@
 #include "Apis/LibSystem.h"
 #include "Apis/LibEncode.h"
 #include "AvConfigs/AvConfigNetService.h"
+#include "config.h"
 
 
+#ifndef _AV_WARE_VERSION_MAJOR
+#define _AV_WARE_VERSION_MAJOR	0
+#endif
 
+#ifndef _AV_WARE_VERSION_MINOR
+#define _AV_WARE_VERSION_MINOR	0
+#endif
+
+#ifndef _AV_WARE_VERSION_PATCH
+#define _AV_WARE_VERSION_PATCH	0
+#endif
+
+#ifndef _AV_WARE_VERSION_OEM
+#define _AV_WARE_VERSION_OEM	""
+#endif
+
+
+//base、alpha、beta 、RC 、 release(R)
+#ifndef _AV_WARE_VERSION_RUNTIME
+#define _AV_WARE_VERSION_RUNTIME "beta"
+#endif
+
+
+#define EKey_ConfigsPath	"EKey_ConfigsPath"
+#define EKey_WebRoot		"EKey_WebRoot"
+#define EKey_WebIndex		"EKey_WebIndex"
 
 class CAvDevice:public CAvObject
 {
 public:
 	SINGLETON_DECLARE(CAvDevice);
 	av_bool Initialize();//这个函数一定要在加载配置表之前运行；
+	av_bool InitializeLua();
 	av_bool InitializeConfigs();//这个函数一定要放在加载完配置表之后 
+
 public:
-	static av_bool GetEnv(std::string &key, std::string &value);
-	static av_bool SetEnv(std::string &key, std::string &value);
+	static std::string GetSoftVersionString();
+	static av_u32      GetSoftVersionU32();
+
+public:
+	static av_bool GetEnv(std::string key, std::string &value);
+	static av_bool SetEnv(std::string key, std::string &value);
 
 private:
 	static CMutex m_SEnvMutex;
@@ -62,11 +94,14 @@ public:
 	
 	static av_uint GetDeviceStartUp();
 	static av_bool SystemBeep();
+public:
+	static av_bool SystemUpgrade(std::string UpgradeFilePath);
+	static av_bool SystemUpgrade(av_uchar *ptr, av_uint length);
+	static av_u32  SystemUpgradeProgress();
+private:
+	static C_UpgradeProgress m_SystemUpgradeProgress;
 
-	static av_bool SystemUpgrade(std::string UpgradeFilePath, av_uint &Progress);
-	static av_bool SystemUpgrade(av_uchar *ptr, av_uint length, av_uint &Progress);
-	
-
+public:
 	static av_bool GetMemLoadInfo(C_MemoryLoadInfo &MemLoadInfo);
 	static av_bool GetNetLoadInfo(C_NetLoadInfo &NetLoadInfo);
 	static av_bool GetCpuLoadInfo(C_CpuLoadInfo &CpuLoadInfo);

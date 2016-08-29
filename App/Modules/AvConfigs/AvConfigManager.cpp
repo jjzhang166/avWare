@@ -16,6 +16,7 @@
 
 #include "Apis/AvWareType.h"
 #include "AvThread/AvTimer.h"
+#include "AvDevice/AvDevice.h"
 #include "AvConfigs/AvConfigIndex.h"
 #include "AvConfigs/AvConfigTable.h"
 #include "AvConfigs/AvConfigManager.h"
@@ -30,11 +31,11 @@ typedef Json::Reader AvConfigReader;
 #endif
 
 #ifdef WIN32
-#define  AvConfigPath "./configs/avWare1.json"
-#define  AvConfigPathBackUp "./configs/avWare2.json"
+#define  AvConfigFileName "avWare1.json"
+#define  AvConfigFileNameBu "avWare2.json"
 #else
-#define  AvConfigPath "./configs/avWare1.conf"
-#define  AvConfigPathBackUp "./configs/avWare2.conf"
+#define  AvConfigFileName "avWare1.conf"
+#define  AvConfigFileNameBu "avWare2.conf"
 #endif
 
 class TimerConfManager:public CTimer
@@ -56,12 +57,18 @@ CMutex CAvConfigManager::m_mutex;
 CAvConfigManager::CAvConfigManager()
 {
 	m_timer = nullptr;
+	m_ConfigFullPatch.assign(AvConfigFileName);
+	m_ConfigFullPatchBu.assign(AvConfigFileNameBu);
 }
 
 CAvConfigManager::~CAvConfigManager()
 {
-	if (nullptr != m_timer)
+	if (nullptr != m_timer){
 		delete m_timer;
+		m_timer = NULL;
+	}
+	m_ConfigFullPatchBu.clear();
+	m_ConfigFullPatch.clear();
 }
 
 void CAvConfigManager::Initialize()
@@ -71,18 +78,21 @@ void CAvConfigManager::Initialize()
 	m_config_data.reserve(512 * 1024);
 	AvConfigReader reader;
 	bool load_flag = false;
+	std::string ConfigPath; 
+	av_bool abRet = CAvDevice::GetEnv(std::string(EKey_ConfigsPath), ConfigPath);
+	if (abRet == av_true){
+		SetAvConfigPath(ConfigPath);
+	}
 
-
-	if (av_true == LoadConfigFromFile(AvConfigPath, m_config_data)){
+	if (av_true == LoadConfigFromFile(m_ConfigFullPatch.c_str(), m_config_data)){
 		load_flag = reader.parse(m_config_data, m_total);
 	}
 	if (false == load_flag) {
 		av_msg("Load Configfile1 failed\n");
-		if (av_true == LoadConfigFromFile(AvConfigPathBackUp, m_config_data)){
+		if (av_true == LoadConfigFromFile(m_ConfigFullPatchBu.c_str(), m_config_data)){
 			load_flag = reader.parse(m_config_data, m_total);
 		}
 	}
-
 	if (false == load_flag){
 		av_error("Load all config file failed\n");
 	}
@@ -96,6 +106,7 @@ void CAvConfigManager::Initialize()
 	
 	m_name_configIndex.insert(ConfIndexValueType("Capture", CONF_CAPTURE_FORMATS));
 	LoadConfig("Capture", m_ConfigCapture);
+
 
 	m_name_configIndex.insert(ConfIndexValueType("Image", CONF_IMAGE_FORMATS));
 	LoadConfig("Image", m_ConfigImage);
@@ -132,6 +143,7 @@ void CAvConfigManager::Initialize()
 	//Net Server Email
 	m_name_configIndex.insert(ConfIndexValueType("NetServerSmtp", CONF_NET_SER_EMAIL));
 	LoadConfig("NetServerSmtp", m_confignet_smtp);
+
 	//ftp
 	m_name_configIndex.insert(ConfIndexValueType("NetServerFtp", CONF_NET_SER_FTP));
 	LoadConfig("NetServerFtp", m_confignet_ftp);
@@ -145,6 +157,7 @@ void CAvConfigManager::Initialize()
 	if (false == load_flag){
 		Save();
 	}
+	
 }
 
 void CAvConfigManager::LoadConfig(const char *name, CAvConfigBase &conf)
@@ -162,8 +175,8 @@ void CAvConfigManager::LoadConfig(const char *name, CAvConfigBase &conf)
 	conf.SetConfigTable(m_total[name]);
 	m_change = av_true;
 	//将配置参数设置生效但不要写入配置表
-	conf.Attach(this, (AvConfigCallBack)(&CAvConfigManager::CBConfigChange));
 	conf.SettingUp(-1, CONF_REQ_APPLY_NOT_SAVE);
+	conf.Attach(this, (AvConfigCallBack)(&CAvConfigManager::CBConfigChange));
 }
 
 av_bool CAvConfigManager::LoadConfigFromFile(const char *path, std::string &conf)
@@ -186,20 +199,42 @@ av_bool CAvConfigManager::LoadConfigFromFile(const char *path, std::string &conf
 	return av_true;
 }
 
+av_bool CAvConfigManager::SetAvConfigPath(std::string &ConfPatch)
+{
+	if (ConfPatch.size() == 0){
+		m_ConfigFullPatch.clear();
+		m_ConfigFullPatch.assign(AvConfigFileName);
+		m_ConfigFullPatchBu.assign(AvConfigFileNameBu);
+	}
+	else{
+		m_ConfigFullPatch = ConfPatch;
+		m_ConfigFullPatch.append("/");
+		m_ConfigFullPatch.append(AvConfigFileName);
+		m_ConfigFullPatchBu = ConfPatch;
+		m_ConfigFullPatchBu.append("/");
+		m_ConfigFullPatchBu.append(AvConfigFileNameBu);
+	}
+	return av_true;
+}
 void CAvConfigManager::Save()
 {
 	CGuard lock(m_mutex);
 	if (!m_change) return;
 
 	m_change = av_false;
+
+#if 1
 	AvConfigWriter writer;
 	m_config_data = writer.write(m_total);
-
-	remove(AvConfigPathBackUp);
-	rename(AvConfigPath, AvConfigPathBackUp);
+#else
+	AvConfigWriter writer(m_config_data);
+	writer.write(m_total);
+#endif
+	remove(m_ConfigFullPatchBu.c_str());
+	rename(m_ConfigFullPatch.c_str(), m_ConfigFullPatchBu.c_str());
 
 	//TODO将m_config_data 保存为文件
-	FILE *fp = fopen(AvConfigPath, "w");
+	FILE *fp = fopen(m_ConfigFullPatch.c_str(), "w");
 	if (NULL == fp) {
 		perror("Save Config failed can`t create file:");
 		return;

@@ -151,6 +151,7 @@ static int	GetDeviceInfo(DeviceInfo_S *info)
 	strcat(info->country,"China");
 	strcat(info->name,"IPC");
 	strcat(info->softwareVer,"Build V1.0");
+	sprintf(info->softwareVer, "%s", CAvDevice::GetSoftVersionString().c_str());
 	info->devType = ENUM_DEVTYPE_IPC;
 	snprintf(info->facturer,sizeof(info->facturer),"%s",FactoryInfo.FactoryName);
 	snprintf(info->model,sizeof(info->model),"%s",FactoryInfo.ProductModel);
@@ -219,6 +220,7 @@ static int	GetNetProtocolInfo(NetProtocolInfo *info)
  	info->onvifPort = 8080; 
  	sprintf(info->rtspUrl[0][0],"rtsp://%s:%d/c=0&amp;s=0",ConfigNet.LanAttr.IpAddr,info->rtspPort);
 	sprintf(info->rtspUrl[0][1],"rtsp://%s:%d/c=0&amp;s=1",ConfigNet.LanAttr.IpAddr,info->rtspPort);
+	sprintf(info->snapUrl[0][0], "http://%s/%d.snap", ConfigNet.LanAttr.IpAddr, 0);
 	return 0;
 }
 static int	SetNetProtocolInfo(NetProtocolInfo *info)
@@ -400,10 +402,12 @@ static int	GetVideoEncodeCab(int chn, int streamId, VedioEncodeCab_S *info)
 			info->resSupport[pos++].height = 4320;
 			break;
 		default:
+			assert(0);
 			break;
 		}
 	}
 	info->resSupportNum = pos;
+	assert(pos);
 	info->maxReslution.width = info->resSupport[0].width ;
 	info->maxReslution.height = info->resSupport[0].height;
 	info->defaultReslution.height = info->resSupport[0].width;;

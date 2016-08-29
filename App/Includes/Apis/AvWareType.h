@@ -23,6 +23,7 @@
 #include <time.h>
 #include <assert.h>
 #include <fcntl.h>
+
 #if defined(__cplusplus)
 #include <map>
 #include <list>
@@ -49,6 +50,8 @@
 #include <sys/reboot.h>
 #include <sys/uio.h>
 #include <netdb.h>
+#include <sys/ioctl.h>
+#include <errno.h>
 #else
 
 #endif
@@ -102,8 +105,8 @@ typedef short				av_16,		av_sshort, av_short;
 typedef unsigned short		av_u16,		av_ushort;
 typedef double				av_double;
 typedef float				av_float;
-typedef char				av_char;
-typedef unsigned char		av_uchar;
+typedef char				av_char,	av_s8, av_8;
+typedef unsigned char		av_uchar,	av_u8;
 typedef void				av_void;
 typedef long				av_long;
 #ifdef WIN32
@@ -175,6 +178,11 @@ typedef unsigned long long int  av_u64, av_ulonglong;
 	#define snprintf sprintf_s
 	#endif
 #endif
+
+// #define open	_open
+// #define write	_write
+// #define read	_read
+// #define close	_close
 
 #ifndef inline
 #define inline __inline

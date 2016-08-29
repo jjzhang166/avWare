@@ -45,7 +45,7 @@ private:
 	av_int SendRtmpData(unsigned int nPacketType,	unsigned char *predata,  unsigned int presize, 
 													unsigned char *loaddata, unsigned int loaddatasize,
 													unsigned char headerType = RTMP_PACKET_SIZE_LARGE);
-	av_int SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type nalType, CAvPacket *AvPacket);
+	av_int SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type_h264 nalType, CAvPacket *AvPacket);
 private:
 	av_int SendAacSpac();
 	av_int SendAudioData(CAvPacket *Packet);

@@ -169,7 +169,8 @@ public:
 	int LocalPtzCommand(C_PtzCmd		&PtzCmd);
 
 	int LocalFirmwareUpgrade(C_FirmwareUpgrade &FirmwareUpgrade);
-	int LocalFirmwareData(unsigned char *data, int datalen, unsigned int status, unsigned int *Progress);
+	int LocalFirmwareData(unsigned char *data, int datalen, unsigned int status);
+	int LocalFirmwareProgress();
 
 	int LocalGetLogCaps(C_LogCaps &LogCaps);
 	int LocalGetLogProfile(C_LogProfile &LogProfile);

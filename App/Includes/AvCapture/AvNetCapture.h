@@ -157,6 +157,7 @@ public:
 	av_bool SetTime(av_timeval &atv);
 	av_bool SetIFrame(av_int Slave = CHL_MAIN_T);
 
+	CAvPacket *GetSnap(av_int Slave = CHL_SUB1_T);
 public:
 	av_bool LoadConfigs();
 private:

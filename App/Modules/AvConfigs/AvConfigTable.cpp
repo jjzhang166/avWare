@@ -18,7 +18,7 @@
 
 CMutex CAvConfigBase::m_mutex;
 
-CAvConfigBase::CAvConfigBase(int cur_index, int max_index)
+CAvConfigBase::CAvConfigBase(int &cur_index, int max_index)
 :m_status(CONF_STATUS_CHECK),
 m_valid(av_true),
 m_env_used_index(cur_index),
@@ -59,11 +59,13 @@ void CAvConfigBase::GetValueInt(AvConfigKey key, AvConfigValue &table, int &val,
 	val = table_tmp.isInt() ? table_tmp.asInt() : def;
 }
 
+/*
 void CAvConfigBase::GetValueInt64(AvConfigKey key, AvConfigValue &table, av_64 &val, av_64 def)
 {
 	AvConfigValue &table_tmp = GetValue(key, table);
 	val = table_tmp.isInt64() ? table_tmp.asInt64() : def;
 }
+*/
 
 const char* CAvConfigBase::GetValueString(AvConfigKey key, AvConfigValue &table, const char *def)
 {
@@ -196,14 +198,17 @@ void CAvConfigBase::Process(AvConfigKey key, AvConfigValue &table, unsigned char
 	}
 }
 
+
 void CAvConfigBase::Process(AvConfigKey key, AvConfigValue &table, unsigned int &val,
 								unsigned int def, unsigned int min, unsigned int max)
 {
 	switch(m_status)
 	{
 	case CONF_STATUS_GET:
-		av_64 val_tmp;
-		GetValueInt64(key, table, val_tmp, def);
+		//av_64 val_tmp;
+		//GetValueInt64(key, table, val_tmp, def);
+		av_int val_tmp;
+		GetValueInt(key, table, val_tmp, def);
 		if ((val_tmp < 0)) {
 			val = def;
 		} else {
@@ -211,7 +216,8 @@ void CAvConfigBase::Process(AvConfigKey key, AvConfigValue &table, unsigned int 
 		}
 		break;
 	case CONF_STATUS_SET:
-		GetValue(key, table) = (Json::Int64)val;
+		//GetValue(key, table) = (Json::Int64)val;
+		GetValue(key, table) = val;
 		break;
 	case CONF_STATUS_DEFAULT:
 		val = def;
@@ -229,6 +235,7 @@ void CAvConfigBase::Process(AvConfigKey key, AvConfigValue &table, unsigned int 
 	}
 }
 
+
 void CAvConfigBase::Process(AvConfigKey key, AvConfigValue &table, unsigned short &val,
 								unsigned short def, unsigned short min, unsigned short max)
 {
@@ -244,7 +251,8 @@ void CAvConfigBase::Process(AvConfigKey key, AvConfigValue &table, unsigned shor
 		}
 		break;
 	case CONF_STATUS_SET:
-		GetValue(key, table) = (Json::Int64)val;
+		//GetValue(key, table) = (Json::Int64)val;
+		GetValue(key, table) = val;
 		break;
 	case CONF_STATUS_DEFAULT:
 		val = def;
@@ -382,7 +390,7 @@ int CAvConfigBase::SettingUp(int index, int require)
 	CGuard lock(m_mutex);
 	int req = require;
 	AvConfigValue tmp;
-	int i;
+	int i = 0;
 	//检查配置参数是否变化
 	if (m_env_used_index == m_use_index) {
 		if (-1 == index) {
@@ -409,7 +417,7 @@ int CAvConfigBase::SettingUp(int index, int require)
 			ProcessValue(tmp, i);
 		}
 	} else {
-		ProcessValue(tmp, i);
+		ProcessValue(tmp, index);
 	}
 
 	if (valid()) {

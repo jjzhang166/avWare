@@ -107,7 +107,7 @@ av_bool CAvLog::Append(LogType Type, av_char *data, av_u16 len)
 		Logitem.t = time(NULL);
 		Logitem.lt = Type;
 		memset(Logitem.context, 0x00, sizeof(Logitem.context));
-		len == 0 ? NULL : memcpy(Logitem.context, data, len);
+		len == 0 ? NULL : memcpy(Logitem.context, data, len > 11 ? 11:len);
 		m_logFile.Open(LOG_PATH, CFile::modeCreate | CFile::modeReadWrite | CFile::modeNoTruncate);
 		ret = m_logFile.Read(&LogHead, sizeof(C_LogHead));
 		if (ret != sizeof(C_LogHead)){

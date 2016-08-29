@@ -73,7 +73,7 @@ av_bool	CAvPacket::PutBufferOver()
 
 	C_AvMediaHead MediaHead;
 	av_u32 length = 0;
-	if (true == AvMediaHeadParse(m_Buffer, &MediaHead, &length)){
+	if (av_true == AvMediaHeadParse(m_Buffer, &MediaHead, &length)){
 		m_TimeStamp = MediaHead.pts;
 		m_Channel = MediaHead.Channel;
 		m_Slave = MediaHead.Slave;
@@ -163,7 +163,7 @@ av_bool			CAvPacket::IsVideoFrame()
 //#define FindStartPlace(data) ((data)[0]==0x00 && (data)[1] == 0x00 && (data)[2] == 0x00 && (data)[3] == 0x01) 
 #define FindStartPlace(data) ((data)[0]==0x00 && (data)[1] == 0x00 && (((data)[2] == 0x01) ||((data)[2] == 0x00 && (data)[3] == 0x01 ))) 
 
-av_bool			CAvPacket::GetNaluSplit()
+av_bool			CAvPacket::GetNaluSplitH264()
 {
 	CGuard m(m_Mutex);
 	if (m_StreamType != avStreamT_V) return av_false;
@@ -179,98 +179,96 @@ av_bool			CAvPacket::GetNaluSplit()
 			if (!FindStartPlace(&m_RawBuffer[DataPlace])){
 				continue;
 			}
-
-		//	DataPlace += 4;//让出 00 00 00 01
 			if (m_RawBuffer[DataPlace + 2] == 0x01){
 				DataPlace += 3;
 			}
 			else{
 				DataPlace += 4;
 			}
-			switch (0x01 << (m_RawBuffer[DataPlace] & 0x1f)){
-			case nal_unit_type_nr:
+			switch ((m_RawBuffer[DataPlace] & 0x1f)){
+			case nal_unit_type_h264_nr:
 				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
 				for (SliceLen = 0; !FindStartPlace(&m_RawBuffer[DataPlace]); DataPlace++, SliceLen++);
 				DataPlace--;
 				m_NaluInfo[m_NaluInfoCount].len = SliceLen;
-				m_NaluInfo[m_NaluInfoCount].type = nal_unit_type_nr;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_h264_nr;
 				m_NaluInfoCount++;
 				break;
-			case nal_unit_type_p:
+			case nal_unit_type_h264_p:
 				m_NaluInfo[m_NaluInfoCount].data	= &m_RawBuffer[DataPlace];
 				m_NaluInfo[m_NaluInfoCount].len		= m_RawBufferLength - DataPlace;//数组下标与实际少1
-				m_NaluInfo[m_NaluInfoCount].type	= nal_unit_type_p;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_h264_p;
 				m_NaluInfoCount++;
 				m_IsSplitNalu = av_true;
 				return av_true;
 
 				break;
-			case nal_unit_type_dataA:
+			case nal_unit_type_h264_dataA:
 				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
 				for (SliceLen = 0; !FindStartPlace(&m_RawBuffer[DataPlace]); DataPlace++, SliceLen++);
 				DataPlace--;
 				m_NaluInfo[m_NaluInfoCount].len = SliceLen;
-				m_NaluInfo[m_NaluInfoCount].type = nal_unit_type_dataA;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_h264_dataA;
 				m_NaluInfoCount++;
 				break;
-			case nal_unit_type_dataB:
+			case nal_unit_type_h264_dataB:
 				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
 				for (SliceLen = 0; !FindStartPlace(&m_RawBuffer[DataPlace]); DataPlace++, SliceLen++);
 				DataPlace--;
 				m_NaluInfo[m_NaluInfoCount].len = SliceLen;
-				m_NaluInfo[m_NaluInfoCount].type = nal_unit_type_dataB;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_h264_dataB;
 				m_NaluInfoCount++;
 				break;
-			case nal_unit_type_dataC:
+			case nal_unit_type_h264_dataC:
 				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
 				for (SliceLen = 0; !FindStartPlace(&m_RawBuffer[DataPlace]); DataPlace++, SliceLen++);
 				DataPlace--;
 				m_NaluInfo[m_NaluInfoCount].len = SliceLen;
-				m_NaluInfo[m_NaluInfoCount].type = nal_unit_type_dataC;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_h264_dataC;
 				m_NaluInfoCount++;
 				break;
-			case nal_unit_type_idr:
+			case nal_unit_type_h264_idr:
 				m_NaluInfo[m_NaluInfoCount].data		= &m_RawBuffer[DataPlace];
 				m_NaluInfo[m_NaluInfoCount].len			= m_RawBufferLength - DataPlace;//数组下标与实际少1
-				m_NaluInfo[m_NaluInfoCount].type		= nal_unit_type_idr;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_h264_idr;
 				m_NaluInfoCount++;
 				m_IsSplitNalu = av_true;
 				return av_true;
 				break;
-			case nal_unit_type_sei:
+			case nal_unit_type_h264_sei:
 				m_NaluInfo[m_NaluInfoCount].data		= &m_RawBuffer[DataPlace];
 				for (SliceLen = 0; !FindStartPlace(&m_RawBuffer[DataPlace]); DataPlace++, SliceLen++);
 				DataPlace--;
 				m_NaluInfo[m_NaluInfoCount].len			= SliceLen;
-				m_NaluInfo[m_NaluInfoCount].type = nal_unit_type_sei;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_h264_sei;
 				m_NaluInfoCount++;
 				break;
-			case nal_unit_type_sps:
+			case nal_unit_type_h264_sps:
 				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
 				for (SliceLen = 0; !FindStartPlace(&m_RawBuffer[DataPlace]); DataPlace++, SliceLen++);
 				DataPlace--;
 				m_NaluInfo[m_NaluInfoCount].len = SliceLen;
-				m_NaluInfo[m_NaluInfoCount].type = nal_unit_type_sps;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_h264_sps;
 				m_NaluInfoCount++;
 				break;
-			case nal_unit_type_pps:
+			case nal_unit_type_h264_pps:
 				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
 				for (SliceLen = 0; !FindStartPlace(&m_RawBuffer[DataPlace]); DataPlace++, SliceLen++);
 				DataPlace--;
 				m_NaluInfo[m_NaluInfoCount].len = SliceLen;
-				m_NaluInfo[m_NaluInfoCount].type = nal_unit_type_pps;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_h264_pps;
 				m_NaluInfoCount++;
 				break;
-			case nal_unit_type_delimiter:
+			case nal_unit_type_h264_delimiter:
 				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
 				for (SliceLen = 0; !FindStartPlace(&m_RawBuffer[DataPlace]); DataPlace++, SliceLen++);
 				DataPlace--;
 				m_NaluInfo[m_NaluInfoCount].len = SliceLen;
-				m_NaluInfo[m_NaluInfoCount].type = nal_unit_type_delimiter;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_h264_delimiter;
 				m_NaluInfoCount++;
 				break;
 			default:
-				//printf ("why default have no nal_unit_type???\n");
+				av_error("H264 NAL Unit TYPE ERROR %d\n", (m_RawBuffer[DataPlace] & 0x1f));
 				break;
 			}
 		}
@@ -279,13 +277,112 @@ av_bool			CAvPacket::GetNaluSplit()
 	m_IsSplitNalu = av_true;
 	return av_true;
 }
+av_bool			CAvPacket::GetnaluSplitHevc()
+{
+	CGuard m(m_Mutex);
+	if (m_StreamType != avStreamT_V) return av_false;
+	if (m_IsSplitNalu == av_true) return av_true;
+
+	m_NaluInfoCount = 0;
+	memset(m_NaluInfo, 0x00, sizeof(m_NaluInfo));
+	{
+		unsigned int DataPlace = 0;
+		int SliceLen = 0;
+		for (DataPlace = 0; DataPlace < m_RawBufferLength - 4; DataPlace++){
+			if (!FindStartPlace(&m_RawBuffer[DataPlace])){
+				continue;
+			}
+			if (m_RawBuffer[DataPlace + 2] == 0x01){
+				DataPlace += 3;
+			}
+			else{
+				DataPlace += 4;
+			}
+
+			switch (((m_RawBuffer[DataPlace] >> 1) & 0x3f)){
+			case nal_unit_type_hevc_trail_r:
+				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
+				m_NaluInfo[m_NaluInfoCount].len = m_RawBufferLength - DataPlace;//数组下标与实际少1
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_hevc_trail_r;
+				m_NaluInfoCount++;
+				m_IsSplitNalu = av_true;
+				return av_true;
+				break;
+
+			case nal_unit_type_hevc_idr:
+				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
+				m_NaluInfo[m_NaluInfoCount].len = m_RawBufferLength - DataPlace;//数组下标与实际少1
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_hevc_idr;
+				m_NaluInfoCount++;
+				m_IsSplitNalu = av_true;
+				return av_true;
+				break;
+			case nal_unit_type_hevc_sei:
+				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
+				for (SliceLen = 0; !FindStartPlace(&m_RawBuffer[DataPlace]); DataPlace++, SliceLen++);
+				DataPlace--;
+				m_NaluInfo[m_NaluInfoCount].len = SliceLen;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_hevc_sei;
+				m_NaluInfoCount++;
+				break;
+			case nal_unit_type_hevc_sps:
+				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
+				for (SliceLen = 0; !FindStartPlace(&m_RawBuffer[DataPlace]); DataPlace++, SliceLen++);
+				DataPlace--;
+				m_NaluInfo[m_NaluInfoCount].len = SliceLen;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_hevc_sps;
+				m_NaluInfoCount++;
+				break;
+			case nal_unit_type_hevc_pps:
+				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
+				for (SliceLen = 0; !FindStartPlace(&m_RawBuffer[DataPlace]); DataPlace++, SliceLen++);
+				DataPlace--;
+				m_NaluInfo[m_NaluInfoCount].len = SliceLen;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_hevc_pps;
+				m_NaluInfoCount++;
+				break;
+			case nal_unit_type_hevc_vps:
+				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
+				for (SliceLen = 0; !FindStartPlace(&m_RawBuffer[DataPlace]); DataPlace++, SliceLen++);
+				DataPlace--;
+				m_NaluInfo[m_NaluInfoCount].len = SliceLen;
+				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_hevc_vps;
+				m_NaluInfoCount++;
+				break;
+			default:
+				av_error("H265 NAL Unit TYPE ERROR %d\n", ((m_RawBuffer[DataPlace] >> 1) & 0x3f));
+				return av_false;
+				break;
+
+			}
+		}
+	}
+	m_IsSplitNalu = av_true;
+	return av_true;
+}
+
+av_bool			CAvPacket::GetNaluSplit()
+{
+	av_bool ret = av_false;
+	if (m_Comp == AvComp_H264){
+		ret = GetNaluSplitH264();
+	}
+	else if (m_Comp == AvComp_H265){
+		ret = GetnaluSplitHevc();
+	}
+	else{
+		return av_false;
+	}
+
+	return ret;
+}
 av_u32			CAvPacket::GetNaluCount()
 {
 	CGuard m(m_Mutex);
 	if (m_IsSplitNalu == av_false) return 0;
 	return m_NaluInfoCount;
 }
-av_bool			CAvPacket::GetNaluFrame(av_nal_unit_type naltype, av_uchar *&data, av_32 &datalen)
+av_bool			CAvPacket::GetNaluFrame(av_int naltype, av_uchar *&data, av_32 &datalen)
 {
 	CGuard m(m_Mutex);
 	if (m_IsSplitNalu == av_false) return av_false;
@@ -299,7 +396,7 @@ av_bool			CAvPacket::GetNaluFrame(av_nal_unit_type naltype, av_uchar *&data, av_
 	}
 	return av_false;
 }
-av_bool			CAvPacket::GetNaluFrame(av_32 index, av_nal_unit_type &naltype, av_uchar *&data, av_32 &datalen)
+av_bool			CAvPacket::GetNaluFrame(av_32 index, av_int &naltype, av_uchar *&data, av_32 &datalen)
 {
 	CGuard m(m_Mutex);
 	if (m_IsSplitNalu == av_false) return av_false;
@@ -444,7 +541,15 @@ av_bool CAvPacketManager::Initialize()
 CAvPacket *CAvPacketManager::GetAvPacket(av_u32 NewLen)
 {
 	CAvPacket *packet = NULL;
-	assert(NewLen <= AVPACKET_MAX_FRAME);
+	if (NewLen <= AVPACKET_MAX_FRAME){
+		if (NewLen >= (int)((float)AVPACKET_MAX_FRAME*0.8)){
+			av_warning("GetAvPacket Length = %d kb\n", NewLen / 1024);
+		}
+	}
+	else{
+		av_error("GetAvPacket Length = %d kb\n", NewLen/1024);
+		assert(0);
+	}
 	int nodeLen = (NewLen + AVPACKET_UNIT - 1) / AVPACKET_UNIT;
 	nodeLen > 0 ? nodeLen--: NULL;
 	
@@ -474,7 +579,7 @@ av_bool CAvPacketManager::PutAvPacket(CAvPacket *Packet)
 
 av_void CAvPacketManager::OnTime()
 {
-	av_msg("Clear up CAvPacketManager time[%d]\n", time(NULL));
+	av_msg("Clear up CAvPacketManager time[%d]\n", (av_u32)time(NULL));
 	Dump();
 	av_u32 NodePacketUse = 0;
 	for (int i = 0; i < AVPACKET_MAX_FRAME / AVPACKET_UNIT; i++){

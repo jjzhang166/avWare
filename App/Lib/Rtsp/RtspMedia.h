@@ -23,7 +23,7 @@
 
 #if defined (_AV_WARE_)
 #include "AvPacket/AvPacket.h"
-#else
+#endif
 typedef enum {
 	nal_unit_type_nr = 0x01 << 0,
 	nal_unit_type_p = 0x01 << 1,
@@ -38,8 +38,7 @@ typedef enum {
 	nal_unit_type_nalend = 0x01 << 10,
 	nal_unit_type_streamend = 0x01 << 11,
 	nal_unit_type_pading = 0x01 << 12,
-}nal_unit_type;
-#endif
+}nal_unit_type_rtsp;
 
 
 typedef enum 
@@ -185,6 +184,7 @@ public:
 
 	void SetSequence(RTSP_MEDIA_TYPE_E type,unsigned int Seq);
 	void SetStartTimeStamp(RTSP_MEDIA_TYPE_E type, unsigned int TmStamp);
+	void SetTimeStampInterval(RTSP_MEDIA_TYPE_E type, unsigned int TmStamp);
 	void SetSyncSourceIdentCode(RTSP_MEDIA_TYPE_E type, unsigned int ssrc);
 	void SetRtpSocket(RTSP_MEDIA_TYPE_E type, int sock);
 	void SetRtcpSocket(RTSP_MEDIA_TYPE_E type, int sock);
@@ -228,7 +228,7 @@ public:
 	virtual int RtpPacketH265Fua(const char *nalu_data, int nalu_len);
 	virtual int RtpPacketMjpegFua();
 	virtual int RtpPakcetJpegFua();
-	virtual int RtpPacketAudioFua(const char *AFrame, int FrameLen, RTSP_MEDIA_ENCODEC codeC, int TimeInterl);
+	virtual int RtpPacketAudioFua(const char *AFrame, int FrameLen, RTSP_MEDIA_ENCODEC codeC);
 
 	virtual int RtpUnPacketH264Fua();
 	virtual int RtpUnPacketH265Fua();
@@ -245,23 +245,35 @@ public:
 	virtual ~CRtspMediaSer();
 	virtual bool StartMedia()		= 0;
 	virtual bool StopMedia()		= 0;
-public:
-	int PushStreamFrame(CRtspMedia::RTSP_MEDIA_ENCODEC codeC, const char *data, int len, int TimeInterl);
+
 	
 #ifdef _AV_WARE_
+public:
 	int PushVideoStreamPacket(CAvPacket *AvPacket);
-#endif
 
 private:
-	int PushH264VideoStreamFrame(const char *data, int len);
-	int PushH265VideoStreamFrame(const char *data, int len);
-	int PushMjpegVideoStreamFrame(const char *data, int len);
-	int PushG711aAudioStreamFrame(const char *data, int len);
-	int PushG711uAudioStreamFrame(const char *data, int len);
+	int PushVideostreamH264Packet(CAvPacket *AvPacket);
+	int PushVideostreamH265Packet(CAvPacket *AvPacket);
+	int PushVideostreamMjpegPacket(CAvPacket *AvPacket);
+	int PushVideostreamG711aPacket(CAvPacket *AvPacket);
+	int PushVideostreamG711uPacket(CAvPacket *AvPacket);
+	int PushVideostreamAacPacket(CAvPacket *AvPacket);
+	int PushVideostreamPcmPacket(CAvPacket *AvPacket);
+#else
+public:
+	int PushStreamFrame(CRtspMedia::RTSP_MEDIA_ENCODEC codeC, const char *data, int len, int TimeInterl);
+private:
+	int PushH264VideoStreamFrame(const char *data,	int len, int TimeInterl);
+	int PushH265VideoStreamFrame(const char *data,	int len, int TimeInterl);
+	int PushMjpegVideoStreamFrame(const char *data, int len, int TimeInterl);
+	int PushG711aAudioStreamFrame(const char *data, int len, int TimeInterl);
+	int PushG711uAudioStreamFrame(const char *data, int len, int TimeInterl);
 	int PushAacAudioStreamFrame(const char *data, int len, int TimeInterl);
-	int PushPcmAudioStreamFrame(const char *data, int len);
+	int PushPcmAudioStreamFrame(const char *data,	int len, int TimeInterl);
+#endif
 private:
 	int m_FrameIndex;
+	av_u64  m_MediaLastPts[RTSP_MEDIA_Nr];
 };
 
 

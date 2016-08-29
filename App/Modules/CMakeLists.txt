@@ -51,16 +51,6 @@ set(AvCaptureHeader_LIST
 add_library(AvCapture STATIC ${AvCaptureSRC_LIST} ${AvCaptureHeader_LIST})
 set_property(TARGET AvCapture PROPERTY FOLDER "AvModules")
 
-#AvDecode
-set(AvDecodeSRC_LIST 
-		AvDecode/AvDecode.cpp
-	)
-set(AvDecodeHeader_LIST 
-		${project_headers_pach}/AvDecode/AvDecode.h
-	)
-add_library(AvDecode STATIC ${AvDecodeSRC_LIST} ${AvDecodeHeader_LIST})
-set_property(TARGET AvDecode PROPERTY FOLDER "AvModules")
-
 #AvDevice
 set(AvDeviceSRC_LIST 
 		AvDevice/AvDevice.cpp
@@ -203,6 +193,27 @@ set(AvRecordHeader_LIST
 	)
 add_library(AvRecord STATIC ${AvRecordSRC_LIST} ${AvRecordHeader_LIST})
 set_property(TARGET AvRecord PROPERTY FOLDER "AvModules")
+
+#AvRecord
+set(AvFSRC_LIST 
+		AvF/AvF.cpp
+	)
+set(AvFHeader_LIST 
+		${project_headers_pach}/AvF/AvF.h
+	)
+add_library(AvF STATIC ${AvFSRC_LIST} ${AvFHeader_LIST})
+set_property(TARGET AvF PROPERTY FOLDER "AvModules")
+
+#AvProc
+set(AvProcSRC_LIST 
+		AvProc/AvProc.cpp
+	)
+set(AvProcHeader_LIST 
+		${project_headers_pach}/AvProc/AvProc.h
+		${project_headers_pach}/AvProc/logAvWareExport.h
+	)
+add_library(AvProc STATIC ${AvProcSRC_LIST} ${AvProcHeader_LIST})
+set_property(TARGET AvProc PROPERTY FOLDER "AvModules")
 
 #AvConfigs
 set(AvConfigExSRC_LIST

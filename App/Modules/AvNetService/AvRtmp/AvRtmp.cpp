@@ -96,7 +96,7 @@ static char * put_be32(char *output, uint32_t nVal)
 static char * put_be64(char *output, uint64_t nVal)
 {
 	output = put_be32(output, nVal >> 32);
-	output = put_be32(output, nVal);
+	output = put_be32(output, (uint32_t)nVal);
 	return output;
 }
 static char * put_amf_string(char *c, const char *str)
@@ -161,6 +161,13 @@ AvRtmp::~AvRtmp()
 		free(m_CacheBuffer);
 		m_CacheBuffer = NULL;
 		m_CacheBufferLen = 0;
+	}
+
+	CAvPacket *pack = NULL;
+	while (m_Avpacket.empty() == false){
+		pack = m_Avpacket.front();
+		pack->Release();
+		m_Avpacket.pop();
 	}
 }
 av_bool AvRtmp::Start(av_uchar Channel, av_uchar Slave, std::string url)
@@ -371,7 +378,7 @@ av_int AvRtmp::SendRtmpData(unsigned int nPacketType, unsigned char *predata, un
 	}
 	return nRet;
 }
-av_int AvRtmp::SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type nalType, CAvPacket *AvPacket)
+av_int AvRtmp::SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type_h264 nalType, CAvPacket *AvPacket)
 {
 	int prelen = 0;
 	unsigned char predata[256] = { 0 };
@@ -382,7 +389,7 @@ av_int AvRtmp::SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type nalType
 	AvPacket->GetNaluFrame(nalType, (av_uchar *&)pData, DataLen);
 	switch (nalType)
 	{
-	case nal_unit_type_idr:
+	case nal_unit_type_h264_idr:
 	{
 
 		predata[prelen++] = 0x17;// 1:Iframe  7:AVC   
@@ -399,7 +406,7 @@ av_int AvRtmp::SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type nalType
 		ret = SendRtmpData(nPacketType, predata, prelen, (unsigned char *)pData, DataLen);
 	}
 		break;
-	case nal_unit_type_p:
+	case nal_unit_type_h264_p:
 	{
 		predata[prelen++] = 0x27;// 1:Iframe  7:AVC   
 		predata[prelen++] = 0x01;// AVC NALU   
@@ -414,7 +421,7 @@ av_int AvRtmp::SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type nalType
 		ret = SendRtmpData(nPacketType, predata, prelen, (unsigned char *)pData, DataLen);
 	}
 		break;
-	case nal_unit_type_pps:
+	case nal_unit_type_h264_pps:
 	{
 		predata[prelen++] = 0x17;// 1:Iframe  7:AVC   
 		predata[prelen++] = 0x01;// AVC NALU   
@@ -429,12 +436,12 @@ av_int AvRtmp::SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type nalType
 		ret = SendRtmpData(nPacketType, predata, prelen, (unsigned char *)pData, DataLen);
 	}
 		break;
-	case nal_unit_type_sps:
+	case nal_unit_type_h264_sps:
 	{
 		char *DataSps, *DataPps;
 		int   LenSps, LenPps;
-		AvPacket->GetNaluFrame(nal_unit_type_sps, (av_uchar *&)DataSps, LenSps);
-		AvPacket->GetNaluFrame(nal_unit_type_pps, (av_uchar *&)DataPps, LenPps);
+		AvPacket->GetNaluFrame(nal_unit_type_h264_sps, (av_uchar *&)DataSps, LenSps);
+		AvPacket->GetNaluFrame(nal_unit_type_h264_pps, (av_uchar *&)DataPps, LenPps);
 		assert(LenSps + LenPps + 16 < sizeof(predata));
 		predata[prelen++] = 0x17;
 		predata[prelen++] = 0x00;
@@ -465,7 +472,7 @@ av_int AvRtmp::SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type nalType
 		ret = SendRtmpData(nPacketType, predata, prelen, NULL, 0, RTMP_PACKET_SIZE_MEDIUM);
 	}
 		break;
-	case nal_unit_type_sei:
+	case nal_unit_type_h264_sei:
 	{
 		predata[prelen++] = 0x17;// 1:Iframe  7:AVC   
 		predata[prelen++] = 0x01;// AVC NALU   
@@ -492,28 +499,28 @@ av_int  AvRtmp::PushMediaData(CAvPacket *AvPacket)
 	char *pData = NULL;
 	int   Len = 0;
 	int ret = 0;
-	av_nal_unit_type nalutype;
+	av_nal_unit_type_h264 nalutype;
 
 	for (int i = 0; i < (int)AvPacket->GetNaluCount(); i++){
-		AvPacket->GetNaluFrame(i, nalutype, (av_uchar *&)pData, Len);
+		AvPacket->GetNaluFrame(i, (av_int &)nalutype, (av_uchar *&)pData, Len);
 		switch (nalutype)
 		{
-		case nal_unit_type_idr:
+		case nal_unit_type_h264_idr:
 			ret = SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
 			break;
-		case nal_unit_type_p:
+		case nal_unit_type_h264_p:
 			ret = SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
 			break;
-		case nal_unit_type_sei:
+		case nal_unit_type_h264_sei:
 			ret = 1;
 			//ret = SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
 			break;
-		case nal_unit_type_pps://PÖ¡´øPPS  windows intel media sdk , H264
+		case nal_unit_type_h264_pps://PÖ¡´øPPS  windows intel media sdk , H264
 			if (AvPacket->FrameType() != avFrameT_I){
 				ret = SendRtmpPacket(RTMP_PACKET_TYPE_VIDEO, nalutype, AvPacket);
 			}
 			break;
-		case nal_unit_type_sps:
+		case nal_unit_type_h264_sps:
 			if (m_PicHeigh != AvPacket->ImageHeigh() || m_PicWidth != AvPacket->ImageWidth()){
 				m_PicWidth = AvPacket->ImageWidth();
 				m_PicHeigh = AvPacket->ImageHeigh();
@@ -534,7 +541,7 @@ av_int  AvRtmp::PushMediaData(CAvPacket *AvPacket)
 		}
 	}
 	if (m_nVBasePts != 0){
-		m_nVTimestamp = (AvPacket->TimeStamp() - m_nVBasePts)/1000;
+		m_nVTimestamp = (av_u32)(AvPacket->TimeStamp() - m_nVBasePts)/1000;
 	}
 	else{
 		m_nVBasePts = AvPacket->TimeStamp();
@@ -551,7 +558,7 @@ av_int AvRtmp::SendAacSpac()
 	// af 00 13 90	 ;;aac    22050 16bits
 	// 72 00 04 88   ;;g711-a 8000 16bits
 
-	unsigned char preData[32];
+//	unsigned char preData[32];
 	int  preLen = 0;
 	int SampleRate = 0;
 	int SampleBits = 0;
@@ -643,7 +650,7 @@ av_int AvRtmp::SendAudioData(CAvPacket *Packet)
 		break;
 	}
 	if (m_nABasePts != 0){
-		m_nATimestamp = (Packet->TimeStamp() - m_nABasePts) / 1000;
+		m_nATimestamp = (av_uint)(Packet->TimeStamp() - m_nABasePts) / 1000;
 	}
 	else{
 		m_nABasePts = Packet->TimeStamp();

@@ -47,7 +47,7 @@ SINGLETON_IMPLEMENT(CAvUart)
 static av_bool PtzCmd2Buffer(av_32 cmd, av_uchar VSpeed, av_uchar HSpeed, av_buf &buf)
 {
 	char  *pData = buf.base;
-	const char PELCO_D[] = { 0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01 };
+	const char PELCO_D[10] = { 0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01 };
 	memcpy(pData, PELCO_D, sizeof(PELCO_D));
 
 	switch (cmd)

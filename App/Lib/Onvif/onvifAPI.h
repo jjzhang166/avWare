@@ -150,6 +150,7 @@ typedef struct _AudioEncode_S{
 }AudioEncode_S;
 
 
+
 typedef struct _NetProtocolInfo_S{
 	int 	onvifPort;
 	int		rtspPort;

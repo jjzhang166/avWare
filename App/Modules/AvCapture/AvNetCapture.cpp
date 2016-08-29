@@ -83,6 +83,11 @@ av_bool CAvNetCapture::SetIFrame(av_int Slave)
 {
 	return av_true;
 }
+CAvPacket *CAvNetCapture::GetSnap(av_int Slave)
+{
+	
+	return NULL;
+}
 
 av_bool CAvNetCapture::LoadConfigs()
 {

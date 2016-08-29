@@ -37,9 +37,13 @@ public:
 	av_bool SetTime(av_timeval &atv);
 	av_bool SetIFrame(av_int Slave = CHL_MAIN_T);
 
+	CAvPacket *GetSnap(av_int Slave = CHL_SUB1_T);
 private:
 	av_int m_Channel;
 	E_CaptureSynchronizeStat m_LastCaptureSyncStat;
+
+	CAvPacket *	m_Snap;
+	CMutex		m_SnapMutex;
 
 public:
 	av_bool CaptureCreate();

@@ -31,7 +31,8 @@
 
 #define DefWebServicePort 80
 #define DefWebServiceRooDir "./webroot"
-#define DefWebServiceIndex  "index.html"
+//#define DefWebServiceIndex  "index.html"
+#define  DefWebServiceIndex "login.html"
 
 
 
@@ -39,7 +40,7 @@ class CWebService:public CAvObject
 {
 public:
 	CWebService();
-	~CWebService();
+	virtual ~CWebService();
 
 	bool WebStart();
 	bool WebStop();
@@ -63,8 +64,8 @@ public:
 
 
 public:
-	virtual int WebCallBackProc(std::string InBuf, std::string &OutBuf);
-
+	virtual int WebCallBackDataProc(std::string InBuf, std::string &OutBuf);
+	virtual int WebCallBackGetSnap(int Channel, std::string &SnapData);
 
 private:
 	std::string m_RootDir;

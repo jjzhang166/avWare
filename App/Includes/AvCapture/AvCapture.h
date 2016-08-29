@@ -41,6 +41,8 @@ public:
 
 	virtual av_bool SetTime(av_timeval &atv) = 0;
 	virtual av_bool SetIFrame(av_int Slave = CHL_MAIN_T) = 0;
+
+	virtual CAvPacket *GetSnap(av_int Slave = CHL_SUB1_T) = 0;
 private:
 
 };

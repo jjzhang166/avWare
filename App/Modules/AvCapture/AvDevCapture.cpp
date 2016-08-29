@@ -9,6 +9,7 @@ CAvDevCapture::CAvDevCapture()
 	m_Channel = 0;
 	m_LastCaptureSyncStat = E_Capture_VideoNONE;
 	
+	m_Snap = NULL;
 
 	m_ConfigEncode.Update(m_Channel);
 	m_ConfigEncode.Attach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigEncodeModify);
@@ -121,6 +122,13 @@ av_bool CAvDevCapture::SetTime(av_timeval &atv)
 av_bool CAvDevCapture::SetIFrame(av_int Slave)
 {
 	return AvCaptureForceKeyFrame((av_char)m_Channel, (av_char)Slave);
+}
+
+CAvPacket * CAvDevCapture::GetSnap(av_int Slave)
+{
+	CGuard m(m_SnapMutex);
+	if (NULL != m_Snap)m_Snap->AddRefer();
+	return m_Snap;
 }
 
 
@@ -252,12 +260,13 @@ void CAvDevCapture::ThreadProc()
 	E_CaptureSynchronizeStat ViStatus;
 	av_bool isSleep = av_false;
 	int i = 0;
-	av_msg("%s Task Running\n", __FUNCTION__);
+	
 	C_EncodeCaps EncodeCaps;
 	CAvDevice::GetCaptureCaps(m_Channel, EncodeCaps);
+	av_msg("%s Task Running StreamMark = %x\n", __FUNCTION__, EncodeCaps.ExtChannel);
 	while (av_true == m_Loop){
-
 		isSleep = av_true;
+		//#pragma omp parallel for
 		for (i = CHL_MAIN_T; i < CHL_NR_T; i++){
 			if (!(AvMask(i) & EncodeCaps.ExtChannel))continue;
 			ret = AvCaptureGetBuffer(m_Channel, i, avStreamT_V, &buf);
@@ -268,6 +277,17 @@ void CAvDevCapture::ThreadProc()
 				AvFree(buf.base);
 				AvPacket->PutBufferOver();
 				m_StreamSignal[i](m_Channel, i, AvPacket);
+
+				if (i == CHL_JPEG_T){ 
+					m_SnapMutex.Enter();
+					if (NULL != m_Snap)m_Snap->Release();
+				
+					m_Snap = AvPacket;
+					m_Snap->AddRefer();
+					
+					m_SnapMutex.Leave();
+				}
+
 				AvPacket->Release();
 				
 			}
@@ -453,6 +473,7 @@ av_void CAvDevCapture::OnConfigEncodeModify(CAvConfigEncode *ConfigEncode, int &
 			}
 		}
 	}
+	av_warning("OnConfigEncodeModify Modify\n");
 }
 av_void CAvDevCapture::OnConfigCaptureModify(CAvConfigCapture *ConfigCapture, int &result)
 {

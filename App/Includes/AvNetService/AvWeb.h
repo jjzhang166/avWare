@@ -12,9 +12,18 @@
 |  日期:
 |  说明:
 ******************************************************************/
+#ifndef AVWARE_AVNETSERVICE_AVWEB_H_
+#define AVWARE_AVNETSERVICE_AVWEB_H_
+
+#include <map>
+#include <list>
 #include "Apis/AvWareType.h"
 #include "CAvObject.h"
 #include "WebService/LibWebService.h"
+#include "AvNetService/AvWebProcess.h"
+
+class CAvPacket;
+class CAvWebSnap;
 
 class CAvWebSer:public CWebService
 {
@@ -28,10 +37,15 @@ private:
 	~CAvWebSer();
 
 private:
-	int WebCallBackProc(std::string InBuf, std::string &OutBuf);
 
+	int WebCallBackDataProc(std::string InBuf, std::string &OutBuf);
+	int WebCallBackGetSnap(int Channel, std::string &SnapData);
+
+	void RegisterMsgProc();
+	typedef std::map<std::string, WebMsgProc> MAP_LIST;
+	MAP_LIST map_webmsgproc_;
 };
-
 
 #define g_AvWebSer (*CAvWebSer::instance())
 
+#endif //AVWARE_AVNETSERVICE_AVWEB_H_

@@ -50,13 +50,17 @@ public:
 public:
 	av_bool			GetNaluSplit();
 	av_u32			GetNaluCount();
-	av_bool			GetNaluFrame(av_nal_unit_type naltype, av_uchar *&data, av_32 &datalen);
-	av_bool			GetNaluFrame(av_32 index, av_nal_unit_type &naltype, av_uchar *&data, av_32 &datalen);
+	av_bool			GetNaluFrame(av_int naltype, av_uchar *&data, av_32 &datalen);
+	av_bool			GetNaluFrame(av_32 index, av_int &naltype, av_uchar *&data, av_32 &datalen);
+private:
+	av_bool			GetNaluSplitH264();
+	av_bool			GetnaluSplitHevc();
+
 private:
 	typedef struct {
 		av_uchar *data;
 		av_int	 len;
-		av_nal_unit_type type;
+		av_int   type;
 	}AvPacketNaluInfo;
 
 	av_u32			 m_NaluInfoCount;
@@ -120,7 +124,7 @@ typedef struct {
 	std::list <CAvPacket *> LeftPacket;
 }C_PacketNode;
 
-#define AVPACKET_MAX_FRAME	(500*1024)
+#define AVPACKET_MAX_FRAME	(800*1024)
 #define AVPACKET_UNIT		(20*1024)
 
 class CAvPacketManager:public CTimer

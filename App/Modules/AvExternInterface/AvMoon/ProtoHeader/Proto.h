@@ -380,7 +380,8 @@ public:
 
 
 	virtual int LocalFirmwareUpgrade(C_FirmwareUpgrade &FirmwareUpgrade);
-	virtual int LocalFirmwareData(unsigned char *data, int datalen, unsigned int status/*PROTO_STATUS_BEGIN //开始数据|  PROTO_STATUS_ING,//中间数据| PROTO_STATUS_END,	//数据结束*/, unsigned int *Progress);
+	virtual int LocalFirmwareData(unsigned char *data, int datalen, unsigned int status/*PROTO_STATUS_BEGIN //开始数据|  PROTO_STATUS_ING,//中间数据| PROTO_STATUS_END,	//数据结束*/);
+	virtual int LocalFirmwareProgress();
 	virtual int LocalGetLogCaps(C_LogCaps &LogCaps);
 	virtual int LocalGetLogProfile(C_LogProfile &LogProfile);
 	virtual int LocalSetLogProfile(C_LogProfile &LogProfile);

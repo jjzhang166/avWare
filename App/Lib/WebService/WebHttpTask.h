@@ -45,10 +45,12 @@ typedef enum __EnFileType
 	EnFileType_Cgi,
 	EnFileType_Json,
 	EnFileType_Xml,
+	EnFileType_Css,
 	EnFileType_Default,
 } EnFileType;
 
-typedef int(CAvObject::*WebCallBack)(std::string InBuf, std::string &OutBuf);
+typedef int(CAvObject::*WebDataCallBack)(std::string InBuf, std::string &OutBuf);
+typedef int(CAvObject::*WebSnapCallBack)(int Channel, std::string &SnapData);
 
 class CWorkTask:public CAvObject
 {   
@@ -59,7 +61,7 @@ public:
 	int SetSocket(int fdSock);//将socket传进来
 	int SetWebAttr(std::string WebRoot, std::string WebIndex);
 
-	int SetCallBack(CAvObject *obj, WebCallBack proc);
+	int SetCallBack(CAvObject *obj, WebDataCallBack DataProc, WebSnapCallBack SnapProc);
 	int GetSocket();
 	int HandleConnect(int fdSock,int iTimeout = 5000000);
 	int ParseAndHandReq(int fdSock, char *pData, int iLen);
@@ -69,6 +71,7 @@ public:
 	int DoScriptFile(int fdSock, char *name, EnFileType EnFileType);
 	int DoStaticFile(int fdsock, char *name, EnFileType EnFileType);
 	int DoDataFile(int fdSock, std::string jsondata);
+	int DoSanpFile(int fdSock, char *SnapFile);
 	int cpFile(int fdSock,char *name, EnFileType EnFileType);
 	int CheckValidMsg(char* bufMsg,int lenMsg);
 
@@ -84,7 +87,9 @@ private:
 	std::string m_IndexHtml;
 
 	CAvObject *m_CbObj;
-	WebCallBack  m_CbProc;
+	WebDataCallBack  m_CbDataProc;
+	WebSnapCallBack	 m_CbSnapProc;
+	
 };   
 
 

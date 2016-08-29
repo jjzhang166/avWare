@@ -13,18 +13,74 @@
 |  说明:
 ******************************************************************/
 #include "AvDevice/AvDevice.h"
+#include "AvConfigs/AvConfigCapture.h"
 #include "AvConfigs/AvConfigNetService.h"
-
+#include "AvLua/AvLua.h"
 
 SINGLETON_IMPLEMENT(CAvDevice);
 
 
 C_DeviceFactoryInfo CAvDevice::m_FactoryInfo;
 std::string CAvDevice::m_SStartGUID;
+
 av_bool CAvDevice::Initialize()
 {
 	av_msg("%s Started\n", __FUNCTION__);
 	AvSystemInit();
+	
+
+	{//FACTOORY
+		C_DeviceFactoryInfo FactoryInfo = { 0 };
+		GetDeviceInfo(FactoryInfo);
+	}
+
+	{//一定要放在fac 后面，因为lua 里面有可能有auto 的选项，此时需要FAC 参数 配合。
+		InitializeLua();
+	}
+
+	{// GPIO
+		AvGpioInit();
+	}
+	
+
+	{// RTC
+		AvRtcInit();
+		AvTimeRtc2System();
+	}
+
+	{//GUID
+		av_timeval timeval;
+		AvGetTimeOfDay(&timeval);
+		char guid[128];
+		srand((unsigned int)timeval.tv_usec);
+		sprintf(guid, "%s-%04X-%04X-%08X", m_FactoryInfo.ProductMacAddr, timeval.tv_sec, timeval.tv_usec, rand());
+		m_SStartGUID.clear();
+		m_SStartGUID.assign(guid);
+	}
+
+
+	return av_true;
+}
+av_bool CAvDevice::InitializeLua()
+{
+	CAvLua initLua;
+	std::string Value;
+	initLua.LuaLoadfile("init.lua");
+	Value = initLua.LuaGlobal("avWare_configs_path");
+	if (Value.empty() == false){
+		SetEnv(std::string(EKey_ConfigsPath), Value);
+	}
+	
+	Value = initLua.LuaGlobal("avWare_webroot");
+	if (Value.empty() == false){
+		SetEnv(std::string(EKey_WebRoot), Value);
+	}
+
+	Value = initLua.LuaGlobal("avWare_webindex");
+	if (Value.empty() == false){
+		SetEnv(std::string(EKey_WebIndex), Value);
+	}
+	
 	return av_true;
 }
 av_bool CAvDevice::InitializeConfigs()
@@ -34,17 +90,62 @@ av_bool CAvDevice::InitializeConfigs()
 }
 CAvDevice::~CAvDevice()
 {
-
 }
 CAvDevice::CAvDevice()
 {
-
 }
+
+
+static int GetCompileDateTime(char *szDateTime)
+{
+
+	#define MONTH_PRE_YEAR 12
+	const char szEnglishMonth[MONTH_PRE_YEAR][6] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+	char szMonth[12] = { 0 };
+	int iYear, iMonth, iDay, iHour, iMin, iSec;
+
+	sscanf(__DATE__, "%s %d %d", szMonth, &iDay, &iYear);
+	sscanf(__TIME__, "%d:%d:%d", &iHour, &iMin, &iSec);
+
+	for (int i = 0; i < MONTH_PRE_YEAR; i++)
+	{
+		if (strncmp(szMonth, szEnglishMonth[i], 3) == 0)
+		{
+			iMonth = i + 1;
+			break;
+		}
+	}
+	sprintf(szDateTime, "%02d%02d%02d", iYear%100, iMonth, iDay);
+	return 0;
+}
+
+std::string CAvDevice::GetSoftVersionString()
+{
+	std::string Version;
+	av_char ver[128];
+	av_char _complileDate[128];
+	GetCompileDateTime(_complileDate);
+
+	sprintf(ver, "%d.%d.%d.%s_%s", _AV_WARE_VERSION_MAJOR, _AV_WARE_VERSION_MINOR,_AV_WARE_VERSION_PATCH,
+		_complileDate, _AV_WARE_VERSION_RUNTIME);
+	if (0 != strlen(_AV_WARE_VERSION_OEM)){
+		strcat(ver, "_");
+		strcat(ver, _AV_WARE_VERSION_OEM);
+}
+
+	Version.assign(ver);
+	return Version;
+}
+av_u32      CAvDevice::GetSoftVersionU32()
+{
+	return _AV_WARE_VERSION_MAJOR << 16 | _AV_WARE_VERSION_MINOR << 8 | _AV_WARE_VERSION_PATCH;
+}
+
 
 
 CMutex CAvDevice::m_SEnvMutex;
 std::map<std::string, std::string> CAvDevice::m_SEnv;
-av_bool CAvDevice::GetEnv(std::string &key, std::string &value)
+av_bool CAvDevice::GetEnv(std::string key, std::string &value)
 {
 	CGuard m(m_SEnvMutex);
 	if (key.size() == 0){
@@ -57,13 +158,13 @@ av_bool CAvDevice::GetEnv(std::string &key, std::string &value)
 	value = m_SEnv[key];
 	return av_true;
 }
-av_bool CAvDevice::SetEnv(std::string &key, std::string &value)
+av_bool CAvDevice::SetEnv(std::string key, std::string &value)
 {
 	CGuard m(m_SEnvMutex);
 	if (key.size() == 0){
 		return av_false;
 	}
-	m_SEnv[key] = value;
+	
 	if (value == std::string("")){
 		std::map<std::string, std::string>::iterator i;
 		i = m_SEnv.find(key);
@@ -71,18 +172,16 @@ av_bool CAvDevice::SetEnv(std::string &key, std::string &value)
 			m_SEnv.erase(i);
 		}
 	}
+	else{
+		m_SEnv[key] = value;
+	}
 	return av_true;
 }
 
-#include "AvConfigs/AvConfigCapture.h"
+
 av_bool CAvDevice::Start()
 {
-	//## bsp sys
-	C_DeviceFactoryInfo FactoryInfo;
-	GetDeviceInfo(FactoryInfo);
 
-
-	AvGpioInit();
 	{
 		//## Set NetWork
 		m_ConfigNetComm.Update();
@@ -119,27 +218,6 @@ av_bool CAvDevice::Start()
 				}
 			}
 		}
-
-		
-
-	}
-
-	{
-		//## Rtc Time 2 SysTime
-		AvRtcInit();
-		AvTimeRtc2System();
-	}
-
-	{
-		av_timeval timeval;
-		AvGetTimeOfDay(&timeval);
-		char guid[128];
-		srand((unsigned int)timeval.tv_usec);
-
-		sprintf(guid, "%s-%04X-%04X-%08X", FactoryInfo.ProductMacAddr, timeval.tv_sec, timeval.tv_usec, rand());
-
-		m_SStartGUID.clear();
-		m_SStartGUID.assign(guid);
 	}
 
 	return av_true;
@@ -291,6 +369,15 @@ av_bool CAvDevice::GetDeviceInfo(C_DeviceFactoryInfo &FactoryInfo)
 			sprintf(m_FactoryInfo.HardWareVersion, "%s", "AV-HardWare-00-00-01");
 			sprintf(m_FactoryInfo.ProductModel, "%s", "AV-Product-Model-A");
 		}
+		else{
+// 			memset(&m_FactoryInfo, 0x00, sizeof(C_DeviceFactoryInfo));
+// 			sprintf(m_FactoryInfo.FactoryName, "%s", "aVware Factory");
+// 			sprintf(m_FactoryInfo.SerialNumber, "%s", "AV-0001-0002-0003-0004");
+// 			sprintf(m_FactoryInfo.ProductMacAddr, "%s", "00:1A:2B:3C:4D:5E");
+// 			sprintf(m_FactoryInfo.HardWareVersion, "%s", "AV-HardWare-00-00-01");
+// 			sprintf(m_FactoryInfo.ProductModel, "%s", "AV-Product-Model-A");
+		}
+
 	}
 	FactoryInfo = m_FactoryInfo;
 	return av_true;
@@ -298,7 +385,10 @@ av_bool CAvDevice::GetDeviceInfo(C_DeviceFactoryInfo &FactoryInfo)
 av_bool CAvDevice::SetDeviceInfo(C_DeviceFactoryInfo &FactoryInfo)
 {
 	m_FactoryInfo = FactoryInfo;
+	av_msg("SetDeviceInfo \nFactoryName[%s]MaxChannel[%d]\nSerialNumber[%s]\n", 
+		m_FactoryInfo.FactoryName,  m_FactoryInfo.MaxChannel, m_FactoryInfo.SerialNumber);
 	return AvSetDeviceInfo(&m_FactoryInfo);
+	return av_true;
 }
 
 av_uint CAvDevice::GetDeviceStartUp()
@@ -310,16 +400,22 @@ av_bool CAvDevice::SystemBeep()
 	return AvSystemBeep(0xff, 100);
 }
 
-av_bool CAvDevice::SystemUpgrade(std::string UpgradeFilePath, av_uint &Progress)
+C_UpgradeProgress CAvDevice::m_SystemUpgradeProgress;
+
+av_bool CAvDevice::SystemUpgrade(std::string UpgradeFilePath)
 {
-	av_bool ret = AvSystemUpgradeFile(UpgradeFilePath.c_str(), &Progress);
+	av_bool ret = AvSystemUpgradeFile(UpgradeFilePath.c_str(), &m_SystemUpgradeProgress);
 	return ret;
 }
-av_bool CAvDevice::SystemUpgrade(av_uchar *ptr, av_uint length, av_uint &Progress)
+av_bool CAvDevice::SystemUpgrade(av_uchar *ptr, av_uint length)
 {
 	return av_true;
 }
-
+av_u32  CAvDevice::SystemUpgradeProgress()
+{
+	av_msg("ProgressCmd = %d  Value =  %d\n", m_SystemUpgradeProgress.ProgressCmd, m_SystemUpgradeProgress.ProgressValue);
+	return (av_u32)(m_SystemUpgradeProgress.ProgressCmd << 16 | m_SystemUpgradeProgress.ProgressValue);
+}
 
 av_bool CAvDevice::GetMemLoadInfo(C_MemoryLoadInfo &MemLoadInfo)
 {

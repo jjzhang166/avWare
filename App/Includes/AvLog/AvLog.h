@@ -33,6 +33,7 @@ public:
 		LOG_CONF			= 0X20,
 		LOG_CONF_SAVE,
 		LOG_CONF_LOAD,
+		LOG_CONF_DEFAULT,
 
 		LOG_HDD				= 0x40,
 		LOG_HDD_WERR,

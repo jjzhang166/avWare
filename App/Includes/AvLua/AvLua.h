@@ -2,7 +2,7 @@
 #define _AV_LUA_H_
 
 #include "Lua/lua.hpp"
-#define LuaHomeDir "lua"
+#define LuaHomeDir "Lua"
 
 
 
@@ -45,13 +45,11 @@ inline void *lua_alloc(void *ud, void *ptr, size_t osize, size_t nsize) {
 	(void)ud;  (void)osize;  /* not used */
 	if (nsize == 0) {
 		free(ptr);
-		//av_warning("free %p\n", ptr);
 		return NULL;
 	}
 	else{
 		char *RetPtr = NULL;
 		RetPtr = (char *)realloc(ptr, nsize);
-		//av_warning("reall %p old ptr = %p\n", RetPtr, ptr);
 		return RetPtr;
 	}
 }
@@ -69,7 +67,7 @@ public:
 		if (luaL_loadfile(m_LuaState, LuaFilePath)){
 			assert(0);
 		}
-
+		lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
 	}
 	CAvLua(){
 		m_LuaState = NULL;
@@ -87,7 +85,7 @@ public:
 	template <typename ... ARGS>
 	int LuaCall(const char *LuaFucName, ARGS... args)
 	{
-		lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
+		
 		int r = lua_getglobal(m_LuaState, LuaFucName);
 
 		int  sizeargs = sizeof...(args);
@@ -112,7 +110,7 @@ public:
 	std::string LuaGlobal(const char *LuaGlobal)
 	{
 		std::string ret;
-		lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
+		
 		int t = lua_getglobal(m_LuaState, LuaGlobal);
 
 		if (lua_isstring(m_LuaState, -1)){
@@ -138,8 +136,7 @@ public:
 	std::list <std::string> LuaArray(const char *ArrayName){
 		std::list<std::string> ret;
 		ret.clear();
-		//lua_settop(m_LuaState, 0);
-		lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
+	
 		int iRet = lua_getglobal(m_LuaState, ArrayName);
 		if (iRet <= 0){
 			return ret;
@@ -162,6 +159,7 @@ public:
 		if (luaL_loadfile(m_LuaState, LuaFilePath)){
 			assert(0);
 		}
+		lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
 		return av_true;
 	}
 

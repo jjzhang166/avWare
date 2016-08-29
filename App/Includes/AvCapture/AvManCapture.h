@@ -29,7 +29,7 @@ private:
 public:
 	av_bool Initialize();
 	Capture *GetAvCaptureInstance(av_int iChannel);
-
+	av_u32   GetAvCaptureTotal();
 private:
 	std::map <av_int, Capture *>  m_ManCaptureMap;
 	av_int m_MaxCaptureChannels;

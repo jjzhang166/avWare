@@ -8,11 +8,13 @@ target_link_libraries(${target} bz2)
 target_link_libraries(${target} z)
 target_link_libraries(${target} dome)
 target_link_libraries(${target} autofocus)
-
+target_link_libraries(${target} tklpn)
 
 # static library
 target_link_libraries(${target} img_algo_s2l)
 target_link_libraries(${target} img_dsp_s2l_hf)
 target_link_libraries(${target} textinsert)
 target_link_libraries(${target} ProtoShare)
+target_link_libraries(${target} chrome_convert)
+target_link_libraries(${target} mtd)
 

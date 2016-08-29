@@ -91,7 +91,8 @@ public:
 		CONF_STATUS_SET,
 	}ConfigValueStatus;
 
-	CAvConfigBase(int cur_index,int max_index);
+	CAvConfigBase(int &cur_index,int max_index);
+
 	virtual ~CAvConfigBase();
 	
 	inline ConfigValueStatus status(void)	const { return m_status; }
@@ -142,7 +143,7 @@ private:
 	AvConfigValue&		GetValue		(AvConfigKey key, AvConfigValue &table);
 	void				GetValueBool	(AvConfigKey key, AvConfigValue &table, av_bool &val,	av_bool def		);
 	void				GetValueInt		(AvConfigKey key, AvConfigValue &table, int &val,		int def			);
-	void				GetValueInt64	(AvConfigKey key, AvConfigValue &table, av_64 &val,		av_64 def		);
+	//void				GetValueInt64	(AvConfigKey key, AvConfigValue &table, av_64 &val,		av_64 def		);
 	const char*			GetValueString	(AvConfigKey key, AvConfigValue &table,	const char* def					);
 
 	virtual void		WriteToEnv(int index) = 0;
@@ -183,8 +184,10 @@ public:
 	inline T& GetConfig(int index = 0) { return m_use_config[index]; }
 	inline T& operator[](int index){ return m_use_config[index]; }
 
-	inline virtual void WriteToEnv(int index) { m_env_config[index] = m_use_config[index]; }
-	inline virtual void ReadFromEnv(int index) { m_use_config[index] = m_env_config[index]; }
+	//TODO: 写成inline 会导致无法获取配置 原因待查
+	virtual void WriteToEnv(int index) { m_env_config[index] = m_use_config[index];}
+	virtual void ReadFromEnv(int index) { m_use_config[index] = m_env_config[index];}
+
 
 	inline av_bool Compare(const void *env, const void *use)
 	{

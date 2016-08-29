@@ -18,7 +18,32 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
 #include "AvWareType.h"
+	typedef enum {
+		AvSensor_OV9712		= 0,
+		AvSensor_OV4689,
+		AvSensor_OV5658,
+
+		AvSensor_AR0130		= 5,
+		AvSensor_AR0330,
+		AvSensor_AR0237,
+
+		AvSensor_IMX138		= 10,
+		AvSensor_IMX122,
+		AvSensor_IMX236,
+		AvSensor_IMX178,
+		AvSensor_IMX185,
+		AvSensor_IMX117,
+		AvSensor_IMX123,
+
+		AvSensor_BT1120		= 25,
+		AvSensor_BT656,
+
+		AvSensor_AUTO		= 30,
+	}E_AvSensor;
+
 	typedef enum {
 		AvChip_S2L22M,
 		AvChip_S2L33M,
@@ -258,9 +283,11 @@ typedef struct {
 	av_char		HardWareVersion[64];
 	av_char		ProductModel[64];
 	av_char		ProductMacAddr[32];
+	av_uint		ChipType;
+	av_uint		SensorType;
 	av_uint		FActoryTime;
-	av_ushort	MaxChannel;
-	av_ushort	Res;
+	av_uint		MaxChannel;
+	av_uint		Res;
 }C_DeviceFactoryInfo;
 
 typedef struct {
@@ -296,8 +323,13 @@ Rebootting = 6,
 ModifyOver = 7,
 HaveNoResource = 8,
 */
-av_bool AvSystemUpgradeFile(const av_char * UpgradeFilePath, av_uint *Progress/*0-7表示百分比 ; 8-15 动作WipePartition=1;WriteData=2*/);
-av_bool AvSystemUpgradeMemory(av_uchar *ptr, av_uint length, av_uint *Progress/*0-7表示百分比 ; 8-15 动作*/);
+typedef struct{
+	av_ushort ProgressCmd;
+	av_ushort ProgressValue;
+}C_UpgradeProgress;
+
+av_bool AvSystemUpgradeFile(const av_char * UpgradeFilePath, C_UpgradeProgress *Progress);
+av_bool AvSystemUpgradeMemory(av_uchar *ptr, av_uint length, C_UpgradeProgress *Progress);
 av_bool AvGetMemLoadInfo(C_MemoryLoadInfo *MemLoadInfo);
 av_bool AvGetNetLoadInfo(C_NetLoadInfo *NetLoadInfo);
 av_bool AvGetCpuLoadInfo(C_CpuLoadInfo *CpuLoadInfo);

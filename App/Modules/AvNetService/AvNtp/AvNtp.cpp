@@ -227,12 +227,12 @@ int CAvNtp::GetNtpTime(int sk, struct addrinfo *addr, struct ntp_packet *ret_tim
 
 
         /* 设置接收NTP包的数据结构 */
-        ret_time->leap_ver_mode = ntohl(data[0]);
+        ret_time->leap_ver_mode = (unsigned char)ntohl(data[0]);
 
-        ret_time->startum = ntohl(data[1]);
-        ret_time->poll = ntohl(data[2]);
+		ret_time->startum = (unsigned char)ntohl(data[1]);
+		ret_time->poll = (char)ntohl(data[2]);
 
-        ret_time->precision = ntohl(data[3]);
+		ret_time->precision = (char)ntohl(data[3]);
 
         ret_time->root_delay = ntohl(*(int*)&(data[4]));
 

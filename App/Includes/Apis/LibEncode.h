@@ -154,21 +154,32 @@ typedef enum {
 	avMediaUp_RecordTimer,
 	avMediaUp_RecordManual,
 }av_media_property;
+
 typedef enum {
-	nal_unit_type_nr		= 0x01 << 0,
-	nal_unit_type_p			= 0x01 << 1,
-	nal_unit_type_dataA		= 0x01 << 2,
-	nal_unit_type_dataB		= 0x01 << 3,
-	nal_unit_type_dataC		= 0x01 << 4,
-	nal_unit_type_idr		= 0x01 << 5,
-	nal_unit_type_sei		= 0x01 << 6,
-	nal_unit_type_sps		= 0x01 << 7,
-	nal_unit_type_pps		= 0x01 << 8,
-	nal_unit_type_delimiter = 0x01 << 9,
-	nal_unit_type_nalend	= 0x01 << 10,
-	nal_unit_type_streamend = 0x01 << 11,
-	nal_unit_type_pading	= 0x01 << 12,
-}av_nal_unit_type;
+	nal_unit_type_h264_nr = 0,
+	nal_unit_type_h264_p = 1,
+	nal_unit_type_h264_dataA = 2,
+	nal_unit_type_h264_dataB = 3,
+	nal_unit_type_h264_dataC = 4,
+	nal_unit_type_h264_idr = 5,
+	nal_unit_type_h264_sei = 6,
+	nal_unit_type_h264_sps = 7,
+	nal_unit_type_h264_pps = 8,
+	nal_unit_type_h264_delimiter = 9,
+	nal_unit_type_h264_nalend = 10,
+	nal_unit_type_h264_streamend = 11,
+	nal_unit_type_h264_pading = 12,
+}av_nal_unit_type_h264;
+
+typedef enum {
+	nal_unit_type_hevc_trail_n	= 0,
+	nal_unit_type_hevc_trail_r	= 1,
+	nal_unit_type_hevc_idr		= 19,
+	nal_unit_type_hevc_vps		= 32,
+	nal_unit_type_hevc_sps		= 33,
+	nal_unit_type_hevc_pps		= 34,
+	nal_unit_type_hevc_sei		= 39,
+}av_nal_unit_type_hevc;
 
 typedef enum{
 	avStreamT_V,
@@ -229,8 +240,8 @@ typedef enum {
 typedef struct {
 	av_u32 nMaxChannels;
 	av_u32 CompMask;
-	av_u32 SampleRateMask;
-	av_u32 SampleBitsMask;
+	av_u32 SampleRateMask[AvComp_NR];
+	av_u32 SampleBitsMask[AvComp_NR];
 }C_AudioCaps;
 
 typedef struct {
@@ -268,19 +279,25 @@ typedef struct {
 	C_RECT   rect;
 	av_u32	 color;//argb
 }C_CoverFormats;
+typedef enum {
+	WM_CHANNEL_NAME,
+	WM_DATE_TIME,
+	WM_TYPE_Nr,
+}E_WaterMarkingType;
 
 typedef enum {
 	WM_YMD_HMS,
 	WM_YMD_W_HMS,
 	WM_HMS_YMD,
-}E_WaterMarkingType;
+}E_WaterMarkingStyle;
+
 typedef struct {
 	av_uchar index;
 	av_bool  enable;
 	C_RECT   rect;
 	av_u32	 color;
 	av_char  WaterMarkString[128];
-	E_WaterMarkingType  type;
+	E_WaterMarkingStyle  type;
 }C_WaterMarkingFormats;
 
 typedef struct {
@@ -290,6 +307,7 @@ typedef struct {
 	
 	av_u32  IrCutModeMask;
 	av_u32  VideoReverseMask;
+	av_u32  VideoRoRateMask;
 	av_u32  AntiFlckerMask;
 	av_u32  ExposureMask;
 	av_u32	WhiteBalanceMask;
@@ -305,8 +323,15 @@ typedef enum {
 typedef enum {
 	VIDEOREVERSE_HOR,
 	VIDEOREVERSE_VER,
-	VIDEOREVERSE_90,
 }E_VideoReverse;
+
+typedef enum{
+	VIDEOROTATE_0,
+	VIDEOROTATE_90,
+	VIDEOROTATE_180,
+	VIDEOROTATE_270,
+}E_VideoRotate;
+
 
 
 typedef enum{
@@ -355,18 +380,45 @@ typedef enum {
 	AvExposureMode_LAST = 4
 }E_ExposureMode;
 
+
 typedef struct {
-	av_bool			ReverseHor;
-	av_bool			ReverseVer;
-	av_bool			Reverse90;
+	av_bool bMirror;
+	av_bool bFilp;
+}C_CapReverseAttr;
 
-	E_IrCutMode			IrCutMode;
-	E_AntiFlckerMode	AntiFlckerMode;
-	E_WhiteBalanceMode	WhiteBalanceMode;
-	E_ExposureMode		ExposureMode;
+typedef struct {
+	E_VideoRotate mode;
+}C_CapRotateAttr;
 
+typedef struct {
+	E_IrCutMode mode;
+	//for Timer IRCUT
+	av_u32		tOpen;
+	av_u32		tClose;
+}C_CapIrCutAttr;
+typedef struct {
+	E_AntiFlckerMode mode;
+
+}C_CapAntiFlckerAttr;
+typedef struct {
+	E_WhiteBalanceMode mode;
+	//for AvWhiteBalanceMode_MANUAL
+	av_u32			 value;
+}C_CapWhiteBalanceAttr;
+typedef struct {
+	E_ExposureMode mode;
+	av_int		   max;
+	av_int		   min;
+}C_CapExposureAttr;
+
+typedef struct {
+	C_CapReverseAttr		ReverseAttr;
+	C_CapRotateAttr			RotateAttr;
+	C_CapIrCutAttr			IrCutAttr;
+	C_CapAntiFlckerAttr		AntiFlckerAttr;
+	C_CapWhiteBalanceAttr	WhiteBalanceAttr;
+	C_CapExposureAttr		ExposureAttr;
 }C_CaptureInFormats;
-
 
 typedef enum {
 	E_Capture_VideoNONE,
@@ -379,6 +431,8 @@ typedef enum {
 
 
 
+av_bool AvImageSize2ImageValue(av_capture_size ImageSize, av_u32 *ImageValueW, av_u32 *ImageValueH);
+av_bool AvImageValue2ImageSize(av_capture_size *ImageSize, av_u32 ImageValueW, av_u32 ImageValueH);
 
 
 av_bool AvCaptureCreate(av_uchar Channel);
@@ -392,6 +446,7 @@ av_bool AvCaptureGetCaps(av_uchar Channel, C_EncodeCaps *EncodeCaps);
 av_bool AvEncodeSetFormat(av_uchar Channel, av_uchar Slave, C_EncodeFormats *Formats);
 
 av_bool AvCaptureInCaps(av_char Channel, C_CaptureInCaps *CaptureInCaps);
+
 av_bool AvCaptureInSetFormat(av_uchar channel, C_CaptureInFormats *Formats);
 av_bool AvCaptureGetBuffer(av_uchar Channel, av_uchar Slave, av_stream_type ast, av_buf *buf);
 av_bool AvCaptureForceKeyFrame(av_uchar Channel, av_uchar Slave);

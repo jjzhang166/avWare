@@ -28,10 +28,17 @@ av_bool CManCapture::Initialize()
 		pCapture->Initialize((av_int)i);
 		m_ManCaptureMap.insert(std::pair<av_int, Capture*>(i, pCapture));
 	}
-
+	m_MaxCaptureChannels = i;
 	return av_true;
 }
 Capture *CManCapture::GetAvCaptureInstance(av_int iChannel)
 {
+	assert(iChannel >= 0);
+	assert(iChannel < m_MaxCaptureChannels);
 	return m_ManCaptureMap[iChannel];
+}
+
+av_u32   CManCapture::GetAvCaptureTotal()
+{
+	return m_MaxCaptureChannels;
 }

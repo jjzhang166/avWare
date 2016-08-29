@@ -1,6 +1,32 @@
 #Top Dir
 cmake_minimum_required(VERSION 3.1)
 
+
+
+set (_AV_WARE_VERSION_MAJOR 1)
+set (_AV_WARE_VERSION_MINOR 0)
+set (_AV_WARE_VERSION_PATCH 5)
+set (_AV_WARE_VERSION_OEM Gp)
+#base、alpha、beta 、RC �?release(R)
+set (_AV_WARE_VERSION_RUNTIME RC)
+
+
+include (InstallRequiredSystemLibraries)
+set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")  
+set (CPACK_PACKAGE_VERSION_MAJOR "${_AV_WARE_VERSION_MAJOR}") 
+set (CPACK_PACKAGE_VERSION_MINOR "${_AV_WARE_VERSION_MINOR}")  
+set (CPACK_PACKAGE_VERSION_PATCH "${_AV_WARE_VERSION_PATCH}")
+
+set (CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}")
+set (CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}.${CPACK_PACKAGE_VERSION_MINOR}")
+set (CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}.${CPACK_PACKAGE_VERSION_PATCH}")
+set (CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}_${_AV_WARE_VERSION_OEM}")
+set (CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}_${_AV_WARE_VERSION_RUNTIME}")
+set (CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6)")
+include (CPack)  
+
+
+
 if (WIN32)
 	option (HAVE_CapCamera "use laptop camera for capture " OFF)
 	option (HAVE_CapScreen "use screen for capture " ON)
@@ -15,8 +41,8 @@ elseif (UNIX)
 	#COMPILER
 	#set (COMPILER LINUX)
 	#set (COMPILER AMBA)
-	#set (COMPILER HISI16C)
-	set (COMPILER HISI18EV100)
+	set (COMPILER HISI16C)
+	#set (COMPILER HISI18EV100)
 	#set (COMPILER HISI18C)
 	#set (COMPILER HISI18A)
 	#set (COMPILER HISI16D)
@@ -69,10 +95,42 @@ set (CMAKE_CONFIGURATION_TYPES Debug Release)
 
 set (CMAKE_BUILD_TYPE "Release")
 set (CMAKE_BUILD_TYPE "Debug")
+
 project (avWare)
 
+if (WIN32)
+	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
+	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
+	add_definitions("-D_WINSOCK_DEPRECATED_NO_WARNINGS")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /openmp")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP /openmp")
+	set(CMAKE_EXE_LINKER_FLAGS "/SAFESEH:NO ")
+elseif (UNIX)
+	#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
+	#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fopenmp")
 
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+	if (CMAKE_BUILD_TYPE MATCHES "Release")
+		message("*****Use Build Type ${CMAKE_BUILD_TYPE}")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s -O2 -pipe -fPIC -Wall -MMD -fno-strict-aliasing -fmessage-length=0")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s -O2 -pipe -fPIC -Wall -MMD -fno-strict-aliasing -fmessage-length=0")
+	elseif (CMAKE_BUILD_TYPE MATCHES "Debug")
+		message("*****Use Build Type ${CMAKE_BUILD_TYPE}")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -ggdb -pipe -fPIC -Wall -MMD -fno-strict-aliasing")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -ggdb -pipe -fPIC -Wall -MMD -fno-strict-aliasing")
 
+		if (COMPILER MATCHES LINUX)  
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
+			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
+		endif()
+	else()
+		message(FATAL_ERROR "Please use cmake -DCMAKE_BUILD_TYPE=Debug(Release) dir")
+	endif()
+
+endif()
+
+add_definitions("-D_AV_WARE_")
 
 
 configure_file (
@@ -82,24 +140,12 @@ configure_file (
 
 include_directories(${PROJECT_BINARY_DIR})
 
-	add_definitions("-D_AV_WARE_")
-	
-if (WIN32)
-	set(CMAKE_C_FLAGS_DEBUG, "-g -Wall -O2" )
-	set(CMAKE_CXX_FLAGS_DEBUG, "-g -Wall -O2" )
-
-	set(CMAKE_C_FLAGS_RELEASE, "-Wall -O2" )
-	set(CMAKE_CXX_FLAGS_RELEASE, "-Wall -O2" )
-	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
-	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
-	set(CMAKE_EXE_LINKER_FLAGS "/SAFESEH:NO ")
-elseif (UNIX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -O2")
-endif()
-
 if (WITH_UI STREQUAL "ON")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 endif()
 	
-ADD_SUBDIRECTORY(App)
+
+	
+
+add_subdirectory(App)
 

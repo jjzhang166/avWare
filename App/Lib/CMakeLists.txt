@@ -18,23 +18,30 @@ include_directories(Onvif)
 include_directories(Common)
 
 set (CommonSRC_JSONCPP_LIST
-		Common/JsonCppSrc/json_tool.h
 		Common/JsonCppSrc/json_reader.cpp
-		Common/JsonCppSrc/json_valueiterator.inl
 		Common/JsonCppSrc/json_value.cpp
 		Common/JsonCppSrc/json_writer.cpp
+		Common/JsonCppSrc/json_tool.h
+		Common/JsonCppSrc/json_valueiterator.inl
 		Common/JsonCppSrc/version.h.in
 )
+
 set(CommonINC_JSONCPP_LIST
 		Common/jsoncpp/json.h
 		Common/jsoncpp/autolink.h
 		Common/jsoncpp/value.h
 		Common/jsoncpp/reader.h
 		Common/jsoncpp/writer.h
+		Common/jsoncpp/config.h
 		Common/jsoncpp/features.h
 		Common/jsoncpp/version.h
-		Common/jsoncpp/config.h
+		Common/jsoncpp/forwards.h
+		Common/jsoncpp/allocator.h
+		Common/jsoncpp/assertions.h
 	)
+#Common/jsoncpp/features.h
+#Common/jsoncpp/version.h
+
 set (CommonSRC_GTKUTF8_LIST
 		Common/gtkutf8.c)
 set (CommonINC_GTKUTF8_LIST
@@ -62,8 +69,8 @@ set (CommonINC_LIST
 	${CommonINC_GTKUTF8_LIST}
 	)
 	
-add_library(LibCommon STATIC ${CommonSRC_LIST} ${CommonINC_LIST})
-set_property(TARGET LibCommon PROPERTY FOLDER "AvLibs")
+add_library(Common STATIC ${CommonSRC_LIST} ${CommonINC_LIST})
+set_property(TARGET Common PROPERTY FOLDER "AvLibs")
 
 include_directories(Smtp)
 set(SmtpSRC_LIST 
@@ -72,8 +79,8 @@ set(SmtpSRC_LIST
 set(SmtpINC_LIST 
 		Smtp/CSmtp.h
 	)
-add_library(LibSmtp STATIC ${SmtpSRC_LIST} ${SmtpINC_LIST})
-set_property(TARGET LibSmtp PROPERTY FOLDER "AvLibs")
+add_library(Smtp STATIC ${SmtpSRC_LIST} ${SmtpINC_LIST})
+set_property(TARGET Smtp PROPERTY FOLDER "AvLibs")
 
 include_directories(Upnp)
 set(UpnpSRC_LIST
@@ -110,8 +117,8 @@ set(UpnpINC_LIST
 		Upnp/miniupnpcstrings.h
 		Upnp/miniupnpctypes.h
 	)
-add_library(LibUpnp STATIC ${UpnpSRC_LIST} ${UpnpINC_LIST})	
-set_property(TARGET LibUpnp PROPERTY FOLDER "AvLibs")
+add_library(Upnp STATIC ${UpnpSRC_LIST} ${UpnpINC_LIST})	
+set_property(TARGET Upnp PROPERTY FOLDER "AvLibs")
 
 if (WIN32)
 
@@ -123,7 +130,7 @@ set(DhcpSRC_LIST
 set(DhcpINC_LIST
 		Dhcp/dhcp.h
 	)
-add_library(LibDhcp STATIC ${DhcpSRC_LIST} ${DhcpINC_LIST})
+add_library(Dhcp STATIC ${DhcpSRC_LIST} ${DhcpINC_LIST})
 endif()
 
 include_directories(Ddns)
@@ -136,8 +143,8 @@ set(DdnsINC_LIST
 		Ddns/Ddns_Net.h
 		Ddns/NetDdns.h
 )
-add_library(LibDdns STATIC ${DdnsSRC_LIST} ${DdnsINC_LIST})
-set_property(TARGET LibDdns PROPERTY FOLDER "AvLibs")
+add_library(Ddns STATIC ${DdnsSRC_LIST} ${DdnsINC_LIST})
+set_property(TARGET Ddns PROPERTY FOLDER "AvLibs")
 
 include_directories(Ftp)
 set(FtpSRC_LIST
@@ -146,8 +153,20 @@ set(FtpSRC_LIST
 set(FtpINC_LIST
 		Ftp/Ftp.h
 )
-add_library(LibFtp STATIC ${FtpSRC_LIST} ${FtpINC_LIST})
-set_property(TARGET LibFtp PROPERTY FOLDER "AvLibs")
+add_library(Ftp STATIC ${FtpSRC_LIST} ${FtpINC_LIST})
+set_property(TARGET Ftp PROPERTY FOLDER "AvLibs")
+
+##SQLITE
+include_directories(SQlite)
+set(SQLiteSRC_LIST
+		Sqlite/sqlite3.c
+)
+set(SQLiteINC_LIST
+		Sqlite/sqlite3.h
+		Sqlite/sqlite3ext.h
+)
+add_library(SQLite STATIC ${SQLiteINC_LIST} ${SQLiteSRC_LIST})
+set_property(TARGET SQLite PROPERTY FOLDER "AvLibs")
 
 
 include_directories(Rtsp)

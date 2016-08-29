@@ -39,6 +39,9 @@ bool CAvRtspServerMedia::StopMedia()
 av_void CAvRtspServerMedia::OnStream(av_int Channel, av_int Slave, CAvPacket *AvPacket)
 {
 	
+#if 1
+	PushVideoStreamPacket(AvPacket);
+#else
 	switch (AvPacket->Comp())
 	{
 	case AvComp_AAC:
@@ -46,7 +49,7 @@ av_void CAvRtspServerMedia::OnStream(av_int Channel, av_int Slave, CAvPacket *Av
 		static av_u64 LastAudioPts = 0;
 		int InterlTime = 0;
 		if (LastAudioPts != 0){
-			InterlTime = (AvPacket->TimeStamp() - LastAudioPts) / 1000;
+			InterlTime = (int)(AvPacket->TimeStamp() - LastAudioPts) / 1000;
 			InterlTime *= (AvPacket->SampleRate()/1000);
 			InterlTime += 5;
 			InterlTime = 0;
@@ -73,6 +76,8 @@ av_void CAvRtspServerMedia::OnStream(av_int Channel, av_int Slave, CAvPacket *Av
 	default:
 		break;
 	}
+#endif
+	
 
 }
 
@@ -104,23 +109,34 @@ static CRtspMedia *createMedia(std::string url)
 	int		Slave = 0;
 	char	str[128] = {0};
 	char	temp[12];
-	sprintf(str, url.c_str());
+	sprintf(str, "%s", url.c_str());
 	int len = strlen(str);
 
 	for (int i = 0, j = 0; i < len;){
 		if (0 == strncasecmp(&str[i], "c=", 2)){
 			i += 2;
+			j = 0;
 			while (is_num(str[i])){
 				temp[j++] = str[i++];
 			}
 			temp[j] = '\0';
+			if (j == 0) {
+				av_error("Url Error\n");
+				return NULL;
+			}
+
 			Channel = atoi(temp);
 		} else if (0 == strncasecmp(&str[i], "s=", 2)){
 			i += 2;
+			j = 0;
 			while (is_num(str[i])){
 				temp[j++] = str[i++];
 			}
 			temp[j] = '\0';
+			if (j == 0) {
+				av_error("Url Error\n");
+				return NULL;
+			}
 			Slave = atoi(temp);
 		}
 		else{
@@ -128,10 +144,14 @@ static CRtspMedia *createMedia(std::string url)
 		}
 	}
 
-
+	if (Channel >= g_AvManCapture.GetAvCaptureTotal()){
+		return NULL;
+	}
 	CAvRtspServerMedia *SerMedia = NULL;
 	SerMedia = new CAvRtspServerMedia;
+	assert(SerMedia != NULL);
 	SerMedia->SetMediaInfo(Channel, Slave);
+	
 	return SerMedia;
 }
 

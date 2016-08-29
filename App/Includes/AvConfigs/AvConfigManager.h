@@ -41,6 +41,12 @@ public:
 	int ExportConfig();
 	int ImportConfig();
 
+public:
+	av_bool SetAvConfigPath(std::string &ConfPatch);
+private:
+	std::string m_ConfigFullPatch;
+	std::string m_ConfigFullPatchBu;
+
 private:
 	std::map<int, std::string> m_config_id_name;
 	std::map<std::string, CAvConfigBase*> m_config_name_confclass;

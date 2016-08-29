@@ -1,0 +1,423 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>config</title>
+	<link rel="stylesheet" href="jquery/css/jquery.ui.all.css">
+	<script src="jquery/jquery-1.9.1.min.js"></script>
+	<script src="jquery/jquery.ui.core.js"></script>
+	<script src="jquery/jquery.ui.widget.js"></script>
+	<script src="jquery/jquery.ui.mouse.js"></script>
+	<script src="jquery/jquery.ui.slider.js"></script>
+	<script src="jquery/json2.js"></script>
+	<script src="js/network.js"></script>
+	<script src="js/encode.js"></script>
+</head>
+<script  type="text/javascript">
+/*JS 关于布局*/	
+	var Color_SubTagSelected = "#6292b6";
+	var Color_SubTag = "#282d51";
+	var Color_SubTagMouseOver = "green";
+	var Color_MainTagSelected = "#405c74";
+	var Color_MainTag = "#274762";
+	
+	var idlist={"MainTag":[	{"id":"ID_BoxMainTag_Encode","listId":"ID_SubEncoderList","selected":true,
+						 				"SubTag":[	{"id":"ID_TagVedioEncode","selected":true, "ContentId":"ID_ContentVedioEnc",
+													"Initfun":InitVedioEncodeUi},
+													{"id":"ID_TagAudioEncode","selected":false,"ContentId":"ID_ContentAudioEnc"},
+													{"id":"ID_TagAIParam","selected":false,"ContentId":"ID_ContentAIParam","Initfun":InitVedioCaptureUi}
+												 ]
+							},
+							{
+							 "id":"ID_BoxMainTag_SysSet","listId":"ID_SubSysBaseInfo","selected":false,
+										"SubTag":[	{"id":"ID_TagSysBaseInfo","selected":false},
+													{"id":"ID_TagSysUsrManage","selected":false}
+												 ]
+							},
+							{
+							 "id":"ID_BoxMainTag_NetSet","listId":"ID_SubNetInfo","selected":false,
+										"SubTag":[{"id":"ID_TagNetBaseInfo","selected":false}]
+							}
+						]};
+				
+	function FiliterSubUiStart()
+	{
+		//alert("ui start");
+		for(var i = 0; i < idlist.MainTag.length;i++){
+			for(var j = 0; j < idlist.MainTag[i].SubTag.length;j++){
+				if(true == idlist.MainTag[i].SubTag[j].selected){
+					if(null != idlist.MainTag[i].SubTag[j].ContentId
+					&& null != idlist.MainTag[i].SubTag[j].Initfun){
+						idlist.MainTag[i].SubTag[j].Initfun();
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	function FlushMenuBox()
+	{
+		for(var i = 0; i < idlist.MainTag.length;i++){
+			if(true == idlist.MainTag[i].selected){
+				document.getElementById(idlist.MainTag[i].id).style.background=Color_MainTagSelected;
+				document.getElementById(idlist.MainTag[i].listId).style.display="block";
+			}else{
+				document.getElementById(idlist.MainTag[i].id).style.background=Color_MainTag;
+				document.getElementById(idlist.MainTag[i].listId).style.display="none";
+			}
+			for(var j = 0; j < idlist.MainTag[i].SubTag.length;j++){
+				if(true == idlist.MainTag[i].SubTag[j].selected){
+					//alert(idlist.MainTag[i].SubTag[j].id +"    " +idlist.MainTag[i].SubTag[j].ContentId);
+					document.getElementById(idlist.MainTag[i].SubTag[j].id).style.background=Color_SubTagSelected;
+					if(null != idlist.MainTag[i].SubTag[j].ContentId){					
+						document.getElementById(idlist.MainTag[i].SubTag[j].ContentId).style.display = "block";
+					}
+					
+				}else{
+					//alert(idlist.MainTag[i].SubTag[j].id +"    " +idlist.MainTag[i].SubTag[j].ContentId);
+					document.getElementById(idlist.MainTag[i].SubTag[j].id).style.background=Color_SubTag;	
+					if(null != idlist.MainTag[i].SubTag[j].ContentId){	
+						//alert("111");
+						//alert(idlist.MainTag[i].SubTag[j].ContentId);
+						document.getElementById(idlist.MainTag[i].SubTag[j].ContentId).style.display = "none";
+					}
+				}
+			}
+		}
+	}
+	var data = {"Header":{"Action":"RePly","Method":"GetVideoEncodeCaps","Session":"24678","Status":"OK"},"Param":{"Bitctrl":["CBR","VBR"],"Channel":0,"Compress":["H264","H265","MJPEG"],"MaxBitRate":8192,"MaxGop":100,"MaxQLevel":4,"Maxframerate":30,"MinBitRate":512,"MinGop":10,"MinQLevel":0,"Minframerate":1,"Resolution":["1920*1080","1280*960","1280*720"],"Slave":0}};
+	$(function() {
+		FlushMenuBox();
+		InitVedioEncodeUi();
+	});
+	
+	function ResetLastSelected()
+	{
+		for(var i = 0; i < idlist.MainTag.length;i++){
+			if(true == idlist.MainTag[i].selected){
+				idlist.MainTag[i].selected = false;
+				for(var j = 0; j < idlist.MainTag[i].SubTag.length;j++){
+					if(true == idlist.MainTag[i].SubTag[j].selected){
+						idlist.MainTag[i].SubTag[j].selected = false;
+						return ;
+					}
+				}
+			}
+		}
+	}
+
+	function SetObjdisplayBlock(obj) {
+		var i = 0;
+		ResetLastSelected();
+		for(i = 0; i < idlist.MainTag.length;i++){
+			if(idlist.MainTag[i].id == obj.id){
+				idlist.MainTag[i].selected = true;
+				idlist.MainTag[i].SubTag[0].selected = true;
+				break;
+			}
+		}
+		FlushMenuBox();
+	}
+	
+	function OnclickEventSubTag(obj)
+	{	
+		for(var i = 0; i < idlist.MainTag.length;i++){
+			if(true == idlist.MainTag[i].selected){
+				for(var j = 0; j < idlist.MainTag[i].SubTag.length;j++){
+					if(true == idlist.MainTag[i].SubTag[j].selected){
+						idlist.MainTag[i].SubTag[j].selected = false;
+					}
+					if(idlist.MainTag[i].SubTag[j].id == obj.id){
+						idlist.MainTag[i].SubTag[j].selected = true;
+					}
+				}
+				break;
+			}
+		}
+		FlushMenuBox();
+		FiliterSubUiStart();
+	}
+	
+	function OnmouseOverEventSubTag(obj)
+	{
+		obj.style.background=Color_SubTagMouseOver;
+	}
+	
+	function OnmouseOutEventSubTag(obj)
+	{
+		for(var i = 0; i < idlist.MainTag.length;i++){
+			if(true == idlist.MainTag[i].selected){
+				for(var j = 0; j < idlist.MainTag[i].SubTag.length;j++){
+					if(idlist.MainTag[i].SubTag[j].id == obj.id){
+						if(idlist.MainTag[i].SubTag[j].selected == true){
+							obj.style.background=Color_SubTagSelected;
+						}else{
+							obj.style.background=Color_SubTag;
+						}
+						return ;
+					}
+				}
+			}
+		}
+	}
+	function VedioEncodeSubmit()
+	{
+		SetVedioEncodeConfig(0,0);
+		SetVedioEncodeConfig(0,1);
+	}
+</script>
+<style type="text/css">
+ /*页面*/
+ *{
+  -moz-user-select:none;/*火狐*/
+  -webkit-user-select:none;/*webkit浏览器*/
+  -ms-user-select:none;/*IE10*/
+  -khtml-user-select:none;/*早期浏览器*/
+  user-select:none;
+}
+
+ *{margin:0px;padding:0px;}
+  html,body{width:100%;height:100%;margin:0px;padding:0px; background:#151c39;}
+  #ID_INDEX_HEAD{background:#2B4458;
+				height:50px;
+				top:0px;
+				position:absolute;
+				left:0px;right:0px;
+				border-bottom:1px outset  #00BFFF;
+				} 	
+  .navLi{
+		float:right;
+		list-style:none;
+		width:100px;
+		height:50px;
+		border-left:1px outset   #00BFFF;
+		text-align:center;
+		line-height: 50px;
+		font-family:verdana;font-size:80%;color:#F8F8FF;
+	}
+	.navLi:hover{ background-color:#405c74;}
+	#ID_CfgBox{
+		width:900px;
+		height:500px;
+		background:#405c74;
+		margin-top:50px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	 #ID_BoxLeft{width:210px; background:#274762; height: 450px;  float:left} 
+	 #ID_BoxMidle{width:690px; background:#6292b6;; height: 450px; margin-left:210px;} 
+	 #ID_BoxBottom{width:900px; background:#2B4458; height: 50px;} 
+	 .boxMainTag{
+		list-style:none;
+		width:210px;
+		height:auto;
+		text-align:center;
+		line-height: 50px;
+		font-family:verdana;
+		font-size:14px;
+		color:#F8F8FF;
+		border-bottom:1px outset  #00BFFF;
+	 }
+	 .boxMainTag:hover{ background-color:#405c74;}
+	 .boxSubTag{
+		background: #282d51;
+		width:210px;
+		height:auto;
+		text-align:center;
+		line-height: 30px;
+		font-family:verdana;
+		font-size:14px;
+		color:#F8F8FF;
+	 }
+	 /*.boxSubTag:hover{ background-color:green;}*/
+	 .boxSubTable{
+		display:none;
+	 }
+	 .boxMidleContent{
+		display:none;
+	 }
+	 .boxMidleFontDiv{
+		width:40%;
+		height:20px;
+		text-align:right;
+		line-height: 20px;
+		font-family:verdana;
+		font-size:14px;
+		color:#F8F8FF;
+		float:left;
+		margin-top:5px;
+	 }
+	 .boxMidleUiDiv{
+		width:50%;
+		height:20px;
+		text-align:left;
+		line-height: 20px;
+		float:right;
+		margin-top:5px;
+	 }	 
+	 .boxMidleUiCheckbox{
+	 	width:24%;
+		height:20px;
+		text-align:left;
+		line-height: 20px;
+		float:left;
+		margin-top:5px;
+	 }
+	 .boxMidleUiSingleDiv{
+		width:100px;
+		height:20px;
+		text-align:left;
+		line-height: 20px;
+		margin-top:5px;
+	 }	 
+	 .boxMidleUiHeadNbspLine{
+		width:100%;
+		height:20px;
+		text-align:center;
+		line-height: 50px;
+		font-family:verdana;
+		font-size:16px;
+		color:#F8F8FF;	 
+	 }
+	 
+	 .boxMidleUiSubmitButtonRight{
+		width:70px;
+		height:30px;
+		margin-left:80%;
+		background:#274762;
+		color:#ffffff;
+		border:1px outset #274762;
+	 }
+	.boxMidleUiSubmitButtonMidle{
+		width:70px;
+		height:30px;
+		margin-left:40%;
+		background:#274762;
+		color:#ffffff;
+		border:1px outset #274762;
+	 } 
+	 
+	 #ID_VedioEncodeMainHead,#ID_VedioEncodeSubHead{
+		width:100%;
+		height:50px;
+		text-align:center;
+		line-height: 50px;
+		font-family:verdana;
+		font-size:16px;
+		color:#F8F8FF;
+	 } 
+	 
+	 
+ </style>
+
+<body width="100%" height="100%">
+	<div id="ID_INDEX_HEAD" >
+		<ul>
+			<li class="navLi" onclick="self.location='login.html'">退出</li>
+			<li class="navLi" onclick="self.location='index.html'">视频预览</li>
+		</ul>
+	</div>
+	<div id="ID_CfgBox">
+		<div id="ID_BoxLeft">
+			<ul style="height: auto;">
+				<li style="list-style:none;">
+					<div class="boxMainTag" id="ID_BoxMainTag_Encode" onclick="SetObjdisplayBlock(this)">编码参数</div>
+					<div id="ID_SubEncoderList" class="boxSubTable">
+						<div class="boxSubTag" id="ID_TagVedioEncode" onclick="OnclickEventSubTag(this)" onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">视频编码</div>
+						<div class="boxSubTag" id="ID_TagAudioEncode" onclick="OnclickEventSubTag(this)" onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">音频编码</div>
+						<div class="boxSubTag" id="ID_TagAIParam" onclick="OnclickEventSubTag(this)" onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">采集参数</div>						
+					</div>
+				</li>
+				<li style="list-style:none;">
+					<div class="boxMainTag" id="ID_BoxMainTag_SysSet" onclick="SetObjdisplayBlock(this)">系统设置</div>
+					<div id="ID_SubSysBaseInfo" class="boxSubTable">
+						<div class="boxSubTag" id="ID_TagSysBaseInfo" onclick="OnclickEventSubTag(this)"  onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">基本信息</div>
+						<div class="boxSubTag" id="ID_TagSysUsrManage" onclick="OnclickEventSubTag(this)"  onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">用户管理</div>
+					</div>
+				</li>
+				<li style="list-style:none;">
+					<div class="boxMainTag" id="ID_BoxMainTag_NetSet" onclick="SetObjdisplayBlock(this)" >网络设置</div>
+					<div id="ID_SubNetInfo" class="boxSubTable">
+						<div class="boxSubTag" id="ID_TagNetBaseInfo" onclick="OnclickEventSubTag(this)"  onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">基本信息</div>
+					</div>
+				</li>				
+			<ul>
+		</div>
+		<div id="ID_BoxMidle">
+			<div class = "boxMidleContent" id="ID_ContentVedioEnc">
+			<!--	<table style="width:100%;height:400px;">
+					<tr>
+						<td width="50%" style="background:red;"></td>
+						<td style="background:blue;"></td>
+					</tr>
+					<tr>
+						<td width="50%" style="background:red;"></td>
+						<td style="background:blue;"></td>
+					</tr>
+					<tr>
+						<td width="50%" style="background:red;"></td>
+						<td style="background:blue;"></td>
+					</tr>					
+				</table>< -->
+			<div style="width:50%;height:300px; float:left;">
+				<div id="ID_VedioEncodeMainHead">主码流配置</div>
+				<div class="boxMidleFontDiv" >码流类型:</div>
+				<select class="boxMidleUiDiv" id="ID_Chn0Stream0Compress"></select>
+				<div class="boxMidleFontDiv">分辨率:</div>
+				<select class="boxMidleUiDiv"  id="ID_Chn0Stream0Reslution"></select>
+				<div class="boxMidleFontDiv">帧率:</div>
+				<select class="boxMidleUiDiv"  id="ID_Chn0Stream0Fps"></select>
+				<div class="boxMidleFontDiv">I帧间隔:</div>
+				<select class="boxMidleUiDiv"  id="ID_Chn0Stream0Gop"></select>
+				<div class="boxMidleFontDiv">码流模式:</div>
+				<select class="boxMidleUiDiv" id="ID_Chn0Stream0BitCtrlMode"></select>
+				<div class="boxMidleFontDiv">画质:</div>
+				<select class="boxMidleUiDiv" id="ID_Chn0Stream0Quility"></select>
+				<div class="boxMidleFontDiv">码率:</div>
+				<input class="boxMidleUiDiv" value="8192" id="ID_Chn0Stream0BitRate"/>
+			</div>
+			<div style="width:10%;height:300px;float:right;">
+			</div>
+			<div style="width:40%;height:300px;float:right;">
+				<div id="ID_VedioEncodeMainHead">子码流配置</div>
+				<div class="boxMidleFontDiv" >码流类型:</div>
+				<select class="boxMidleUiDiv" id="ID_Chn0Stream1Compress"></select>
+				<div class="boxMidleFontDiv">分辨率:</div>
+				<select class="boxMidleUiDiv" id="ID_Chn0Stream1Reslution"></select>
+				<div class="boxMidleFontDiv">帧率:</div>
+				<select class="boxMidleUiDiv"  id="ID_Chn0Stream1Fps"></select>
+				<div class="boxMidleFontDiv">I帧间隔:</div>
+				<select class="boxMidleUiDiv" id="ID_Chn0Stream1Gop"></select>
+				<div class="boxMidleFontDiv">码流模式:</div>
+				<select class="boxMidleUiDiv" id="ID_Chn0Stream1BitCtrlMode"></select>
+				<div class="boxMidleFontDiv">画质:</div>
+				<select class="boxMidleUiDiv" id="ID_Chn0Stream1Quility"></select>
+				<div class="boxMidleFontDiv">码率:</div>
+				<input class="boxMidleUiDiv" value="8192" id="ID_Chn0Stream1BitRate"/>
+			</div>
+			<input type="button" class="boxMidleUiSubmitButtonRight" onclick="VedioEncodeSubmit()" value="提交"/>
+			</div>
+			<div class = "boxMidleContent" id="ID_ContentAudioEnc">
+			</div>
+			<div class = "boxMidleContent" id="ID_ContentAIParam">
+				<div style="width:50%;height:170px; float:left;">
+					<div class="boxMidleUiHeadNbspLine"></div>
+					<div class="boxMidleFontDiv">水平翻转:</div>
+					<input class="boxMidleUiCheckbox" value="0" id="ID_VedioCaptureHorreverse" type="checkbox"/>
+					<div class="boxMidleFontDiv">垂直翻转:</div>
+					<input class="boxMidleUiCheckbox" value="1" id="ID_VedioCaptureVerreverse" type="checkbox"/>
+					<div class="boxMidleFontDiv" >电源频率:</div>
+					<select class="boxMidleUiDiv" id="ID_PowerFrequency"></select>
+					<div class="boxMidleFontDiv">色彩模式:</div>
+					<select class="boxMidleUiDiv"  id="ID_IRcut"></select>
+					<!-- ><div class="boxMidleFontDiv">白平衡:</div>
+					<select class="boxMidleUiDiv"  id="ID_WhiteBlance"></select> <-->
+				</div>
+				<input  class="boxMidleUiSubmitButtonMidle" type="button" onclick="SetVedioCapture(0,0)" value="提交"/>
+			</div>
+		</div>
+		<div id="ID_BoxBottom"></div>
+	</div>
+</body>	
+</html>

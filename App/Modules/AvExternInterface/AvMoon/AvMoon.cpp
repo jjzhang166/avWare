@@ -499,9 +499,7 @@ int CAvMoon::LocalGetCaptureCaps(C_CaptureCaps &CaptureCaps)
 	if (CaptureInCaps.VideoReverseMask & AvMask(VIDEOREVERSE_VER)){
 		CaptureCaps.MirrorMask |= ProtoMask(MirrorMode_VER);
 	}
-	if (CaptureInCaps.VideoReverseMask & AvMask(VIDEOREVERSE_90)){
-		CaptureCaps.MirrorMask |= ProtoMask(MirrorMode_HALFMIRROR);
-	}
+
 
 	if (CaptureInCaps.ExposureMask & AvMask(AvExposureMode_AUTO)){
 		CaptureCaps.ExposureMask |= ProtoMask(ExposureMode_AUTO);
@@ -558,7 +556,7 @@ int CAvMoon::LocalGetCaptureProfile(C_CaptureProfile &CaptureProfile)
 	CAvConfigCapture ConfigCapture;
 	ConfigCapture.Update(CaptureProfile.Channel);
 	ConfigCaptureFormats &Formats = ConfigCapture.GetConfig(CaptureProfile.Channel);
-	switch (Formats.AntiFlckerMode)
+	switch (Formats.AntiFlckerAttr.mode)
 	{
 	case AvAntiFlckerMode_INDOOR_50HZ:
 		CaptureProfile.AntiFlcker = AntiFlckerMode_INDOOR_50HZ;
@@ -598,7 +596,7 @@ int CAvMoon::LocalGetCaptureProfile(C_CaptureProfile &CaptureProfile)
 		break;
 	}
 
-	switch (Formats.ExposureMode)
+	switch (Formats.ExposureAttr.mode)
 	{
 	case AvExposureMode_AUTO:
 		CaptureProfile.Exposure = ExposureMode_AUTO;
@@ -614,7 +612,7 @@ int CAvMoon::LocalGetCaptureProfile(C_CaptureProfile &CaptureProfile)
 		break;
 	}
 
-	switch (Formats.WhiteBalanceMode)
+	switch (Formats.WhiteBalanceAttr.mode)
 	{
 	case AvWhiteBalanceMode_OFF:
 		CaptureProfile.WhiteBalance = WhiteBalanceMode_OFF;
@@ -647,17 +645,16 @@ int CAvMoon::LocalGetCaptureProfile(C_CaptureProfile &CaptureProfile)
 		break;
 	}
 
-	if (Formats.Reverse90 == av_true){
+
+	if (Formats.ReverseAttr.bMirror == av_true){
 		CaptureProfile.MirrorMaskValue |= ProtoMask(MirrorMode_HALFMIRROR);
 	}
-	if (Formats.ReverseHor == av_true){
+	if (Formats.ReverseAttr.bFilp == av_true){
 		CaptureProfile.MirrorMaskValue |= ProtoMask(MirrorMode_HOR);
 	}
-	if (Formats.ReverseVer == av_true){
-		CaptureProfile.MirrorMaskValue |= ProtoMask(MirrorMode_VER);
-	}
 
-	switch (Formats.IrCutMode)
+
+	switch (Formats.IrCutAttr.mode)
 	{
 	case IRCUT_OPEN:
 		CaptureProfile.IrCut = IrCutMode_OPEN;
@@ -670,6 +667,8 @@ int CAvMoon::LocalGetCaptureProfile(C_CaptureProfile &CaptureProfile)
 		break;
 	case IRCUT_TIMER:
 		CaptureProfile.IrCut = IrCutMode_TIMER;
+		CaptureProfile.IrCutTimer.start = Formats.IrCutAttr.tOpen;
+		CaptureProfile.IrCutTimer.end = Formats.IrCutAttr.tClose;
 			break;
 	default:
 		break;
@@ -688,37 +687,37 @@ int CAvMoon::LocalSetCaptureProfile(C_CaptureProfile &CaptureProfile)
 	switch (CaptureProfile.AntiFlcker)
 	{
 	case AntiFlckerMode_INDOOR_50HZ:
-		Formats.AntiFlckerMode = AvAntiFlckerMode_INDOOR_50HZ;
+		Formats.AntiFlckerAttr.mode = AvAntiFlckerMode_INDOOR_50HZ;
 		break;
 	case AntiFlckerMode_OUTDOOR_50HZ:
-		Formats.AntiFlckerMode = AvAntiFlckerMode_OUTDOOR_50HZ;
+		Formats.AntiFlckerAttr.mode = AvAntiFlckerMode_OUTDOOR_50HZ;
 		break;
 	case AntiFlckerMode_AUTO_50HZ:
-		Formats.AntiFlckerMode = AvAntiFlckerMode_AUTO_50HZ;
+		Formats.AntiFlckerAttr.mode = AvAntiFlckerMode_AUTO_50HZ;
 		break;
 	case AntiFlckerMode_INDOOR_60HZ:
-		Formats.AntiFlckerMode = AvAntiFlckerMode_INDOOR_60HZ;
+		Formats.AntiFlckerAttr.mode = AvAntiFlckerMode_INDOOR_60HZ;
 		break;
 	case AntiFlckerMode_OUTDOOR_60HZ:
-		Formats.AntiFlckerMode = AvAntiFlckerMode_OUTDOOR_60HZ;
+		Formats.AntiFlckerAttr.mode = AvAntiFlckerMode_OUTDOOR_60HZ;
 		break;
 	case AntiFlckerMode_AUTO_60HZ:
-		Formats.AntiFlckerMode = AvAntiFlckerMode_AUTO_60HZ;
+		Formats.AntiFlckerAttr.mode = AvAntiFlckerMode_AUTO_60HZ;
 		break;
 	case AntiFlckerMode_THEATER_50HZ:
-		Formats.AntiFlckerMode = AvAntiFlckerMode_THEATER_50HZ;
+		Formats.AntiFlckerAttr.mode = AvAntiFlckerMode_THEATER_50HZ;
 		break;
 	case AntiFlckerMode_FAST_50HZ:
-		Formats.AntiFlckerMode = AvAntiFlckerMode_FAST_50HZ;
+		Formats.AntiFlckerAttr.mode = AvAntiFlckerMode_FAST_50HZ;
 		break;
 	case AntiFlckerMode_THEATER_60HZ:
-		Formats.AntiFlckerMode = AvAntiFlckerMode_THEATER_60HZ;
+		Formats.AntiFlckerAttr.mode = AvAntiFlckerMode_THEATER_60HZ;
 		break;
 	case AntiFlckerMode_FAST_60HZ:
-		Formats.AntiFlckerMode = AvAntiFlckerMode_FAST_60HZ;
+		Formats.AntiFlckerAttr.mode = AvAntiFlckerMode_FAST_60HZ;
 		break;
 	case AntiFlckerMode_ANTI_FLICKER_CLOSED:
-		Formats.AntiFlckerMode = AvAntiFlckerMode_ANTI_FLICKER_CLOSED;
+		Formats.AntiFlckerAttr.mode = AvAntiFlckerMode_ANTI_FLICKER_CLOSED;
 		break;
 
 	default:
@@ -728,13 +727,14 @@ int CAvMoon::LocalSetCaptureProfile(C_CaptureProfile &CaptureProfile)
 	switch (CaptureProfile.Exposure)
 	{
 	case ExposureMode_AUTO:
-		Formats.ExposureMode = AvExposureMode_AUTO;
+		Formats.ExposureAttr.mode = AvExposureMode_AUTO;
 		break;
 	case ExposureMode_MANUAL:
-		Formats.ExposureMode = AvExposureMode_MANUAL;
+		Formats.ExposureAttr.mode = AvExposureMode_MANUAL;
+		Formats.ExposureAttr.min = CaptureProfile.ExposureValue;
 		break;
 	case ExposureMode_TRAFFIC:
-		Formats.ExposureMode = AvExposureMode_TRAFFIC;
+		Formats.ExposureAttr.mode = AvExposureMode_TRAFFIC;
 		break;
 
 	default:
@@ -744,68 +744,70 @@ int CAvMoon::LocalSetCaptureProfile(C_CaptureProfile &CaptureProfile)
 	switch (CaptureProfile.WhiteBalance)
 	{
 	case WhiteBalanceMode_OFF:
-		Formats.WhiteBalanceMode = AvWhiteBalanceMode_OFF;
+		Formats.WhiteBalanceAttr.mode = AvWhiteBalanceMode_OFF;
 		break;
 	case WhiteBalanceMode_AUTO:
-		Formats.WhiteBalanceMode = AvWhiteBalanceMode_AUTO;
+		Formats.WhiteBalanceAttr.mode = AvWhiteBalanceMode_AUTO;
 		break;
 	case WhiteBalanceMode_DAYTIME:
-		Formats.WhiteBalanceMode = AvWhiteBalanceMode_DAYTIME;
+		Formats.WhiteBalanceAttr.mode = AvWhiteBalanceMode_DAYTIME;
 		break;
 	case WhiteBalanceMode_EVENING:
-		Formats.WhiteBalanceMode = AvWhiteBalanceMode_EVENING;
+		Formats.WhiteBalanceAttr.mode = AvWhiteBalanceMode_EVENING;
 		break;
 	case WhiteBalanceMode_CLOUDY:
-		Formats.WhiteBalanceMode = AvWhiteBalanceMode_CLOUDY;
+		Formats.WhiteBalanceAttr.mode = AvWhiteBalanceMode_CLOUDY;
 		break;
 	case WhiteBalanceMode_OFFICE:
-		Formats.WhiteBalanceMode = AvWhiteBalanceMode_OFFICE;
+		Formats.WhiteBalanceAttr.mode = AvWhiteBalanceMode_OFFICE;
 		break;
 	case WhiteBalanceMode_FLUORESCENT:
-		Formats.WhiteBalanceMode = AvWhiteBalanceMode_FLUORESCENT;
+		Formats.WhiteBalanceAttr.mode = AvWhiteBalanceMode_FLUORESCENT;
 		break;
 	case WhiteBalanceMode_INCANDESCENT:
-		Formats.WhiteBalanceMode = AvWhiteBalanceMode_INCANDESCENT;
+		Formats.WhiteBalanceAttr.mode = AvWhiteBalanceMode_INCANDESCENT;
 		break;
 	case WhiteBalanceMode_MANUAL:
-		Formats.WhiteBalanceMode = AvWhiteBalanceMode_MANUAL;
+		Formats.WhiteBalanceAttr.mode = AvWhiteBalanceMode_MANUAL;
 		break;
 	default:
 		break;
 	}
 
 	if (CaptureProfile.MirrorMaskValue & ProtoMask(MirrorMode_HALFMIRROR)){
-		Formats.Reverse90 = av_true;
+		Formats.RotateAttr.mode = VIDEOROTATE_90;
 	}
 	else{
-		Formats.Reverse90 = av_false;
+		Formats.RotateAttr.mode = VIDEOROTATE_0;
 	}
 	if (CaptureProfile.MirrorMaskValue & ProtoMask(MirrorMode_HOR)){
-		 Formats.ReverseHor = av_true;
+		 Formats.ReverseAttr.bMirror = av_true;
 	}
 	else{
-		Formats.ReverseHor = av_false;
+		Formats.ReverseAttr.bMirror = av_false;
 	}
 	if (CaptureProfile.MirrorMaskValue & ProtoMask(MirrorMode_VER)){
-		Formats.ReverseVer = av_true;
+		Formats.ReverseAttr.bFilp = av_true;
 	}
 	else{
-		Formats.ReverseVer = av_false;
+		Formats.ReverseAttr.bMirror = av_false;
 	}
 
 	switch (CaptureProfile.IrCut)
 	{
 	case IrCutMode_OPEN :
-		Formats.IrCutMode = IRCUT_OPEN;
+		Formats.IrCutAttr.mode = IRCUT_OPEN;
 		break;
 	case IrCutMode_CLOSE:
-		Formats.IrCutMode = IRCUT_CLOSE ;
+		Formats.IrCutAttr.mode = IRCUT_CLOSE;
 		break;
 	case IrCutMode_AUTO:
-		Formats.IrCutMode = IRCUT_AUTO ;
+		Formats.IrCutAttr.mode = IRCUT_AUTO;
 		break;
 	case IrCutMode_TIMER:
-		Formats.IrCutMode = IRCUT_TIMER ;
+		Formats.IrCutAttr.mode = IRCUT_TIMER;
+		Formats.IrCutAttr.tOpen = CaptureProfile.IrCutTimer.start;
+		Formats.IrCutAttr.tClose = CaptureProfile.IrCutTimer.end;
 		break;
 	default:
 		break;
@@ -1264,7 +1266,7 @@ int CAvMoon::LocalGetNetWorkProfile(C_NetWorkProfile &NetWorkProfile)
 	NetComm.Update();
 	ConfigNetComm &ConfigNet = NetComm.GetConfig(NetCommT_Lan0);
 	sprintf(NetWorkProfile.Ipv4, "%s", ConfigNet.LanAttr.IpAddr);
-	sprintf(NetWorkProfile.Ipv6, "");
+	sprintf(NetWorkProfile.Ipv6, "%s", "");
 	sprintf(NetWorkProfile.GateWay, "%s", ConfigNet.LanAttr.Gateway);
 	sprintf(NetWorkProfile.DnsI, "%s", ConfigNet.LanAttr.Dns1);
 	sprintf(NetWorkProfile.DnsII, "%s", ConfigNet.LanAttr.Dns2);
@@ -1286,7 +1288,6 @@ int CAvMoon::LocalSetNetWorkProfile(C_NetWorkProfile &NetWorkProfile)
 	CAvConfigNetComm NetComm;
 	NetComm.Update();
 	
-	E_NetComm_Type NetCom;
 	switch (NetWorkProfile.NetDev)
 	{
 	case NetWorkDev_LINK:
@@ -1329,7 +1330,7 @@ int CAvMoon::LocalSetNetWorkProfile(C_NetWorkProfile &NetWorkProfile)
 
 int CAvMoon::LocalGetManufacturerInfo(C_ManufacturerInfo &FacInfo)
 {
-	av_msg("%s\n", __FUNCTION__);
+	
 	C_DspCaps DspCaps;
 	CAvDevice::GetDspCaps(DspCaps);
 	C_DeviceFactoryInfo DeviceFacInfo;
@@ -1341,13 +1342,136 @@ int CAvMoon::LocalGetManufacturerInfo(C_ManufacturerInfo &FacInfo)
 	sprintf(FacInfo.FacManufacturer, "%s", DeviceFacInfo.FactoryName);
 	sprintf(FacInfo.FacProductionSerialNo, "%s", DeviceFacInfo.SerialNumber);
 
-	FacInfo.FacChip = (Chip)0xff;
-	FacInfo.FacSenSor = (Sensor)0xff;
+	//FacInfo.FacChip = (Chip)0xff;
+	//FacInfo.FacSenSor = (Sensor)0xffffffff;
+	switch (DeviceFacInfo.SensorType)
+	{
+	case AvSensor_OV9712:
+		FacInfo.FacSenSor = Sensor_OV9712;
+		break;
+	case AvSensor_OV4689:
+		FacInfo.FacSenSor = Sensor_OV4689;
+		break;
+	case AvSensor_OV5658:
+		FacInfo.FacSenSor = Sensor_OV5658;
+		break;
+	case AvSensor_AR0130:
+		FacInfo.FacSenSor = Sensor_AR0130;
+		break;
+	case AvSensor_AR0330:
+		FacInfo.FacSenSor = Sensor_AR0330;
+		break;
+	case AvSensor_AR0237:
+		FacInfo.FacSenSor = Sensor_AR0130;
+		break;
+	case AvSensor_IMX138:
+			FacInfo.FacSenSor = Sensor_IMX122;
+			break;
+		case AvSensor_IMX122:
+			FacInfo.FacSenSor = Sensor_IMX122;
+			break;
+		case AvSensor_IMX236:
+			FacInfo.FacSenSor = Sensor_IMX322;
+			break;
+		case AvSensor_IMX178:
+			FacInfo.FacSenSor = Sensor_IMX178;
+			break;
+		case AvSensor_IMX185:
+			FacInfo.FacSenSor = Sensor_IMX178;
+			break;
+		case AvSensor_IMX117:
+			FacInfo.FacSenSor = Sensor_IMX178;
+			break;
+		case AvSensor_IMX123:
+			FacInfo.FacSenSor = Sensor_IMX122;
+			break;
+		case AvSensor_BT1120:
+			FacInfo.FacSenSor = Sensor_IMX322;
+			break;
+		case AvSensor_BT656:
+			FacInfo.FacSenSor = Sensor_IMX322;
+			break;
+	default:
+		assert(0);
+		break;
+	}
+	switch (DeviceFacInfo.ChipType)
+	{
+	case AvChip_S2L22M:
+		FacInfo.FacChip = Chip_IPC_A22M;
+		break;
+	case AvChip_S2L33M:
+		FacInfo.FacChip = Chip_IPC_A33M;
+		break;
+	case AvChip_S2L55M:
+		FacInfo.FacChip = Chip_IPC_A55M;
+		break;
+	case AvChip_S2L65:
+		FacInfo.FacChip = Chip_IPC_A65;
+		break;
+	case AvChip_S2L66:
+		FacInfo.FacChip = Chip_IPC_A66;
+		break;
+	case AvChip_H18EV100:
+		FacInfo.FacChip = Chip_IPC_H18E;
+		break;
+	case AvChip_H18EV200:
+		FacInfo.FacChip = Chip_IPC_H18E;
+		break;
+	case AvChip_H18EV201:
+		FacInfo.FacChip = Chip_IPC_H18E;
+		break;
+	case AvChip_H18C:
+		FacInfo.FacChip = Chip_IPC_H18C;
+		break;
+	case AvChip_H18A:
+		FacInfo.FacChip = Chip_IPC_H18A;
+		break;
+	case AvChip_H16CV100:
+		FacInfo.FacChip = Chip_IPC_H16C;
+		break;
+	case AvChip_H16CV200:
+		FacInfo.FacChip = Chip_IPC_H16C;
+		break;
+	case AvChip_H16A:
+		FacInfo.FacChip = Chip_IPC_H16A;
+		break;
+	case AvChip_H16D:
+		FacInfo.FacChip = Chip_IPC_H16D;
+		break;
+	case AvChip_H19:
+		FacInfo.FacChip = Chip_IPC_H16D;
+		break;
+	case AvChip_H20D:
+		FacInfo.FacChip = Chip_NVR_H20D;
+		break;
+	case AvChip_H35:
+		FacInfo.FacChip = Chip_NVR_H35;
+		break;
+	case AvChip_H36:
+		FacInfo.FacChip = Chip_NVR_H36;
+		break;
+	case AvChip_WIN32:
+		FacInfo.FacChip = Chip_WINDOWS_32;
+		break;
+	case AvChip_WIN64:
+		FacInfo.FacChip = Chip_WINDOWS_64;
+		break;
+	case AvChip_LIN32:
+		FacInfo.FacChip = Chip_LINUX_32;
+		break;
+	case AvChip_LIN64:
+		FacInfo.FacChip = Chip_LINUX_64;
+		break;
+	default:
+		assert(0);
+		break;
+	}
 
 	std::string guid;
 	CAvDevice::GetStartUpGuid(guid);
 	sprintf(FacInfo.ProtocolUniqueCode, "%s", guid.c_str());
-
+	av_msg("%s ProtocolUniqueCode[%s]\n", __FUNCTION__, FacInfo.ProtocolUniqueCode);
 	return 0;
 }
 int CAvMoon::LocalSetManufacturerInfo(C_ManufacturerInfo &FacInfo)
@@ -1357,13 +1481,183 @@ int CAvMoon::LocalSetManufacturerInfo(C_ManufacturerInfo &FacInfo)
 	
 	DeviceFacInfo.MaxChannel = FacInfo.ChannelMax;
 	DeviceFacInfo.FActoryTime = FacInfo.FacTime;
+
+	
+	DeviceFacInfo.SensorType = FacInfo.FacSenSor;
+	switch (FacInfo.FacSenSor)
+	{
+	case Sensor_NONE:
+		av_msg("Sensor Sensor_NONE\n");
+		DeviceFacInfo.SensorType = AvSensor_AUTO;
+		break;
+	case Sensor_OV9712:
+		av_msg("Sensor Sensor_OV9712\n");
+		DeviceFacInfo.SensorType = AvSensor_OV9712;
+		break;
+	case Sensor_AR0130:
+		av_msg("Sensor Sensor_AR0130\n");
+		DeviceFacInfo.SensorType = AvSensor_AR0130;
+		break;
+	case Sensor_MT9P006:
+		av_msg("Sensor Sensor_MT9P006\n");
+		DeviceFacInfo.SensorType = AvSensor_AR0130;
+		break;
+	case Sensor_AR0330:
+		av_msg("Sensor Sensor_AR0330\n");
+		DeviceFacInfo.SensorType = AvSensor_AR0330;
+		break;
+	case Sensor_AR0331:
+		av_msg("Sensor Sensor_AR0331\n");
+		DeviceFacInfo.SensorType = AvSensor_AR0330;
+		break;
+	case Sensor_IMX122:
+		av_msg("Sensor Sensor_IMX122\n");
+		DeviceFacInfo.SensorType = AvSensor_IMX122;
+		break;
+	case Sensor_IMX222:
+		av_msg("Sensor Sensor_IMX222\n");
+		DeviceFacInfo.SensorType = AvSensor_IMX122;
+		break;
+	case Sensor_IMX322:
+		av_msg("Sensor Sensor_IMX322\n");
+		DeviceFacInfo.SensorType = AvSensor_IMX122;
+		break;
+	case Sensor_OV4689:
+		av_msg("Sensor Sensor_OV4689\n");
+		DeviceFacInfo.SensorType = AvSensor_OV4689;
+		break;
+	case Sensor_OV5658:
+		av_msg("Sensor Sensor_OV5658\n");
+		DeviceFacInfo.SensorType = AvSensor_OV5658;
+		break;
+	case Sensor_IMX178:
+		av_msg("Sensor Sensor_IMX178\n");
+		DeviceFacInfo.SensorType = AvSensor_IMX178;
+		break;
+	case Sensor_IMX290:
+		av_msg("Sensor Auto\n");
+		DeviceFacInfo.SensorType = AvSensor_IMX236;
+		break;
+	case Sensor_LAST:
+		av_msg("Sensor Sensor_LAST -1\n");
+		DeviceFacInfo.SensorType = -1;
+		break;
+	default:
+		av_msg("Sensor default -1\n");
+		DeviceFacInfo.SensorType = -1;
+		break;
+	}
+	switch (FacInfo.FacChip)
+	{
+	case Chip_NONE:
+		av_msg("Sensor Chip_NONE\n");
+		DeviceFacInfo.ChipType = -1;
+		break; 
+	case Chip_WINDOWS_32:
+		av_msg("Sensor Chip_WINDOWS_32\n");
+		DeviceFacInfo.ChipType = AvChip_WIN32;
+		break;
+	case Chip_WINDOWS_64:
+		av_msg("Sensor Chip_WINDOWS_64\n");
+		DeviceFacInfo.ChipType = AvChip_WIN64;
+		break;
+	case Chip_LINUX_32:
+		av_msg("Sensor Chip_LINUX_32\n");
+		DeviceFacInfo.ChipType = AvChip_LIN32;
+		break;
+	case Chip_LINUX_64:
+		av_msg("Sensor Chip_LINUX_64\n");
+		DeviceFacInfo.ChipType = AvChip_LIN64;
+		break;
+	case Chip_MAC_32:
+		av_msg("Sensor Chip_MAC_32\n");
+		DeviceFacInfo.ChipType = -1;
+		break;
+	case Chip_MAC_64:
+		av_msg("Sensor Chip_MAC_64\n");
+		DeviceFacInfo.ChipType = -1;
+		break;
+	case Chip_IPC_H18E:
+		av_msg("Sensor Chip_IPC_H18E\n");
+		DeviceFacInfo.ChipType = AvChip_H18EV100;
+		break;
+	case Chip_IPC_H18C:
+		av_msg("Sensor Chip_IPC_H18C\n");
+		DeviceFacInfo.ChipType = AvChip_H18C;
+		break;
+	case Chip_IPC_H18A:
+		av_msg("Sensor Chip_IPC_H18A\n");
+		DeviceFacInfo.ChipType = AvChip_H18A;
+		break;
+	case Chip_IPC_H16C:
+		av_msg("Sensor Chip_IPC_H16C\n");
+		DeviceFacInfo.ChipType = AvChip_H16CV100;
+		break;
+	case Chip_IPC_H16A:
+		av_msg("Sensor Chip_IPC_H16A\n");
+		DeviceFacInfo.ChipType = AvChip_H16A;
+		break;
+	case Chip_IPC_H16D:
+		av_msg("Sensor Chip_IPC_H16D\n");
+		DeviceFacInfo.ChipType = AvChip_H16D;
+		break;
+	case Chip_IPC_A22M:
+		av_msg("Sensor Chip_IPC_A22M\n");
+		DeviceFacInfo.ChipType = AvChip_S2L22M;
+		break;
+	case Chip_IPC_A33M:
+		av_msg("Sensor Chip_IPC_A33M\n");
+		DeviceFacInfo.ChipType = AvChip_S2L33M;
+		break;
+	case Chip_IPC_A55M:
+		av_msg("Sensor Chip_IPC_A55M\n");
+		DeviceFacInfo.ChipType = AvChip_S2L55M;
+		break;
+	case Chip_IPC_A65:
+		av_msg("Sensor Chip_IPC_A65\n");
+		DeviceFacInfo.ChipType = AvChip_S2L65;
+		break;
+	case Chip_IPC_A66:
+		av_msg("Sensor Chip_IPC_A66\n");
+		DeviceFacInfo.ChipType = AvChip_S2L66;
+		break;
+	case Chip_NVR_H20D:
+		av_msg("Sensor Chip_NVR_H20D\n");
+		DeviceFacInfo.ChipType = AvChip_H20D;
+		break;
+	case Chip_NVR_H21:
+		av_msg("Sensor Chip_NVR_H21\n");
+		DeviceFacInfo.ChipType = AvChip_H20D;
+		break;
+	case Chip_NVR_H31:
+		av_msg("Sensor Chip_NVR_H31\n");
+		DeviceFacInfo.ChipType = AvChip_H35;
+		break;
+	case Chip_NVR_H35:
+		av_msg("Sensor Chip_NVR_H35\n");
+		DeviceFacInfo.ChipType = AvChip_H35;
+		break;
+	case Chip_NVR_H36:
+		av_msg("Sensor Chip_NVR_H36\n");
+		DeviceFacInfo.ChipType = AvChip_H36;
+		break;
+	case Chip_LAST:
+		av_msg("Sensor Chip_LAST\n");
+		DeviceFacInfo.ChipType = -1;
+		break;
+	default:
+		av_msg("Sensor default\n");
+		DeviceFacInfo.ChipType = -1;
+		break;
+	}
+
 	sprintf(DeviceFacInfo.ProductModel, "%s", FacInfo.FacProductionModel);
 	sprintf(DeviceFacInfo.HardWareVersion, "%s", FacInfo.HardWareVersion);
 	sprintf(DeviceFacInfo.FactoryName, "%s", FacInfo.FacManufacturer);
 	sprintf(DeviceFacInfo.SerialNumber, "%s", FacInfo.FacProductionSerialNo);
 	char buffer[32];
 	int bufferlen = 0;
-	for (int i = 0; i < strlen(DeviceFacInfo.SerialNumber); i++){
+	for (unsigned int i = 0; i < strlen(DeviceFacInfo.SerialNumber); i++){
 		if (bufferlen == 0 && DeviceFacInfo.SerialNumber[i] != '-') continue;
 		if (bufferlen != 0 && DeviceFacInfo.SerialNumber[i] == '-'){
 			break;
@@ -1573,7 +1867,7 @@ int CAvMoon::LocalFirmwareUpgrade(C_FirmwareUpgrade &FirmwareUpgrade)
 	av_msg("%s\n", __FUNCTION__);
 	return 0;
 }
-int CAvMoon::LocalFirmwareData(unsigned char *data, int datalen, unsigned int status, unsigned int *Progress)
+int CAvMoon::LocalFirmwareData(unsigned char *data, int datalen, unsigned int status)
 {
 	av_msg("%s\n", __FUNCTION__);
 	static int firmwarefd = -1;
@@ -1595,7 +1889,8 @@ int CAvMoon::LocalFirmwareData(unsigned char *data, int datalen, unsigned int st
 	else if (PROTO_STATUS_END == status){
 		write(firmwarefd, data, datalen);
 		close(firmwarefd);
-		CAvDevice::SystemUpgrade(FilePatch, *Progress);
+		//av_msg("Progress address *Progress %p, &Progress = %p, Progress = %p\n", *Progress, &Progress, Progress);
+		CAvDevice::SystemUpgrade(FilePatch);
 	}
 	else if (PROTO_STATUS_BEGIN == status){
 		write(firmwarefd, data, datalen);
@@ -1606,7 +1901,10 @@ int CAvMoon::LocalFirmwareData(unsigned char *data, int datalen, unsigned int st
 
 	return 0;
 }
-
+int CAvMoon::LocalFirmwareProgress()
+{
+	return CAvDevice::SystemUpgradeProgress();
+}
 int CAvMoon::LocalGetLogCaps(C_LogCaps &LogCaps)
 {
 	av_msg("%s\n", __FUNCTION__);

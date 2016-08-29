@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Cache-Control" content="no-store, must-revalidate" />
+    <meta http-equiv="expires" content="0" />
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+	<script src="components/LoginHead/jquery.js"></script>
+	<script src="components/LoginHead/vector.js"></script>
+	<script src="components/Qrcode/qrcode.js"></script>
+	<script src="jquery/jquery-1.9.1.min.js"></script>
+	<script src="jquery/jquery.ui.core.js"></script>
+	<script src="jquery/jquery.ui.widget.js"></script>
+	<script src="jquery/jquery.ui.mouse.js"></script>
+	<script src="jquery/jquery.ui.slider.js"></script>
+	<script src="jquery/json2.js"></script>
+	<script src="js/network.js"></script>
+    <title> Login </title>
+</head>	
+<style type="text/css">
+ /*页面*/
+ *{margin:0px;padding:0px;}
+  html,body{width:100%;height:100%;margin:0px;padding:0px; background:#a5bea5;}
+ /*登录界面*/
+ #ID_loginui{width:425px;height:330px;margin:auto; margin-top:120px; background:#eff3ff;}
+ #ID_LoginuiHead{width:100%;height:180px;background:#009ede;}
+ #output {width: 100%;height: 100%;}
+ .login_lable{text-align:right;width:30%;background:#405070}
+ .login_input{width:200px;height:25px;line-height:100%;color:#808080;}
+ .login_button{width:200px;height:30px;color:#fff}
+ .login_Lang{font-weight:;font-size:80%;margin-top:6px;}
+ #ID_loginbutton{background:#08a2de;border:solid 1px #08a2de}
+ /*主页*/
+ #ID_INDEX_TABLE{width:900px;height:630px;margin:auto; margin-top:0px; background:#eff3ff;}
+ #ID_INDEX_HEAD_LINE{width:720px;height:54px;background:#009ede;}
+ #ID_INDEX_HEAD_LOG{width:180px;height:54px;background:#BD0000;}
+ #ID_MIDDLE_LEFT{width:197;height:576px;background:#097867;}
+ #ID_MIDDLE_RIGHT{width:703;height:576px;background:#435268;}
+ /*左边界面*/
+ /* ul li以横排显示 所有class为menu的div中的ul样式 */
+div.INDEX_LEFT_UL ul
+{
+    list-style:none; /* 去掉ul前面的符号 */
+    margin: 0px; /* 与外界元素的距离为0 */
+    padding: 0px; /* 与内部元素的距离为0 */
+    width: auto; /* 宽度根据元素内容调整 */
+}
+/* 所有class为menu的div中的ul中的li样式 */
+div.INDEX_LEFT_UL ul li
+{
+    float:left; /* 向左漂移，将竖排变为横排 */
+}
+/* 所有class为menu的div中的ul中的a样式(包括尚未点击的和点击过的样式) */
+div.INDEX_LEFT_UL ul li a, div.menu ul li a:visited
+{
+    background-color: #465c71; /* 背景色 */
+    border: 1px #4e667d solid; /* 边框 */
+    color: #dde4ec; /* 文字颜色 */
+    display: block; /* 此元素将显示为块级元素，此元素前后会带有换行符 */
+    line-height: 1.35em; /* 行高 */
+    padding: 4px 20px; /* 内部填充的距离 */
+    text-decoration: none; /* 不显示超链接下划线 */
+    white-space: nowrap; /* 对于文本内的空白处，不会换行，文本会在在同一行上继续，直到遇到 <br> 标签为止。 */
+}
+/* 所有class为menu的div中的ul中的a样式(鼠标移动到元素中的样式) */
+div.INDEX_LEFT_UL ul li a:hover
+{
+    background-color: #bfcbd6; /* 背景色 */
+    color: #465c71; /* 文字颜色 */
+    text-decoration: none; /* 不显示超链接下划线 */
+}
+/* 所有class为menu的div中的ul中的a样式(鼠标点击元素时的样式) */
+div.INDEX_LEFT_UL ul li a:active
+{
+    background-color: #465c71; /* 背景色 */
+    color: #cfdbe6; /* 文字颜色 */
+    text-decoration: none; /* 不显示超链接下划线 */
+}
+ </style>
+ 
+<body style="display:block;" onload="OnLoad();" >
+<!-- 登录界面 -->
+<div id="ID_loginui">
+	<div id="ID_LoginuiHead"><div id="output"></div></div> 
+	<table width="100%" height="120px">
+		<tr height="10px"> </tr>
+		<tr>
+			<td width="35%">
+				<div id="ID_Qrcode" style="width:80px; height:80px; margin-left:35px;"></div>
+			</td>
+			<td>
+				<table width="100%">
+					<tr>
+					<!--	<td class="login_lable" id="usname_lable"></td> -->
+						<td width="49%" ><input id="ID_usrname" class="login_input" value="用户名" onfocus="loginUsrOnofcus(this)" maxlength="15"/></td>
+					</tr>
+					<tr height="3px"> </tr>
+					<tr>
+					<!--	<td class="login_lable" id="usname_lable"></td> </td> -->
+						<td width="49%"><input  id="ID_password" class="login_input" value="密码" onfocus="loginPassWordOnofcus(this)" maxlength="15"/></td>
+					</tr>
+					<tr height="3px"> </tr>				
+					<tr height="3px"> </tr>		
+					<tr>
+					<td><input id="ID_loginbutton" type="button" value="登录" class="login_button" onclick="login()"/></td>
+					</tr>			
+				</table>
+			</td>
+		</tr>
+	</table>
+	<div style="width:425px;height:30px;">
+	<!--	<a style="float:left;" class="login_Lang">简体中文|</a>
+		<a style="float:left;" class="login_Lang">English</a>-->
+	</div> 
+</div>
+<!-- INDEX 页面 -->
+</body>
+
+<script language="javascript" type="text/javascript">    
+var loginPort = 9008;
+var language;
+var qrcObj = document.getElementById("ID_Qrcode");
+var qrcode = new QRCode(qrcObj, {
+	width : 80,
+	height : 80,
+});
+
+
+function getFromIP() 
+{
+	var url = document.URL; 
+	//var url = "http://192.168.1.119:80/123";
+	var index;
+	var ip;
+	index = url.indexOf(".");
+	if(index  < 0){
+		return NULL; 
+	}
+	index = url.indexOf("/",index);
+	if(index  < 0){
+		return url; 
+	}
+	ip = url.substring(0,index)+"/";
+	return ip;
+}
+
+function sleep(numberMillis) 
+{ 
+   var now = new Date();
+   var exitTime = now.getTime() + numberMillis;  
+   while (true) { 
+       now = new Date(); 
+       if (now.getTime() > exitTime)    return;
+    }
+}
+
+function login()
+{
+	var strName;
+	var strPassword;
+	strName = document.getElementById("ID_usrname").value;
+	strPassword = document.getElementById("ID_password").value;
+	var msg={
+		Username:strName,
+		Password:strPassword
+	};
+	$.SetCookie("usrname",strName); 
+	$.SetCookie("password",strPassword); 
+	resp = $.sendMsg("LogIn",msg);
+	if(false == resp.success){
+	//	alert("连接失败或密码错误");
+	//	return ;
+	}
+	self.location='index.html';
+}
+
+function OnLoad()
+{
+
+}
+
+function loginUsrOnofcus(obj)
+{
+	obj.value="";
+	obj.style.color="#009ede";
+}
+function loginPassWordOnofcus(obj)
+{
+	obj.value="";
+	obj.type="password";
+	obj.style.color="#009ede";
+}
+function checkedSavePassWord(obj)
+{
+	var saveps = document.getElementById("ID_savepass_lable");
+	if(obj.checked == true){
+		saveps.style.color="#009ede";
+	}else{
+		saveps.style.color="#808080";
+	}
+}
+function getSDKstate(obj)
+{
+	var url = getFromIP();
+	url += "sdget.htm?"
+//	alert(url);
+	window.location.href=url;
+}
+function makeCode () {			
+	//qrcode.makeCode(getFromIP() );
+	qrcode.makeCode("http://www.graceport.cn/");
+}
+
+$(function(){
+	// 初始化 传入dom id
+	var victor = new Victor("ID_LoginuiHead", "output");
+	makeCode(); 
+});
+</script>
+</html>

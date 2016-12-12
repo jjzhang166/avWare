@@ -18,7 +18,7 @@
 #include "AvThread/AvTimer.h"
 #include "AvConfigs/AvConfigNetService.h"
 
-class CAvDdnsCli : public CTimer
+class CAvDdnsCli : public CAvObject
 {
 public:
 	SINGLETON_DECLARE(CAvDdnsCli);

@@ -14,75 +14,66 @@
 ******************************************************************/
 #ifndef _AVTIMER_H_
 #define _AVTIMER_H_
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "CAvObject.h"
 #include "AvThread/AvThread.h"
 #include "AvThread/AvThreadPool.h"
+#include "Apis/AvWareLibDef.h"
+/*
+default CAvTimer
+m_InterlValMSec = 0;
+m_StartRunMSec = 0;
+m_bContinual = av_true;
+m_bBigTask = av_false;
+*/
 
-
-class CTimer:public CThread
+class AVWARE_API CAvTimer:public CThread
 {
 public:
-	typedef enum{
-		OnTimeing,/*执行定时器函数中*/
-		UnOnTime,/*未到定时时间*/
-		Deleteing,/*准备销毁*/
-		UnStart,/*未开始启动定时器*/
-	}Status;
+	typedef av_void(CAvObject::*ONTIMER_PROC)(CAvTimer &Timer);
+public:
+	CAvTimer();
+	~CAvTimer();
+	SINGLETON_DECLARE(CAvTimer);
+
+	av_void SetOnTimerProc(CAvObject *Obj, ONTIMER_PROC proc);
+	av_void SetInterlvalMsec(av_u32 InterlValMSec);
+	av_void SetStartRunMSec(av_u32 StartRunMSec);
+	av_void SetContinual(av_bool bContinual = av_false);
+	av_void SetBigTask(av_bool bBigTask = av_true);
+	av_void StopTimer();
 
 public:
-	CTimer(std::string TimerName = std::string("TimerNoName"));
-	virtual ~CTimer();
-
-public:
-	friend class CTimerManage;
-	av_bool SetTimerName(std::string name);
-	std::string GetTimerName();
-	av_bool StartTimer(av_u32 InterlvalMSec, av_u32 StartRunMSec = 0, av_bool IsContinual = av_false, av_bool bAutoDestruct = av_true);
-	av_bool StopTimer();
-
-	Status  GetStatus();
-
-	virtual av_void OnTime() = 0;
-
-private:
-	av_bool StartTask();
-	void ThreadProc();
-private:
-	av_long		m_StartRunMsec;
-	av_long		m_RegisterMSec;
-	av_long		m_TmLast;
-	av_long		m_TmInterval;
-	std::string m_TimerName;
-	av_bool		m_Continual;
-	av_bool		m_bAutoDestruct;
-	Status		m_Status;
-
-};
-
-
-class CTimerManage :public CThread
-{
-public:
-	SINGLETON_DECLARE(CTimerManage);
-private:
-	~CTimerManage();
-	CTimerManage();
-public:
-	friend class CTimer;
-	av_bool TimerAdd(CTimer *pTimer);
-	av_bool TimerRemove(CTimer *pTimer);
-	av_void Dump();
-
+	static av_bool StartTimer(CAvTimer &Timer);
+	static av_bool StartTimer(av_u32 InterlValMSec, CAvObject *Obj, ONTIMER_PROC proc, av_bool bBigTask = av_false, av_u32 StartRunMSec = 0, av_bool bContinual = av_true);
+	static av_bool StopTimer(CAvTimer &Timer);
 
 	av_bool Initialize();
+	av_void Dump();
+
 private:
 	av_void ThreadProc();
-	std::list <CTimer *> m_TimerList;
-	CMutex m_MutexList;
+	av_bool m_bIsTimerManager;
+
+private:
+	ONTIMER_PROC		m_OnTimerProc;
+	CAvObject			*m_Object;
+	av_u32				 m_InterlValMSec;
+	av_u32				 m_StartRunMSec;
+	av_bool				 m_bContinual;
+	av_bool				 m_bStop;
+	av_u32				 m_TimerID;
+	av_u32				 m_TimerLast;
+	av_bool				 m_bBigTask;
+
+private:
+	static std::list<CAvTimer>		   m_TimerList;
+	static CMutex					   m_MutexList;
+
 };
 
-#define g_AvTimerManager (*CTimerManage::instance())
+#define g_AvTimer (*CAvTimer::instance())
+
 
 
 #endif

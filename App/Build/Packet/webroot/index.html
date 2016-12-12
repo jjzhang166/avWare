@@ -212,7 +212,6 @@
 	<div id="ID_INDEX_HEAD" >
 		<ul>
 			<li class="navLi" onclick="self.location='login.html'">退出</li>
-			<li class="navLi">P2P二维码</li>
 			<li class="navLi" onclick="self.location='config.html';">系统配置</li>
 		</ul>
 	</div>
@@ -316,7 +315,7 @@
 		var ip; 
 		var usrname = $.GetCookie("usrname"); 
 		var password = $.GetCookie("password"); 
-		console.log("usr="+usrname+"   pw="+password);
+		//console.log("usr="+usrname+"   pw="+password);
 		var ocx =  document.getElementById('OCX');
 		ip = GetDevIP();
 		if(ip){
@@ -332,6 +331,7 @@
 			ocx.AvAuthentication(usrname,password);
 			ocx.AvConnect(ip, 5000);
 			ocx.AvOpenStream(0,0);
+			//alert("插件加载完毕 ip="+ip);
 		}
 	});
 </script>

@@ -11,7 +11,9 @@
 	<script src="jquery/jquery.ui.slider.js"></script>
 	<script src="jquery/json2.js"></script>
 	<script src="js/network.js"></script>
+	<script src="js/common.js"></script>
 	<script src="js/encode.js"></script>
+	<script src="js/netconfig.js"></script>
 </head>
 <script  type="text/javascript">
 /*JS 关于布局*/	
@@ -21,31 +23,31 @@
 	var Color_MainTagSelected = "#405c74";
 	var Color_MainTag = "#274762";
 	
-	var idlist={"MainTag":[	{"id":"ID_BoxMainTag_Encode","listId":"ID_SubEncoderList","selected":true,
-						 				"SubTag":[	{"id":"ID_TagVedioEncode","selected":true, "ContentId":"ID_ContentVedioEnc",
+	var idlist={"MainTag":[	{"id":"ID_BoxMainTag_Encode","listId":"ID_SubEncoderList","selectype":true,
+						 				"SubTag":[	{"id":"ID_TagVedioEncode","selectype":true, "ContentId":"ID_ContentVedioEnc",
 													"Initfun":InitVedioEncodeUi},
-													{"id":"ID_TagAudioEncode","selected":false,"ContentId":"ID_ContentAudioEnc"},
-													{"id":"ID_TagAIParam","selected":false,"ContentId":"ID_ContentAIParam","Initfun":InitVedioCaptureUi}
+													{"id":"ID_TagAudioEncode","selectype":false,"ContentId":"ID_ContentAudioEnc"},
+													{"id":"ID_TagAIParam","selectype":false,"ContentId":"ID_ContentAIParam","Initfun":InitVedioCaptureUi}
 												 ]
 							},
 							{
-							 "id":"ID_BoxMainTag_SysSet","listId":"ID_SubSysBaseInfo","selected":false,
-										"SubTag":[	{"id":"ID_TagSysBaseInfo","selected":false},
-													{"id":"ID_TagSysUsrManage","selected":false}
+							 "id":"ID_BoxMainTag_SysSet","listId":"ID_SubSysBaseInfo","selectype":false,
+										"SubTag":[	{"id":"ID_TagSysBaseInfo","selectype":false,"ContentId":"ID_ContentSysBaseInfo"}
 												 ]
 							},
 							{
-							 "id":"ID_BoxMainTag_NetSet","listId":"ID_SubNetInfo","selected":false,
-										"SubTag":[{"id":"ID_TagNetBaseInfo","selected":false}]
+							 "id":"ID_BoxMainTag_NetSet","listId":"ID_SubNetInfo","selectype":false,
+										"SubTag":[	/*{"id":"ID_TagNetBaseInfo","selectype":false},*/
+													{"id":"ID_TagRtmp","selectype":false,"ContentId":"ID_ContentRtmp","Initfun":InitRtmpUi}
+												]
 							}
 						]};
 				
 	function FiliterSubUiStart()
 	{
-		//alert("ui start");
 		for(var i = 0; i < idlist.MainTag.length;i++){
 			for(var j = 0; j < idlist.MainTag[i].SubTag.length;j++){
-				if(true == idlist.MainTag[i].SubTag[j].selected){
+				if(true == idlist.MainTag[i].SubTag[j].selectype){
 					if(null != idlist.MainTag[i].SubTag[j].ContentId
 					&& null != idlist.MainTag[i].SubTag[j].Initfun){
 						idlist.MainTag[i].SubTag[j].Initfun();
@@ -56,10 +58,10 @@
 		}
 	}
 	
-	function FlushMenuBox()
+	function FlushMenuBox()//刷新所有菜单
 	{
 		for(var i = 0; i < idlist.MainTag.length;i++){
-			if(true == idlist.MainTag[i].selected){
+			if(true == idlist.MainTag[i].selectype){
 				document.getElementById(idlist.MainTag[i].id).style.background=Color_MainTagSelected;
 				document.getElementById(idlist.MainTag[i].listId).style.display="block";
 			}else{
@@ -67,39 +69,42 @@
 				document.getElementById(idlist.MainTag[i].listId).style.display="none";
 			}
 			for(var j = 0; j < idlist.MainTag[i].SubTag.length;j++){
-				if(true == idlist.MainTag[i].SubTag[j].selected){
-					//alert(idlist.MainTag[i].SubTag[j].id +"    " +idlist.MainTag[i].SubTag[j].ContentId);
+				//alert("i="+i+" j="+j);
+				//alert(idlist.MainTag[i].id);
+				//alert(idlist.MainTag[i].SubTag[j].id);
+				//alert(idlist.MainTag[i].SubTag[j].selectype);
+				if(true == idlist.MainTag[i].SubTag[j].selectype){
 					document.getElementById(idlist.MainTag[i].SubTag[j].id).style.background=Color_SubTagSelected;
 					if(null != idlist.MainTag[i].SubTag[j].ContentId){					
-						document.getElementById(idlist.MainTag[i].SubTag[j].ContentId).style.display = "block";
+						document.getElementById(idlist.MainTag[i].SubTag[j].ContentId).style.display = "block";//初始化被选中的界面
+						if(null != idlist.MainTag[i].SubTag[j].Initfun){//初始化被选中的内容参数
+							idlist.MainTag[i].SubTag[j].Initfun();
+						}
 					}
 					
 				}else{
-					//alert(idlist.MainTag[i].SubTag[j].id +"    " +idlist.MainTag[i].SubTag[j].ContentId);
 					document.getElementById(idlist.MainTag[i].SubTag[j].id).style.background=Color_SubTag;	
 					if(null != idlist.MainTag[i].SubTag[j].ContentId){	
-						//alert("111");
-						//alert(idlist.MainTag[i].SubTag[j].ContentId);
 						document.getElementById(idlist.MainTag[i].SubTag[j].ContentId).style.display = "none";
 					}
 				}
 			}
 		}
 	}
-	var data = {"Header":{"Action":"RePly","Method":"GetVideoEncodeCaps","Session":"24678","Status":"OK"},"Param":{"Bitctrl":["CBR","VBR"],"Channel":0,"Compress":["H264","H265","MJPEG"],"MaxBitRate":8192,"MaxGop":100,"MaxQLevel":4,"Maxframerate":30,"MinBitRate":512,"MinGop":10,"MinQLevel":0,"Minframerate":1,"Resolution":["1920*1080","1280*960","1280*720"],"Slave":0}};
-	$(function() {
+	
+	$(function() {//页面初始化
 		FlushMenuBox();
-		InitVedioEncodeUi();
+		//InitVedioEncodeUi();
 	});
 	
-	function ResetLastSelected()
+	function ResetLastSelected()//重置所有主菜单
 	{
 		for(var i = 0; i < idlist.MainTag.length;i++){
-			if(true == idlist.MainTag[i].selected){
-				idlist.MainTag[i].selected = false;
+			if(true == idlist.MainTag[i].selectype){
+				idlist.MainTag[i].selectype = false;
 				for(var j = 0; j < idlist.MainTag[i].SubTag.length;j++){
-					if(true == idlist.MainTag[i].SubTag[j].selected){
-						idlist.MainTag[i].SubTag[j].selected = false;
+					if(true == idlist.MainTag[i].SubTag[j].selectype){
+						idlist.MainTag[i].SubTag[j].selectype = false;
 						return ;
 					}
 				}
@@ -107,36 +112,36 @@
 		}
 	}
 
-	function SetObjdisplayBlock(obj) {
+	function SetObjdisplayBlock(obj) {//主菜单选中事件
 		var i = 0;
 		ResetLastSelected();
 		for(i = 0; i < idlist.MainTag.length;i++){
 			if(idlist.MainTag[i].id == obj.id){
-				idlist.MainTag[i].selected = true;
-				idlist.MainTag[i].SubTag[0].selected = true;
+				idlist.MainTag[i].selectype = true;
+				idlist.MainTag[i].SubTag[0].selectype = true;
 				break;
 			}
 		}
 		FlushMenuBox();
 	}
 	
-	function OnclickEventSubTag(obj)
+	function OnclickEventSubTag(obj)//二级菜单选中事件
 	{	
 		for(var i = 0; i < idlist.MainTag.length;i++){
-			if(true == idlist.MainTag[i].selected){
+			if(true == idlist.MainTag[i].selectype){
 				for(var j = 0; j < idlist.MainTag[i].SubTag.length;j++){
-					if(true == idlist.MainTag[i].SubTag[j].selected){
-						idlist.MainTag[i].SubTag[j].selected = false;
+					if(true == idlist.MainTag[i].SubTag[j].selectype){
+						idlist.MainTag[i].SubTag[j].selectype = false;
 					}
 					if(idlist.MainTag[i].SubTag[j].id == obj.id){
-						idlist.MainTag[i].SubTag[j].selected = true;
+						idlist.MainTag[i].SubTag[j].selectype = true;
 					}
 				}
 				break;
 			}
 		}
 		FlushMenuBox();
-		FiliterSubUiStart();
+		//FiliterSubUiStart();
 	}
 	
 	function OnmouseOverEventSubTag(obj)
@@ -147,10 +152,10 @@
 	function OnmouseOutEventSubTag(obj)
 	{
 		for(var i = 0; i < idlist.MainTag.length;i++){
-			if(true == idlist.MainTag[i].selected){
+			if(true == idlist.MainTag[i].selectype){
 				for(var j = 0; j < idlist.MainTag[i].SubTag.length;j++){
 					if(idlist.MainTag[i].SubTag[j].id == obj.id){
-						if(idlist.MainTag[i].SubTag[j].selected == true){
+						if(idlist.MainTag[i].SubTag[j].selectype == true){
 							obj.style.background=Color_SubTagSelected;
 						}else{
 							obj.style.background=Color_SubTag;
@@ -201,12 +206,11 @@
 		width:900px;
 		height:500px;
 		background:#405c74;
-		margin-top:50px;
 		margin-left: auto;
 		margin-right: auto;
 	}
 	 #ID_BoxLeft{width:210px; background:#274762; height: 450px;  float:left} 
-	 #ID_BoxMidle{width:690px; background:#6292b6;; height: 450px; margin-left:210px;} 
+	 #ID_BoxMidle{width:690px; background:#6292b6; height: 450px; margin-left:210px;} 
 	 #ID_BoxBottom{width:900px; background:#2B4458; height: 50px;} 
 	 .boxMainTag{
 		list-style:none;
@@ -238,7 +242,7 @@
 		display:none;
 	 }
 	 .boxMidleFontDiv{
-		width:40%;
+		width:124px;
 		height:20px;
 		text-align:right;
 		line-height: 20px;
@@ -249,7 +253,7 @@
 		margin-top:5px;
 	 }
 	 .boxMidleUiDiv{
-		width:50%;
+		width:155px;
 		height:20px;
 		text-align:left;
 		line-height: 20px;
@@ -257,7 +261,7 @@
 		margin-top:5px;
 	 }	 
 	 .boxMidleUiCheckbox{
-	 	width:24%;
+	 	width:143px;
 		height:20px;
 		text-align:left;
 		line-height: 20px;
@@ -293,6 +297,7 @@
 		width:70px;
 		height:30px;
 		margin-left:40%;
+		margin-top:20px;
 		background:#274762;
 		color:#ffffff;
 		border:1px outset #274762;
@@ -318,9 +323,10 @@
 			<li class="navLi" onclick="self.location='index.html'">视频预览</li>
 		</ul>
 	</div>
+	<div style="height:50px;"></div>
 	<div id="ID_CfgBox">
 		<div id="ID_BoxLeft">
-			<ul style="height: auto;">
+			<ul>
 				<li style="list-style:none;">
 					<div class="boxMainTag" id="ID_BoxMainTag_Encode" onclick="SetObjdisplayBlock(this)">编码参数</div>
 					<div id="ID_SubEncoderList" class="boxSubTable">
@@ -333,16 +339,16 @@
 					<div class="boxMainTag" id="ID_BoxMainTag_SysSet" onclick="SetObjdisplayBlock(this)">系统设置</div>
 					<div id="ID_SubSysBaseInfo" class="boxSubTable">
 						<div class="boxSubTag" id="ID_TagSysBaseInfo" onclick="OnclickEventSubTag(this)"  onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">基本信息</div>
-						<div class="boxSubTag" id="ID_TagSysUsrManage" onclick="OnclickEventSubTag(this)"  onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">用户管理</div>
 					</div>
 				</li>
 				<li style="list-style:none;">
 					<div class="boxMainTag" id="ID_BoxMainTag_NetSet" onclick="SetObjdisplayBlock(this)" >网络设置</div>
 					<div id="ID_SubNetInfo" class="boxSubTable">
-						<div class="boxSubTag" id="ID_TagNetBaseInfo" onclick="OnclickEventSubTag(this)"  onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">基本信息</div>
+					<!--	<div class="boxSubTag" id="ID_TagNetBaseInfo" onclick="OnclickEventSubTag(this)"  onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">基本信息</div> -->
+						<div class="boxSubTag" id="ID_TagRtmp" onclick="OnclickEventSubTag(this)"  onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">RTMP</div>
 					</div>
 				</li>				
-			<ul>
+			</ul>
 		</div>
 		<div id="ID_BoxMidle">
 			<div class = "boxMidleContent" id="ID_ContentVedioEnc">
@@ -360,7 +366,7 @@
 						<td style="background:blue;"></td>
 					</tr>					
 				</table>< -->
-			<div style="width:50%;height:300px; float:left;">
+			<div style="width:310px;height:300px; float:left;">
 				<div id="ID_VedioEncodeMainHead">主码流配置</div>
 				<div class="boxMidleFontDiv" >码流类型:</div>
 				<select class="boxMidleUiDiv" id="ID_Chn0Stream0Compress"></select>
@@ -377,9 +383,9 @@
 				<div class="boxMidleFontDiv">码率:</div>
 				<input class="boxMidleUiDiv" value="8192" id="ID_Chn0Stream0BitRate"/>
 			</div>
-			<div style="width:10%;height:300px;float:right;">
+			<div style="width:70px;height:300px;float:right;">
 			</div>
-			<div style="width:40%;height:300px;float:right;">
+			<div style="width:310px;height:300px;float:right;">
 				<div id="ID_VedioEncodeMainHead">子码流配置</div>
 				<div class="boxMidleFontDiv" >码流类型:</div>
 				<select class="boxMidleUiDiv" id="ID_Chn0Stream1Compress"></select>
@@ -399,9 +405,16 @@
 			<input type="button" class="boxMidleUiSubmitButtonRight" onclick="VedioEncodeSubmit()" value="提交"/>
 			</div>
 			<div class = "boxMidleContent" id="ID_ContentAudioEnc">
+				<div style="width:50%;height:170px; float:left;">
+					<div class="boxMidleUiHeadNbspLine"></div>
+					<div class="boxMidleFontDiv" >音频编码:</div>
+					<input class="boxMidleUiDiv" value="AAC" disabled />
+					<div class="boxMidleFontDiv">采样率:</div>
+					<input class="boxMidleUiDiv" value="8000" disabled />
+				</div>
 			</div>
 			<div class = "boxMidleContent" id="ID_ContentAIParam">
-				<div style="width:50%;height:170px; float:left;">
+				<div style="width:50%;height:120px; float:left;">
 					<div class="boxMidleUiHeadNbspLine"></div>
 					<div class="boxMidleFontDiv">水平翻转:</div>
 					<input class="boxMidleUiCheckbox" value="0" id="ID_VedioCaptureHorreverse" type="checkbox"/>
@@ -415,6 +428,40 @@
 					<select class="boxMidleUiDiv"  id="ID_WhiteBlance"></select> <-->
 				</div>
 				<input  class="boxMidleUiSubmitButtonMidle" type="button" onclick="SetVedioCapture(0,0)" value="提交"/>
+			</div>
+			<div class = "boxMidleContent" id="ID_ContentSysBaseInfo">
+				<div style="width:50%;height:170px; float:left;">
+					<div class="boxMidleUiHeadNbspLine"></div>
+					<div class="boxMidleFontDiv" >设备名称:</div>
+					<input class="boxMidleUiDiv" value="IPC" disabled />
+					<div class="boxMidleFontDiv">软件版本:</div>
+					<input class="boxMidleUiDiv" value="IPC V2.1 C" disabled />
+					<div class="boxMidleFontDiv">硬件版本:</div>
+					<input class="boxMidleUiDiv" value="HI3516D DS V2.1" disabled />
+				</div>
+			</div>
+			<div class = "boxMidleContent" id="ID_ContentRtmp">
+				<div style="width:50%;height:170px;">
+					<div class="boxMidleUiHeadNbspLine"></div>
+					<div class="boxMidleFontDiv">使能:</div>
+					<input class="boxMidleUiCheckbox" id="ID_RtmpEnable" type="checkbox"/>
+					<div class="boxMidleFontDiv">音频:</div>
+					<input class="boxMidleUiCheckbox" id="ID_RtmpAudio" type="checkbox"/>
+					<div class="boxMidleFontDiv">通道:</div>
+					<select class="boxMidleUiDiv"  id="ID_RtmpChnnel">
+						<option value="0" selected>0</option>
+					</select>
+					<div class="boxMidleFontDiv">码流:</div>
+					<select class="boxMidleUiDiv"  id="ID_RtmpStreamType" onchange="InitRtmpUi()">
+						<option value="0" selected>0</option>
+						<option value="1" >1</option>
+					</select>
+					<div class="boxMidleFontDiv" >地址:</div>
+					<input class="boxMidleUiDiv" id="ID_RtmpAddr"/>
+					<div class="boxMidleFontDiv" >字串:</div>
+					<input class="boxMidleUiDiv" id="ID_RtmpString"/>
+				</div>
+				<input  class="boxMidleUiSubmitButtonMidle" type="button" onclick="RtmpSubmit()" value="提交"/>
 			</div>
 		</div>
 		<div id="ID_BoxBottom"></div>

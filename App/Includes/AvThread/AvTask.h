@@ -14,7 +14,7 @@
 ******************************************************************/
 #ifndef _AV_TASK_H_
 #define _AV_TASK_H_
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvThread/AvThread.h"
 
 class CAvTask:public CThread

@@ -15,32 +15,27 @@
 #ifndef _LIBDECODE_H_
 #define _LIBDECODE_H_
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-//“Ù∆µΩ‚¬Î
-av_bool AvAudioDecodeCreate();
-av_bool AvAudioDecodeDestroy();
-av_bool AvAudioDecodeStart();
-av_bool AvAudioDecodeStop();
-av_bool AvAudioDecodeSetFormat();
-av_bool AvAudioDecodeBuffer();
-
-
 typedef struct{
-	av_u32	 CompMask;
-	av_u32	 ImageSizeMask;// CHL_MAIN_T
-	av_uchar ExtChannel;
-	av_u32   ExtImageSizeMask[DisplaySize_NR];
-	av_uchar MaxOutFrameRate;
+	unsigned int CompMask;
+	unsigned int ImageSizeMask;// CHL_MAIN_T
+	unsigned int MaxOutFrameRate;
+	unsigned int MaxChannels;
 }C_DecodeCaps;
 
-av_bool AvGetDecodeCaps(av_uchar Channel, C_DecodeCaps *DecodeCaps);
+bool AvAudioDecodeBuffer(unsigned  char *buffer, int bufferlen);
 
+bool AvDecodeSplit(int SplitNo, unsigned int hWid[]);
 
+bool AvDecodeGetCaps(C_DecodeCaps *DecodeCaps);
+bool AvDecodeStart(int ScreenID, unsigned int hWid);
+bool AvDecodeStop(int ScreenID);
 
+bool AvDecodeRenderBuffer(int ScreenID, unsigned  char  *buffer, int bufferlen);
 
 
 #ifdef __cplusplus

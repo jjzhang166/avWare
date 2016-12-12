@@ -14,7 +14,7 @@
 ******************************************************************/
 #ifndef _AVUSER_H_
 #define _AVUSER_H_
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "CAvObject.h"
 
 class CAvUser

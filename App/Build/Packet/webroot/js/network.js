@@ -1,26 +1,30 @@
 (function($){ 
     $.extend({
         sendMsg: function(cmd, body){
+			//alert("sendMsg"+1);
         	var message = $.buildMessage(cmd, body);
+			//alert("sendMsg"+2);
 			var resp;
 			var str;
 			message += "\r\n\r\n";
 			//alert(message);
-			console.log(message);
+			//console.log(message);
 			$.ajax({
 				url: "Login.cgi",
 				async: false,
 				type:"POST",
-				timeout:2000,
+				timeout:1000,
 				data: message
 			}).done(function(response) {
-				console.log(response);
+				//console.log(response);
+				//alert("response");
 				var str = JSON.parse(response); 
 				resp = {success:true,data:str.Param};
 			}).fail(function(){
+				//alert("fail");
 				resp = {success:false,data:""};
 			})		
-			console.log(resp.data);
+			//console.log(resp.data);
 			return resp;
 		},
 		buildMessage: function(cmd, bodyMsg) {
@@ -36,9 +40,11 @@
         	return JSON.stringify(message);
 		},
 		SetCookie: function (name,value){
+			//alert("SetCookie 1");
 			var str = name + "="+value+"&amp;";
 			document.cookie = str;
-			console.log("setCookie:"+str);
+			//alert("SetCookie 2");
+			//console.log("setCookie:"+str);
 			return ;
 		},
 		GetCookie: function(name){

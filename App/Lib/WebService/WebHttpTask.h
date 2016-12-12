@@ -16,7 +16,7 @@
 #define __DH_WEB_HTTP_TASK_H__
 
 
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "CAvObject.h"
 #define WebPrintf av_msg
 #define WebPerror av_error

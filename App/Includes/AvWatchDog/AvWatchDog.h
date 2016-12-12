@@ -15,7 +15,7 @@
 #ifndef _AVWATCHDOG_H_
 #define _AVWATCHDOG_H_
 
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "CAvObject.h"
 #include "AvThread/AvThread.h"
 class CWatchDog :public CThread

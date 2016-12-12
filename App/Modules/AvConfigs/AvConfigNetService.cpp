@@ -76,15 +76,15 @@ template<> void ProcessValue<ConfigNetNtp>(CAvConfigBase &av_conf, AvConfigValue
 
 template<> void ProcessValue<ConfigNetComm>(CAvConfigBase &av_conf, AvConfigValue &val, ConfigNetComm &config, int index, int diff)
 {
-
+	std::string DefaultString;
 	C_NetCommCaps NetCommCaps;
 	CAvDevice::GetNetCommCaps(NetCommCaps);
 
-	E_NetComm_Mode MaxGetMode = NetCommGetMode_NR;
-	E_NetComm_Mode MinGetMode = NetCommGetMode_MANUAL;
+	NetCommT MaxGetMode = NetCommT_LAST;
+	NetCommGetMode MinGetMode = NetCommGetMode_MANUAL;
 
-	av_findMaxMask(MaxGetMode, NetCommCaps.NetCommGetModeMask[index], E_NetComm_Mode);
-	av_findMinMask(MinGetMode, NetCommCaps.NetCommGetModeMask[index], E_NetComm_Mode);
+	av_findMaxMask(MaxGetMode, NetCommCaps.NetCommGetModeMask[index], NetCommT);
+	av_findMinMask(MinGetMode, NetCommCaps.NetCommGetModeMask[index], NetCommGetMode);
 
 	if (AvMask(index) & NetCommCaps.NetCommMask){
 		av_conf.Process("Support", val, (int &)config.Support, (int)av_true, (int)av_true, (int)av_true);
@@ -92,7 +92,7 @@ template<> void ProcessValue<ConfigNetComm>(CAvConfigBase &av_conf, AvConfigValu
 	}
 	else{
 		av_conf.Process("Support", val, (int &)config.Support, (int)av_false, (int)av_false, (int)av_false);
-		av_conf.Process("GetMode", val, (int &)config.GetMode, (int)NetCommGetMode_NR, (int)NetCommGetMode_NR, (int)NetCommGetMode_NR);
+		av_conf.Process("GetMode", val, (int &)config.GetMode, (int)NetCommGetMode_LAST, (int)NetCommGetMode_LAST, (int)NetCommGetMode_LAST);
 	}
 	AvConfigValue &Attribute = val["Attribute"];
 	switch (index)
@@ -108,37 +108,50 @@ template<> void ProcessValue<ConfigNetComm>(CAvConfigBase &av_conf, AvConfigValu
 		av_conf.Process("Ifrname", val, config.Ifrname, "BlueTooth");
 		av_conf.Process("MarkCode", Attribute, config.BlueToothAttr.MarkCode, "0123456");
 		break;
-	case NetCommT_Lan0:
-		if (~(AvMask(NetCommT_Lan0))&NetCommCaps.NetCommMask){
+	case NetCommT_LAN0:
+		if (~(AvMask(NetCommT_LAN0))&NetCommCaps.NetCommMask){
 			av_conf.Process("Enable", val, (int &)config.Enable, (int)av_true, (int)av_false, (int)av_true);
 		}
 		else{
 			av_conf.Process("Enable", val, (int &)config.Enable, (int)av_true, (int)av_true, (int)av_true);
 		}
-		av_conf.Process("NetCommType", val, (int &)config.type, (int)NetCommT_Lan0, (int)NetCommT_Lan0, (int)NetCommT_Lan0);
+		av_conf.Process("NetCommType", val, (int &)config.type, (int)NetCommT_LAN0, (int)NetCommT_LAN0, (int)NetCommT_LAN0);
 		av_conf.Process("Ifrname", val, config.Ifrname, "eth0");
-		av_conf.Process("Dns1",		Attribute, config.LanAttr.Dns1, "8.8.8.8");
-		av_conf.Process("Dns2",		Attribute, config.LanAttr.Dns2, "8.8.8.8");
-		av_conf.Process("Gateway",	Attribute, config.LanAttr.Gateway, "192.168.1.1");
-		av_conf.Process("Host",		Attribute, config.LanAttr.Host, "HostName");
-		av_conf.Process("IpAddr",	Attribute, config.LanAttr.IpAddr, "192.168.1.90");
-		av_conf.Process("Submask",	Attribute, config.LanAttr.Submask, "255.255.255.0");
+		
+		CAvDevice::GetEnv(EKey_DefaultDns1,		DefaultString);
+		av_conf.Process("Dns1",		Attribute, config.LanAttr.Dns1,		DefaultString.c_str());
+		CAvDevice::GetEnv(EKey_DefaultDns2,		DefaultString);
+		av_conf.Process("Dns2",		Attribute, config.LanAttr.Dns2,		DefaultString.c_str());
+		CAvDevice::GetEnv(EKey_DefaultGateWay,	DefaultString);
+		av_conf.Process("Gateway",	Attribute, config.LanAttr.Gateway,	DefaultString.c_str());
+		CAvDevice::GetEnv(EKey_DefaultHostName, DefaultString);
+		av_conf.Process("Host",		Attribute, config.LanAttr.Host,		DefaultString.c_str());
+		CAvDevice::GetEnv(EKey_DefaultIpaddr,	DefaultString);
+		av_conf.Process("IpAddr",	Attribute, config.LanAttr.IpAddr,	DefaultString.c_str());
+		CAvDevice::GetEnv(EKey_DefaultNetMask,	DefaultString);
+		av_conf.Process("Submask",	Attribute, config.LanAttr.Submask,	DefaultString.c_str());
 		break;
-	case NetCommT_Lan1:
-		if (~(AvMask(NetCommT_Lan1))&NetCommCaps.NetCommMask){
+	case NetCommT_LAN1:
+		if (~(AvMask(NetCommT_LAN1))&NetCommCaps.NetCommMask){
 			av_conf.Process("Enable", val, (int &)config.Enable, (int)av_true, (int)av_false, (int)av_true);
 		}
 		else{
 			av_conf.Process("Enable", val, (int &)config.Enable, (int)av_true, (int)av_true, (int)av_true);
 		}
-		av_conf.Process("NetCommType", val, (int &)config.type, (int)NetCommT_Lan1, (int)NetCommT_Lan1, (int)NetCommT_Lan1);
+		av_conf.Process("NetCommType", val, (int &)config.type, (int)NetCommT_LAN1, (int)NetCommT_LAN1, (int)NetCommT_LAN1);
 		av_conf.Process("Ifrname", val, config.Ifrname, "eth1");
-		av_conf.Process("Dns1", Attribute, config.LanAttr.Dns1, "8.8.8.8");
-		av_conf.Process("Dns2", Attribute, config.LanAttr.Dns2, "8.8.8.8");
-		av_conf.Process("Gateway", Attribute, config.LanAttr.Gateway, "192.168.1.1");
-		av_conf.Process("Host", Attribute, config.LanAttr.Host, "HostName");
-		av_conf.Process("IpAddr", Attribute, config.LanAttr.IpAddr, "192.168.1.91");
-		av_conf.Process("Submask", Attribute, config.LanAttr.Submask, "255.255.255.0");
+		CAvDevice::GetEnv(EKey_DefaultDns1, DefaultString);
+		av_conf.Process("Dns1",		Attribute, config.LanAttr.Dns1,		DefaultString.c_str());
+		CAvDevice::GetEnv(EKey_DefaultDns2, DefaultString);
+		av_conf.Process("Dns2",		Attribute, config.LanAttr.Dns2,		DefaultString.c_str());
+		CAvDevice::GetEnv(EKey_DefaultGateWay, DefaultString);
+		av_conf.Process("Gateway",	Attribute, config.LanAttr.Gateway,	DefaultString.c_str());
+		CAvDevice::GetEnv(EKey_DefaultHostName, DefaultString);
+		av_conf.Process("Host",		Attribute, config.LanAttr.Host,		DefaultString.c_str());
+		CAvDevice::GetEnv(EKey_DefaultIpaddr, DefaultString);
+		av_conf.Process("IpAddr",	Attribute, config.LanAttr.IpAddr,	DefaultString.c_str());
+		CAvDevice::GetEnv(EKey_DefaultNetMask, DefaultString);
+		av_conf.Process("Submask",	Attribute, config.LanAttr.Submask,	DefaultString.c_str());
 		break;
 	case NetCommT_Wireless:
 		if (~(AvMask(NetCommT_Wireless))&NetCommCaps.NetCommMask){
@@ -172,4 +185,13 @@ template<> void ProcessValue<ConfigNetComm>(CAvConfigBase &av_conf, AvConfigValu
 	}
 
 	
+}
+
+template<> void ProcessValue<ConfigRtmp>(CAvConfigBase &ConfBase, AvConfigValue &ConfValue, ConfigRtmp &config, int index, int diff)
+{
+	ConfBase.Process("RtmpAddress", ConfValue, config.RtmpFormats.RtmpAddress, "rtmp://push.rtmpserver.com:1935");
+	ConfBase.Process("Slave", ConfValue, config.RtmpFormats.Slave, CHL_SUB1_T, CHL_MAIN_T, CHL_SUB1_T);
+	ConfBase.Process("RtmpString", ConfValue, config.RtmpFormats.RtmpString, "sample");
+	ConfBase.Process("bEnable", ConfValue, (av_int&)config.RtmpFormats.bEnable, av_false, av_false, av_true);
+	ConfBase.Process("bAudio", ConfValue, (av_int&)config.RtmpFormats.bAudio, av_false, av_false, av_true);
 }

@@ -16,11 +16,11 @@
 #define _AVPACKET_H_
 #include "CAvObject.h"
 #include "AvThread/AvThread.h"
-#include "Apis/AvWareType.h"
-#include "Apis/LibEncode.h"
 #include "AvThread/AvTimer.h"
+#include "Apis/AvWareLibDef.h"
+#include "Apis/AvEnum.h"
 
-class CAvPacket
+class AVWARE_API CAvPacket
 {
 	friend class CAvPacketManager;
 private:
@@ -46,7 +46,7 @@ public:
 	av_u32			GetBufferSize();
 
 	av_bool			IsVideoFrame();
-
+	av_void			ConvertLocalChannel(int LocalChannel);
 public:
 	av_bool			GetNaluSplit();
 	av_u32			GetNaluCount();
@@ -55,6 +55,7 @@ public:
 private:
 	av_bool			GetNaluSplitH264();
 	av_bool			GetnaluSplitHevc();
+	
 
 private:
 	typedef struct {
@@ -85,30 +86,30 @@ public:
 private:
 	av_u32			m_Refer;
 public:
-	av_stream_type  StreamType();
+	StreamContent	StreamCont();
 public:
 	av_u64			TimeStamp();
 	av_u32			ImageWidth();
 	av_u32			ImageHeigh();
 	av_u32			Channel();
 	av_u32			Slave();
-	av_comp_t		Comp();
-	av_frame_type   FrameType();
+	AvComp			Comp();
+	avFrameT	    FrameType();
 	av_ushort		FrameRate();
 public:
 	av_u32			SampleRate();
 	av_u32			SampleBits();
 	av_u32			MediaPropertyMask();
 private:
-	av_stream_type	m_StreamType;
+	StreamContent 	m_StreamCont;
 	av_u64			m_TimeStamp;
 	av_short		m_Channel;
 	av_short		m_Slave;
 
-	av_comp_t		m_Comp;
+	AvComp			m_Comp;
 	av_u32			m_ImageWidth;
 	av_u32			m_ImageHeigh;
-	av_frame_type	m_FrameType;
+	avFrameT		m_FrameType;
 	av_ushort		m_FrameRate;
 
 	av_u32			m_SampleRate;
@@ -127,7 +128,7 @@ typedef struct {
 #define AVPACKET_MAX_FRAME	(800*1024)
 #define AVPACKET_UNIT		(20*1024)
 
-class CAvPacketManager:public CTimer
+class AVWARE_API CAvPacketManager :public CAvObject
 {
 
 private:
@@ -140,10 +141,10 @@ public:
 	CAvPacket *GetAvPacket(av_u32 NewLen = AVPACKET_MAX_FRAME);
 	av_bool PutAvPacket(CAvPacket *Packet);
 	av_bool Dump();
-	av_void OnTime();
+	av_void OnTime(CAvTimer &Timer);
 private:
 	C_PacketNode m_AvPacketNodeInfo[AVPACKET_MAX_FRAME / AVPACKET_UNIT];
-
+	CAvTimer	 m_Timer;
 };
 
 

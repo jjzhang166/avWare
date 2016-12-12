@@ -15,13 +15,13 @@
 #ifndef _AVCONFIGS_NETSERVICE_H_
 #define _AVCONFIGS_NETSERVICE_H_
 
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvNetService/AvSmtp.h"
 #include "AvNetService/AvUpnp.h"
 #include "AvNetService/AvNtp.h"
 #include "AvNetService/AvDdns.h"
 #include "AvNetService/AvFtp.h"
-
+#include "Apis/LibSystem.h"
 #include "AvConfigs/AvConfigTable.h"
 
 ////////////////////////////////////
@@ -102,8 +102,8 @@ typedef struct {
 typedef struct {
 	av_bool Enable;//打开或者关闭
 	av_bool Support;//硬件上是否支持
-	E_NetComm_Type type;
-	E_NetComm_Mode GetMode;
+	NetCommT	type;
+	NetCommGetMode GetMode;
 	char Ifrname[32];
 	union 
 	{
@@ -114,12 +114,27 @@ typedef struct {
 	};
 }ConfigNetComm;
 
+typedef struct{
+	av_char RtmpAddress[128];
+	av_char RtmpString[128];
+	av_uint Slave;
+	av_bool bEnable;
+	av_bool bAudio;
+}C_RtmpFormats;
+
+typedef struct{
+	C_RtmpFormats RtmpFormats;
+}ConfigRtmp;
+
+
+
+
 typedef TAvConfig<ConfigNetSerSmtp>	CAvConfigNetSerSmtp;
 typedef TAvConfig<ConfigNetFtp>		CAvConfigNetFtp;
 typedef TAvConfig<ConfigNetDdns>	CAvConfigNetDdns;
 typedef TAvConfig<ConfigNetUpnp>	CAvConfigNetUpnp;
 typedef TAvConfig<ConfigNetNtp>		CAvConfigNetNtp;
 typedef TAvConfig<ConfigNetComm, 0, ConfMaxNetComm> CAvConfigNetComm;
-
+typedef TAvConfig<ConfigRtmp, 0, SYS_CHN_NUM>		CAvConfigRtmp;
 
 #endif

@@ -14,7 +14,8 @@
 ******************************************************************/
 #include "AvPacket/AvPacket.h"
 #include "AvDevice/AvDevice.h"
-
+#include "Apis/AvWareCplusplus.h"
+#include "Apis/LibEncode.h"
 
 CAvPacket::CAvPacket(av_u32 MaxLength)
 {
@@ -79,29 +80,30 @@ av_bool	CAvPacket::PutBufferOver()
 		m_Slave = MediaHead.Slave;
 		m_MediaPropertyMask = MediaHead.MediaPropertyMask;
 
-		if (MediaHead.StreamType == avStreamT_V){
-			m_StreamType = avStreamT_V;
+		if (MediaHead.Sc == StreamContent_VIDEO){
+			m_StreamCont = StreamContent_VIDEO;
 			m_Comp = MediaHead.VHead.comp;
 			m_ImageWidth = MediaHead.VHead.ImageWidth;
 			m_ImageHeigh = MediaHead.VHead.ImageHeigh;
 			m_FrameRate = MediaHead.VHead.FrameRate;
-			m_FrameType = MediaHead.VHead.frametype;
-	}
-		else if (MediaHead.StreamType == avStreamT_A){
-			m_StreamType = avStreamT_A;
+			m_FrameType = MediaHead.VHead.Ft;
+		}
+		else if (MediaHead.Sc == StreamContent_AUDIO){
+			m_StreamCont = StreamContent_AUDIO;
 			m_Comp = MediaHead.AHead.comp;
 			m_SampleBits = MediaHead.AHead.sampleRate;
 			m_SampleRate = MediaHead.AHead.sampleRate;
-	}
+		}
 		else {
 			assert(0);
-	}
+		}
 		m_RawBuffer = m_Buffer + length;
 		m_RawBufferLength = MediaHead.PlayLoadLength;
 		
 		if (length + MediaHead.PlayLoadLength != m_BufferLength){
+			av_error("length + MediaHead.PlayLoadLength = %d, m_BufferLength = %d\n", length + MediaHead.PlayLoadLength, m_BufferLength);
 			assert(0);
-	}
+		}
 	}
 	else{
 		m_RawBuffer = m_Buffer;
@@ -166,7 +168,7 @@ av_bool			CAvPacket::IsVideoFrame()
 av_bool			CAvPacket::GetNaluSplitH264()
 {
 	CGuard m(m_Mutex);
-	if (m_StreamType != avStreamT_V) return av_false;
+	if (m_StreamCont != StreamContent_VIDEO) return av_false;
 	if (m_IsSplitNalu == av_true) return av_true;
 
 	m_NaluInfoCount = 0;
@@ -195,8 +197,8 @@ av_bool			CAvPacket::GetNaluSplitH264()
 				m_NaluInfoCount++;
 				break;
 			case nal_unit_type_h264_p:
-				m_NaluInfo[m_NaluInfoCount].data	= &m_RawBuffer[DataPlace];
-				m_NaluInfo[m_NaluInfoCount].len		= m_RawBufferLength - DataPlace;//数组下标与实际少1
+				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
+				m_NaluInfo[m_NaluInfoCount].len = m_RawBufferLength - DataPlace;//数组下标与实际少1
 				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_h264_p;
 				m_NaluInfoCount++;
 				m_IsSplitNalu = av_true;
@@ -228,18 +230,18 @@ av_bool			CAvPacket::GetNaluSplitH264()
 				m_NaluInfoCount++;
 				break;
 			case nal_unit_type_h264_idr:
-				m_NaluInfo[m_NaluInfoCount].data		= &m_RawBuffer[DataPlace];
-				m_NaluInfo[m_NaluInfoCount].len			= m_RawBufferLength - DataPlace;//数组下标与实际少1
+				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
+				m_NaluInfo[m_NaluInfoCount].len = m_RawBufferLength - DataPlace;//数组下标与实际少1
 				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_h264_idr;
 				m_NaluInfoCount++;
 				m_IsSplitNalu = av_true;
 				return av_true;
 				break;
 			case nal_unit_type_h264_sei:
-				m_NaluInfo[m_NaluInfoCount].data		= &m_RawBuffer[DataPlace];
+				m_NaluInfo[m_NaluInfoCount].data = &m_RawBuffer[DataPlace];
 				for (SliceLen = 0; !FindStartPlace(&m_RawBuffer[DataPlace]); DataPlace++, SliceLen++);
 				DataPlace--;
-				m_NaluInfo[m_NaluInfoCount].len			= SliceLen;
+				m_NaluInfo[m_NaluInfoCount].len = SliceLen;
 				m_NaluInfo[m_NaluInfoCount].type = (av_int)nal_unit_type_h264_sei;
 				m_NaluInfoCount++;
 				break;
@@ -268,7 +270,7 @@ av_bool			CAvPacket::GetNaluSplitH264()
 				m_NaluInfoCount++;
 				break;
 			default:
-				av_error("H264 NAL Unit TYPE ERROR %d\n", (m_RawBuffer[DataPlace] & 0x1f));
+				av_error("H264 NAL Unit TYPE ERROR %x\n", (m_RawBuffer[DataPlace] & 0x1f));
 				break;
 			}
 		}
@@ -280,7 +282,7 @@ av_bool			CAvPacket::GetNaluSplitH264()
 av_bool			CAvPacket::GetnaluSplitHevc()
 {
 	CGuard m(m_Mutex);
-	if (m_StreamType != avStreamT_V) return av_false;
+	if (m_StreamCont != StreamContent_VIDEO) return av_false;
 	if (m_IsSplitNalu == av_true) return av_true;
 
 	m_NaluInfoCount = 0;
@@ -350,7 +352,7 @@ av_bool			CAvPacket::GetnaluSplitHevc()
 				m_NaluInfoCount++;
 				break;
 			default:
-				av_error("H265 NAL Unit TYPE ERROR %d\n", ((m_RawBuffer[DataPlace] >> 1) & 0x3f));
+				av_error("H265 NAL Unit TYPE ERROR %x\n", ((m_RawBuffer[DataPlace] >> 1) & 0x3f));
 				return av_false;
 				break;
 
@@ -361,6 +363,11 @@ av_bool			CAvPacket::GetnaluSplitHevc()
 	return av_true;
 }
 
+av_void			CAvPacket::ConvertLocalChannel(int LocalChannel)
+{
+	AvMediaHeadConvert(m_Buffer, LocalChannel);
+	m_Channel = LocalChannel;
+}
 av_bool			CAvPacket::GetNaluSplit()
 {
 	av_bool ret = av_false;
@@ -417,8 +424,8 @@ av_bool			CAvPacket::ReSet()
 	m_ImageHeigh = 0;
 	m_Channel = -1;
 	m_Slave = -1;
-	m_Comp = AvComp_NR;
-	m_FrameType = avFrameT_NR;
+	m_Comp = AvComp_LAST;
+	m_FrameType = avFrameT_LAST;
 	m_FrameRate = 0;
 
 	m_RawBuffer = NULL;
@@ -434,7 +441,7 @@ av_bool			CAvPacket::ReSet()
 	m_SampleRate = 0;
 	m_SampleBits = 0;
 	m_MediaPropertyMask = 0;
-	m_StreamType = avStreamT_Nr;
+	m_StreamCont = StreamContent_LAST;
 	memset(m_NaluInfo, 0x00, sizeof(m_NaluInfo));
 
 	return av_true;
@@ -468,9 +475,9 @@ av_u64			CAvPacket::TimeStamp()
 	return m_TimeStamp;
 }
 
-av_stream_type	CAvPacket::StreamType()
+StreamContent	CAvPacket::StreamCont()
 {
-	return m_StreamType;
+	return m_StreamCont;
 }
 av_u32			CAvPacket::ImageWidth()
 {
@@ -488,11 +495,11 @@ av_u32			CAvPacket::Slave()
 {
 	return m_Slave;
 }
-av_comp_t		CAvPacket::Comp()
+AvComp		CAvPacket::Comp()
 {
 	return m_Comp;
 }
-av_frame_type   CAvPacket::FrameType()
+avFrameT   CAvPacket::FrameType()
 {
 	return m_FrameType;
 }
@@ -533,8 +540,10 @@ av_bool CAvPacketManager::Initialize()
 	for (int i = 0; i < AVPACKET_MAX_FRAME / AVPACKET_UNIT; i++){
 		m_AvPacketNodeInfo[i].total = 0;
 	}
-	SetTimerName(__FUNCTION__);
-	StartTimer(30 * 1000, 0, av_true, av_false);
+// 	SetTimerName(__FUNCTION__);
+// 	StartTimer(30 * 1000, 0, av_true, av_false);
+
+	CAvTimer::StartTimer(10*1000, this, (CAvTimer::ONTIMER_PROC)&CAvPacketManager::OnTime);
 	return av_true;
 }
 
@@ -577,7 +586,7 @@ av_bool CAvPacketManager::PutAvPacket(CAvPacket *Packet)
 	return av_true;
 }
 
-av_void CAvPacketManager::OnTime()
+av_void CAvPacketManager::OnTime(CAvTimer &Timer)
 {
 	av_msg("Clear up CAvPacketManager time[%d]\n", (av_u32)time(NULL));
 	Dump();
@@ -594,7 +603,7 @@ av_bool CAvPacketManager::Dump()
 	av_u32 total = 0;
 	av_u32 free = 0;
 	av_u32 use = 0;
-	
+
 	for (int i = 0; i < AVPACKET_MAX_FRAME / AVPACKET_UNIT; i++){
 		m_AvPacketNodeInfo[i].mutex.Enter();
 		total = m_AvPacketNodeInfo[i].total;

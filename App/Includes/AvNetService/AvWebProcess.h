@@ -2,7 +2,7 @@
 #define AVWARE_AVNETSERVICE_AVWEBPROCESS_H_
 
 #include "jsoncpp/json.h"
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 
 typedef Json::Value CWebMsg;
 typedef Json::Reader CWebMsgReader;
@@ -18,7 +18,7 @@ enum{
 };
 
 namespace av_web{
-
+#if 0
 template <typename EnumType>
 struct EnumNameStr
 {
@@ -57,7 +57,7 @@ const char * ConvertEnumToString(EnumType em)
 	}
 	return EnumNameStr<EnumType>::List[em];
 }
-
+#endif
 
 //LogIn
 int AvWebLogIn(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
@@ -90,6 +90,9 @@ int AvWebGetVideoCaptureCaps(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_
 int AvWebGetVideoCaptureProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
 //SetVideoCaptureProfile
 int AvWebSetVideoCaptureProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
+
+int AvWebGetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
+int AvWebSetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
 }
 
 #endif //AVWARE_AVNETSERVICE_AVWEBPROCESS_H_

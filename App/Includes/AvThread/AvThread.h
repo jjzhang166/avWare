@@ -15,14 +15,50 @@
 #ifndef _AVTHREAD_H_
 #define _AVTHREAD_H_
 #include <string>
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "CAvObject.h"
-#include "Apis/LibSystem.h"
+#include "Apis/AvWareLibDef.h"
 
 #if defined(WIN32)
 #else
 #include <sys/prctl.h>
 #endif
+
+#if 1
+class CMutex
+{
+public:
+	CMutex();
+	virtual ~CMutex();
+	av_bool Enter();
+	av_bool Leave();
+private:
+	av_mutex *m_hMutex;
+};
+
+
+class CGuard
+{
+public:
+	CGuard(CMutex& Mutex);
+	~CGuard();
+private:
+	CMutex &m_Mutex;
+};
+
+class CSemaphore
+{
+public:
+	CSemaphore(unsigned int dwInitialCount = 0);
+	virtual ~CSemaphore();
+	av_bool Pend();
+	av_bool PendTimeOut(int ms);
+	int Post();
+protected:
+private:
+	av_sem *m_hSemphore;
+};
+#else
 class CMutex
 {
 public:
@@ -46,7 +82,6 @@ public:
 		assert(m_hMutex);
 		return AvMutexUnLock(m_hMutex);
 	};
-protected:
 private:
 	av_mutex *m_hMutex;
 };
@@ -70,29 +105,6 @@ private:
 	CMutex &m_Mutex;
 };
 
-// class CCond
-// {
-// public:
-// 	inline CCond():m_hCond(0){
-// 		
-// 	}
-// 	inline ~CCond(){
-// 
-// 	}
-// 
-// 	inline av_bool CondWait(){
-// 
-// 	}
-// 	inline av_bool CondSignal(){
-// 
-// 	}
-// 	inline av_bool Cond
-// 
-// 
-// private:
-// 	av_cond *m_hCond;
-// };
-
 class CSemaphore
 {
 public:
@@ -112,6 +124,11 @@ public:
 		assert(m_hSemphore);
 		return AvSemWait(m_hSemphore);
 	};
+	inline av_bool PendTimeOut(int ms)
+	{
+		assert(m_hSemphore);
+		return AvSemWaitTimeOut(m_hSemphore, ms);
+	}
 	inline int Post()
 	{
 		assert(m_hSemphore);
@@ -121,10 +138,11 @@ protected:
 private:
 	av_sem *m_hSemphore;
 };
+#endif
 
 
 #if defined(WIN32)
-#define THREAD_SET_THREADNAME(TaskName) 
+#define THREAD_SET_THREADNAME(TaskName)
 #else
 #define THREAD_SET_THREADNAME(TaskName) \
 	do \
@@ -133,9 +151,11 @@ private:
 			av_error("prctl set task name [%s] error \n", TaskName);\
 		}\
 	} while (0)
+
+
 #endif
 
-class CThread:public CAvObject
+class AVWARE_API CThread:public CAvObject
 {
 public:
 	enum CThreadStatus{
@@ -154,8 +174,8 @@ public:
 	CThread(const std::string threadName = std::string("NullName"));
 	virtual ~CThread();
 	virtual void ThreadProc() = 0;
-	av_bool run();
-	av_bool stop(av_bool wait = av_false);
+	av_bool ThreadStart();
+	av_bool ThreadStop(av_bool wait = av_false, av_int waitms = 300);
 
 	av_bool SetThreadName(const std::string threadName);
 	av_bool GetThreadName(std::string &threadName);
@@ -163,6 +183,7 @@ public:
 	av_bool SetThreadId();
 	av_bool isThreadRun();
 	CThreadStatus GetThreadStatus();
+	av_bool SetThreadStatus(CThreadStatus status);
 
 	av_void SetAutoDestruct();
 	av_bool GetAutoDestruct();

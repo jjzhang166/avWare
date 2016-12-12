@@ -15,7 +15,7 @@
 #ifndef _RTCP_H_
 #define _RTCP_H_
 
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "RTP.h"
 
 
@@ -119,7 +119,7 @@ public:
 public:
 	virtual av_bool RtcpGetPacket(RTCP_TYPE type, std::string &Packet);
 	virtual RTCP_TYPE RtcpParsePacket(std::string &Packet);
-	
+
 public:
 	void SetSock(int sock);
 	int Sock();

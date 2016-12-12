@@ -1,40 +1,35 @@
 #ifndef _AV_F_H_
 #define _AV_F_H_
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
+#include "Apis/LibEncode.h"
 #include "AvPacket/AvPacket.h"
-
-class CAvF
+#include "AvRecord/AvRecordCom.h"
+class CAvF :public CAvRecFCom
 {
 public:
-	typedef enum{
-		AvF_OR	= 1 << 0,
-		AvF_OW	= 1 << 1,
-	}OpenMode;
+#define _AVF_TAG_VERSION 0x00010101
 
-	typedef enum {
-		AvSeekP_CUR,
-		AvSeekP_HEAD,
-	}SeekPlace;
-
-	typedef enum {
-		AvSeekC_Audio,
-		AvSeekC_Video,
-		AvSeekC_Alarm,
-		AvSeekC_IFrame,
-	}SeekContext;
+	typedef struct {
+		av_uint TagVer;
+		av_uint AvRecFContMask;
+		av_uint PrewFrameLen;
+		av_uint NextFrameLen;
+	}CAvFTag;
 
 public:
 	CAvF();
 	~CAvF();
-public:
-	av_bool open(av_char *FilePatch, OpenMode _mode);
-	av_bool close();
-	av_bool read(CAvPacket &Packet);
-	av_bool write(CAvPacket &Packet);
-	av_bool seek(SeekPlace p, SeekContext c, av_32 offset);
-	av_bool rename(av_char *newName);
-	av_bool remove();
 
+public:
+	av_bool AvRecFOpen(av_char *FilePatch, AvRecFOpenMode _mode);
+	av_int  AvRecFNextFrameLength();
+	av_bool AvRecFReadPacket(CAvPacket &Packet);
+	av_bool AvRecFWritePacket(CAvPacket &Packet);
+	av_bool AvRecFSeek(AvRecFSeekPlace seek, AvRecFSeekContext c, av_32 offset);
+	av_bool AvRecFRename(av_char *newName);
+	av_bool AvRecFRemove();
+	av_bool AvRecFClose();
+	av_bool AvRecRepair();
 private:
 	std::string m_FilePatch;
 	av_u32		m_Mode;
@@ -43,7 +38,7 @@ private:
 	av_u32		m_FrameRate;
 
 	FILE*		m_File;
-
+	CAvFTag		m_AvfTag;
 };
 
 

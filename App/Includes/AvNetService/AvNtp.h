@@ -14,7 +14,7 @@
 ******************************************************************/
 #ifndef _AV_NTP_H_
 #define _AV_NTP_H_
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvThread/AvTimer.h"
 #include "AvThread/AvThread.h"
 

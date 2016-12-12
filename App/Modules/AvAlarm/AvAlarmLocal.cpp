@@ -123,7 +123,7 @@ av_bool CAvAlmLocal::Initialize()
 	bRet = AvGetIoAlmCaps(&m_AlmIoCaps);
 
 	bRet = avGetMdAlmCaps(&m_AlmMdCaps);
-	CThread::run();
+	CThread::ThreadStart();
 	return av_true;
 }
 

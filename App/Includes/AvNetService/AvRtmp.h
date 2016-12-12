@@ -14,11 +14,12 @@
 ******************************************************************/
 #ifndef _AVRTMP_H_
 #define _AVRTMP_H_
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "CAvObject.h"
 #include "AvPacket/AvPacket.h"
 #include "AvThread/AvThread.h"
 #include "Rtmp/rtmp.h"
+#include "AvConfigs/AvConfigNetService.h"
 class AvRtmp:public CThread
 {
 public:
@@ -40,19 +41,19 @@ private:
 	av_bool RtmpPullTask();
 	av_bool RtmpPushTask();
 private:
-	av_int SendMetaPacket(av_comp_t Vcomp, av_int PicWidth, av_int PicHight, av_int FrameRate, 
-						  av_comp_t Acomp, av_int ASampleRate, av_int ABits);
+	av_int SendMetaPacket(AvComp Vcomp, av_int PicWidth, av_int PicHight, av_int FrameRate, 
+		AvComp Acomp, av_int ASampleRate, av_int ABits);
 	av_int SendRtmpData(unsigned int nPacketType,	unsigned char *predata,  unsigned int presize, 
 													unsigned char *loaddata, unsigned int loaddatasize,
 													unsigned char headerType = RTMP_PACKET_SIZE_LARGE);
-	av_int SendRtmpPacket(unsigned int nPacketType, av_nal_unit_type_h264 nalType, CAvPacket *AvPacket);
+	av_int SendRtmpPacket(unsigned int nPacketType, nal_unit_type_h264 nalType, CAvPacket *AvPacket);
 private:
 	av_int SendAacSpac();
 	av_int SendAudioData(CAvPacket *Packet);
 private:
 	av_u32		m_AudioCfgSampleRate;
 	av_u32		m_AudioCfgSampleBits;
-	av_comp_t	m_AudioComp;
+	AvComp		m_AudioComp;
 	av_u32		m_AudioChannels;
 
 
@@ -75,6 +76,9 @@ private:
 private:
 	std::queue<CAvPacket *> m_Avpacket;
 	CMutex	m_Mutex;
+
+private:
+	CAvConfigRtmp m_RtmpConfig;
 };
 
 

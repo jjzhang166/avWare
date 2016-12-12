@@ -125,6 +125,7 @@ public:
     static bool Rename(const char* oldName, const char* newName);
     static bool Remove(const char* fileName);
     static bool MakeDirectory(const char* dirName);
+	static bool MakeDeepDirectory(const char *DeepDirName);
     static bool RemoveDirectory(const char* dirName);
     static bool StatFS(const char* path,
         uint64* userFreeBytes,

@@ -20,7 +20,7 @@
 //#include "AvConfigs/AvConfigsNetWork.h"
 
 
-class CAvUpnpCli : public CTimer
+class CAvUpnpCli : public CAvObject
 {
 public:
 	SINGLETON_DECLARE(CAvUpnpCli);

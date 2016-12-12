@@ -14,20 +14,21 @@
 ******************************************************************/
 #ifndef _AVCONFIGCAPTURE_H_
 #define _AVCONFIGCAPTURE_H_
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvConfigs/AvConfigTable.h"
+#include "AvProtocol/AvNetProto.h"
 #include "Apis/LibEncode.h"
 
 
 
 typedef struct {
 	av_bool Enable;
-	C_EncodeFormats Formats;
-}C_CHLEncodeFormats;
+	C_EnCodeProfile Profile;
+}C_CHLEncodeProfile;
 
 typedef struct{
-	C_CHLEncodeFormats CHLFormats[CHL_NR_T];
-}ConfigEncodeFormats;
+	C_CHLEncodeProfile CHLProfile[CHL_NR_T];
+}ConfigEncodeProfile;
 
 
 typedef struct {
@@ -40,68 +41,30 @@ typedef struct{
 
 
 
-typedef enum{
-	ProtocolOnvif,
-	ProtocolRtmp,
-	ProtocolRtsp,
-	ProtocolMoon,
-}E_ProtoMode;
 
-typedef struct{
-	av_char MainUrl[128];
-	av_char SubUrl[128];
-}C_ProtoRtspFormats;
 
-typedef struct {
-	av_char MainUrl[128];
-	av_char SubUrl[128];
-}C_ProtoRtmpFormats;
-
-typedef struct {
-	av_char Url[128];
-	av_int	Port;
-}C_ProtoMoonFormats;
-
-typedef struct {
-	av_char Url[128];
-}C_ProtoOnvifFormats;
-
-typedef struct{
-	av_bool IsEnable;
-	av_char UsrName[64];
-	av_char Passwd[64];
-	av_int  DigitalChannel;
-	av_int  ShowWindowsId;
-	E_ProtoMode ProtoMode;
-	union{
-		C_ProtoOnvifFormats OnvifFormats;
-		C_ProtoMoonFormats  MoonFormats;
-		C_ProtoRtmpFormats  RtmpFormats;
-		C_ProtoRtspFormats	RtspFormats;
-	};
-}ConfigProtoFormats;
-
+typedef C_ProtoFormats ConfigProtoFormats;
 
 typedef C_AudioProfile ConfigAudioFormats;
 
-typedef C_ImageFormats ConfigImageFormats;
+typedef C_ImageProfile ConfigImageProfile;
 
-typedef C_CaptureInFormats ConfigCaptureFormats;
+typedef C_CaptureProfile ConfigCaptureProfile;
 
 
-typedef TAvConfig<ConfigEncodeFormats, 0, ConfMaxCaptureChn> CAvConfigEncode;
+typedef TAvConfig<ConfigEncodeProfile, 0, SYS_LOCALCAPTURE_CHN> CAvConfigEncode;
 
-typedef TAvConfig<ConfigImageFormats, 0, ConfMaxCaptureChn> CAvConfigImage;
+typedef TAvConfig<ConfigImageProfile, 0, SYS_LOCALCAPTURE_CHN> CAvConfigImage;
 
-typedef TAvConfig<ConfigCaptureFormats, 0, ConfMaxCaptureChn> CAvConfigCapture;
+typedef TAvConfig<ConfigCaptureProfile, 0, SYS_LOCALCAPTURE_CHN> CAvConfigCapture;
 
-typedef TAvConfig<ConfigCoverFormats, 0, ConfMaxCaptureChn>CAvConfigCover;
+typedef TAvConfig<ConfigCoverFormats, 0, SYS_LOCALCAPTURE_CHN>CAvConfigCover;
 
-typedef TAvConfig<ConfigWaterMarkingFormats, 0, ConfMaxCaptureChn>CAvConfigWaterMarking;
+typedef TAvConfig<ConfigWaterMarkingFormats, 0, SYS_LOCALCAPTURE_CHN>CAvConfigWaterMarking;
 
-typedef TAvConfig<ConfigProtoFormats, 0, ConfMaxDecodeChn>CAvConfigProtocol;
+typedef TAvConfig<ConfigProtoFormats, 0, SYS_REMOTECAPTURE_CHN>CAvConfigProtocol;
 
-typedef TAvConfig<ConfigAudioFormats, 0, 2>CAvConfigAudio;
+typedef TAvConfig<ConfigAudioFormats, 0, 1>CAvConfigAudio;
 
 
 

@@ -14,7 +14,7 @@
 ******************************************************************/
 #ifndef _AV_RTSP_H_
 #define _AV_RTSP_H_
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "CAvObject.h"
 #include "Rtsp/LibRtspServer.h"
 #include "AvPacket/AvPacket.h"

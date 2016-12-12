@@ -14,7 +14,7 @@
 ******************************************************************/
 #ifndef _AV_DDNS_H_
 #define _AV_DDNS_H_
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 
 typedef enum
 {

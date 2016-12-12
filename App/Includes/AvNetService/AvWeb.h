@@ -17,7 +17,7 @@
 
 #include <map>
 #include <list>
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "CAvObject.h"
 #include "WebService/LibWebService.h"
 #include "AvNetService/AvWebProcess.h"

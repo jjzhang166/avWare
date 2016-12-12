@@ -15,7 +15,7 @@
 #ifndef _AV_DHCP_H_
 #define _AV_DHCP_H_
 
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 
 
 class CAvDhcp

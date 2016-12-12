@@ -21,10 +21,9 @@
 #include "AvConfigs/AvConfigNetService.h"
 #include "AvConfigs/AvConfigCapture.h"
 #include "AvConfigs/AvConfigAlarm.h"
+#include "AvConfigs/AvConfigRecord.h"
 
-void ConfigUnitTest(void);
 
-class CTimer;
 
 std::string getString(const AvConfigValue &val);
 
@@ -62,7 +61,7 @@ private:
 	av_bool m_change;
 	AvConfigValue m_total;
 	std::string m_config_data;
-	CTimer *m_timer;
+	//CTimer *m_timer;
 
 	static CMutex m_mutex;
 
@@ -87,7 +86,10 @@ private:
 	CAvConfigNetDdns			m_confignet_ddns;
 	CAvConfigNetUpnp			m_confignet_upnp;
 	CAvConfigNetNtp				m_confignet_ntp;
+	CAvConfigRtmp				m_config_rtmp;
 	
+	CAvConfigRecord				m_config_record;
+	CAvConfigRecordCtrl			m_config_recordctrl;
 };
 
 #define g_AvConfigManager (*CAvConfigManager::instance())

@@ -17,7 +17,7 @@
 
 SINGLETON_IMPLEMENT(CAvNtpCli)
 
-CAvNtpCli::CAvNtpCli():CTimer("AvNtpCli")
+CAvNtpCli::CAvNtpCli()
 {
 
 }
@@ -37,10 +37,10 @@ av_bool CAvNtpCli::Start()
 
 av_bool CAvNtpCli::Stop()
 {
-	if (GetStatus() != UnStart)
-	{
-		StopTimer();
-	}
+// 	if (GetStatus() != UnStart)
+// 	{
+// 		StopTimer();
+// 	}
 	m_AvConfigNetNtp.Detach(this, (AvConfigCallBack)&CAvNtpCli::AvConfigNtp);
 	return av_true;
 }
@@ -60,14 +60,14 @@ av_void CAvNtpCli::AvConfigNtp(CAvConfigNetNtp* obj, int &num)
 	ConfigNetNtp ntp_config = obj->GetConfig();
 	av_msg("CAvNtpCli::AvConfigNtp Enable = %d\n", ntp_config.Enable);
 
-	if (GetStatus() != UnStart)
-	{
-		StopTimer();
-	}
+// 	if (GetStatus() != UnStart)
+// 	{
+// 		StopTimer();
+// 	}
 	
 	if (ntp_config.Enable == av_true)
 	{		
-		StartTimer(1*1000, 5*1000, av_true, av_true);
+/*		StartTimer(1*1000, 5*1000, av_true, av_true);*/
 	}
 	m_AvConfigNetNtp.Update();
 }

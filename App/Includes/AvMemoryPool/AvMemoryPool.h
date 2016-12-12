@@ -15,7 +15,7 @@
 #ifndef _AVMEMORYPOOL_H_
 #define _AVMEMORYPOOL_H_
 
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "CAvObject.h"
 #include "MemPool/CMemoryPool.h"
 

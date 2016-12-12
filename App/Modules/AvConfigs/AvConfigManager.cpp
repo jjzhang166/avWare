@@ -13,8 +13,8 @@
 |  说明:
 ******************************************************************/
 #include <iostream>
-
-#include "Apis/AvWareType.h"
+#include "AvFile/AvFile.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvThread/AvTimer.h"
 #include "AvDevice/AvDevice.h"
 #include "AvConfigs/AvConfigIndex.h"
@@ -38,17 +38,17 @@ typedef Json::Reader AvConfigReader;
 #define  AvConfigFileNameBu "avWare2.conf"
 #endif
 
-class TimerConfManager:public CTimer
-{
-public:
-	TimerConfManager(){}
-	~TimerConfManager(){}
-public: 
-	void OnTime()
-	{
-		av_msg("TimerConfManager test\n");
-	}
-};
+// class TimerConfManager:public CTimer
+// {
+// public:
+// 	TimerConfManager(){}
+// 	~TimerConfManager(){}
+// public: 
+// 	void OnTime()
+// 	{
+// 		av_msg("TimerConfManager test\n");
+// 	}
+// };
 
 SINGLETON_IMPLEMENT(CAvConfigManager);
 
@@ -56,24 +56,24 @@ CMutex CAvConfigManager::m_mutex;
 
 CAvConfigManager::CAvConfigManager()
 {
-	m_timer = nullptr;
+/*	m_timer = nullptr;*/
 	m_ConfigFullPatch.assign(AvConfigFileName);
 	m_ConfigFullPatchBu.assign(AvConfigFileNameBu);
 }
 
 CAvConfigManager::~CAvConfigManager()
 {
-	if (nullptr != m_timer){
-		delete m_timer;
-		m_timer = NULL;
-	}
+// 	if (nullptr != m_timer){
+// 		delete m_timer;
+// 		m_timer = NULL;
+// 	}
 	m_ConfigFullPatchBu.clear();
 	m_ConfigFullPatch.clear();
 }
 
 void CAvConfigManager::Initialize()
 {
-	m_timer = new TimerConfManager();
+//	m_timer = new TimerConfManager();
 	m_change = av_false;
 	m_config_data.reserve(512 * 1024);
 	AvConfigReader reader;
@@ -81,6 +81,7 @@ void CAvConfigManager::Initialize()
 	std::string ConfigPath; 
 	av_bool abRet = CAvDevice::GetEnv(std::string(EKey_ConfigsPath), ConfigPath);
 	if (abRet == av_true){
+		
 		SetAvConfigPath(ConfigPath);
 	}
 
@@ -103,7 +104,7 @@ void CAvConfigManager::Initialize()
 	m_name_configIndex.insert(ConfIndexValueType("DeviceUart", CONF_DEVICE_UART));
 	LoadConfig("DeviceUart", m_config_device_uart);
 
-	
+
 	m_name_configIndex.insert(ConfIndexValueType("Capture", CONF_CAPTURE_FORMATS));
 	LoadConfig("Capture", m_ConfigCapture);
 
@@ -153,6 +154,15 @@ void CAvConfigManager::Initialize()
 	LoadConfig("NetServerUpnp", m_confignet_upnp);
 	m_name_configIndex.insert(ConfIndexValueType("NetServerNtp", CONF_NET_SER_NTP));
 	LoadConfig("NetServerNtp", m_confignet_ntp);
+	m_name_configIndex.insert(ConfIndexValueType("NetProtoRtmp", CONF_PROTO_RTMP));
+	LoadConfig("NetProtoRtmp", m_config_rtmp);
+	//RECORD
+	m_name_configIndex.insert(ConfIndexValueType("Record", CONF_RECORD));
+	LoadConfig("Record", m_config_record);
+
+	//Recordctrl  
+	m_name_configIndex.insert(ConfIndexValueType("RecordCtrl", CONF_RECORDCTRL));
+	LoadConfig("RecordCtrl", m_config_recordctrl);
 
 	if (false == load_flag){
 		Save();
@@ -168,7 +178,7 @@ void CAvConfigManager::LoadConfig(const char *name, CAvConfigBase &conf)
 	//装载配置
 	conf.GetConfigTable(m_total[name]);
 	if (!conf.valid() || 0 == conf.get_use_index()) {
-		av_msg("Load Config from file faile restore default\n");
+		av_warning("Load Config[%15s] from file failed restore default\n", name);
 		conf.set_use_index(conf.get_max_index());
 		conf.GetDefault();
 	}
@@ -214,6 +224,7 @@ av_bool CAvConfigManager::SetAvConfigPath(std::string &ConfPatch)
 		m_ConfigFullPatchBu.append("/");
 		m_ConfigFullPatchBu.append(AvConfigFileNameBu);
 	}
+	av_msg("ConfigsFullPath[%s][%s]\n", m_ConfigFullPatch.c_str(), m_ConfigFullPatchBu.c_str());
 	return av_true;
 }
 void CAvConfigManager::Save()
@@ -234,9 +245,10 @@ void CAvConfigManager::Save()
 	rename(m_ConfigFullPatch.c_str(), m_ConfigFullPatchBu.c_str());
 
 	//TODO将m_config_data 保存为文件
+	CFile::MakeDeepDirectory(m_ConfigFullPatch.c_str());
 	FILE *fp = fopen(m_ConfigFullPatch.c_str(), "w");
 	if (NULL == fp) {
-		perror("Save Config failed can`t create file:");
+		av_error("Save Config failed can`t create file:[%s]\n", m_ConfigFullPatch.c_str());
 		return;
 	}
 	fwrite(m_config_data.c_str(), sizeof(char), m_config_data.size(), fp);

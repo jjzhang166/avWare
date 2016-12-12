@@ -1,0 +1,228 @@
+if (CMAKE_BUILD_TYPE MATCHES "Release")
+		message("*****Use Build Type ${CMAKE_BUILD_TYPE}")
+		set (USE_CPACK ON)
+elseif (CMAKE_BUILD_TYPE MATCHES "Debug")
+		set (USE_CPACK OFF)
+		
+		message("*****Use Build Type ${CMAKE_BUILD_TYPE}")
+else()
+		message(FATAL_ERROR "packet mast use  cmake -DCMAKE_BUILD_TYPE=Release dir")
+endif()
+
+
+if (${USE_CPACK} STREQUAL "ON")
+	set(SDK_VERSION  "AvWareSDK_${_AV_WARE_VERSION_MAJOR}_${_AV_WARE_VERSION_MINOR}_${_AV_WARE_VERSION_PATCH}")
+	set(INSTALL_DIR bin)
+else()
+	set(INSTALL_DIR ${EXECUTABLE_OUTPUT_PATH}/${CMAKE_BUILD_TYPE})
+	set(SDK_VERSION  "${EXECUTABLE_OUTPUT_PATH}/AvWareSDK_${_AV_WARE_VERSION_MAJOR}_${_AV_WARE_VERSION_MINOR}_${_AV_WARE_VERSION_PATCH}")
+endif()
+
+set (CPACK_PACKAGE_VERSION_MAJOR "${_AV_WARE_VERSION_MAJOR}") 
+set (CPACK_PACKAGE_VERSION_MINOR "${_AV_WARE_VERSION_MINOR}")  
+set (CPACK_PACKAGE_VERSION_PATCH "${_AV_WARE_VERSION_PATCH}")
+
+set (CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}")
+set (CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}.${CPACK_PACKAGE_VERSION_MINOR}")
+set (CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}.${CPACK_PACKAGE_VERSION_PATCH}")
+set (CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}.${CPACK_PACKAGE_VERSION_MINOR}")
+
+##Cpack
+if (${USE_CPACK} STREQUAL "ON")
+	include (InstallRequiredSystemLibraries)
+	set(CPACK_COMPONENT_UNSPECIFIED_HIDDEN TRUE)
+	set(CPACK_COMPONENT_UNSPECIFIED_REQUIRED TRUE)
+	set(CPACK_MONOLITHIC_INSTALL 1)
+	set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
+	set(CPACK_COMPONENTS_IGNORE_GROUPS 1)
+	set(CPACK_COMPONENTS_GROUPING "IGNORE")
+#	set(CPACK_GENERATOR WIX)
+#	set(CPACK_GENERATOR deb)
+	set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "First Use Cmake cpack")
+	set (CPACK_PACKAGE_VENDOR "Knight")
+	set (CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../Doc/ReadMe.txt")
+	set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../Doc/License.txt")
+
+#
+
+	set (CPACK_PACKAGE_INSTALL_DIRECTORY "avWare")
+	if (WIN32 AND NOT UNIX)
+	  set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/Build/Packet/install_icon\\\\Install_03.ico")
+	  set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/Build/Packet/install_icon\\\\Install_03.ico")
+	  set(CPACK_NSIS_INSTALLED_ICON_NAME "avWare.exe")
+	  set(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY}")
+	  set(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.graceport.cn")
+	  set(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.graceport.cn")
+	  set(CPACK_NSIS_CONTACT "knight@graceport.cn")
+	  set(CPACK_NSIS_MODIFY_PATH ON)
+	  set(CPACK_CREATE_DESKTOP_LINKS "avWare")
+	else(WIN32 AND NOT UNIX)
+	  set(CPACK_STRIP_FILES "avWare")
+	  set(CPACK_SOURCE_STRIP_FILES "")
+	endif(WIN32 AND NOT UNIX)
+	set(CPACK_PACKAGE_EXECUTABLES "avWare" "GracePort")
+	include (CPack)
+	
+	if (WIN32)
+		set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+		
+	endif(WIN32)
+endif(${USE_CPACK} STREQUAL "ON")
+
+##install
+if (WIN32)
+	if (${CMAKE_WITH_UI} STREQUAL "ON")
+		install (FILES ${CMAKE_QT_PATH}/bin/Qt5Core.dll DESTINATION ${INSTALL_DIR}/)
+		install (FILES ${CMAKE_QT_PATH}/bin/Qt5Gui.dll DESTINATION ${INSTALL_DIR}/)
+		install (FILES ${CMAKE_QT_PATH}/bin/Qt5Widgets.dll DESTINATION ${INSTALL_DIR}/)
+		install (FILES ${CMAKE_QT_PATH}/plugins/platforms/qminimal.dll DESTINATION ${INSTALL_DIR}/platforms/)
+		install (FILES ${CMAKE_QT_PATH}/plugins/platforms/qoffscreen.dll DESTINATION ${INSTALL_DIR}/platforms/)
+		install (FILES ${CMAKE_QT_PATH}/plugins/platforms/qwindows.dll DESTINATION ${INSTALL_DIR}/platforms/)
+	endif()
+	install (FILES Build/Platform/${COMPILER}/avcodec-57.dll DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/avdevice-57.dll DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/avfilter-6.dll DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/avformat-57.dll DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/avutil-55.dll DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/swresample-2.dll DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/swscale-4.dll DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/d3dx9_43.dll DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/AvCedrShared.dll DESTINATION ${INSTALL_DIR}/)
+	#install (FILES Build/Platform/${COMPILER}/libgcc_s_dw2-1.dll DESTINATION ${INSTALL_DIR}/)
+	#install (FILES Build/Platform/${COMPILER}/libiconv-2.dll DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/SDL2.dll DESTINATION ${INSTALL_DIR}/)
+	#install (FILES Build/Platform/${COMPILER}/AvPlayer.dll DESTINATION ${INSTALL_DIR}/)
+	#install (FILES Build/Platform/${COMPILER}/libmfxsw32.dll DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/postproc-54.dll DESTINATION ${INSTALL_DIR}/)
+	#install (FILES Build/Platform/${COMPILER}/pthreadGC2.dll DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/pthreadVC2.dll DESTINATION ${INSTALL_DIR}/)
+	#install (FILES Build/Platform/${COMPILER}/libx264-148.dll DESTINATION ${INSTALL_DIR}/)
+	#install (FILES Build/Platform/${COMPILER}/CapEncoder.dll DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/libeay32.dll DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/ssleay32.dll DESTINATION ${INSTALL_DIR}/)
+	
+	install (FILES Build/Platform/${COMPILER}/ActiveXInstall.bat DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/ActiveXUninstall.bat DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/AvActiveX.exe DESTINATION ${INSTALL_DIR}/)
+	install (FILES Build/Platform/${COMPILER}/AvProtoShare.dll DESTINATION ${INSTALL_DIR}/)
+	if (${USE_CPACK} STREQUAL "ON")
+		install (FILES ${EXECUTABLE_OUTPUT_PATH}/Release/${target}.exe DESTINATION ${INSTALL_DIR}/)
+		install (DIRECTORY Build/Packet/webroot DESTINATION ${INSTALL_DIR}/)
+		install (DIRECTORY Build/Packet/Lua DESTINATION ${INSTALL_DIR}/)
+	else()
+		install (DIRECTORY Build/Packet/webroot DESTINATION ${INSTALL_DIR}/../App/)
+		install (DIRECTORY Build/Packet/Lua DESTINATION ${INSTALL_DIR}/../App/)
+	endif(${USE_CPACK} STREQUAL "ON")
+
+	
+	install (FILES Includes/CAvObject.h 						DESTINATION ${SDK_VERSION}/Includes/)
+	install (FILES Includes/Signal_s.h	 						DESTINATION ${SDK_VERSION}/Includes/)
+	install (FILES Includes/Signals.h 							DESTINATION ${SDK_VERSION}/Includes/)
+	install (FILES Includes/Apis/AvEnum.h 						DESTINATION ${SDK_VERSION}/Includes/Apis/)
+	install (FILES Includes/Apis/AvEnuminline.h 				DESTINATION ${SDK_VERSION}/Includes/Apis/)
+	install (FILES Includes/Apis/AvSystemStruct.h 				DESTINATION ${SDK_VERSION}/Includes/Apis/)
+	install (FILES Includes/Apis/AvWareLibDef.h 				DESTINATION ${SDK_VERSION}/Includes/Apis/)
+	install (FILES Includes/Apis/AvWareStruct.h 				DESTINATION ${SDK_VERSION}/Includes/Apis/)
+	install (FILES Includes/Apis/AvWareType.h 					DESTINATION ${SDK_VERSION}/Includes/Apis/)
+	install (FILES Includes/Apis/AvWareCplusplus.h				DESTINATION ${SDK_VERSION}/Includes/Apis/)
+	
+	install (FILES Includes/AvProtocol/AvNetProto.h				DESTINATION ${SDK_VERSION}/Includes/AvProtocol/)
+	install (FILES Includes/AvPacket/AvPacket.h 				DESTINATION ${SDK_VERSION}/Includes/AvPacket/)
+	install (FILES Includes/AvThread/AvThread.h 				DESTINATION ${SDK_VERSION}/Includes/AvThread/)
+	install (FILES Includes/AvThread/AvThreadPool.h 			DESTINATION ${SDK_VERSION}/Includes/AvThread/)
+	install (FILES Includes/AvThread/AvTimer.h 					DESTINATION ${SDK_VERSION}/Includes/AvThread/)
+	
+	install (FILES Lib/uvPlusPlus/libuvCpp.h 					DESTINATION ${SDK_VERSION}/Includes/uvPlusPlus/)
+	install (FILES Modules/AvProtocol/AvProto/Proto.h 			DESTINATION ${SDK_VERSION}/Includes/AvProto/)
+	install (FILES Modules/AvProtocol/AvProto/ProtoAlarm.h 		DESTINATION ${SDK_VERSION}/Includes/AvProto/)
+elseif (UNIX)
+
+	if (COMPILER MATCHES "LINUX")
+		install (DIRECTORY ../App/Build/webroot DESTINATION ${EXECUTABLE_OUTPUT_PATH}) 
+	else()
+		set (CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}_${_AV_WARE_VERSION_OEM}")
+		set (CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}_${_AV_WARE_VERSION_RUNTIME}")
+		install (FILES ${EXECUTABLE_OUTPUT_PATH}/${target} DESTINATION ${EXECUTABLE_OUTPUT_PATH}/_Packet)
+		install (FILES Build/Packet/start.sh DESTINATION ${EXECUTABLE_OUTPUT_PATH}/_Packet)
+		install (DIRECTORY Build/Packet/webroot DESTINATION ${EXECUTABLE_OUTPUT_PATH}/_Packet)
+		install (DIRECTORY Build/Packet/Lua DESTINATION ${EXECUTABLE_OUTPUT_PATH}/_Packet)
+		
+		#install (FILES Build/Platform/${COMPILER}/libProtoShare.so DESTINATION ${EXECUTABLE_OUTPUT_PATH}/_Packet/lib)
+
+		if (COMPILER MATCHES "HISI_16C_18ACE_V100")
+			set(CHIP_MASK 0x39)
+			set(PACK_PREFIX H18EAC16C_V100)
+			install (DIRECTORY Build/Packet/${COMPILER}/sensor DESTINATION ${EXECUTABLE_OUTPUT_PATH}/_Packet/configs)
+			install (DIRECTORY Build/Packet/${COMPILER}/ko DESTINATION ${EXECUTABLE_OUTPUT_PATH}/_Packet)
+
+		elseif (COMPILER MATCHES "HISI_16C_18E_V200")
+			set(CHIP_MASK 0x42)
+			set(PACK_PREFIX H18E16C_V200)
+			#tar -cJvf avWare.tar.gz avWare
+			install (DIRECTORY Build/Packet/${COMPILER}/sensor DESTINATION ${EXECUTABLE_OUTPUT_PATH}/_Packet/configs)
+			install (DIRECTORY Build/Packet/${COMPILER}/ko DESTINATION ${EXECUTABLE_OUTPUT_PATH}/_Packet)
+
+		elseif (COMPILER MATCHES "HISI_16AD")
+			set(CHIP_MASK 0x300)
+			set(PACK_PREFIX H16AD)
+			install (DIRECTORY Build/Packet/${COMPILER}/sensor DESTINATION ${EXECUTABLE_OUTPUT_PATH}/_Packet/configs)
+			install (DIRECTORY Build/Packet/${COMPILER}/ko DESTINATION ${EXECUTABLE_OUTPUT_PATH}/_Packet)
+
+		elseif (COMPILER MATCHES "HISI_3535")
+		elseif (COMPILER MATCHES "AMBA")
+			set(CHIP_MASK 0x1f00000)
+			set(PACK_PREFIX AMBA)
+			install (FILES Build/Packet/start.sh DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+			install (DIRECTORY Build/Packet/webroot DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+			install (DIRECTORY Build/Packet/Lua DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+			install (FILES Build/Platform/AMBA/libtklpn.so DESTINATION ${EXECUTABLE_OUTPUT_PATH}/lib)
+
+		endif ()
+		
+	endif()
+
+		
+endif()#WIN32
+
+##嵌入式平台打包
+if (WIN32)
+	
+elseif (UNIX)
+	set (packet_cmake ${CMAKE_CURRENT_SOURCE_DIR}/Build/Packet.Cmake)
+	add_custom_target(packet COMMAND ${CMAKE_COMMAND} ARGS -P ${packet_cmake} DEPENDS ${target})
+	if (COMPILER MATCHES "AMBA")
+		add_custom_command(TARGET packet POST_BUILD COMMAND echo "")
+		add_custom_command(TARGET packet POST_BUILD COMMAND echo "")
+		add_custom_command(TARGET packet POST_BUILD COMMAND echo "============Build ${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.tar.img============")
+		add_custom_command(TARGET packet POST_BUILD COMMAND tar -czvf ${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.tar.img 
+			${EXECUTABLE_OUTPUT_PATH}/avWare
+			${EXECUTABLE_OUTPUT_PATH}/Lua
+			${EXECUTABLE_OUTPUT_PATH}/start.sh
+			${EXECUTABLE_OUTPUT_PATH}/webroot
+			${EXECUTABLE_OUTPUT_PATH}/lib
+		)
+		add_custom_command(TARGET packet POST_BUILD COMMAND cp ${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.tar.img ${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.tar.gz)
+		add_custom_command(TARGET packet POST_BUILD COMMAND mkAvPack -f=${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.tar.img -version=${CPACK_PACKAGE_VERSION} -chip=${CHIP_MASK} -mode=jffs2 -custom=${_AV_WARE_VERSION_OEM})
+	else()
+		add_custom_command(TARGET packet POST_BUILD COMMAND echo "")
+		add_custom_command(TARGET packet POST_BUILD COMMAND echo "")
+		add_custom_command(TARGET packet POST_BUILD COMMAND echo "============Build ${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.ro.img============")
+		add_custom_command(TARGET packet POST_BUILD COMMAND rm -rf ${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.ro.img)
+		add_custom_command(TARGET packet POST_BUILD COMMAND mksquashfs ${EXECUTABLE_OUTPUT_PATH}/_Packet/ ${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.ro.img -b 64k -comp xz)
+		add_custom_command(TARGET packet POST_BUILD COMMAND cp ${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.ro.img ${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.squashfs)
+		add_custom_command(TARGET packet POST_BUILD COMMAND echo "")
+		add_custom_command(TARGET packet POST_BUILD COMMAND mkAvPack -f=${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.ro.img -version=${CPACK_PACKAGE_VERSION} -chip=${CHIP_MASK} -mode=squashfs -custom=${_AV_WARE_VERSION_OEM})
+		add_custom_command(TARGET packet POST_BUILD COMMAND echo "============${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.ro.img Over============")
+		
+		add_custom_command(TARGET packet POST_BUILD COMMAND echo "")
+		add_custom_command(TARGET packet POST_BUILD COMMAND echo "")
+		add_custom_command(TARGET packet POST_BUILD COMMAND echo "============Build ${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.wr.img============")
+		add_custom_command(TARGET packet POST_BUILD COMMAND rm -rf ${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.wr.img)
+		
+		add_custom_command(TARGET packet POST_BUILD COMMAND mkfs.jffs2 -d ${EXECUTABLE_OUTPUT_PATH}/_Packet/ -l -e 0x10000 -o ${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.wr.img)
+		add_custom_command(TARGET packet POST_BUILD COMMAND cp ${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.wr.img ${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.jffs2)
+		add_custom_command(TARGET packet POST_BUILD COMMAND mkAvPack -f=${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.wr.img -version=${CPACK_PACKAGE_VERSION} -chip=${CHIP_MASK} -mode=jffs2 -custom=${_AV_WARE_VERSION_OEM})
+		add_custom_command(TARGET packet POST_BUILD COMMAND echo "============Build ${EXECUTABLE_OUTPUT_PATH}/${PACK_PREFIX}_${CPACK_PACKAGE_VERSION}.wr.img Over ============")
+	endif()
+
+endif()#WIN32

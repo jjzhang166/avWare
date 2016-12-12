@@ -15,7 +15,7 @@
 #ifndef AVWARE_AVCONFIG_AVCONFIGDEVICE_H_
 #define AVWARE_AVCONFIG_AVCONFIGDEVICE_H_
 
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvConfigs/AvConfigTable.h"
 #include "Apis/LibSystem.h"
 

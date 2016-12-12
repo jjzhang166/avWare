@@ -18,7 +18,7 @@
 
 SINGLETON_IMPLEMENT(CAvDdnsCli)
 
-CAvDdnsCli::CAvDdnsCli():CTimer("AvDdnsCli")
+CAvDdnsCli::CAvDdnsCli()
 {
 	m_AvConfigChanged = 0;
 }
@@ -34,14 +34,14 @@ av_bool CAvDdnsCli::Start()
 	//m_AvConfigsDdns.Update();
 	m_AvConfigsDdns.Attach(this, (AvConfigCallBack)&CAvDdnsCli::AvConfigDdns);
 	AvConfigDdns(&m_AvConfigsDdns, ret);
-	StartTimer(1*1000, 5*1000, av_true, av_true);
+//	StartTimer(1*1000, 5*1000, av_true, av_true);
 	
 	return av_true;
 }
 
 av_bool CAvDdnsCli::Stop()
 {
-	StopTimer();
+	//StopTimer();
 	m_AvConfigsDdns.Detach(this, (AvConfigCallBack)&CAvDdnsCli::AvConfigDdns);	
 	return av_true;
 }

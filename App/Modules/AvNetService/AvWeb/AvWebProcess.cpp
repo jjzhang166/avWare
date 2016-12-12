@@ -1,8 +1,9 @@
 #include "AvNetService/AvWebProcess.h"
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvConfigs/AvConfigCapture.h"
 #include "AvDevice/AvDevice.h"
 #include "AvUart/AvUart.h"
+#include "Apis/AvEnuminline.h"
 
 using std::string;
 namespace av_web{
@@ -19,11 +20,49 @@ inline int AvWebChannelSalveCheck(CWebMsg& web_req, int& channel, int& slave)
 	return WEB_STATUS_OK;
 }
 
+inline void GetSupportEncImageSize(CWebMsg &msg, const av_u32 ImageSizeMask)
+{
+	int array_index = 0;
+	for (int i = CaptureSize_Self; i < CaptureSize_LAST; i++) {
+		if (AvMask(i) & ImageSizeMask) {
+			msg[array_index] = EnumNameCaptureSize(static_cast<CaptureSize>(i));
+			av_msg("support Encode Image Size %s\n",msg[array_index].asCString());
+			++array_index;
+		}
+	}
+}
+
+
+inline void GetSupportEncComp(CWebMsg &msg, const av_u32 EncCompMask)
+{
+	int array_index = 0;
+	for (int i = AvComp_H264; i <= AvComp_LAST; i++) {
+		if (AvMask(i) & EncCompMask) {
+			msg[array_index] = EnumNameAvComp(static_cast<AvComp>(i));
+			av_msg("support Encode Comp %s\n",msg[array_index].asCString());
+			++array_index;
+		}
+	}
+}
+
+inline void GetSupportEncBitContrul(CWebMsg &msg, av_uchar EncBitControl)
+{
+	int array_index = 0;
+	av_warning("__%s EncBitControl = %x\n", __FUNCTION__, EncBitControl);
+	for (int i = BitRateCtrl_CBR; i < BitRateCtrl_LAST; i++) {
+		if (AvMask(i) & EncBitControl) {
+			msg[array_index] = EnumNameBitRateCtrl(static_cast<BitRateCtrl>(i));
+			av_msg("support Encode Comp %s\n",msg[array_index].asCString());
+			++array_index;
+		}
+	}
+}
+
 }// namespace av_web
 
-
+#if 0
 template<> 
-const char* av_web::EnumNameStr<av_comp_t>::List[] = 
+const char* av_web::EnumNameStr<AvComp>::List[] =
 {
 	"MJPEG",	//AvComp_MJPEG,
 	"H264",		//AvComp_H264,
@@ -40,7 +79,7 @@ const char* av_web::EnumNameStr<av_comp_t>::List[] =
 };
 
 template<> 
-const char* av_web::EnumNameStr<av_capture_size>::List[] =
+const char* av_web::EnumNameStr<CaptureSize>::List[] =
 {
 	"Self",			//CaptureSize_Self,
 	"480*270",		//CaptureSize_QVGAEX,	//480*270
@@ -62,14 +101,14 @@ const char* av_web::EnumNameStr<av_capture_size>::List[] =
 };
 
 template<> 
-const char* av_web::EnumNameStr<av_bitrate_ctrl>::List[] =
+const char* av_web::EnumNameStr<BitRateCtrl>::List[] =
 {
 	"CBR",		//AvBitRate_CBR
 	"VBR",		//AvBitRate_VBR
 };
 
 template<>
-const char* av_web::EnumNameStr<E_IrCutMode>::List[] =
+const char* av_web::EnumNameStr<IrCutMode>::List[] =
 {
 	"Open",			//IRCUT_OPEN,
 	"Close",		//IRCUT_CLOSE,
@@ -78,7 +117,7 @@ const char* av_web::EnumNameStr<E_IrCutMode>::List[] =
 };
 
 template<>
-const char* av_web::EnumNameStr<E_AntiFlckerMode>::List[] =
+const char* av_web::EnumNameStr<AntiFlckerMode>::List[] =
 {
 	"None",			//AvAntiFlckerMode_NONE = 0,
 	"InDoor50Hz",			//AvAntiFlckerMode_INDOOR_50HZ = 1,
@@ -94,11 +133,13 @@ const char* av_web::EnumNameStr<E_AntiFlckerMode>::List[] =
 	"Close",				//AvAntiFlckerMode_ANTI_FLICKER_CLOSED = 11,
 	"Nr",				//AvAntiFlckerMode_LAST = 12
 };
+#endif
 
 int av_web::AvWebLogIn(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	av_msg("User: %s  PW: %s\n", web_req["Username"].asCString(), web_req["Password"].asCString());
 	have_resp_param = av_true;
+	//TODO: session还没处理
 	web_resp["Session"] = "24678";
 	return WEB_STATUS_OK;
 }
@@ -118,13 +159,14 @@ int av_web::AvWebGetDeviceCaps(CWebMsg &web_req, CWebMsg &web_resp, av_bool &hav
 	web_resp["MaxDecodeChannel"] = dspcap.nMaxDecodeChannel;
 	CWebMsg &enccap_comp_array = web_resp["Compress"];
 	//TODO:暂时写死
-	enccap_comp_array[(unsigned int)0] = "H264";
-	enccap_comp_array[(unsigned int)1] = "H265";
-	enccap_comp_array[(unsigned int)2] = "MJPEG";
+	enccap_comp_array[static_cast<unsigned int>(0)] = "H264";
+	enccap_comp_array[static_cast<int>(1)] = "H265";
+	enccap_comp_array[static_cast<int>(2)] = "MJPEG";
 	web_resp["MaxResolution"] = "1920*1080";
 	have_resp_param = av_true;
 	return WEB_STATUS_OK;
 }
+
 
 int av_web::AvWebGetVideoEncodeCaps(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
@@ -137,30 +179,31 @@ int av_web::AvWebGetVideoEncodeCaps(CWebMsg &web_req, CWebMsg &web_resp, av_bool
 		return WEB_STATUS_PARAM_ERROR;
 	}
 	C_EncodeCaps enc_cap = { 0 };
-	g_AvDevice.GetCaptureCaps(channel, enc_cap);
+	g_AvDevice.GetEncodeCaps(channel, enc_cap);
 	web_resp["Channel"] = channel;
 	web_resp["Slave"] = slave;
-	//TODO:暂时写死 后面改活
+
+
 	CWebMsg &enccap_res_array = web_resp["Resolution"];
-	if (CHL_MAIN_T == (slave)) {
-		enccap_res_array[(unsigned int)0] = ConvertEnumToString<av_capture_size>(CaptureSize_1080P);
-		enccap_res_array[(unsigned int)1] = ConvertEnumToString<av_capture_size>(CaptureSize_960P);
-		enccap_res_array[(unsigned int)2] = ConvertEnumToString<av_capture_size>(CaptureSize_720P);
-	} else {
-		enccap_res_array[(unsigned int)0] = ConvertEnumToString<av_capture_size>(CaptureSize_D1);
-		enccap_res_array[(unsigned int)1] = ConvertEnumToString<av_capture_size>(CaptureSize_VGA);
-		enccap_res_array[(unsigned int)2] = ConvertEnumToString<av_capture_size>(CaptureSize_QVGA);
+	if (CHL_MAIN_T == slave) {
+		GetSupportEncImageSize(enccap_res_array, enc_cap.ImageSizeMask);
+	}
+	else if ((CHL_SUB1_T == slave) && (enc_cap.ExtChannelMask & AvMask(CHL_SUB1_T))) {
+	
+		CAvConfigEncode	conf_encode;
+		conf_encode.Update(channel);
+		ConfigEncodeProfile &profile = conf_encode.GetConfig(channel);
+
+		int tmp = profile.CHLProfile[CHL_MAIN_T].Profile.ImageSize;
+		GetSupportEncImageSize(enccap_res_array, enc_cap.ExtImageSizeMask[tmp]);
 	}
 
 
 	CWebMsg &enccap_comp_array = web_resp["Compress"];
-	enccap_comp_array[(unsigned int)0] = ConvertEnumToString<av_comp_t>(AvComp_H264);
-	enccap_comp_array[(unsigned int)1] = ConvertEnumToString<av_comp_t>(AvComp_H265);
-	enccap_comp_array[(unsigned int)2] = ConvertEnumToString<av_comp_t>(AvComp_MJPEG);
+	GetSupportEncComp(enccap_comp_array, enc_cap.CompMask);
 
 	CWebMsg &enccap_bitctrl_array = web_resp["Bitctrl"];
-	enccap_bitctrl_array[(unsigned int)0] = ConvertEnumToString<av_bitrate_ctrl>(AvBitRate_CBR);
-	enccap_bitctrl_array[(unsigned int)1] = ConvertEnumToString<av_bitrate_ctrl>(AvBitRate_VBR);
+	GetSupportEncBitContrul(enccap_bitctrl_array, enc_cap.BitRateCtrlMask);
 
 	web_resp["Maxframerate"] = 30;
 	web_resp["Minframerate"] = 1;
@@ -191,31 +234,32 @@ int av_web::AvWebGetVideoEncodeProfile(CWebMsg &web_req, CWebMsg &web_resp, av_b
 	//TODO: 请求参数范围检测
 	CAvConfigEncode	conf_encode;
 	conf_encode.Update(channel);
-	ConfigEncodeFormats &tag_encode = conf_encode.GetConfig(channel);
-	if (tag_encode.CHLFormats[slave].Enable) {
+	ConfigEncodeProfile &Profile = conf_encode.GetConfig(channel);
+	if (Profile.CHLProfile[slave].Enable) {
 
 		//C_EncodeFormats &format = tag_encode.CHLFormats[slave].Formats;
 		web_resp["Channel"] = channel;
 		web_resp["Slave"] = slave;
 		string str_tmp;
 
-		web_resp["Compress"] = ConvertEnumToString<av_comp_t>(tag_encode.CHLFormats[slave].Formats.Comp);
+		web_resp["Compress"] = EnumNameAvComp(Profile.CHLProfile[slave].Profile.Comp);
+		
 
-		if (nullptr != ConvertEnumToString<av_capture_size>(tag_encode.CHLFormats[slave].Formats.ImageSize)) {
-			web_resp["Resolution"] = ConvertEnumToString<av_capture_size>(tag_encode.CHLFormats[slave].Formats.ImageSize);
+		if (nullptr != EnumNameCaptureSize(Profile.CHLProfile[slave].Profile.ImageSize)) {
+			web_resp["Resolution"] = EnumNameCaptureSize(Profile.CHLProfile[slave].Profile.ImageSize);
 		} else {
 			char tmp[36] = { 0 };
 			sprintf(tmp, "%d*%d",
-				tag_encode.CHLFormats[slave].Formats.ImageSelfWidth,
-				tag_encode.CHLFormats[slave].Formats.ImageSelfHeigh);
+				Profile.CHLProfile[slave].Profile.ImageSelfWidth,
+				Profile.CHLProfile[slave].Profile.ImageSelfHeigh);
 			web_resp["Resolution"] = tmp;
 		}
-		web_resp["FrameRate"] = tag_encode.CHLFormats[slave].Formats.FrameRate;
-		web_resp["Bitctrl"] = ConvertEnumToString<av_bitrate_ctrl>(tag_encode.CHLFormats[slave].Formats.BitRateCtrl);
-		web_resp["BitctrlCbrValue"] = tag_encode.CHLFormats[slave].Formats.BitRateValue;
-		web_resp["BitctrlVbrValue"] = tag_encode.CHLFormats[slave].Formats.BitRateValue;
-		web_resp["GOP"] = tag_encode.CHLFormats[slave].Formats.Gop;
-		web_resp["QLevel"] = tag_encode.CHLFormats[slave].Formats.Qlevel;
+		web_resp["FrameRate"] = Profile.CHLProfile[slave].Profile.FrameRate;
+		web_resp["Bitctrl"] = EnumNameBitRateCtrl(Profile.CHLProfile[slave].Profile.BitRateCtl);
+		web_resp["BitctrlCbrValue"] = Profile.CHLProfile[slave].Profile.BitRateValue;
+		web_resp["BitctrlVbrValue"] = Profile.CHLProfile[slave].Profile.BitRateValue;
+		web_resp["GOP"] = Profile.CHLProfile[slave].Profile.Gop;
+		web_resp["QLevel"] = Profile.CHLProfile[slave].Profile.Qlevel;
 	} else {
 		return WEB_STATUS_PARAM_ERROR;
 	}
@@ -238,22 +282,23 @@ int av_web::AvWebSetVideoEncodeProfile(CWebMsg &web_req, CWebMsg &web_resp, av_b
 
 	CAvConfigEncode *pConfEncode = new CAvConfigEncode();
 	pConfEncode->Update();
-	ConfigEncodeFormats &tag_encode = pConfEncode->GetConfig(channel);
-	C_EncodeFormats &tmp_enc_fmt = tag_encode.CHLFormats[slave].Formats;
+	ConfigEncodeProfile &Profile = pConfEncode->GetConfig(channel);
+	C_EnCodeProfile &EnCodeProfile = Profile.CHLProfile[slave].Profile;
 
-	tmp_enc_fmt.Comp = ConvertStringToEnum<av_comp_t>(web_req["Compress"].asCString());
-	tmp_enc_fmt.ImageSize = ConvertStringToEnum<av_capture_size>(web_req["Resolution"].asCString());
-	tmp_enc_fmt.FrameRate = web_req["FrameRate"].isInt() ? web_req["FrameRate"].asInt() : -1;
+	
+	EnCodeProfile.Comp = AvCompStr2EnumValue(web_req["Compress"].asCString());
+	EnCodeProfile.ImageSize = CaptureSizeStr2EnumValue(web_req["Resolution"].asCString());
+	EnCodeProfile.FrameRate = web_req["FrameRate"].isInt() ? web_req["FrameRate"].asInt() : -1;
 
-	tmp_enc_fmt.BitRateCtrl = ConvertStringToEnum<av_bitrate_ctrl>(web_req["Bitctrl"].asCString());
-	if (AvBitRate_CBR == tmp_enc_fmt.BitRateCtrl) {
-		tmp_enc_fmt.BitRateValue = web_req["BitctrlCbrValue"].isInt() ? web_req["BitctrlCbrValue"].asInt() : -1;
-	} else if (AvBitRate_VBR == tmp_enc_fmt.BitRateCtrl) {
-		//tmp_enc_fmt.BitRateValue = web_req["BitctrlVbrValue"].isInt() ? web_req["BitctrlVbrValue"].asInt() : -1;
-		tmp_enc_fmt.Qlevel = web_req["QLevel"].isInt() ? web_req["QLevel"].asInt() : -1;
+	EnCodeProfile.BitRateCtl = BitRateCtrlStr2EnumValue(web_req["Bitctrl"].asCString());
+	if (BitRateCtrl_CBR == EnCodeProfile.BitRateCtl) {
+		EnCodeProfile.BitRateValue = web_req["BitctrlCbrValue"].isInt() ? web_req["BitctrlCbrValue"].asInt() : -1;
+	}
+	else if (BitRateCtrl_VBR == EnCodeProfile.BitRateCtl) {
+		EnCodeProfile.Qlevel = web_req["QLevel"].isInt() ? web_req["QLevel"].asInt() : -1;
 	}
 
-	tmp_enc_fmt.Gop = web_req["GOP"].isInt() ? web_req["GOP"].asInt() : -1;
+	EnCodeProfile.Gop = web_req["GOP"].isInt() ? web_req["GOP"].asInt() : -1;
 	int ret = 1;
 	ret = pConfEncode->SettingUp();
 	delete pConfEncode;
@@ -263,33 +308,6 @@ int av_web::AvWebSetVideoEncodeProfile(CWebMsg &web_req, CWebMsg &web_resp, av_b
 		return WEB_STATUS_PARAM_ERROR;
 	}
 	
-#if 0
-	CAvConfigEncode	conf_encode;
-	conf_encode.Update(channel);
-	ConfigEncodeFormats &tag_encode = conf_encode.GetConfig(channel);
-	C_EncodeFormats &tmp_enc_fmt = tag_encode.CHLFormats[slave].Formats;
-
-	tmp_enc_fmt.Comp = ConvertStringToEnum<av_comp_t>(web_req["Compress"].asCString());
-	tmp_enc_fmt.ImageSize = ConvertStringToEnum<av_capture_size>(web_req["Resolution"].asCString());
-	tmp_enc_fmt.FrameRate = web_req["FrameRate"].isInt() ? web_req["FrameRate"].asInt() : -1;
-
-	tmp_enc_fmt.BitRateCtrl = ConvertStringToEnum<av_bitrate_ctrl>(web_req["Bitctrl"].asCString());
-	if (AvBitRate_CBR == tmp_enc_fmt.BitRateCtrl) {
-		tmp_enc_fmt.BitRateValue = web_req["BitctrlCbrValue"].isInt() ? web_req["BitctrlCbrValue"].asInt() : -1;
-	} else if (AvBitRate_VBR == tmp_enc_fmt.BitRateCtrl) {
-		//tmp_enc_fmt.BitRateValue = web_req["BitctrlVbrValue"].isInt() ? web_req["BitctrlVbrValue"].asInt() : -1;
-		tmp_enc_fmt.Qlevel = web_req["QLevel"].isInt() ? web_req["QLevel"].asInt() : -1;
-	}
-
-	tmp_enc_fmt.Gop = web_req["GOP"].isInt() ? web_req["GOP"].asInt() : -1;
-
-	if (1 == conf_encode.SettingUp(channel)) {
-		return WEB_STATUS_OK;
-	} else {
-		return WEB_STATUS_PARAM_ERROR;
-	}
-#endif
-	//return (1 == conf_encode.SettingUp(channel)) ? WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
 }
 
 int av_web::AvWebGetImageProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
@@ -302,7 +320,7 @@ int av_web::AvWebGetImageProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &h
 
 	CAvConfigImage conf_image;
 	conf_image.Update();
-	ConfigImageFormats &image_fmt = conf_image.GetConfig(channel);
+	ConfigImageProfile &image_fmt = conf_image.GetConfig(channel);
 	web_resp["Brightness"] = image_fmt.Brightness;
 	web_resp["Contrast"] = image_fmt.Contrast;
 	web_resp["Saturation"] = image_fmt.Saturation;
@@ -322,7 +340,7 @@ int av_web::AvWebSetImageProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &h
 
 	CAvConfigImage conf_image;
 	conf_image.Update();
-	ConfigImageFormats &image_fmt = conf_image.GetConfig(channel);
+	ConfigImageProfile &image_fmt = conf_image.GetConfig(channel);
 	image_fmt.Brightness = web_req["Brightness"].isInt() ? web_req["Brightness"].asInt() : -1;
 	image_fmt.Contrast = web_req["Contrast"].isInt() ? web_req["Contrast"].asInt() : -1;
 	image_fmt.Saturation = web_req["Saturation"].isInt() ? web_req["Saturation"].asInt() : -1;
@@ -341,11 +359,12 @@ int av_web::AvWebCallPtz(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp
 	if (!web_req["Cmd"].isInt()) {
 		return WEB_STATUS_PARAM_ERROR;
 	}
-	PtzCmd ptzcmd = { 0 };
-	ptzcmd.Cmd = web_req["Cmd"].asInt();
-	ptzcmd.HSpeed = web_req["HSpeed"].isInt() ? web_req["HSpeed"].asInt() : 1;
-	ptzcmd.VSpeed = web_req["VSpeed"].isInt() ? web_req["VSpeed"].asInt() : 1;
-	return (av_true == g_AvUart.PtzStart(ptzcmd)) ? WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
+// 	C_PtzCmd PtzCmd;
+// 
+// 	PtzCmd.PtzCmd = web_req["Cmd"].asInt();
+// 	PtzCmd.HSpeed = web_req["HSpeed"].isInt() ? web_req["HSpeed"].asInt() : 1;
+// 	PtzCmd.VSpeed = web_req["VSpeed"].isInt() ? web_req["VSpeed"].asInt() : 1;
+// 	return (av_true == g_AvUart.PtzStart(ptzcmd)) ? WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
 }
 
 int av_web::AvWebCallPtzFocus(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
@@ -359,11 +378,11 @@ int av_web::AvWebCallPtzFocus(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have
 	if (!web_req["Cmd"].isInt()) {
 		return WEB_STATUS_PARAM_ERROR;
 	}
-	PtzCmd ptzcmd = { 0 };
-	ptzcmd.Cmd = web_req["Cmd"].asInt();
-	ptzcmd.HSpeed = web_req["HSpeed"].isInt() ? web_req["HSpeed"].asInt() : 1;
-	ptzcmd.VSpeed = web_req["VSpeed"].isInt() ? web_req["VSpeed"].asInt() : 1;
-	av_msg("TODO: Call Ptz Focus cmd %d HSpeed %d\n", ptzcmd.Cmd, ptzcmd.HSpeed);
+// 	PtzCmd ptzcmd = { 0 };
+// 	ptzcmd.Cmd = web_req["Cmd"].asInt();
+// 	ptzcmd.HSpeed = web_req["HSpeed"].isInt() ? web_req["HSpeed"].asInt() : 1;
+// 	ptzcmd.VSpeed = web_req["VSpeed"].isInt() ? web_req["VSpeed"].asInt() : 1;
+// 	av_msg("TODO: Call Ptz Focus cmd %d HSpeed %d\n", ptzcmd.Cmd, ptzcmd.HSpeed);
 	return WEB_STATUS_OK;
 }
 
@@ -378,11 +397,11 @@ int av_web::AvWebCallPtzIris(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_
 	if (!web_req["Cmd"].isInt()) {
 		return WEB_STATUS_PARAM_ERROR;
 	}
-	PtzCmd ptzcmd = { 0 };
-	ptzcmd.Cmd = web_req["Cmd"].asInt();
-	ptzcmd.HSpeed = web_req["HSpeed"].isInt() ? web_req["HSpeed"].asInt() : 1;
-	ptzcmd.VSpeed = web_req["VSpeed"].isInt() ? web_req["VSpeed"].asInt() : 1;
-	av_msg("TODO: Call Ptz Iris cmd %d HSpeed %d\n", ptzcmd.Cmd, ptzcmd.HSpeed);
+// 	PtzCmd ptzcmd = { 0 };
+// 	ptzcmd.Cmd = web_req["Cmd"].asInt();
+// 	ptzcmd.HSpeed = web_req["HSpeed"].isInt() ? web_req["HSpeed"].asInt() : 1;
+// 	ptzcmd.VSpeed = web_req["VSpeed"].isInt() ? web_req["VSpeed"].asInt() : 1;
+// 	av_msg("TODO: Call Ptz Iris cmd %d HSpeed %d\n", ptzcmd.Cmd, ptzcmd.HSpeed);
 	return WEB_STATUS_OK;
 }
 
@@ -394,14 +413,15 @@ int av_web::AvWebGetVideoCaptureCaps(CWebMsg &web_req, CWebMsg &web_resp, av_boo
 	int ret = AvWebChannelSalveCheck(web_req, channel, slave);
 	if (WEB_STATUS_OK != ret) { return ret; }
 
+	//TODO:暂时写死
 	CWebMsg &tmpAf = web_resp["Antiflicker"];
-	tmpAf[(unsigned int)0] = ConvertEnumToString<E_AntiFlckerMode>(AvAntiFlckerMode_AUTO_50HZ);
-	tmpAf[(unsigned int)1] = ConvertEnumToString<E_AntiFlckerMode>(AvAntiFlckerMode_AUTO_60HZ);
+	tmpAf[0] = EnumNameAntiFlckerMode(AntiFlckerMode_AUTO_50HZ);
+	tmpAf[1] = EnumNameAntiFlckerMode(AntiFlckerMode_AUTO_60HZ);
 
 	CWebMsg &tmpIr = web_resp["IrCut"];
-	tmpIr[(unsigned int)0] = ConvertEnumToString<E_IrCutMode>(IRCUT_AUTO);
-	tmpIr[(unsigned int)1] = ConvertEnumToString<E_IrCutMode>(IRCUT_CLOSE);
-	tmpIr[(unsigned int)2] = ConvertEnumToString<E_IrCutMode>(IRCUT_OPEN);
+	tmpIr[(unsigned int)0] = EnumNameIrCutMode(IrCutMode_AUTO);
+	tmpIr[(unsigned int)1] = EnumNameIrCutMode(IrCutMode_CLOSE);
+	tmpIr[(unsigned int)2] = EnumNameIrCutMode(IrCutMode_OPEN);
 
 	have_resp_param = av_true;
 	return WEB_STATUS_OK;
@@ -417,12 +437,12 @@ int av_web::AvWebGetVideoCaptureProfile(CWebMsg &web_req, CWebMsg &web_resp, av_
 
 	CAvConfigCapture conf_cap;
 	conf_cap.Update();
-	ConfigCaptureFormats &cap_fmat = conf_cap.GetConfig(channel);
+	ConfigCaptureProfile &cap_fmat = conf_cap.GetConfig(channel);
 
-	web_resp["Antiflicker"] = ConvertEnumToString<E_AntiFlckerMode>(cap_fmat.AntiFlckerAttr.mode);
-	web_resp["IrCut"] = ConvertEnumToString<E_IrCutMode>(cap_fmat.IrCutAttr.mode);
-	web_resp["Horreverse"] = cap_fmat.ReverseAttr.bFilp == av_true ? 1 : 0;
-	web_resp["Verreverse"] = cap_fmat.ReverseAttr.bMirror == av_true ? 1 : 0;
+	web_resp["Antiflicker"] = EnumNameAntiFlckerMode(cap_fmat.AntiFlcker);
+	web_resp["IrCut"] = EnumNameIrCutMode(cap_fmat.IrCut);
+	web_resp["Horreverse"] = cap_fmat.MirrorMaskValue & AvMask(MirrorMode_HOR) ? 1 : 0;
+	web_resp["Verreverse"] = cap_fmat.MirrorMaskValue & AvMask(MirrorMode_VER)  ? 1 : 0;
 	have_resp_param = av_true;
 	return WEB_STATUS_OK;
 }
@@ -437,11 +457,64 @@ int av_web::AvWebSetVideoCaptureProfile(CWebMsg &web_req, CWebMsg &web_resp, av_
 
 	CAvConfigCapture conf_cap;
 	conf_cap.Update();
-	ConfigCaptureFormats &cap_fmat = conf_cap.GetConfig(channel);
-	cap_fmat.AntiFlckerAttr.mode = ConvertStringToEnum<E_AntiFlckerMode>(web_req["Antiflicker"].asCString());
-	cap_fmat.IrCutAttr.mode = ConvertStringToEnum<E_IrCutMode>(web_req["IrCut"].asCString());
-	cap_fmat.ReverseAttr.bFilp = web_req["Horreverse"].asInt() == 1 ? av_true : av_false;
-	cap_fmat.ReverseAttr.bMirror = web_req["Verreverse"].asInt() == 1 ? av_true : av_false;
+	ConfigCaptureProfile &CapProfile = conf_cap.GetConfig(channel);
+	CapProfile.AntiFlcker = AntiFlckerModeStr2EnumValue(web_req["Antiflicker"].asCString());
+	CapProfile.IrCut = IrCutModeStr2EnumValue(web_req["IrCut"].asCString());
+	if (web_req["Horreverse"].asInt() == 1){
+		CapProfile.MirrorMaskValue |= AvMask(MirrorMode_HOR);
+	}
+	else{
+		CapProfile.MirrorMaskValue &= ~AvMask(MirrorMode_HOR);
+	}
+	if (web_req["Verreverse"].asInt() == 1){
+		CapProfile.MirrorMaskValue |= AvMask(MirrorMode_VER);
+	}
+	else{
+		CapProfile.MirrorMaskValue &= ~AvMask(MirrorMode_VER);
+	}
 	have_resp_param = av_true;
 	return (0 == conf_cap.SettingUp(channel)) ? WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
+}
+
+int av_web::AvWebGetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+{
+	have_resp_param = av_false;
+	int channel = 0;
+	int slave = 0;
+	int ret = AvWebChannelSalveCheck(web_req, channel, slave);
+	if (WEB_STATUS_OK != ret) { return ret; }
+
+	//if (slave > K_RTMP_CONFIG_MAX) { return WEB_STATUS_PARAM_ERROR; }
+
+	CAvConfigRtmp rtmp;
+	rtmp.Update();
+	ConfigRtmp &conf_rtmp = rtmp.GetConfig(channel);
+	
+	web_resp["RtmpAddr"] = conf_rtmp.RtmpFormats.RtmpAddress;
+	web_resp["RtmpString"] = conf_rtmp.RtmpFormats.RtmpString;
+	web_resp["Enable"] = conf_rtmp.RtmpFormats.bEnable;
+	web_resp["RtmpAudio"] = conf_rtmp.RtmpFormats.bAudio;
+	
+	have_resp_param = av_true;
+	return WEB_STATUS_OK;
+}
+
+int av_web::AvWebSetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+{
+	have_resp_param = av_false;
+	int channel = 0;
+	int slave = 0;
+	int ret = AvWebChannelSalveCheck(web_req, channel, slave);
+	if (WEB_STATUS_OK != ret) { return ret; }
+
+	CAvConfigRtmp rtmp;
+	rtmp.Update();
+	ConfigRtmp &conf_rtmp = rtmp.GetConfig(channel);
+	
+	strcpy(conf_rtmp.RtmpFormats.RtmpAddress, web_req["RtmpAddr"].asCString());
+	strcpy(conf_rtmp.RtmpFormats.RtmpString, web_req["RtmpString"].asCString());
+	conf_rtmp.RtmpFormats.bEnable = web_req["Enable"].asInt() == 1 ? av_true:av_false;
+	conf_rtmp.RtmpFormats.bAudio = web_req["RtmpAudio"].asInt() == 1 ? av_true : av_false;
+
+	return (0 == rtmp.SettingUp(channel)) ? WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
 }

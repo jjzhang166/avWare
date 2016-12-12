@@ -14,7 +14,7 @@
 ******************************************************************/
 #ifndef _AVQUEUE_H_
 #define _AVQUEUE_H_
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvThread/AvThread.h"
 
 class CQueue

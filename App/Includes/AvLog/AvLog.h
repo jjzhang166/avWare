@@ -14,7 +14,7 @@
 ******************************************************************/
 #ifndef _AVLOG_H_
 #define _AVLOG_H_
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "CAvObject.h"
 #include "AvThread/AvThread.h"
 #include "AvFile/AvFile.h"

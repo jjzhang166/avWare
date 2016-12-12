@@ -12,7 +12,7 @@
 |  日期:
 |  说明:
 ******************************************************************/
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvNetService/AvNtp.h"
 
 #define AV_NTP_PORT          123               /*NTP专用端口号字符串*/

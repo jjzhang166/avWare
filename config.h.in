@@ -1,24 +1,21 @@
-/*use laptop camera for capture */
-#cmakedefine HAVE_CapCamera
-
-/*use screen for capture*/
-#cmakedefine HAVE_CapScreen
-
-/*use intel media sdk for encodeing*/
-#cmakedefine HAVE_EncIntelGPU
-
-/*use ffmpeg for encodeing */
-#cmakedefine HAVE_EncFfmpeg
-
 /*use memory pool for stream buffer*/
 #cmakedefine HAVE_MemPool
 
-/*Have Sensor Input Stream*/
-#cmakedefine HAVE_SensorInput
+/*AvWare moudle Qt Ui*/
+#cmakedefine _AV_WARE_M_HAVE_UI
 
-/*Have HDMI Input Stream*/
-#cmakedefine HAVE_HdmiInput
+/*_AV_WARE_M_HAVE_UI_CLOSE_CAPUTRE*/
+#cmakedefine _AV_WARE_M_HAVE_UI_CLOSE_CAPUTRE
 
-/*Have QT UI*/
-#cmakedefine WITH_UI
+/*SYS_CHN_NUM*/
+#cmakedefine SYS_CHN_NUM @SYS_CHN_NUM@
 
+/*Use Have Proc*/
+#cmakedefine _AV_WARE_M_HAVE_PROC
+
+
+#define _AV_WARE_VERSION_MAJOR 		@_AV_WARE_VERSION_MAJOR@
+#define _AV_WARE_VERSION_MINOR 		@_AV_WARE_VERSION_MINOR@
+#define _AV_WARE_VERSION_PATCH 		@_AV_WARE_VERSION_PATCH@
+#define _AV_WARE_VERSION_OEM 		"@_AV_WARE_VERSION_OEM@"
+#define _AV_WARE_VERSION_RUNTIME 	"@_AV_WARE_VERSION_RUNTIME@"

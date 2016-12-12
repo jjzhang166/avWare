@@ -164,7 +164,7 @@ public:
 		RTSP_MEDIA_ENCODEC_PCM,
 		RTSP_MEDIA_ENCODEC_NR,
 	}RTSP_MEDIA_ENCODEC;
-	
+
 	typedef enum {
 		RTP_OVER_TCP,
 		RTP_OVER_UDP,
@@ -212,9 +212,9 @@ protected:
 #define IsSetSdp(type) (m_SdpInfo[type].size() > 0 ?true:false)
 	
 private:
-	CRTP m_MediaRTP[RTSP_MEDIA_Nr];
-	CRTCP m_MediaRTCP[RTSP_MEDIA_Nr];
-
+	CRTP	m_MediaRTP[RTSP_MEDIA_Nr];
+	CRTCP	m_MediaRTCP[RTSP_MEDIA_Nr];
+	
 public:
 	virtual av_bool RtcpGetPacket(CRTCP::RTCP_TYPE type, std::string &Packet);
 	virtual CRTCP::RTCP_TYPE RtcpParsePacket(std::string &Packet);
@@ -244,7 +244,7 @@ public:
 	CRtspMediaSer();
 	virtual ~CRtspMediaSer();
 	virtual bool StartMedia()		= 0;
-	virtual bool StopMedia()		= 0;
+	virtual bool StopMedia() = 0;
 
 	
 #ifdef _AV_WARE_
@@ -268,7 +268,7 @@ private:
 	int PushMjpegVideoStreamFrame(const char *data, int len, int TimeInterl);
 	int PushG711aAudioStreamFrame(const char *data, int len, int TimeInterl);
 	int PushG711uAudioStreamFrame(const char *data, int len, int TimeInterl);
-	int PushAacAudioStreamFrame(const char *data, int len, int TimeInterl);
+	int PushAacAudioStreamFrame(const char *data,	int len, int TimeInterl);
 	int PushPcmAudioStreamFrame(const char *data,	int len, int TimeInterl);
 #endif
 private:

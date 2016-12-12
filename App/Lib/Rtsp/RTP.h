@@ -89,13 +89,13 @@ public:
 	unsigned int InterChnPort();
 
 private:
-	unsigned int m_Interleaved;
-	RtpHead		 m_RtpHead;
-	RTP_PACKET_T m_RtpBuf[RTP_MAX_RTP_PACKET];
-	int			 m_RtpBufCnt;
+	unsigned int	m_Interleaved;
+	RtpHead			m_RtpHead;
+	RTP_PACKET_T	m_RtpBuf[RTP_MAX_RTP_PACKET];
+	int				m_RtpBufCnt;
 
-	unsigned char m_FuIndicatorHeader[3];
-	unsigned int m_FuIndicatorHeaderLen;
+	unsigned char	m_FuIndicatorHeader[3];
+	unsigned int	m_FuIndicatorHeaderLen;
 
 	unsigned int	m_Sequence;
 	unsigned int	m_TimeStamp;

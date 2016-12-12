@@ -72,6 +72,9 @@ void CAvWebSer::RegisterMsgProc()
 	map_webmsgproc_["GetVideoCaptureCaps"] = &av_web::AvWebGetVideoCaptureCaps;
 	map_webmsgproc_["GetVideoCaptureProfile"] = &av_web::AvWebGetVideoCaptureProfile;
 	map_webmsgproc_["SetVideoCaptureProfile"] = &av_web::AvWebSetVideoCaptureProfile;
+
+	map_webmsgproc_["GetRtmpProfile"] = &av_web::AvWebGetRtmpProfile;
+	map_webmsgproc_["SetRtmpProfile"] = &av_web::AvWebSetRtmpProfile;
 }
 
 

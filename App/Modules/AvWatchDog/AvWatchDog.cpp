@@ -13,7 +13,7 @@
 |  หตร๗:
 ******************************************************************/
 #include "AvWatchDog/AvWatchDog.h"
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "Apis/LibSystem.h"
 
 SINGLETON_IMPLEMENT(CWatchDog);
@@ -29,7 +29,7 @@ av_bool CWatchDog::Initialize()
 {
 	av_msg("%s Started\n", __FUNCTION__);
 	Open();
-	CThread::run();
+	CThread::ThreadStart();
 	return av_true;
 }
 
@@ -49,7 +49,7 @@ av_bool CWatchDog::Open()
 av_bool CWatchDog::Close()
 {
 	AvWatchDogDeInit();
-	return CThread::stop();
+	return CThread::ThreadStop();
 }
 av_bool CWatchDog::Feed()
 {

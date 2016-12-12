@@ -10,8 +10,9 @@ typedef enum {
 
 
 typedef struct {
-	int MaxEncodeChn;
-	int MaxDecodeChn;
+	int MaxDeviceCapture;
+	int MaxNetProtocolCapture;
+	int MaxDecode;
 	char avWareVersion[64];
 }avWare_Device_Info;
 
@@ -19,7 +20,7 @@ typedef struct {
 typedef struct {
 	int Channel;
 	int Slave;
-	
+	int Enable;
 	unsigned int 	CaptureIn;
 	unsigned int 	CaptureOut;
 	unsigned int 	CaptureError;

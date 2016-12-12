@@ -2,7 +2,12 @@
 #define _AV_LUA_H_
 
 #include "Lua/lua.hpp"
+#if defined(WIN32)
 #define LuaHomeDir "Lua"
+#else
+#define LuaHomeDir "/app/Lua"
+#endif
+
 
 
 
@@ -82,6 +87,17 @@ public:
 	}
 		
 public:
+	bool LuaLoadfile(const char *LuaFile){
+		char LuaFilePath[128];
+		sprintf(LuaFilePath, "%s/%s", LuaHomeDir, LuaFile);
+		if (luaL_loadfile(m_LuaState, LuaFilePath)){
+			av_error("Error load %s Lua\n", LuaFilePath);
+			assert(0);
+		}
+		lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
+		return av_true;
+	}
+
 	template <typename ... ARGS>
 	int LuaCall(const char *LuaFucName, ARGS... args)
 	{
@@ -106,6 +122,33 @@ public:
 		}
 		lua_pop(m_LuaState, 1);
 		return 0;
+	}
+	template <typename ... ARGS>
+	std::list <std::string> LuaCall2(const char *LuaFucName, ARGS... args)
+	{
+		std::list<std::string> ret;
+		int r = lua_getglobal(m_LuaState, LuaFucName);
+
+		int  sizeargs = sizeof...(args);
+		if (sizeargs > 0){
+			auto t = std::make_tuple(args...);
+			tuple_visitor(*this, t);
+		}
+		lua_call(m_LuaState, sizeargs, 1);
+
+		int n = luaL_len(m_LuaState, -1);
+		std::string mem;
+
+		for (int i = 1; i <= n; i++){
+			lua_pushnumber(m_LuaState, i);
+			lua_gettable(m_LuaState, -2);
+			mem.assign(lua_tostring(m_LuaState, -1));
+			ret.push_back(mem);
+			lua_pop(m_LuaState, 1);
+		}
+
+
+		return ret;
 	}
 	std::string LuaGlobal(const char *LuaGlobal)
 	{
@@ -141,10 +184,10 @@ public:
 		if (iRet <= 0){
 			return ret;
 		}
-		int n = luaL_len(m_LuaState, -1);
+		int n = (int)luaL_len(m_LuaState, -1);
 		std::string mem;
 		
-		for (int i = 1; i <= n; i++){
+		for (int i = 1;  i <= n; i++){
 			lua_pushnumber(m_LuaState, i);
 			lua_gettable(m_LuaState, -2);
 			mem.assign(lua_tostring(m_LuaState, -1));
@@ -153,15 +196,7 @@ public:
 		}
 		return ret;
 	}
-	bool LuaLoadfile(const char *LuaFile){
-		char LuaFilePath[128];
-		sprintf(LuaFilePath, "%s/%s", LuaHomeDir, LuaFile);
-		if (luaL_loadfile(m_LuaState, LuaFilePath)){
-			assert(0);
-		}
-		lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
-		return av_true;
-	}
+
 
 public:
 	void operator()(int i){

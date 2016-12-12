@@ -14,7 +14,7 @@
 ******************************************************************/
 #ifndef _AVQMSG_H_
 #define _AVQMSG_H_
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvThread/AvThread.h"
 #include "AvThread/AvQueue.h"
 

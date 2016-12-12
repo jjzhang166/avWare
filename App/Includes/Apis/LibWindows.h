@@ -42,25 +42,6 @@ av_bool AvWinSwitch(av_int Channel1, av_int Channel2);
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #endif
+
+

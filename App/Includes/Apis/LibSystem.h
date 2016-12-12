@@ -18,84 +18,47 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
 #include "AvWareType.h"
-	typedef enum {
-		AvSensor_OV9712		= 0,
-		AvSensor_OV4689,
-		AvSensor_OV5658,
 
-		AvSensor_AR0130		= 5,
-		AvSensor_AR0330,
-		AvSensor_AR0237,
-
-		AvSensor_IMX138		= 10,
-		AvSensor_IMX122,
-		AvSensor_IMX236,
-		AvSensor_IMX178,
-		AvSensor_IMX185,
-		AvSensor_IMX117,
-		AvSensor_IMX123,
-
-		AvSensor_BT1120		= 25,
-		AvSensor_BT656,
-
-		AvSensor_AUTO		= 30,
-	}E_AvSensor;
-
-	typedef enum {
-		AvChip_S2L22M,
-		AvChip_S2L33M,
-		AvChip_S2L55M,
-		AvChip_S2L65,
-		AvChip_S2L66,
-
-		AvChip_H18EV100,
-		AvChip_H18EV200,
-		AvChip_H18EV201,
-		AvChip_H18C,
-		AvChip_H18A,
-		AvChip_H16CV100,
-		AvChip_H16CV200,
-		AvChip_H16A,
-		AvChip_H16D,
-		AvChip_H19,
-
-		AvChip_H20D,
-		AvChip_H35,
-		AvChip_H36,
-
-		AvChip_WIN32,
-		AvChip_WIN64,
-
-		AvChip_LIN32,
-		AvChip_LIN64,
-	}E_AvChip;
-
-	typedef struct {
-	av_u32		nMaxEncodePower;
-	av_uchar	nMaxEncodeChannel;
-	av_uchar	nMaxEncodeExtChannel;
-	av_uchar	nMaxDecodeChannel;
-	av_uchar	nMaxDecodeExtChannel;
-}C_DspCaps;
+#include "AvEnum.h"
+#include "AvSystemStruct.h"
 
 av_bool AvGetDspCaps(C_DspCaps *DspCaps);
-
 av_bool AvSystemInit();
 av_bool AvSystemDeInit();
-
 
 //sleep 
 av_void av_msleep(int ms);
 
+
 //GPIO 操作
+typedef enum {
+	AvGpio_SysReset,
+	AvGpio_SensorReset,
+	AvGpio_SysStatusLed,
+	AvGpio_AlmIn1,
+	AvGpio_AlmIn2,
+	AvGpio_AlmOut,
+	AvGpio_Ldr,
+	AvGpio_IrcutA,
+	AvGpio_IrcutB,
+	AvGpio_IrLed,
+	AvGpio_Res1,
+	AvGpio_Res2,
+	AvGpio_Res3,
+}E_AvGpio;
+
+#define GPIO_INVALID -1
+
 av_bool  AvGpioInit();
 av_bool  AvGpioDeInit();
-av_u32   AvGpioRead(av_uchar GpioNo);
-av_bool  AvGpioSet1(av_uchar GpioNo);
-av_bool  AvGpioSet0(av_uchar GpioNo);
+av_u32   AvGpioRead(av_int GpioNo);
+av_bool  AvGpioSet1(av_int GpioNo);
+av_bool  AvGpioSet0(av_int GpioNo);
+av_bool  AvGpioSet(av_int GpioNo, av_int level);
+av_int	 AvGpioConvert(E_AvGpio eGpio);
+av_int	 AvGpioTriggerLevel(E_AvGpio eGpio);
+
 
 //串口 操作
 
@@ -142,21 +105,7 @@ av_bool AvWatchDogDeInit();
 av_bool AvWatchDogFeed();
 
 //rtc 操作
-typedef struct {
-	av_u32 tv_sec;		//设置时间时必添 1900 至今的秒数
-	av_u32 tv_usec;		//设置时间时必添
-	
-	av_u32 t_year;		//实际的年 2016
-	av_u32 t_mon;		//实际的月 1-12
-	av_u32 t_day;		//实际的日 1-31
 
-	av_uchar t_week;		//rang 1-7
-	av_uchar t_hour;
-	av_uchar t_min;
-	av_uchar t_sec;
-
-	av_u32 t_todaysec;	//当天的秒数
-}av_timeval;
 
 
 av_u32  AvGetUpTime();
@@ -182,6 +131,7 @@ av_bool AvMutexTryLock(av_mutex *);
 av_sem *AvSemCreate();
 av_bool AvSemDestroy(av_sem *);
 av_bool AvSemWait(av_sem *);
+av_bool AvSemWaitTimeOut(av_sem *, int ms);
 av_bool AvSemPost(av_sem *);
 av_bool AvSemTryWait(av_sem *);
 
@@ -201,30 +151,6 @@ av_bool avBufFreeHead	(av_buf *);
 #define avBufGetData(avbuf) (avbuf)->base
 #define avBufGetLeftSize(avbuf) ((avbuf)->size - (avbuf)->len)
 
-
-//network
-
-typedef enum{
-	NetCommT_Lan0,
-	NetCommT_Lan1,
-	NetCommT_Wireless,
-	NetCommT_SIM,
-	NetCommT_BlueTooth,
-	NetCommT_Nr,
-}E_NetComm_Type;
-
-typedef enum {
-	NetCommGetMode_MANUAL,
-	NetCommGetMode_AUTO,
-	NetCommGetMode_PPPOE,
-	NetCommGetMode_NR,
-}E_NetComm_Mode;
-
-
-typedef struct{
-	av_u32 NetCommMask;
-	av_u32 NetCommGetModeMask[ConfMaxNetComm];
-}C_NetCommCaps;
 
 #define NetCommMaxStringLen 32
 
@@ -267,8 +193,8 @@ typedef struct
 
 av_bool avNetCommCaps(C_NetCommCaps *NetCommCaps);
 
-av_bool avNetCommSet(E_NetComm_Type type, C_NetCommAttribute *Attr);
-av_bool avNetCommGet(E_NetComm_Type type, C_NetCommAttribute *Attr);
+av_bool avNetCommSet(NetCommT type, C_NetCommAttribute *Attr);
+av_bool avNetCommGet(NetCommT type, C_NetCommAttribute *Attr);
 
 
 
@@ -289,6 +215,7 @@ typedef struct {
 	av_uint		MaxChannel;
 	av_uint		Res;
 }C_DeviceFactoryInfo;
+
 
 typedef struct {
 	av_uint		Totoal;
@@ -313,16 +240,7 @@ av_bool AvSetDeviceInfo(C_DeviceFactoryInfo *FactoryInfo);
 av_uint AvGetDeviceStartUp();
 av_bool AvSystemBeep(av_uint dwFrequence, av_uint dwDuration);
 
-/*
-UpgradeStart = 1,
-UpgradeRecvData = 2,
-UpgradeWipePartition = 3,
-UpgradeWriteData = 4,
-UpgradeOver = 5,
-Rebootting = 6,
-ModifyOver = 7,
-HaveNoResource = 8,
-*/
+
 typedef struct{
 	av_ushort ProgressCmd;
 	av_ushort ProgressValue;

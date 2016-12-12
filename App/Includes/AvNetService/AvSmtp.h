@@ -15,7 +15,7 @@
 #ifndef _AV_SMTP_H_
 #define _AV_SMTP_H_
 
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 
 
 class CAvSmtp

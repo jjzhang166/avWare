@@ -15,7 +15,7 @@
 #ifndef _AVCONFIGALARM_H_
 #define _AVCONFIGALARM_H_
 
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvConfigs/AvConfigTable.h"
 
 #define ConfMaxDayTimeSpan 6

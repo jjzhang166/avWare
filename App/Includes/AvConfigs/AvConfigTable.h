@@ -19,8 +19,8 @@
 #include <string>
 #include <vector>
 #include "jsoncpp/json.h"
-#include"CAvObject.h"
-#include "Apis/AvWareType.h"
+#include "CAvObject.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvThread/AvThread.h"
 
 typedef Json::Value AvConfigValue;
@@ -183,7 +183,7 @@ public:
 	
 	inline T& GetConfig(int index = 0) { return m_use_config[index]; }
 	inline T& operator[](int index){ return m_use_config[index]; }
-
+	
 	//TODO: 写成inline 会导致无法获取配置 原因待查
 	virtual void WriteToEnv(int index) { m_env_config[index] = m_use_config[index];}
 	virtual void ReadFromEnv(int index) { m_use_config[index] = m_env_config[index];}

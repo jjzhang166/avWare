@@ -24,18 +24,16 @@
 #include <assert.h>
 #include <fcntl.h>
 
-#if defined(__cplusplus)
-#include <map>
-#include <list>
-#include <queue>
-#endif
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #if defined (WIN32)
+
 #include <io.h>
+
 #include <WS2tcpip.h>
+#include   <windows.h>
 #elif defined (__GNUC__)
+#include <sys/sysinfo.h>
 #include "sys/prctl.h"
 #include <unistd.h>
 #include <sys/socket.h>
@@ -55,42 +53,13 @@
 #else
 
 #endif
-
+#ifdef _AV_WARE_
 #include "config.h"
-
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-#ifdef SHARE_EXPORTS
-
-#if defined (WIN32)
-
-#if defined (USE_STATIC_LIB)
-#define AVWARE_API
-#else
-#define AVWARE_API __declspec(dllexport)
-#endif
-
-#else //else define win32
-#define AVWARE_API __attribute__((visibility("default")))
-#endif //end define win32
-
-#else //else PROTOSHARE_EXPORTS
-
-#if defined(WIN32)
-#if defined (USE_STATIC_LIB)
-#define AVWARE_API
-#else
-#define AVWARE_API __declspec(dllimport)
-#endif
-
-#else
-#define AVWARE_API
-#endif
-
-#endif //end PROTOSHARE_EXPORTS
 
 #if defined(WIN32)
 #define socklen_t int
@@ -123,9 +92,28 @@ typedef unsigned long long int  av_u64, av_ulonglong;
 
 //////////////////////////////////////////////////////////////////////////
 //##配置表默认信息
-#ifndef ConfMaxCaptureChn
-#define ConfMaxCaptureChn		1
+
+
+
+#ifndef SYS_LOCALCAPTURE_CHN
+#define SYS_LOCALCAPTURE_CHN 1
 #endif
+#ifndef SYS_CHN_NUM
+#define SYS_CHN_NUM 32
+#endif
+
+#ifndef _AV_WARE_M_HAVE_UI_CLOSE_CAPUTRE
+#define SYS_REMOTECAPTURE_CHN (SYS_CHN_NUM-SYS_LOCALCAPTURE_CHN)
+#else
+#define SYS_REMOTECAPTURE_CHN SYS_CHN_NUM
+#endif
+
+
+
+
+// #ifndef ConfMaxCaptureChn
+// #define ConfMaxCaptureChn		1
+// #endif
 
 #ifndef ConfMaxSerial
 #define ConfMaxSerial			4
@@ -147,9 +135,9 @@ typedef unsigned long long int  av_u64, av_ulonglong;
 #define ConfMaxIoAlarmIn		1
 #endif
 
-#ifndef ConfMaxDecodeChn
-#define ConfMaxDecodeChn		32
-#endif
+// #ifndef ConfMaxDecodeChn
+// #define ConfMaxDecodeChn		32
+// #endif
 
 #ifndef ConfMaxUser
 #define ConfMaxUser 10
@@ -184,9 +172,9 @@ typedef unsigned long long int  av_u64, av_ulonglong;
 // #define read	_read
 // #define close	_close
 
-#ifndef inline
-#define inline __inline
-#endif
+//#ifndef inline
+//#define inline __inline
+//#endif
 
 #ifndef strcasecmp
 #define strcasecmp _stricmp
@@ -201,10 +189,10 @@ typedef unsigned long long int  av_u64, av_ulonglong;
 
 typedef enum{
 	av_false = 0,
-	av_true,
+	av_true	 = 1,
 }av_bool;
-static const char sAvBoolStrings[][10] = { "av_true", "av_false" };
-#define GetAvBoolString(b) sAvBoolStrings[b]
+// static const char sAvBoolStrings[][10] = { "av_true", "av_false" };
+// #define GetAvBoolString(b) sAvBoolStrings[b]
 
 typedef struct{
 	char *base;
@@ -288,13 +276,12 @@ extern av_void  AvMemoryPoolFree(av_void *ptr);
 
 
 #if defined(WIN32)
-#include   <windows.h>
 #ifndef PATH_HR
 #define PATH_HR '\\'
 #endif
 #define av_warning(fmt,...) do {printf("[%s][%d]=>", NULL == strrchr(__FILE__, PATH_HR)? __FILE__:(char *)(strrchr(__FILE__, PATH_HR) + 1), __LINE__);SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);printf(fmt, ##__VA_ARGS__); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);}while(0)
-#define av_error(fmt,...) do {printf("[%s][%d]=>", NULL == strrchr(__FILE__, PATH_HR)? __FILE__:(char *)(strrchr(__FILE__, PATH_HR) + 1), __LINE__);SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);printf(fmt, ##__VA_ARGS__); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);}while(0)
-#define av_msg(fmt,...) do {printf("[%s][%d]=>", NULL == strrchr(__FILE__, PATH_HR)? __FILE__:(char *)(strrchr(__FILE__, PATH_HR) + 1), __LINE__);SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); printf(fmt, ##__VA_ARGS__); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);}while(0)
+#define av_error(fmt,...) do {printf("[%s][%d]=>", NULL == strrchr(__FILE__, PATH_HR)? __FILE__:(char *)(strrchr(__FILE__, PATH_HR) + 1), __LINE__);SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);printf(fmt, ##__VA_ARGS__); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15); }while(0)
+#define av_msg(fmt,...) do {printf("[%s][%d]=>", NULL == strrchr(__FILE__, PATH_HR)? __FILE__:(char *)(strrchr(__FILE__, PATH_HR) + 1), __LINE__);SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); printf(fmt, ##__VA_ARGS__); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15); }while(0)
 
 #else
 #define PATH_HR '/'

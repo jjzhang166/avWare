@@ -8,8 +8,6 @@
     <meta name="keywords" content="" />
     <meta name="description" content="" />
 	<script src="components/LoginHead/jquery.js"></script>
-	<script src="components/LoginHead/vector.js"></script>
-	<script src="components/Qrcode/qrcode.js"></script>
 	<script src="jquery/jquery-1.9.1.min.js"></script>
 	<script src="jquery/jquery.ui.core.js"></script>
 	<script src="jquery/jquery.ui.widget.js"></script>
@@ -79,54 +77,9 @@ div.INDEX_LEFT_UL ul li a:active
     text-decoration: none; /* 不显示超链接下划线 */
 }
  </style>
- 
-<body style="display:block;" onload="OnLoad();" >
-<!-- 登录界面 -->
-<div id="ID_loginui">
-	<div id="ID_LoginuiHead"><div id="output"></div></div> 
-	<table width="100%" height="120px">
-		<tr height="10px"> </tr>
-		<tr>
-			<td width="35%">
-				<div id="ID_Qrcode" style="width:80px; height:80px; margin-left:35px;"></div>
-			</td>
-			<td>
-				<table width="100%">
-					<tr>
-					<!--	<td class="login_lable" id="usname_lable"></td> -->
-						<td width="49%" ><input id="ID_usrname" class="login_input" value="用户名" onfocus="loginUsrOnofcus(this)" maxlength="15"/></td>
-					</tr>
-					<tr height="3px"> </tr>
-					<tr>
-					<!--	<td class="login_lable" id="usname_lable"></td> </td> -->
-						<td width="49%"><input  id="ID_password" class="login_input" value="密码" onfocus="loginPassWordOnofcus(this)" maxlength="15"/></td>
-					</tr>
-					<tr height="3px"> </tr>				
-					<tr height="3px"> </tr>		
-					<tr>
-					<td><input id="ID_loginbutton" type="button" value="登录" class="login_button" onclick="login()"/></td>
-					</tr>			
-				</table>
-			</td>
-		</tr>
-	</table>
-	<div style="width:425px;height:30px;">
-	<!--	<a style="float:left;" class="login_Lang">简体中文|</a>
-		<a style="float:left;" class="login_Lang">English</a>-->
-	</div> 
-</div>
-<!-- INDEX 页面 -->
-</body>
-
-<script language="javascript" type="text/javascript">    
+ <script language="javascript" type="text/javascript">    
 var loginPort = 9008;
 var language;
-var qrcObj = document.getElementById("ID_Qrcode");
-var qrcode = new QRCode(qrcObj, {
-	width : 80,
-	height : 80,
-});
-
 
 function getFromIP() 
 {
@@ -160,19 +113,25 @@ function login()
 {
 	var strName;
 	var strPassword;
+	//alert("111111");
 	strName = document.getElementById("ID_usrname").value;
 	strPassword = document.getElementById("ID_password").value;
+	//alert(strName);
+	//alert(strPassword);
 	var msg={
 		Username:strName,
 		Password:strPassword
 	};
 	$.SetCookie("usrname",strName); 
 	$.SetCookie("password",strPassword); 
+	//alert("send msg");
 	resp = $.sendMsg("LogIn",msg);
+	//alert("111111");
 	if(false == resp.success){
-	//	alert("连接失败或密码错误");
-	//	return ;
+		alert("连接失败或密码错误");
+		return ;
 	}
+	//alert("location index");
 	self.location='index.html';
 }
 
@@ -184,13 +143,17 @@ function OnLoad()
 function loginUsrOnofcus(obj)
 {
 	obj.value="";
-	obj.style.color="#009ede";
+	//obj.style.color="#009ede";
 }
 function loginPassWordOnofcus(obj)
 {
-	obj.value="";
-	obj.type="password";
-	obj.style.color="#009ede";
+	//obj.value="";
+	//obj.type="password";
+	//obj.style.color="#009ede";
+	$("#ID_password_Txt").hide();
+	$("#ID_password").show();
+	$("#ID_password").show().focus();
+	//$("#ID_password").style.color="#009ede";
 }
 function checkedSavePassWord(obj)
 {
@@ -210,13 +173,53 @@ function getSDKstate(obj)
 }
 function makeCode () {			
 	//qrcode.makeCode(getFromIP() );
-	qrcode.makeCode("http://www.graceport.cn/");
+	//qrcode.makeCode("http://www.graceport.cn/");
 }
 
 $(function(){
 	// 初始化 传入dom id
-	var victor = new Victor("ID_LoginuiHead", "output");
-	makeCode(); 
+	//var victor = new Victor("ID_LoginuiHead", "output");
+	//makeCode(); 
 });
 </script>
+<body style="display:block;" onload="OnLoad();" >
+<!-- 登录界面 -->
+<div id="ID_loginui">
+	<div id="ID_LoginuiHead"><div id="output"></div></div> 
+	<table width="100%" height="120px">
+		<tr height="10px"> </tr>
+		<tr>
+			<td width="20%">
+				<div id="ID_Qrcode" style="width:80px; height:80px; margin-left:35px;"></div>
+			</td>
+			<td>
+				<table width="100%">
+					<tr>
+					<!--	<td class="login_lable" id="usname_lable"></td> -->
+						<td width="49%" ><input id="ID_usrname" class="login_input" value="用户名" onfocus="loginUsrOnofcus(this)" maxlength="15"/></td>
+					</tr>
+					<tr height="3px"> </tr>
+					<tr>
+					<!--	<td class="login_lable" id="usname_lable"></td> </td> -->
+						<td width="49%"><input  id="ID_password_Txt" class="login_input" value="密码" onfocus="loginPassWordOnofcus(this)" maxlength="15"/>
+										<input  type="password" id="ID_password" class="login_input" style="display: none;" />
+						</td>
+					</tr>
+					<tr height="3px"> </tr>				
+					<tr height="3px"> </tr>		
+					<tr>
+					<td><input id="ID_loginbutton" type="button" value="登录" class="login_button" onclick="login()"/></td>
+					</tr>			
+				</table>
+			</td>
+		</tr>
+	</table>
+	<div style="width:425px;height:30px;">
+	<!--	<a style="float:left;" class="login_Lang">简体中文|</a>
+		<a style="float:left;" class="login_Lang">English</a>-->
+	</div> 
+</div>
+<!-- INDEX 页面 -->
+</body>
 </html>
+

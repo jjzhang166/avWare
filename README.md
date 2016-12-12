@@ -23,6 +23,11 @@ avWare 是深圳市恩港科技开发有限公司，推出的一套开源代码�
 * Linux 平台  [理论上可以在任何linux平台运行，但由于avWare需要依赖些库文件，因此最好在ubuntu上进行开发，目前我们使用的是linuxmint-17.3-cinnamon-32bit.iso、Ubuntu14.04同时也推荐您使用linuxmint系统，以方便我们提供支持]
 
 
+#UI 简图
+![输入图片说明](http://git.oschina.net/GracePort/avWare/attach_files/download?i=70785&u=http%3A%2F%2Ffiles.git.oschina.net%2Fgroup1%2FM00%2F00%2FAF%2FPaAvDFhOpfSAOcX5AAAVFBWFjgY592.png%3Ftoken%3D5d6a1a80c9bb23793128d94b9be22442%26ts%3D1481549299%26attname%3Dui_main.png"在这里输入图片标题")
+![输入图片说明](http://git.oschina.net/GracePort/avWare/attach_files/download?i=70784&u=http%3A%2F%2Ffiles.git.oschina.net%2Fgroup1%2FM00%2F00%2FAF%2FPaAvDFhOpeiAQWEbAAAONREcAXA759.png%3Ftoken%3Db9ab273a75234a1a19443fd1fd06c2ac%26ts%3D1481549299%26attname%3Dui_search.png"在这里输入图片标题")
+![输入图片说明](http://git.oschina.net/GracePort/avWare/attach_files/download?i=70786&u=http%3A%2F%2Ffiles.git.oschina.net%2Fgroup1%2FM00%2F00%2FAF%2FPaAvDFhOpf6AU3IQAAAVInpLKyc967.png%3Ftoken%3D825f5ef6687a3f63ca181d9dba5fa20c%26ts%3D1481549299%26attname%3Dui_setting.png"在这里输入图片标题")
+
 
 #联系方式
 公司网站：	http://www.graceport.cn/ <br/>

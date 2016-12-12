@@ -13,7 +13,7 @@
 |  说明:
 ******************************************************************/
 #include <cstdio>
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "Apis/LibEncode.h"
 #include "Apis/LibSystem.h"
 
@@ -31,11 +31,13 @@
 #include "AvPacket/AvPacket.h"
 #include "AvDevice/AvDevice.h"
 #include "AvWatchDog/AvWatchDog.h"
+#ifdef _AV_WARE_M_HAVE_UI
 #include "AvGui/AvGui.h"
+#include "AvPreview/AvPreview.h"
+#endif
 #include "AvCapture/AvManCapture.h"
 
 #include "AvUart/AvUart.h"
-#include "AvExternInterface/AvExternInterface.h"
 #include "AvLog/AvLog.h"
 #include "AvAudio/AvAudio.h"
 #include "AvAlarm/AvAlarm.h"
@@ -45,6 +47,7 @@
 #include "AvRecord/AvRecord.h"
 #include "AvLua/AvLua.h"
 #include "AvProc/AvProc.h"
+
 
 int main(int argc, char *argv[])
 {
@@ -57,34 +60,41 @@ int main(int argc, char *argv[])
 	sigemptyset(&set);
 	sigaddset(&set, SIGALRM);
 	sigprocmask(SIG_BLOCK, &set, NULL);
-
 #endif
 	/*
 		以下函数运行序列，不得自行调整。
 	*/
 	av_msg("AvWare Runing Start\n");
-	g_AvProc.Initialize();
+
+
+
+	AvProcInit();
 	g_AvDevice.Initialize();
 	g_AvThreadPool.Initialize(10, av_true);
+	g_AvTimer.Initialize();
+
 	g_AvConfigManager.Initialize();
 	g_AvDevice.InitializeConfigs();
-	g_AvMemoryPool.Initialize();
-	g_AvTimerManager.Initialize();
+//	g_AvMemoryPool.Initialize();
+	
 	g_AvPacketManager.Initialize();
 
+#ifdef _AV_WARE_M_HAVE_UI
 	g_AvGui.Initialize();
+#endif
 	g_AvLog.Initialize();
 	g_AvUart.Initialize();
 	g_AvManCapture.Initialize();
 	//g_AvRecordMan.Initialize();
 	g_AvAlarm.Initialize();
 	g_AvNetService.Initialize();
-	g_AvExtInterFace.Initialize();
 	av_msg("AvWare Service Start Succeed\n");
 
 	g_AvThreadPool.Dump();
-	
+
+#ifdef _AV_WARE_M_HAVE_UI
 	g_AvGui.exec();
+#endif
 	while (1) av_msleep(1000);
 
 	return 0;

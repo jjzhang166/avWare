@@ -504,6 +504,44 @@ bool CFile::MakeDirectory(const char* dirName)
 
 	return(opt->mkdir(dirName) == 0);
 }
+bool CFile::MakeDeepDirectory(const char *DeepDirName)
+{
+	char split[5];
+	int  splitlen = 0;
+	int  iRet = 0;
+	char DirPath[256] = { 0 };
+	sprintf(DirPath, DeepDirName);
+	FSOperations* opt = findOpts(DirPath);
+	if (NULL != strstr(DirPath, "/")){
+		sprintf(split, "/");
+		splitlen = 1;
+	}
+	else if (NULL != strstr(DirPath, "\\")){
+		sprintf(split, "\\");
+		splitlen = 1;
+	}
+	else{
+		iRet = opt->mkdir(DirPath);
+		return iRet == 0 ? true : false;
+	}
+
+	char *str = (char *)DirPath;
+	int len = strlen(str);
+	for (int i = 0; i < len; i++) {
+		if (0 == strncmp(&str[i], split, splitlen)) {
+			str[i] = '\0';
+			if (access(str, 0) != 0 && strlen(str)!= 0) {
+				iRet = opt->mkdir(str);
+				if (iRet != 0){
+					return false;
+				}
+			}
+			str[i] = split[0];
+			i += splitlen - 1;
+		}
+	}
+	return true;
+}
 
 bool CFile::RemoveDirectory(const char* dirName)
 {

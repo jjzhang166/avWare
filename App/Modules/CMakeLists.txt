@@ -5,7 +5,7 @@ set (project_headers_pach ${PROJECT_SOURCE_DIR}/../Includes)
 
 include_directories(${project_headers_pach})
 
-add_subdirectory(AvGui)
+
 
 macro(source_group_by_dir source_files)
     if(MSVC)
@@ -24,6 +24,16 @@ macro(source_group_by_dir source_files)
 endmacro(source_group_by_dir)
 
 
+#AvProtocol
+include_directories(AvProtocol)
+#add_subdirectory(AvProtocol)
+
+
+#AvGui
+if (${CMAKE_WITH_UI} STREQUAL "ON")
+	add_subdirectory(AvGui)
+endif()
+
 #AvBuffer
 set(AvPacketSRC_LIST 
 		AvPacket/AvPacket.cpp
@@ -36,7 +46,7 @@ set_property(TARGET AvPacket PROPERTY FOLDER "AvModules")
 
 #AvCapture
 set(AvCaptureSRC_LIST 
-#		AvCapture/AvCapture.cpp
+		AvCapture/AvCapture.cpp
 		AvCapture/AvNetCapture.cpp
 		AvCapture/AvDevCapture.cpp
 		AvCapture/AvManCapture.cpp
@@ -84,6 +94,8 @@ add_library(AvNetService STATIC ${AvNetServiceALL_LIST})
 set_property(TARGET AvNetService PROPERTY FOLDER "AvNetService")
 
 
+
+
 #AvWatchDog
 set(AvWatchDogSRC_LIST 
 		AvWatchDog/AvWatchDog.cpp
@@ -93,6 +105,26 @@ set(AvWatchDogHeader_LIST
 	)
 add_library(AvWatchDog STATIC ${AvWatchDogSRC_LIST} ${AvWatchDogHeader_LIST})
 set_property(TARGET AvWatchDog PROPERTY FOLDER "AvModules")
+
+#AvThread
+set(AvThreadSRC_LIST 
+#		AvThread/AvThread.cpp
+#		AvThread/AvQueue.cpp
+#		AvThread/AvThreadPool.cpp
+#		AvThread/AvTimer.cpp
+#		AvThread/AvTask.cpp
+#		AvThread/AvQmsg.cpp
+	)
+set(AvThreadHeader_LIST 
+		${project_headers_pach}/AvThread/AvThread.h
+		${project_headers_pach}/AvThread/AvQueue.h
+		${project_headers_pach}/AvThread/AvThreadPool.h
+		${project_headers_pach}/AvThread/AvTimer.h
+		${project_headers_pach}/AvThread/AvTask.h
+		${project_headers_pach}/AvThread/AvQmsg.h
+	)
+#add_library(AvThread STATIC ${AvThreadSRC_LIST} ${AvThreadHeader_LIST})
+#set_property(TARGET AvThread PROPERTY FOLDER "AvModules")
 
 #AvAudio
 #set(AvAudioSRC_LIST 
@@ -146,12 +178,7 @@ set(AvFileHeader_LIST
 add_library(AvFile STATIC ${AvFileSRC_LIST} ${AvFileHeader_LIST})
 set_property(TARGET AvFile PROPERTY FOLDER "AvModules")
 
-file(GLOB_RECURSE AvExternInterfaceSRC_LIST AvExternInterface/*.h AvExternInterface/*.hpp)
-file(GLOB_RECURSE AvExternInterfaceHeader_LIST AvExternInterface/*.c AvExternInterface/*.cpp)
-set (AvExternInterfaceALL_LIST ${AvExternInterfaceSRC_LIST} ${AvExternInterfaceHeader_LIST})
-source_group_by_dir(AvExternInterfaceALL_LIST)
-add_library(AvExternInterface STATIC ${AvExternInterfaceALL_LIST})
-set_property(TARGET AvExternInterface PROPERTY FOLDER "AvExternInterface")
+
 
 
 #AvMemoryPool
@@ -187,14 +214,16 @@ set_property(TARGET AvPreview PROPERTY FOLDER "AvModules")
 #AvRecord
 set(AvRecordSRC_LIST 
 		AvRecord/AvRecord.cpp
+		AvRecord/AvRecordDB.cpp
 	)
 set(AvRecordHeader_LIST 
 		${project_headers_pach}/AvRecord/AvRecord.h
+		${project_headers_pach}/AvRecord/AvRecordDB.h
 	)
 add_library(AvRecord STATIC ${AvRecordSRC_LIST} ${AvRecordHeader_LIST})
 set_property(TARGET AvRecord PROPERTY FOLDER "AvModules")
 
-#AvRecord
+#AvF
 set(AvFSRC_LIST 
 		AvF/AvF.cpp
 	)
@@ -224,6 +253,7 @@ set(AvConfigExSRC_LIST
 		AvConfigs/AvConfigUserManager.cpp
 		AvConfigs/AvConfigDevice.cpp
 		AvConfigs/AvConfigAlarm.cpp
+		AvConfigs/AvConfigRecord.cpp
 )
 set(AvConfigExHeader_LIST 
 		${project_headers_pach}/AvConfigs/AvConfigTable.h
@@ -234,8 +264,27 @@ set(AvConfigExHeader_LIST
 		${project_headers_pach}/AvConfigs/AvConfigUserManager.h
 		${project_headers_pach}/AvConfigs/AvConfigDevice.h
 		${project_headers_pach}/AvConfigs/AvConfigAlarm.h
+		${project_headers_pach}/AvConfigs/AvConfigRecord.h
 )
 add_library(AvConfigs STATIC ${AvConfigExSRC_LIST} ${AvConfigExHeader_LIST})
 set_property(TARGET AvConfigs PROPERTY FOLDER "AvModules")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../)

@@ -19,7 +19,7 @@ Function	:ONVIFCallback
 Author		:FootMan
 Email		:FootMan@graceport.cn
 **************************************/
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvNetService/AvOnvif.h"
 #include "Apis/LibEncode.h"
 
@@ -31,19 +31,19 @@ Email		:FootMan@graceport.cn
 //	AvComp_G711A,
 //	AvComp_G711U,
 //	AvComp_AAC,
-static VideoEncoding_E AVCompToOnvifEncoding(av_comp_t		Comp)
+static VideoEncoding_E AVCompToOnvifEncoding(AvComp		Comp)
 {
 	switch(Comp){
 		case AvComp_H264:  return VideoEncoding__H264;
 		case AvComp_H265:  return VideoEncoding__H265;
 		case AvComp_MJPEG: return VideoEncoding__JPEG;
-		case AvComp_NR:
+		case AvComp_LAST:
 		default:
 			return VideoEncoding__NULL;
 	}
 }
 
-static av_comp_t OnvifEncodingToAV(VideoEncoding_E		encoding)
+static AvComp OnvifEncodingToAV(VideoEncoding_E		encoding)
 {
 	switch(encoding){
 		case VideoEncoding__H264: return AvComp_H264;
@@ -51,11 +51,11 @@ static av_comp_t OnvifEncodingToAV(VideoEncoding_E		encoding)
 		case VideoEncoding__JPEG: return AvComp_MJPEG;
 		case VideoEncoding__NULL:
 		default:
-			return AvComp_NR;
+			return AvComp_LAST;
 	}
 }
 
-static av_capture_size GetResEnum(av_32 width, av_32 hight)
+static CaptureSize GetResEnum(av_32 width, av_32 hight)
 {
 	if (width == 480 && hight == 240)
 		return CaptureSize_QVGAEX;
@@ -68,32 +68,32 @@ static av_capture_size GetResEnum(av_32 width, av_32 hight)
 	else if (width == 720 && hight == 576)
 		return CaptureSize_D1;
 	else if (width == 1280 && hight == 720)
-		return CaptureSize_720P;
+		return CaptureSize_HD720P;
 	else if (width == 1280 && hight == 960)
-		return CaptureSize_960P;
+		return CaptureSize_HD960P;
 	else if (width == 1920 && hight == 1080)
-		return CaptureSize_1080P;
+		return CaptureSize_HD1080P;
 	else if (width == 2048 && hight == 1536)
-		return CaptureSize_300W;
+		return CaptureSize_HC300W;
 	else if (width == 2688 && hight == 1520)
-		return CaptureSize_400W;
+		return CaptureSize_HC400W;
 	else if (width == 2592 && hight == 1944)
-		return CaptureSize_500W;
-	else if (width == 3072 && hight == 2048)
-		return CaptureSize_600W;
+		return CaptureSize_HC500W;
+// 	else if (width == 3072 && hight == 2048)
+// 		return CaptureSize_600W;
 	else if (width == 3840 && hight == 2160)
-		return CaptureSize_800W;
+		return CaptureSize_HC800W;
 	else if (width == 4096 && hight == 2160)
-		return CaptureSize_4K;
+		return CaptureSize_HC4K;
 	else if (width == 7680 && hight == 4320)
-		return CaptureSize_8K;
+		return CaptureSize_HC8K;
 	else {
 		return CaptureSize_Self;
 	}
-	return CaptureSize_NR;
+	return CaptureSize_LAST;
 }
 
-static int GetResWidthAndHight(av_capture_size ImageSize, int *width, int *height)
+static int GetResWidthAndHight(CaptureSize ImageSize, int *width, int *height)
 {
 	switch (ImageSize)
 	{
@@ -119,16 +119,16 @@ static int GetResWidthAndHight(av_capture_size ImageSize, int *width, int *heigh
 			*height = 576;
 			*width = 720;
 			break;
-		case CaptureSize_720P:
+		case CaptureSize_HD720P:
 			*height = 720;
 			*width = 1280;
 			break;
-		case CaptureSize_960P:
+		case CaptureSize_HD960P:
 			*height = 960;
 			*width = 1280;
 			break;
-		case CaptureSize_1080P:
-		case DisplaySize_1920_1080:
+		case CaptureSize_HD1080P:
+		case CaptureSize_S1920_1080:
 			*height = 1080;
 			*width = 1920;
 			break;
@@ -183,7 +183,7 @@ static int	GetNetWorkInfo(NetWorkInfo_S *info)
 	C_DeviceFactoryInfo FactoryInfo;
 	CAvConfigNetComm NetComm;
 	NetComm.Update();
-	ConfigNetComm &ConfigNet = NetComm.GetConfig(NetCommT_Lan0);
+	ConfigNetComm &ConfigNet = NetComm.GetConfig(NetCommT_LAN0);
 	CAvDevice::GetDeviceInfo(FactoryInfo);
 	snprintf(info->ip,sizeof(info->ip),"%s",ConfigNet.LanAttr.IpAddr);
 	snprintf(info->dns,sizeof(info->dns),"%s",ConfigNet.LanAttr.Dns1);
@@ -215,7 +215,7 @@ static int	GetNetProtocolInfo(NetProtocolInfo *info)
 {
 	CAvConfigNetComm NetComm;
 	NetComm.Update();
-	ConfigNetComm &ConfigNet = NetComm.GetConfig(NetCommT_Lan0);
+	ConfigNetComm &ConfigNet = NetComm.GetConfig(NetCommT_LAN0);
  	info->rtspPort = 554;
  	info->onvifPort = 8080; 
  	sprintf(info->rtspUrl[0][0],"rtsp://%s:%d/c=0&amp;s=0",ConfigNet.LanAttr.IpAddr,info->rtspPort);
@@ -232,21 +232,21 @@ static int	GetVideoEncode(int chn, int streamId, VedioEncode_S *info)
 {
 	CAvConfigEncode Encode;
 	Encode.Update();
-	ConfigEncodeFormats &Formats = Encode.GetConfig(chn);
+	ConfigEncodeProfile &Profile = Encode.GetConfig(chn);
 		
 	memset(info,0,sizeof(VedioEncode_S));
-	info->bitrate = Formats.CHLFormats[streamId].Formats.BitRateValue;
-	info->cvbrMode = Formats.CHLFormats[streamId].Formats.BitRateCtrl;
-	info->encoding =  AVCompToOnvifEncoding(Formats.CHLFormats[streamId].Formats.Comp);
-	info->frameRate = (int)Formats.CHLFormats[streamId].Formats.FrameRate;
-	info->gop = (int)Formats.CHLFormats[streamId].Formats.Gop;
+	info->bitrate = Profile.CHLProfile[streamId].Profile.BitRateValue;
+	info->cvbrMode = Profile.CHLProfile[streamId].Profile.BitRateCtl;
+	info->encoding = AVCompToOnvifEncoding(Profile.CHLProfile[streamId].Profile.Comp);
+	info->frameRate = (int)Profile.CHLProfile[streamId].Profile.FrameRate;
+	info->gop = (int)Profile.CHLProfile[streamId].Profile.Gop;
 	info->h264Profile = H264Profile__Main;
-	info->qulity = (int)Formats.CHLFormats[streamId].Formats.Qlevel;
-	if(CaptureSize_Self != Formats.CHLFormats[streamId].Formats.ImageSize){
- 		GetResWidthAndHight(Formats.CHLFormats[streamId].Formats.ImageSize,&info->reslution.width,&info->reslution.height);
+	info->qulity = (int)Profile.CHLProfile[streamId].Profile.Qlevel;
+	if (CaptureSize_Self != Profile.CHLProfile[streamId].Profile.ImageSize){
+		GetResWidthAndHight(Profile.CHLProfile[streamId].Profile.ImageSize, &info->reslution.width, &info->reslution.height);
  	}else{
- 		info->reslution.width = Formats.CHLFormats[streamId].Formats.ImageSelfWidth;
- 		info->reslution.height =  Formats.CHLFormats[streamId].Formats.ImageSelfHeigh;
+		info->reslution.width = Profile.CHLProfile[streamId].Profile.ImageSelfWidth;
+		info->reslution.height = Profile.CHLProfile[streamId].Profile.ImageSelfHeigh;
  	}
 	return 0;
 }
@@ -256,19 +256,19 @@ static int	SetVideoEncode(int chn, int streamId, VedioEncode_S *info)
 	//profile qulity
 	CAvConfigEncode Encode;
 	Encode.Update();
-	ConfigEncodeFormats &Formats = Encode.GetConfig(chn);
+	ConfigEncodeProfile &Profile = Encode.GetConfig(chn);
 
- 	Formats.CHLFormats[streamId].Formats.BitRateValue = (av_u32)info->bitrate;
- 	Formats.CHLFormats[streamId].Formats.BitRateCtrl = (av_bitrate_ctrl)info->cvbrMode;
- 	Formats.CHLFormats[streamId].Formats.FrameRate = info->frameRate;
- 	Formats.CHLFormats[streamId].Formats.Gop = info->gop;
-	Formats.CHLFormats[streamId].Formats.Qlevel = info->qulity;
- 	Formats.CHLFormats[streamId].Formats.ImageSize = GetResEnum(info->reslution.width,info->reslution.height);
- 	if(CaptureSize_Self ==  Formats.CHLFormats[streamId].Formats.ImageSize){
- 		Formats.CHLFormats[streamId].Formats.ImageSelfHeigh = info->reslution.height;
- 		Formats.CHLFormats[streamId].Formats.ImageSelfWidth =  info->reslution.width;
+	Profile.CHLProfile[streamId].Profile.BitRateValue = (av_u32)info->bitrate;
+	Profile.CHLProfile[streamId].Profile.BitRateCtl = (BitRateCtrl)info->cvbrMode;
+	Profile.CHLProfile[streamId].Profile.FrameRate = info->frameRate;
+	Profile.CHLProfile[streamId].Profile.Gop = info->gop;
+	Profile.CHLProfile[streamId].Profile.Qlevel = info->qulity;
+	Profile.CHLProfile[streamId].Profile.ImageSize = GetResEnum(info->reslution.width, info->reslution.height);
+	if (CaptureSize_Self == Profile.CHLProfile[streamId].Profile.ImageSize){
+		Profile.CHLProfile[streamId].Profile.ImageSelfHeigh = info->reslution.height;
+		Profile.CHLProfile[streamId].Profile.ImageSelfWidth = info->reslution.width;
  	}
- 	Formats.CHLFormats[streamId].Formats.Comp = OnvifEncodingToAV(info->encoding);
+	Profile.CHLProfile[streamId].Profile.Comp = OnvifEncodingToAV(info->encoding);
  	Encode.SettingUp();
 	return 0;
 }
@@ -283,10 +283,10 @@ static int	GetVideoEncodeCab(int chn, int streamId, VedioEncodeCab_S *info)
 		return -1;
 	}
 	C_EncodeCaps EncodeCaps;
-	CAvDevice::GetCaptureCaps(chn, EncodeCaps);
+	CAvDevice::GetEncodeCaps(chn, EncodeCaps);
 	if (streamId == 0){
-	info->bitrateRange.max = 8192;
-	info->bitrateRange.min = 512;
+		info->bitrateRange.max = 8192;
+		info->bitrateRange.min = 512;
 	}
 	else{
 		info->bitrateRange.max = 1024;
@@ -295,14 +295,14 @@ static int	GetVideoEncodeCab(int chn, int streamId, VedioEncodeCab_S *info)
 	info->encodingCab = VideoEncoding__NULL;
 
 	CAvConfigEncode ConfigEncode;
-	ConfigEncodeFormats &Formats = ConfigEncode.GetConfig(chn);
+	ConfigEncodeProfile &Profile = ConfigEncode.GetConfig(chn);
 
-	for (int i = 0; i < AvComp_NR; i++){
+	for (int i = 0; i < AvComp_LAST; i++){
 		if (streamId == CHL_MAIN_T){
 			if (!(AvMask(i) & EncodeCaps.CompMask)) continue;
 		}
 		else if (streamId == CHL_SUB1_T){
-			if (!(AvMask(i) & EncodeCaps.ExtImageSizeMask[Formats.CHLFormats[CHL_MAIN_T].Formats.ImageSize])) continue;
+			if (!(AvMask(i) & EncodeCaps.ExtImageSizeMask[Profile.CHLProfile[CHL_MAIN_T].Profile.ImageSize])) continue;
 		}
 		else{
 			av_error("Onvif Stream id = %d  bad number\n", streamId);
@@ -336,7 +336,7 @@ static int	GetVideoEncodeCab(int chn, int streamId, VedioEncodeCab_S *info)
 	info->qulityRange.max = 10;
 	info->qulityRange.min = 1;
 	int pos = 0;
-	for (int i = CaptureSize_8K; i > CaptureSize_Self; i--){
+	for (int i = CaptureSize_HC8K; i > CaptureSize_Self; i--){
 		if (!(AvMask(i) & EncodeCaps.ImageSizeMask)) continue;
 		switch (i)
 		{
@@ -360,44 +360,44 @@ static int	GetVideoEncodeCab(int chn, int streamId, VedioEncodeCab_S *info)
 			info->resSupport[pos].width = 720;
 			info->resSupport[pos++].height = 576;
 			break;
-		case CaptureSize_720P:
+		case CaptureSize_HD720P:
 			info->resSupport[pos].width = 1280;
 			info->resSupport[pos++].height = 720;
 			break;
-		case CaptureSize_960P:
+		case CaptureSize_HD960P:
 			info->resSupport[pos].width = 1280;
 			info->resSupport[pos++].height = 960;
 			break;
-		case CaptureSize_1080P:
+		case CaptureSize_HD1080P:
 			info->resSupport[pos].width = 1920;
 			info->resSupport[pos++].height = 1080;
 			break;
-	
-		case CaptureSize_300W:	//2048*1536
+
+		case CaptureSize_HC300W:	//2048*1536
 			info->resSupport[pos].width = 2048;
 			info->resSupport[pos++].height = 1536;
 			break;
-		case CaptureSize_400W:	//2560*1440
+		case CaptureSize_HC400W:	//2560*1440
 			info->resSupport[pos].width = 2560;
 			info->resSupport[pos++].height = 1440;
 			break;
-		case CaptureSize_500W:	//2592*1944
+		case CaptureSize_HC500W:	//2592*1944
 			info->resSupport[pos].width = 2592;
 			info->resSupport[pos++].height = 1944;
 			break;
-		case CaptureSize_600W:	//3072*2048
-			info->resSupport[pos].width = 3072;
-			info->resSupport[pos++].height = 2048;
-			break;
-		case CaptureSize_800W:	//3840*2160
+// 		case CaptureSize_600W:	//3072*2048
+// 			info->resSupport[pos].width = 3072;
+// 			info->resSupport[pos++].height = 2048;
+// 			break;
+		case CaptureSize_HC800W:	//3840*2160
 			info->resSupport[pos].width = 2048;
 			info->resSupport[pos++].height = 2160;
 			break;
-		case CaptureSize_4K:	//4096*2160
+		case CaptureSize_HC4K:	//4096*2160
 			info->resSupport[pos].width = 4096;
 			info->resSupport[pos++].height = 2160;
 			break;
-		case CaptureSize_8K:	//7680*4320
+		case CaptureSize_HC8K:	//7680*4320
 			info->resSupport[pos].width = 7680;
 			info->resSupport[pos++].height = 4320;
 			break;
@@ -481,12 +481,12 @@ static int	GetImagingParam(ImagingParam_S *info)
 {
 	CAvConfigImage ConfigImage;
 	ConfigImage.Update();
-	ConfigImageFormats ImageFomats = ConfigImage.GetConfig();
+	ConfigImageProfile ImageProfile = ConfigImage.GetConfig();
 
-	info->Brightness = ImageFomats.Brightness;
-	info->ColorSaturation = ImageFomats.Saturation;
-	info->Contrast = ImageFomats.Contrast;
-	info->Sharpness = ImageFomats.Hue;
+	info->Brightness = ImageProfile.Brightness;
+	info->ColorSaturation = ImageProfile.Saturation;
+	info->Contrast = ImageProfile.Contrast;
+	info->Sharpness = ImageProfile.Hue;
 	return 0;
 }
 
@@ -494,11 +494,11 @@ static int	SetImagingParam(ImagingParam_S *info)
 {
 	CAvConfigImage ConfigImage;
 	ConfigImage.Update();
-	ConfigImageFormats ImageFomats = ConfigImage.GetConfig();
-	ImageFomats.Brightness = info->Brightness;
-	ImageFomats.Saturation = info->ColorSaturation;
-	ImageFomats.Contrast = info->Contrast;
-	ImageFomats.Hue = info->Sharpness;
+	ConfigImageProfile ImageProfile = ConfigImage.GetConfig();
+	ImageProfile.Brightness = info->Brightness;
+	ImageProfile.Saturation = info->ColorSaturation;
+	ImageProfile.Contrast = info->Contrast;
+	ImageProfile.Hue = info->Sharpness;
 
 	ConfigImage.SettingUp();
 	return 0;
@@ -506,44 +506,19 @@ static int	SetImagingParam(ImagingParam_S *info)
 
 static int	GetImagingCab(ImagingCab_S *info)
 {
-	C_ImageQualityCaps ImageQualityCaps;
-	CAvDevice::GetImageCaps(0, ImageQualityCaps);
+	C_ImageCaps ImageCaps;
+	CAvDevice::GetImageCaps(0, ImageCaps);
 	/*Brightness[0], Contrast[1], Saturation[2], Hue[3]*/
-	if (ImageQualityCaps.SupportMask & (0x01 << 0)){
-		info->Brightness.max = ImageQualityCaps.MaxRange;
-		info->Brightness.min = 0;
-	}
-	else{
-		info->Brightness.max = 0;
-		info->Brightness.min = 0;
-	}
+	info->Brightness.max = ImageCaps.BrightnessRang;
+	info->Brightness.min = 0;
+	info->ColorSaturation.max = ImageCaps.SaturationRang;
+	info->ColorSaturation.min = 0;
 
-	if (ImageQualityCaps.SupportMask & (0x01 << 1)){
-		info->ColorSaturation.max = ImageQualityCaps.MaxRange;
-		info->ColorSaturation.min = 0;
-	}
-	else{
-		info->ColorSaturation.max = 0;
-		info->ColorSaturation.min = 0;
-	}
+	info->Contrast.max = ImageCaps.ContrastRang;
+	info->Contrast.min = 0;
 
-	if (ImageQualityCaps.SupportMask & (0x01 << 2)){
-		info->Contrast.max = ImageQualityCaps.MaxRange;
-		info->Contrast.min = 0;
-	}
-	else{
-		info->Contrast.max = 0;
-		info->Contrast.min = 0;
-	}
-
-	if (ImageQualityCaps.SupportMask & (0x01 << 3)){
-		info->Sharpness.max = ImageQualityCaps.MaxRange;
-		info->Sharpness.min = 0;
-	}
-	else{
-		info->Sharpness.max = 0;
-		info->Sharpness.min = 0;
-	}
+	info->Sharpness.max = ImageCaps.HueRang;
+	info->Sharpness.min = 0;
 	return 0;
 }
 

@@ -3,6 +3,7 @@
 #include "AvAudio/AvAudio.h"
 #include "AvDevice/AvDevice.h"
 #include "Apis/LibEncode.h"
+#include "AvUart/AvUart.h"
 CAvDevCapture::CAvDevCapture()
 {
 	CThread::SetThreadName(__FUNCTION__);
@@ -10,6 +11,8 @@ CAvDevCapture::CAvDevCapture()
 	m_LastCaptureSyncStat = E_Capture_VideoNONE;
 	
 	m_Snap = NULL;
+	m_ConfigCapture.Update(m_Channel);
+	m_ConfigCapture.Attach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigCaptureModify);
 
 	m_ConfigEncode.Update(m_Channel);
 	m_ConfigEncode.Attach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigEncodeModify);
@@ -23,11 +26,28 @@ CAvDevCapture::CAvDevCapture()
 	m_ConfigWaterMark.Update(m_Channel);
 	m_ConfigWaterMark.Attach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigWaterMarkingModify);
 
-	m_ConfigAudio[CHL_ACAP_T].Update(CHL_ACAP_T);
-	m_ConfigAudio[CHL_ACAP_T].Attach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigAudio);
+	m_ConfigAudioCapture.Update();
+	m_ConfigAudioCapture.Attach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigAudioModify);
 
-	m_ConfigAudio[CHL_APLY_T].Update(CHL_APLY_T);
-	m_ConfigAudio[CHL_APLY_T].Attach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigAudio);
+
+	for (int i = 0; i < CHL_NR_T; i++){
+		m_RecvFrameNu[i] = 0;
+		m_ContinuousErrFrameNu[i] = 0;
+		
+		m_CaptureStatus[i].Channel		= m_Channel;
+		m_CaptureStatus[i].Slave		= i;
+		m_CaptureStatus[i].Enable		= 1;
+		m_CaptureStatus[i].CaptureIn	= 0;
+		m_CaptureStatus[i].CaptureOut	= 0;
+		m_CaptureStatus[i].CaptureError = 0;
+		m_CaptureStatus[i].CaptureDrop	= 0;
+		m_CaptureStatus[i].CaptureFps	= 0;
+		m_CaptureStatus[i].CaptureWidth = 0;
+		m_CaptureStatus[i].CaptureHeigh = 0;
+		m_CaptureStatus[i].CaptureFormats[0] = '\0';
+	}
+
+
 }
 CAvDevCapture::~CAvDevCapture()
 {
@@ -37,6 +57,7 @@ CAvDevCapture::~CAvDevCapture()
 	m_ConfigImage.Detach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigImageModify);
 	m_ConfigCover.Detach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigCoverModify);
 	m_ConfigWaterMark.Detach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigWaterMarkingModify);
+	m_ConfigAudioCapture.Detach(this, (AvConfigCallBack)&CAvDevCapture::OnConfigAudioModify);
 
 }
 av_bool CAvDevCapture::Initialize(av_int Channel)
@@ -44,28 +65,37 @@ av_bool CAvDevCapture::Initialize(av_int Channel)
 	m_Channel = Channel;
 	CaptureCreate();
 
-	if (av_true != CThread::run()){
+	if (av_true != CThread::ThreadStart()){
 		av_error("%s Start Thread Error\n", __FUNCTION__);
 	}
 	C_EncodeCaps EncodeCaps;
-	CAvDevice::GetCaptureCaps(m_Channel, EncodeCaps);
+	CAvDevice::GetEncodeCaps(m_Channel, EncodeCaps);
 	for (int i = CHL_MAIN_T; i < CHL_NR_T; i++){
-		if (!(AvMask(i) & EncodeCaps.ExtChannel))continue;
+		if (!(AvMask(i) & EncodeCaps.ExtChannelMask))continue;
 		Start(i);
 	}
 	{
 		C_AudioCaps AudioCaps;
-		CAvDevice::GetACaptureCaps(CHL_ACAP_T, AudioCaps);
-		if (AudioCaps.nMaxChannels != 0){
+		if (av_true == CAvDevice::GetACaptureCaps(CHL_ACAP_T, AudioCaps)){
 			AStart(CHL_ACAP_T);
 		}
-		CAvDevice::GetACaptureCaps(CHL_APLY_T, AudioCaps);
-		if (AudioCaps.nMaxChannels != 0){
+		
+
+		if (av_true == CAvDevice::GetACaptureCaps(CHL_APLY_T, AudioCaps)){
 			AStart(CHL_APLY_T);
 		}
+		
 	}
 
+	AvCoverCreate(m_Channel);
+	AvCoverStart(m_Channel);
+
+
+	AvWaterMarkingCreate(m_Channel);
+	AvWaterMarkingStart(m_Channel);
+	
 	LoadConfigs();
+	
 	return av_true;
 }
 
@@ -102,19 +132,6 @@ av_bool CAvDevCapture::Stop(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnDat
 	}
 }
 
-av_bool CAvDevCapture::SetProfile(av_int Slave, C_EncodeFormats &Formats)
-{
-	return av_true;
-}
-av_bool CAvDevCapture::GetProfile(av_int Slave, C_EncodeFormats &Fromats)
-{
-	return av_true;
-}
-av_bool CAvDevCapture::GetCaps(C_EncodeCaps &Caps)
-{
-	return av_true;
-}
-
 av_bool CAvDevCapture::SetTime(av_timeval &atv)
 {
 	return av_true;
@@ -123,12 +140,166 @@ av_bool CAvDevCapture::SetIFrame(av_int Slave)
 {
 	return AvCaptureForceKeyFrame((av_char)m_Channel, (av_char)Slave);
 }
+Capture::EAvCaptureStatus CAvDevCapture::GetCaptureStatus(av_int Slave)
+{
+	if (Slave == -1){
+		for (int i = 0; i < CHL_NR_T; i++){
+			if (m_RecvFrameNu[i] != 0){
+				return EAvCapture_ING;
+			}
+		}
+
+		return EAvCapture_STOP;
+	}
+	return m_RecvFrameNu[Slave] == 0 ? EAvCapture_STOP : EAvCapture_ING;
+}
 
 CAvPacket * CAvDevCapture::GetSnap(av_int Slave)
 {
 	CGuard m(m_SnapMutex);
 	if (NULL != m_Snap)m_Snap->AddRefer();
 	return m_Snap;
+}
+
+
+av_bool CAvDevCapture::CaptureGetCaps(C_CaptureCaps &CaptureCaps)
+{
+	return AvCaptureGetCaps(m_Channel, &CaptureCaps);
+}
+av_bool CAvDevCapture::CaptureGetProfile(C_CaptureProfile &CaptureProfile)
+{
+	ConfigCaptureProfile &LocalCaptureProfile = m_ConfigCapture.GetConfig(m_Channel);
+	CaptureProfile = LocalCaptureProfile;
+	return av_true;
+}
+av_bool CAvDevCapture::CaptureSetProfile(C_CaptureProfile &CaptureProfile)
+{
+	CAvConfigCapture		ConfigCapture;
+	ConfigCapture.Update();
+	ConfigCaptureProfile &LocalCaptureProfile = ConfigCapture.GetConfig(m_Channel);
+	LocalCaptureProfile = CaptureProfile;
+	av_msg("CaptureSetProfile"
+		"AntiFlcker = %d"
+		"AntiFlckerValue = %d"
+		"bOpenCvbs = %d"
+		"Exposure = %d"
+		"ExposureValue = %d"
+		"IrCut = %d"
+		"Start = %d"
+		"End = %d"
+		"MirrorMaskValue = %d"
+		"WhiteBalance = %d"
+		"WhiteBalanceValue = %d\n",
+		CaptureProfile.AntiFlcker,
+		CaptureProfile.AntiFlckerValue,
+		CaptureProfile.bOpenCvbs,
+		CaptureProfile.Exposure,
+		CaptureProfile.ExposureValue,
+		CaptureProfile.IrCut,
+		CaptureProfile.IrCutTimer.Start,
+		CaptureProfile.IrCutTimer.End,
+		CaptureProfile.MirrorMaskValue, 
+		CaptureProfile.WhiteBalance,
+		CaptureProfile.WhiteBalanceValue);
+
+
+	ConfigCapture.SettingUp();
+	return av_true;
+
+}
+
+av_bool CAvDevCapture::EncodeGetCaps(C_EncodeCaps &EncodeCaps)
+{
+	return AvEncodeGetCaps(m_Channel, &EncodeCaps);
+}
+av_bool CAvDevCapture::EncodeGetProfile(int Slave, C_EnCodeProfile &EnCodeProfile)
+{
+	ConfigEncodeProfile &LocalEncodeProfile = m_ConfigEncode.GetConfig(m_Channel);
+	EnCodeProfile = LocalEncodeProfile.CHLProfile[Slave].Profile;
+
+	return av_true;
+}
+av_bool CAvDevCapture::EncodeSetProfile(int Slave, C_EnCodeProfile &EnCodeProfile)
+{
+	CAvConfigEncode ConfigEncode;
+	ConfigEncode.Update();
+	ConfigEncodeProfile &LocalEncodeProfile = ConfigEncode.GetConfig(m_Channel);
+	LocalEncodeProfile.CHLProfile[Slave].Profile = EnCodeProfile;
+	ConfigEncode.SettingUp();
+	av_msg("Slave = %d, FrameRate = %d,  BitRateCtl = %d, Gop = %d, ImageSize= %d Qlevel = %d comp = %d, bitvalue = %d\n",Slave, EnCodeProfile.FrameRate, EnCodeProfile.BitRateCtl,
+		EnCodeProfile.Gop, EnCodeProfile.ImageSize, EnCodeProfile.Qlevel, EnCodeProfile.Comp, EnCodeProfile.BitRateValue);
+	return av_true;
+}
+
+av_bool  CAvDevCapture::AudioGetCaps(C_AudioCaps &AudioCaps)
+{
+	return AvACaptureCaps(CHL_ACAP_T, &AudioCaps);
+}
+av_bool  CAvDevCapture::AudioGetProfile(C_AudioProfile &AudioProfile)
+{
+	ConfigAudioFormats &LocalAudioProfile = m_ConfigAudioCapture.GetConfig();
+	AudioProfile = LocalAudioProfile;
+	return av_true;
+}
+av_bool  CAvDevCapture::AudioSetProfile(C_AudioProfile &AudioProfile)
+{
+	CAvConfigAudio ConfigAudio;
+	ConfigAudio.Update();
+
+	av_msg("CaptureDevice = %d, Comp = %d, SampleBits = %d, SampleRate = %d, SoundMode = %d, VoiceQualityMask = %d, VolumeCapture = %d,VolumePlay = %d\n",
+		AudioProfile.CaptureDevice,
+		AudioProfile.Comp,
+		AudioProfile.SampleBits,
+		AudioProfile.SampleRate,
+		AudioProfile.SoundMode,
+		AudioProfile.VoiceQualityMask,
+		AudioProfile.VolumeCapture,
+		AudioProfile.VolumePlay);
+	ConfigAudioFormats &LocalAudioProfile = ConfigAudio.GetConfig();
+	LocalAudioProfile = AudioProfile;
+
+	ConfigAudio.SettingUp();
+
+	return av_true;
+}
+
+av_bool CAvDevCapture::ImageGetCaps(C_ImageCaps &ImageCaps)
+{
+	return AvImageCaps(m_Channel, &ImageCaps);
+}
+av_bool CAvDevCapture::ImageGetProfile(C_ImageProfile &ImageProfile)
+{
+	
+	ConfigImageProfile &LocalImageProfile = m_ConfigImage.GetConfig(m_Channel);
+	ImageProfile = LocalImageProfile;
+	return av_true;
+}
+av_bool CAvDevCapture::ImageSetProfile(C_ImageProfile &ImageProfile)
+{
+	CAvConfigImage			ConfigImage;
+	ConfigImage.Update();
+
+	ConfigImageProfile &LocalImageProfile = ConfigImage.GetConfig(m_Channel);
+	LocalImageProfile = ImageProfile;
+	ConfigImage.SettingUp();
+	return av_true;
+}
+
+av_bool CAvDevCapture::PtzGetCaps(C_PtzCaps &PtzCaps)
+{
+	return g_AvUart.PtzGetCaps(PtzCaps);
+}
+av_bool CAvDevCapture::PtzGetProfile(C_PtzProfile &PtzProfile)
+{
+	return g_AvUart.PtzGetProfile(PtzProfile);
+}
+av_bool CAvDevCapture::PtzSetProfile(C_PtzProfile &PtzProfile)
+{
+	return g_AvUart.PtzSetProfile(PtzProfile);
+}
+av_bool CAvDevCapture::PtzSetCommand(C_PtzCmd &PtzCmd)
+{
+	return g_AvUart.PtzSetCommand(PtzCmd);
 }
 
 
@@ -143,11 +314,7 @@ av_bool CAvDevCapture::CaptureCreate()
 	}
 	m_LastCaptureSyncStat = E_Capture_VideoStart;
 
-	AvCoverCreate(m_Channel);
-	AvCoverStart(m_Channel);
 
-	AvWaterMarkingCreate(m_Channel);
-	AvWaterMarkingStart(m_Channel);
 
 	AvACreate(m_Channel);
 
@@ -187,7 +354,7 @@ av_bool CAvDevCapture::VStop(av_uchar Slave)
 av_bool CAvDevCapture::AStart(E_AUDIO_CHL chl)
 {
 	return AvAStart(m_Channel, chl);
-	}
+}
 av_bool CAvDevCapture::AStop(E_AUDIO_CHL chl)
 {
 	return AvAStop(m_Channel, chl);
@@ -195,7 +362,7 @@ av_bool CAvDevCapture::AStop(E_AUDIO_CHL chl)
 av_bool CAvDevCapture::APlayPutBuffer(CAvPacket *Packet)
 {
 	return AvAPlayPutBuffer((av_uchar *)Packet->GetRawBuffer(), Packet->GetRawLength());
-	}
+}
 av_bool CAvDevCapture::ASetProfile(E_AUDIO_CHL CHL, C_AudioProfile &aProfile)
 {
 	return AvASetProfile(m_Channel, CHL, &aProfile);
@@ -204,48 +371,43 @@ av_bool CAvDevCapture::ASetProfile(E_AUDIO_CHL CHL, C_AudioProfile &aProfile)
 av_bool CAvDevCapture::LoadConfigs()
 {
 	C_EncodeCaps EncodeCaps;
-	CAvDevice::GetCaptureCaps(m_Channel, EncodeCaps);
+	CAvDevice::GetEncodeCaps(m_Channel, EncodeCaps);
 
-	ConfigEncodeFormats &Formats = m_ConfigEncode.GetConfig(m_Channel);
+	//视频采集
+	ConfigCaptureProfile &CaptureProfile = m_ConfigCapture.GetConfig(m_Channel);
+	AvCaptureSetProfile(m_Channel, &CaptureProfile);
 
+	//视频编码
+	ConfigEncodeProfile &Formats = m_ConfigEncode.GetConfig(m_Channel);
 	for (int i = CHL_MAIN_T; i < CHL_NR_T; i++){
-		if (!(AvMask(i) & EncodeCaps.ExtChannel)){
+		if (!(AvMask(i) & EncodeCaps.ExtChannelMask)){
 			continue;
 		}
 
-		AvEncodeSetFormat(m_Channel, i, &(Formats.CHLFormats[i].Formats));
+		AvEncodeSetProfile(m_Channel, i, &(Formats.CHLProfile[i].Profile));
 	}
-	ConfigCaptureFormats &CaptureFormats = m_ConfigCapture.GetConfig(m_Channel);
-	AvCaptureInSetFormat(m_Channel, &CaptureFormats);
 
-	ConfigImageFormats &ImageFormats = m_ConfigImage.GetConfig(m_Channel);
-	AvImageSet(m_Channel, &(ImageFormats));
+	//图像参数
+	ConfigImageProfile &ImageProfile = m_ConfigImage.GetConfig(m_Channel);
+	AvImageSetProfile(m_Channel, &(ImageProfile));
 
-	C_EncodeCaps CaptureCaps;
-	CAvDevice::GetCaptureCaps(m_Channel, CaptureCaps);
+	//音频参数
+	ConfigAudioFormats &AudioCapFromat = m_ConfigAudioCapture.GetConfig();
+	ASetProfile(CHL_ACAP_T, AudioCapFromat);
+
+
+	//C_EncodeCaps CaptureCaps;
+	//CAvDevice::GetCaptureCaps(m_Channel, CaptureCaps);
 
 	ConfigCoverFormats &CoverFormats = m_ConfigCover.GetConfig(m_Channel);
-	for (int i = 0; i < CaptureCaps.MaxCover; i++){
+	for (int i = 0; i < EncodeCaps.MaxCover; i++){
 		AvCoverSetFormat(m_Channel, &(CoverFormats.CHLFormats[i]));
 	}
 
 	ConfigWaterMarkingFormats &WaterMarkingFormats = m_ConfigWaterMark.GetConfig(m_Channel);
-	for (int i = 0; i < CaptureCaps.MaxWaterMaring; i++){
+	for (int i = 0; i < EncodeCaps.MaxWaterMaring; i++){
 		AvWaterMarkingSetFormat(m_Channel, &(WaterMarkingFormats.CHLFormats[i]));
 	}
-
-	C_AudioCaps AudioCaps;
-	CAvDevice::GetACaptureCaps(CHL_ACAP_T, AudioCaps);
-	if (AudioCaps.nMaxChannels > 0){
-		ConfigAudioFormats &AudioCapFromat = m_ConfigAudio[CHL_ACAP_T].GetConfig(CHL_ACAP_T);
-		ASetProfile(CHL_ACAP_T, AudioCapFromat);
-	}
-	CAvDevice::GetACaptureCaps(CHL_APLY_T, AudioCaps);
-	if (AudioCaps.nMaxChannels > 0){
-		ConfigAudioFormats &AudioCapFromat = m_ConfigAudio[CHL_APLY_T].GetConfig(CHL_APLY_T);
-		ASetProfile(CHL_APLY_T, AudioCapFromat);
-	}
-
 
 	return av_true;
 
@@ -262,15 +424,18 @@ void CAvDevCapture::ThreadProc()
 	int i = 0;
 	
 	C_EncodeCaps EncodeCaps;
-	CAvDevice::GetCaptureCaps(m_Channel, EncodeCaps);
-	av_msg("%s Task Running StreamMark = %x\n", __FUNCTION__, EncodeCaps.ExtChannel);
+	CAvDevice::GetEncodeCaps(m_Channel, EncodeCaps);
+	av_msg("%s Task Running StreamMark = %x\n", __FUNCTION__, EncodeCaps.ExtChannelMask);
 	while (av_true == m_Loop){
 		isSleep = av_true;
 		//#pragma omp parallel for
 		for (i = CHL_MAIN_T; i < CHL_NR_T; i++){
-			if (!(AvMask(i) & EncodeCaps.ExtChannel))continue;
-			ret = AvCaptureGetBuffer(m_Channel, i, avStreamT_V, &buf);
+			if (!(AvMask(i) & EncodeCaps.ExtChannelMask))continue;
+			ret = AvCaptureGetBuffer(m_Channel, i, StreamContent_VIDEO, &buf);
 			if (ret == av_true){
+				m_RecvFrameNu[i]++;
+				m_ContinuousErrFrameNu[i] = 0;
+
 				isSleep = av_false;
 				AvPacket = g_AvPacketManager.GetAvPacket(buf.len);
 				AvPacket->PutBuffer((av_uchar *)buf.base, buf.len);
@@ -280,22 +445,61 @@ void CAvDevCapture::ThreadProc()
 
 				if (i == CHL_JPEG_T){ 
 					m_SnapMutex.Enter();
-					if (NULL != m_Snap)m_Snap->Release();
-				
+					if (NULL != m_Snap){
+						m_Snap->Release();
+					}
 					m_Snap = AvPacket;
 					m_Snap->AddRefer();
-					
 					m_SnapMutex.Leave();
 				}
+#if defined(_AV_WARE_M_HAVE_PROC)
+				{
+					m_CaptureStatus[i].CaptureIn++;
+					m_CaptureStatus[i].CaptureHeigh = AvPacket->ImageHeigh();
+					m_CaptureStatus[i].CaptureWidth = AvPacket->ImageWidth();
+					m_CaptureStatus[i].CaptureFps = AvPacket->FrameRate();
+					switch (AvPacket->Comp())
+					{
+					case AvComp_MJPEG:
+						sprintf((char *)m_CaptureStatus[i].CaptureFormats, "MJPEG");
+						break;
+					case AvComp_H264:
+						sprintf((char *)m_CaptureStatus[i].CaptureFormats, "H264");
+						break;
+					case AvComp_H265:
+						sprintf((char *)m_CaptureStatus[i].CaptureFormats, "H265");
+						break;
+					case AvComp_JPEG:
+						sprintf((char *)m_CaptureStatus[i].CaptureFormats, "JPEG");
+						break;
+					default:
+						break;
+					}
 
+					if (AvPacket->FrameType() == avFrameT_I && i == CHL_MAIN_T){
+						for (int c = 0; c < CHL_NR_T; c++){
+							if (!(AvMask(c) & EncodeCaps.ExtChannelMask)) m_CaptureStatus[c].Enable = 0;
+							AvProcSet(IOCTRL_CMD_SET_CAPSTAT, &m_CaptureStatus[c]);
+						}
+					}
+
+
+				}
+#endif
 				AvPacket->Release();
 				
+			}
+			else{
+				m_ContinuousErrFrameNu[i]++;
+				if (m_ContinuousErrFrameNu[i] >= 75){
+					m_RecvFrameNu[i] = 0;
+				}
 			}
 		}
 
 		do
 		{
-			ret = AvCaptureGetBuffer(m_Channel, 0, avStreamT_A, &buf);
+			ret = AvCaptureGetBuffer(m_Channel, 0, StreamContent_AUDIO, &buf);
 			if (ret == av_true){
 				AvPacket = g_AvPacketManager.GetAvPacket(buf.len);
 				AvPacket->PutBuffer((av_uchar *)buf.base, buf.len);
@@ -303,14 +507,14 @@ void CAvDevCapture::ThreadProc()
 				AvPacket->PutBufferOver();
 				isSleep = av_false;
 				for (i = CHL_MAIN_T; i < CHL_NR_T; i++){
-					if (!(AvMask(i) & EncodeCaps.ExtChannel))continue;
+					if (!(AvMask(i) & EncodeCaps.ExtChannelMask))continue;
 					m_StreamSignal[i](m_Channel, i, AvPacket);
 				}
 				AvPacket->Release();
 				
 			}
 		} while (ret == av_true);
-
+		
 		if (isSleep == av_true){
 #if defined(WIN32)
 			av_msleep(1);
@@ -333,7 +537,7 @@ void CAvDevCapture::ThreadProc()
 					av_warning("Video In Start Captures \n");
 					CaptureCreate();
 					for (int i = CHL_MAIN_T; i < CHL_NR_T; i++){
-						if (!(AvMask(i) & EncodeCaps.ExtChannel))continue;
+						if (!(AvMask(i) & EncodeCaps.ExtChannelMask))continue;
 						Start(i);
 					}
 					AStart(CHL_ACAP_T);
@@ -352,7 +556,7 @@ void CAvDevCapture::ThreadProc()
 				if (m_LastCaptureSyncStat != E_Capture_VideoStop){
 					av_warning("Video In Stop Captures \n");
 					for (int i = CHL_MAIN_T; i < CHL_NR_T; i++){
-						if (!(AvMask(i) & EncodeCaps.ExtChannel))continue;
+						if (!(AvMask(i) & EncodeCaps.ExtChannelMask))continue;
 						Stop(i);
 					}
 					CaptureDestroy();
@@ -396,9 +600,9 @@ av_void CAvDevCapture::OnConfigWaterMarkingModify(CAvConfigWaterMarking *ConfigW
 	ConfigWaterMarkingFormats &NewWaterMarkingFormats = ConfigWaterMarking->GetConfig(m_Channel);
 
 	av_bool ret = av_false;
-	C_EncodeCaps CaptureCaps;
-	CAvDevice::GetCaptureCaps(m_Channel, CaptureCaps);
-	for (int i = 0; i < CaptureCaps.MaxWaterMaring; i++)
+	C_EncodeCaps EncodeCaps;
+	CAvDevice::GetEncodeCaps(m_Channel, EncodeCaps);
+	for (int i = 0; i < EncodeCaps.MaxWaterMaring; i++)
 	{
 		if (0 != memcmp(&(OldWaterMarkingFormats.CHLFormats[i]), &(NewWaterMarkingFormats.CHLFormats[i]), sizeof(C_WaterMarkingFormats))){
 			ret = AvWaterMarkingSetFormat(m_Channel, &(NewWaterMarkingFormats.CHLFormats[i]));
@@ -419,9 +623,9 @@ av_void CAvDevCapture::OnConfigCoverModify(CAvConfigCover *ConfigCover, int &res
 	ConfigCoverFormats &newFormats = ConfigCover->GetConfig(m_Channel);
 
 	av_bool ret = av_false;
-	C_EncodeCaps CaptureCaps;
-	CAvDevice::GetCaptureCaps(m_Channel, CaptureCaps);
-	for (int i = 0; i < CaptureCaps.MaxCover; i++)
+	C_EncodeCaps EncodeCaps;
+	CAvDevice::GetEncodeCaps(m_Channel, EncodeCaps);
+	for (int i = 0; i < EncodeCaps.MaxCover; i++)
 	{
 		if (0 != memcmp(&OldFormats.CHLFormats[i], &newFormats.CHLFormats[i], sizeof(C_CoverFormats))){
 			ret = AvCoverSetFormat(m_Channel, &(newFormats.CHLFormats[i]));
@@ -439,13 +643,13 @@ av_void CAvDevCapture::OnConfigCoverModify(CAvConfigCover *ConfigCover, int &res
 }
 av_void CAvDevCapture::OnConfigImageModify(CAvConfigImage *ConfigImage, int &result)
 {
-	ConfigImageFormats &OldFormats = m_ConfigImage.GetConfig(m_Channel);
-	ConfigImageFormats &NewFormats = ConfigImage->GetConfig(m_Channel);
+	ConfigImageProfile &OldProfile = m_ConfigImage.GetConfig(m_Channel);
+	ConfigImageProfile &NewProfile = ConfigImage->GetConfig(m_Channel);
 	av_bool ret = av_false;
-	if (0 != memcmp(&OldFormats, &NewFormats, sizeof(ConfigImageFormats))){
-		ret = AvImageSet(m_Channel, &NewFormats);
+	if (0 != memcmp(&OldProfile, &NewProfile, sizeof(ConfigImageProfile))){
+		ret = AvImageSetProfile(m_Channel, &NewProfile);
 		if (ret == av_true){
-			OldFormats = NewFormats;
+			OldProfile = NewProfile;
 			result = 0;
 		}
 		else{
@@ -457,14 +661,14 @@ av_void CAvDevCapture::OnConfigImageModify(CAvConfigImage *ConfigImage, int &res
 av_void CAvDevCapture::OnConfigEncodeModify(CAvConfigEncode *ConfigEncode, int &result)
 {
 	av_warning("OnConfigEncodeModify Modify\n");
-	ConfigEncodeFormats &OldFormats = m_ConfigEncode.GetConfig(m_Channel);
-	ConfigEncodeFormats &NewFormats = ConfigEncode->GetConfig(m_Channel);
+	ConfigEncodeProfile &OldProfile = m_ConfigEncode.GetConfig(m_Channel);
+	ConfigEncodeProfile &NewProfile = ConfigEncode->GetConfig(m_Channel);
 	av_bool ret;
 	for (int i = 0; i < CHL_NR_T; i++){
-		if (0 != memcmp(&(NewFormats.CHLFormats[i].Formats), &(OldFormats.CHLFormats[i].Formats), sizeof(C_EncodeFormats))){
-			ret = AvEncodeSetFormat(m_Channel, i, &(NewFormats.CHLFormats[i].Formats));
+		if (0 != memcmp(&(NewProfile.CHLProfile[i].Profile), &(OldProfile.CHLProfile[i].Profile), sizeof(C_EnCodeProfile))){
+			ret = AvEncodeSetProfile(m_Channel, i, &(NewProfile.CHLProfile[i].Profile));
 			if (ret == av_true){
-				OldFormats.CHLFormats[i].Formats = NewFormats.CHLFormats[i].Formats;
+				OldProfile.CHLProfile[i].Profile = NewProfile.CHLProfile[i].Profile;
 				result = 0;
 			}
 			else{
@@ -478,13 +682,13 @@ av_void CAvDevCapture::OnConfigEncodeModify(CAvConfigEncode *ConfigEncode, int &
 av_void CAvDevCapture::OnConfigCaptureModify(CAvConfigCapture *ConfigCapture, int &result)
 {
 	av_warning("OnConfigCaptureModify Modify\n");
-	ConfigCaptureFormats &OldFormats = m_ConfigCapture.GetConfig(m_Channel);
-	ConfigCaptureFormats &NewFormats = ConfigCapture->GetConfig(m_Channel);
+	ConfigCaptureProfile &OldProfile = m_ConfigCapture.GetConfig(m_Channel);
+	ConfigCaptureProfile &NewProfile = ConfigCapture->GetConfig(m_Channel);
 	av_bool ret = av_false;
-	if (0 != memcmp(&OldFormats, &NewFormats, sizeof(ConfigCaptureFormats))){
-		ret = AvCaptureInSetFormat(m_Channel, &NewFormats);
+	if (0 != memcmp(&OldProfile, &NewProfile, sizeof(ConfigCaptureProfile))){
+		ret = AvCaptureSetProfile(m_Channel, &NewProfile);
 		if (ret == av_true){
-			OldFormats = NewFormats;
+			OldProfile = NewProfile;
 			result = 0;
 		}
 		else{
@@ -493,12 +697,23 @@ av_void CAvDevCapture::OnConfigCaptureModify(CAvConfigCapture *ConfigCapture, in
 		}
 	}
 }
-av_void CAvDevCapture::OnConfigAudio(CAvConfigAudio *ConfigAudio, int &result)
+av_void CAvDevCapture::OnConfigAudioModify(CAvConfigAudio *ConfigAudio, int &result)
 {
+	av_warning("OnConfigAudioModify Modify\n");
+	ConfigAudioFormats &OldProfile = m_ConfigAudioCapture.GetConfig();
+	ConfigAudioFormats &NewProfile = ConfigAudio->GetConfig();
 
+	av_bool ret = av_false;
+	if (0 != memcmp(&OldProfile, &NewProfile, sizeof(ConfigCaptureProfile))){
+		ret = AvASetProfile(m_Channel, CHL_ACAP_T, &NewProfile);
+		if (ret == av_true){
+			OldProfile = NewProfile;
+			result = 0;
+		}
+		else{
+			av_error("AvASetProfile return Error\n");
+			result = -1;
+		}
+	}
 }
 
-av_void CAvDevCapture::OnTest(void  *args, int &result)
-{
-
-}

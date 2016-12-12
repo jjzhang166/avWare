@@ -40,8 +40,12 @@ typedef enum _AvConfigIndex{
 	CONF_ALARM_MD				= 401,
 
 	CONF_NETPROTOCOL			= 501,
-
+	CONF_PROTO_RTMP				= 502,
 	CONF_AUDIO					= 601,
+
+	CONF_RECORD					= 701,
+	CONF_RECORDCTRL				= 702,
+
 }AvConfigIndex;
 
 #endif //AVWARE_AVCONFIG_CONFIGINDEX_H_

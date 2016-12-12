@@ -16,7 +16,7 @@
 #define _AVALARM_H_
 
 #include "Signals.h"
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "AvThread/AvThread.h"
 #include "Apis/LibSystem.h"
 #include "AvThread/AvQmsg.h"

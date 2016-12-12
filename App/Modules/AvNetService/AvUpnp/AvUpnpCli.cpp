@@ -18,7 +18,7 @@
 
 SINGLETON_IMPLEMENT(CAvUpnpCli)
 
-CAvUpnpCli::CAvUpnpCli():CTimer("AvUpnpCli")
+CAvUpnpCli::CAvUpnpCli()
 {
 	m_AvConfigChanged = 0;
 }
@@ -35,14 +35,14 @@ av_bool CAvUpnpCli::Start()
 	memcpy(m_InternalPort, CAvConfigNetUpnp::GetEnvConfig().LocalPort, sizeof(m_InternalPort));
 	
 	m_AvConfigNetUpnp.Attach(this ,(AvConfigCallBack)&CAvUpnpCli::AvConfigUpnp);
-	StartTimer(1*1000, 5*1000, av_true, av_true);
+	//StartTimer(1*1000, 5*1000, av_true, av_true);
 	AvConfigUpnp(&m_AvConfigNetUpnp, ret);
 	return av_true;
 }
 
 av_bool CAvUpnpCli::Stop()
 {
-	StopTimer();
+	//StopTimer();
 	m_AvConfigNetUpnp.Detach(this ,(AvConfigCallBack)&CAvUpnpCli::AvConfigUpnp);
 	return av_true;
 }

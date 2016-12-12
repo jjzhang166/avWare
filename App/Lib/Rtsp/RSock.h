@@ -15,7 +15,7 @@
 #ifndef _RSOCK_H_
 #define _RSOCK_H_
 
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 
 
 

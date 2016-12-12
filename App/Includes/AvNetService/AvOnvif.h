@@ -15,7 +15,7 @@
 #ifndef _AVONVIF_H_
 #define _AVONVIF_H_
 #include "CAvObject.h"
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "Onvif/onvifAPI.h"
 
 class CAvOnvifSer

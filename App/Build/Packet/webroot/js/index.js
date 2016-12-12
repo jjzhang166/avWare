@@ -29,7 +29,7 @@ function SetImageProfile(chn,slave)
 		Brightness:parseInt($("#ID_BrightValue")[0].value),
 		Contrast:parseInt($("#ID_ContrastValue")[0].value),
 		Saturation:parseInt($("#ID_SaturationValue")[0].value),
-		Hue:parseInt($("#ID_ChromaValue")[0].value),
+		Hue:parseInt($("#ID_ChromaValue")[0].value)
 		};
 	var resp = $.sendMsg("SetImageProfile",msg);
 	if(false == resp.success){
@@ -52,7 +52,7 @@ function PtzDriction(cmd)
 		Slave:0,
 		Cmd:cmd,
 		HSpeed:10,
-		VSpeed:10,
+		VSpeed:10
 	};
 	if(cmd >= 2 && cmd <= 17){
 		req = "CallPtzPt";

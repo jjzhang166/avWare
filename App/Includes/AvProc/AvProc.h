@@ -15,30 +15,39 @@
 ******************************************************************/
 #ifndef _AV_PROC_H_
 #define _AV_PROC_H_
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 #include "CAvObject.h"
 #include "logAvWareExport.h"
+#define logAvWarePath "/dev/avWare"
 
-#define logAvWarePath "/dev/logAvWare"
+
 
 class CAvProc:public CAvObject
 {
 public:
 	SINGLETON_DECLARE(CAvProc);
-	av_bool Initialize();
-	av_bool avProcSet(IOCTRL_CMD cmd, av_void *data, av_u32 datalen);
+	static av_bool Initialize();
+	static av_bool avProcSet(IOCTRL_CMD cmd, av_void *data);
 
 private:
 	CAvProc();
 	~CAvProc();
 
 private:
-	av_int m_ProcHandle;
+	static av_int m_ProcHandle;
 
 };
 
 
 #define g_AvProc (*CAvProc::instance())
 
+#if defined(_AV_WARE_M_HAVE_PROC)
+#define AvProcInit() CAvProc::Initialize()
+#define AvProcSet(cmd, data) CAvProc::avProcSet(cmd, data)
+#else
+
+#define AvProcInit()
+#define AvProcSet(cmd, data)
+#endif
 
 #endif

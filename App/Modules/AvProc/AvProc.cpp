@@ -1,9 +1,9 @@
 #include "AvProc/AvProc.h"
-#include "Apis/AvWareType.h"
+#include "Apis/AvWareCplusplus.h"
 
 
 SINGLETON_IMPLEMENT(CAvProc);
-
+av_int CAvProc::m_ProcHandle = -1;
 CAvProc::CAvProc()
 {
 	m_ProcHandle = -1;
@@ -18,11 +18,18 @@ CAvProc::~CAvProc()
 av_bool CAvProc::Initialize()
 {
 #if defined(WIN32)
-
-#else
-	m_ProcHandle = open("/dev/logApp", O_WRONLY);
+	m_ProcHandle = open("avWare.log", _O_WRONLY | _O_CREAT );
 	if (m_ProcHandle <= 0){
-
+		av_error("open %s error\n", logAvWarePath);
+	}
+	else{
+		dup2(m_ProcHandle, 1);
+		dup2(m_ProcHandle, 2);
+	}
+#else
+	m_ProcHandle = open(logAvWarePath, O_WRONLY);
+	if (m_ProcHandle <= 0){
+		av_error("open %s error\n", logAvWarePath);
 	}
 	else{
 		dup2(m_ProcHandle, STDOUT_FILENO);
@@ -30,9 +37,10 @@ av_bool CAvProc::Initialize()
 	}
 #endif
 
+	av_msg("%-20s Over\n", __FUNCTION__);
 	return av_true;
 }
-av_bool CAvProc::avProcSet(IOCTRL_CMD cmd, av_void *data, av_u32 datalen)
+av_bool CAvProc::avProcSet(IOCTRL_CMD cmd, av_void *data)
 {
 	int iRet = 0;
 #if defined(WIN32)

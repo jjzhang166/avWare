@@ -31,7 +31,7 @@ CAvAlarm::~CAvAlarm()
 }
 av_bool CAvAlarm::Initialize()
 {
-	CThread::run();
+	CThread::ThreadStart();
 
 	g_AvAlmLocal.Initialize();
 

@@ -18,6 +18,7 @@
 #include "Apis/AvWareCplusplus.h"
 #include "AvConfigs/AvConfigTable.h"
 #include "Apis/LibSystem.h"
+#include "Apis/AvSystemStruct.h"
 
 
 typedef struct {
@@ -26,5 +27,11 @@ typedef struct {
 	C_SerialAttr	Attribute;
 }ConfigUart;
 typedef TAvConfig<ConfigUart, 0, ConfMaxSerial> CAvConfigUart;
+
+
+
+typedef C_PtzAdvancedCameraLensProfile ConfigPtzCameraLensProfile;
+
+typedef TAvConfig<ConfigPtzCameraLensProfile, 0, 1>CAvConfigPtzCameraLensProfile;
 
 #endif //AVWARE_AVCONFIG_AVCONFIGDEVICE_H_

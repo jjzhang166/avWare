@@ -247,7 +247,8 @@ set_property(TARGET AvProc PROPERTY FOLDER "AvModules")
 #AvConfigs
 set(AvConfigExSRC_LIST
 		AvConfigs/AvConfigTable.cpp
-		AvConfigs/AvConfigManager.cpp
+		AvConfigs/AvConfigManagerBase.cpp
+		AvConfigs/AvConfigManagerGeneral.cpp
 		AvConfigs/AvConfigNetService.cpp
 		AvConfigs/AvConfigCapture.cpp
 		AvConfigs/AvConfigUserManager.cpp
@@ -257,8 +258,9 @@ set(AvConfigExSRC_LIST
 )
 set(AvConfigExHeader_LIST 
 		${project_headers_pach}/AvConfigs/AvConfigTable.h
+		${project_headers_pach}/AvConfigs/AvConfigManagerBase.h
+		${project_headers_pach}/AvConfigs/AvConfigManagerGeneral.h
 		${project_headers_pach}/AvConfigs/AvConfigIndex.h
-		${project_headers_pach}/AvConfigs/AvConfigManager.h
 		${project_headers_pach}/AvConfigs/AvConfigNetService.h
 		${project_headers_pach}/AvConfigs/AvConfigCapture.h
 		${project_headers_pach}/AvConfigs/AvConfigUserManager.h
@@ -288,3 +290,6 @@ set_property(TARGET AvConfigs PROPERTY FOLDER "AvModules")
 
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../)
+
+
+

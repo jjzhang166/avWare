@@ -191,65 +191,25 @@ I_RET  CAvProtoMoon::LocalPtzSetCommand(int Channel, C_PtzCmd &PtzCmd)
 	return pCapture->PtzSetCommand(PtzCmd) == av_true ? IRet_succeed : IRet_faild;
 }
 
-
-I_RET  CAvProtoMoon::LocalFactoryInfoGet(C_ManufacturerInfo &ManfacturerInfo)
+I_RET CAvProtoMoon::LocalAdvancedSystemGetCaps(int Channel, C_AdvancedSystemCaps &AdvancedSystemCaps)
 {
-	av_msg("%s\n", __FUNCTION__);
-	C_DeviceFactoryInfo DeviceFactoryInfo;
-	CAvDevice::GetDeviceInfo(DeviceFactoryInfo);
-
-	ManfacturerInfo.ChannelMax = DeviceFactoryInfo.MaxChannel;
-// 	ManfacturerInfo.FacChip = (AvChip)DeviceFactoryInfo.ChipType;
-// 	ManfacturerInfo.FacSenSor = (AvSensor)DeviceFactoryInfo.SensorType;
-	ManfacturerInfo.FacChip = (AvChip)0xff;
-	ManfacturerInfo.FacSenSor = (AvSensor)0xff;
-	sprintf(ManfacturerInfo.FacManufacturer, "%s", DeviceFactoryInfo.FactoryName);
-	sprintf(ManfacturerInfo.FacProductionModel, "%s", DeviceFactoryInfo.ProductModel);
-	sprintf(ManfacturerInfo.FacProductionSerialNo, "%s", DeviceFactoryInfo.SerialNumber);
-	
-	sprintf(ManfacturerInfo.HardWareVersion, DeviceFactoryInfo.HardWareVersion);
-	ManfacturerInfo.FacTime = DeviceFactoryInfo.FActoryTime;
-	std::string guid;
-	CAvDevice::GetStartUpGuid(guid);
-	sprintf(ManfacturerInfo.ProtocolUniqueCode, "%s", guid.c_str());
-	return IRet_succeed;
+	//av_msg("%s\n", __FUNCTION__);
+	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(Channel);
+	return  pCapture->AdvancedSystemGetCaps(AdvancedSystemCaps) == av_true ? IRet_succeed : IRet_faild;
 }
-
-I_RET  CAvProtoMoon::LocalFactoryInfoSet(C_ManufacturerInfo &ManfacturerInfo)
+I_RET CAvProtoMoon::LocalAdvancedSystemGetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile)
 {
-	av_msg("%s\n", __FUNCTION__);
-	C_DeviceFactoryInfo DeviceFacInfo;
-
-	sprintf(DeviceFacInfo.SerialNumber, "%s", ManfacturerInfo.FacProductionSerialNo);
-	sprintf(DeviceFacInfo.FactoryName, "%s", ManfacturerInfo.FacManufacturer);
-	sprintf(DeviceFacInfo.HardWareVersion, "%s", ManfacturerInfo.HardWareVersion);
-	sprintf(DeviceFacInfo.ProductModel, "%s", ManfacturerInfo.FacProductionModel);
-	char buffer[32];
-	int bufferlen = 0;
-	for (int i = 0; i < strlen(DeviceFacInfo.SerialNumber); i++){
-		if (bufferlen == 0 && DeviceFacInfo.SerialNumber[i] != '-') continue;
-		if (bufferlen != 0 && DeviceFacInfo.SerialNumber[i] == '-'){
-			break;
+	 //av_msg("%s\n", __FUNCTION__);
+	 Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(Channel);
+	 return  pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile) == av_true ? IRet_succeed : IRet_faild;
 		}
-		else{
-			if (bufferlen == 0){
-				i++;
+I_RET CAvProtoMoon::LocalAdvancedSystemSetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile)
+{
+	//av_msg("%s\n", __FUNCTION__);
+	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(Channel);
+	return  pCapture->AdvancedSystemSetProfile(AdvancedSystemProfile) == av_true ? IRet_succeed : IRet_faild;
 			}
-		}
-		buffer[bufferlen] = toupper(DeviceFacInfo.SerialNumber[i]);
-		bufferlen++;
-		buffer[bufferlen] = '\0';
-	}
-	sprintf(DeviceFacInfo.ProductMacAddr, "%s", buffer);
-	DeviceFacInfo.ChipType = ManfacturerInfo.FacChip;
-	DeviceFacInfo.SensorType = ManfacturerInfo.FacSenSor;
-	DeviceFacInfo.FActoryTime = ManfacturerInfo.FacTime;
-	DeviceFacInfo.MaxChannel = ManfacturerInfo.ChannelMax;
-	DeviceFacInfo.Res = 0x00;
 	
-	CAvDevice::SetDeviceInfo(DeviceFacInfo);
-	return IRet_succeed;
-}
 
 
 I_RET  CAvProtoMoon::LocalNetCommGetCaps(C_NetCommCaps &NetCommCaps)
@@ -320,38 +280,26 @@ I_RET  CAvProtoMoon::LocalNetCommSetProfile(C_NetWorkProfile &NetWorkProfile)
 	return IRet_succeed;
 }
 
-I_RET  CAvProtoMoon::LocalFirmWareGetInfo(C_FirmwareInfo &FirmwareInfo)
-{
-	av_msg("%s\n", __FUNCTION__);
-	sprintf(FirmwareInfo.BuildTime, "%s %s", __DATE__, __TIME__);
-	FirmwareInfo.ChipMask = 0xff;
-	FirmwareInfo.CustomMask = 0x00;
-	sprintf(FirmwareInfo.Descriptor, "");
-	sprintf(FirmwareInfo.FilesystemVerion, "File 0.0.1");
-	sprintf(FirmwareInfo.KernelVersion, "Kernel 0.0.1");
-	sprintf(FirmwareInfo.ProtoVersion, "proto 0.0.1");
-	FirmwareInfo.SensorMask = 0xff;	
-	FirmwareInfo.Version = 0x010101;
-	sprintf(FirmwareInfo.FilesystemVerion, "%s", CAvDevice::GetSoftVersionString().c_str());
-
-	return IRet_succeed;
-}
 
 I_RET  CAvProtoMoon::LocalFirmWareUpgrade(C_FirmwareData &FirmwareData)
 {
 	av_msg("%s\n", __FUNCTION__);
-	av_msg("%s\n", __FUNCTION__);
 	static int firmwarefd = -1;
-	static int firmwarelen = 0;
+	//static int firmwarelen = 0;
 	static std::string FilePatch;
-	firmwarelen += FirmwareData.DataLen;
+	//firmwarelen += FirmwareData.DataLen;
+	//av_msg("firmwarefd [%d] PackCnt [%d] PackNum [%d]\n", firmwarefd, FirmwareData.PackCnt, FirmwareData.PackNum);
+
+	//防止升级过程断网，重新升级所升级的包出错
+	if (FirmwareData.PackCnt == 1 && firmwarefd != -1){
+		close(firmwarefd);
+		firmwarefd = -1;
+	}
 
 #if defined(WIN32)
-
 	FilePatch.assign("firmwware.bin");
 	if (firmwarefd == -1) firmwarefd = open(FilePatch.c_str(), O_WRONLY | O_CREAT | O_BINARY);
 #else
-
 	FilePatch.assign("/tmp/firmware.bin");
 	if (firmwarefd == -1) firmwarefd = open(FilePatch.c_str(), O_WRONLY | O_CREAT, 0x666);
 #endif
@@ -389,13 +337,33 @@ I_RET  CAvProtoMoon::LocalStreamStop(int Channel, int Slave)
 	pCapture->Stop(Slave, this, (Capture::SIG_PROC_ONDATA)&CAvProtoMoon::OnLocalPacket);
 	return IRet_succeed;
 }
-I_RET  CAvProtoMoon::LocalDeviceStatus(C_DevStatusInfo &DeviceStat)
+
+CAvPacket *  CAvProtoMoon::LocalSnapshot(int Channel, av_bool bRealTime, av_uint SnapshotInterval, av_uint ContinuousTimes)
+{
+	if (bRealTime == av_true){
+		av_error("real time snap is does't support reutrn NULL \n");
+		return NULL;
+	}
+	else{
+		Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(Channel);
+		return pCapture->Snapshot(bRealTime, SnapshotInterval, ContinuousTimes);
+	}
+}
+
+I_RET  CAvProtoMoon::LocalSyncSystemTime(int Channel, av_timeval &atv)
 {
 	av_msg("%s\n", __FUNCTION__);
-	DeviceStat.uptime = CAvDevice::GetDeviceStartUp();
-	sprintf(DeviceStat.devname, "IPC");
 	return IRet_succeed;
 }
+I_RET  CAvProtoMoon::LocalRequestIdrFrame(int Channel, int Slave)
+{
+	av_msg("%s\n", __FUNCTION__);
+	return IRet_succeed;
+
+}
+
+
+
 I_RET  CAvProtoMoon::LocalCheckAuthorization(const char *usrname, const char *passwd, unsigned int &UsrAccess)
 {
 	av_msg("%s\n", __FUNCTION__);

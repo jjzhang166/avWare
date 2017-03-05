@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>459</height>
+    <width>627</width>
+    <height>469</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,21 +15,18 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <property name="leftMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
     <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
-   <property name="spacing">
-    <number>4</number>
-   </property>
-   <item row="0" column="0" colspan="2">
+   <item row="0" column="0">
     <widget class="QWidget" name="WidGetTitle" native="true">
      <property name="enabled">
       <bool>true</bool>
@@ -243,204 +240,208 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" rowspan="2">
-    <widget class="QTableView" name="TviewDeviceList">
-     <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarAsNeeded</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <layout class="QGridLayout" name="gridLayout_4">
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="leftMargin">
-      <number>16</number>
-     </property>
-     <property name="topMargin">
-      <number>16</number>
+      <number>6</number>
      </property>
      <property name="rightMargin">
-      <number>15</number>
+      <number>6</number>
      </property>
      <property name="bottomMargin">
-      <number>16</number>
+      <number>6</number>
      </property>
-     <property name="horizontalSpacing">
-      <number>16</number>
-     </property>
-     <property name="verticalSpacing">
-      <number>12</number>
-     </property>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="LiEditDevName">
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="LabFacTime">
-       <property name="text">
-        <string>FacTime</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="LiEditFacTime"/>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="LiEditFacName"/>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="LiEditDevModel"/>
-     </item>
-     <item row="4" column="1">
-      <widget class="QComboBox" name="CBoxChipModel"/>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="LabSensorModel">
-       <property name="text">
-        <string>SensorModel</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QComboBox" name="CBoxSensorModel"/>
-     </item>
-     <item row="6" column="1">
-      <widget class="QComboBox" name="CBoxLogoType"/>
-     </item>
-     <item row="7" column="1">
-      <widget class="QComboBox" name="CBoxMaxChannel"/>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="LabDevName">
-       <property name="text">
-        <string>DevName</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="LabFacName">
-       <property name="text">
-        <string>FacName</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="LabDevModel">
-       <property name="text">
-        <string>DevModel</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="LabChipModel">
-       <property name="text">
-        <string>ChipModel</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="LabLogoType">
-       <property name="text">
-        <string>LogoType</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="LabMaxChannel">
-       <property name="text">
-        <string>MaxChannel</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="1">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Support</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <property name="topMargin">
-       <number>12</number>
-      </property>
-      <item row="0" column="1">
-       <widget class="QCheckBox" name="CheckBHasIO">
-        <property name="text">
-         <string>IO</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="CheckBHasWifi">
-        <property name="text">
-         <string>wifi</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QCheckBox" name="CheckBHasAudio">
-        <property name="text">
-         <string>Audio</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="CheckBHasPtz">
-        <property name="text">
-         <string>PTZ</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QCheckBox" name="CheckBHasModifyMac">
-        <property name="text">
-         <string>ModifyMac</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="CheckBHasSD">
-        <property name="text">
-         <string>SD</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="HorSubCannelBtn">
      <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="BtnSubmit">
-       <property name="text">
-        <string>Submit</string>
+      <widget class="QTableView" name="TviewDeviceList">
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAsNeeded</enum>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="BtnCancel">
-       <property name="text">
-        <string>Cancel</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <property name="leftMargin">
+          <number>16</number>
+         </property>
+         <property name="topMargin">
+          <number>16</number>
+         </property>
+         <property name="rightMargin">
+          <number>15</number>
+         </property>
+         <property name="bottomMargin">
+          <number>16</number>
+         </property>
+         <property name="horizontalSpacing">
+          <number>16</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>12</number>
+         </property>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="LiEditDevName">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="LabFacTime">
+           <property name="text">
+            <string>FacTime</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="LiEditFacTime"/>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="LiEditFacName"/>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="LiEditDevModel"/>
+         </item>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="CBoxChipModel"/>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="LabSensorModel">
+           <property name="text">
+            <string>SensorModel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QComboBox" name="CBoxSensorModel"/>
+         </item>
+         <item row="6" column="1">
+          <widget class="QComboBox" name="CBoxLogoType"/>
+         </item>
+         <item row="7" column="1">
+          <widget class="QComboBox" name="CBoxMaxChannel"/>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="LabDevName">
+           <property name="text">
+            <string>DevName</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="LabFacName">
+           <property name="text">
+            <string>FacName</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="LabDevModel">
+           <property name="text">
+            <string>DevModel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="LabChipModel">
+           <property name="text">
+            <string>ChipModel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="LabLogoType">
+           <property name="text">
+            <string>LogoType</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="LabMaxChannel">
+           <property name="text">
+            <string>MaxChannel</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Support</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <property name="topMargin">
+           <number>12</number>
+          </property>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="CheckBHasIO">
+            <property name="text">
+             <string>IO</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="CheckBHasWifi">
+            <property name="text">
+             <string>wifi</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="CheckBHasAudio">
+            <property name="text">
+             <string>Audio</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="CheckBHasPtz">
+            <property name="text">
+             <string>PTZ</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QCheckBox" name="CheckBHasModifyMac">
+            <property name="text">
+             <string>ModifyMac</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="CheckBHasSD">
+            <property name="text">
+             <string>SD</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="HorSubCannelBtn">
+         <item>
+          <widget class="QPushButton" name="BtnSubmit">
+           <property name="text">
+            <string>Submit</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="BtnCancel">
+           <property name="text">
+            <string>Cancel</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

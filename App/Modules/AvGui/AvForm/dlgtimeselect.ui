@@ -1,0 +1,748 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DlgTimeSelect</class>
+ <widget class="QDialog" name="DlgTimeSelect">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>670</width>
+    <height>370</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QLabel" name="Week5">
+   <property name="geometry">
+    <rect>
+     <x>628</x>
+     <y>229</y>
+     <width>36</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Fri</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="Week4checkBox">
+   <property name="geometry">
+    <rect>
+     <x>598</x>
+     <y>86</y>
+     <width>18</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="CTimeAreaSubmit">
+   <property name="geometry">
+    <rect>
+     <x>499</x>
+     <y>340</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Submit</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Week6">
+   <property name="geometry">
+    <rect>
+     <x>628</x>
+     <y>171</y>
+     <width>36</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sat</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Week1">
+   <property name="geometry">
+    <rect>
+     <x>628</x>
+     <y>142</y>
+     <width>36</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Mon</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="Week2checkBox">
+   <property name="geometry">
+    <rect>
+     <x>598</x>
+     <y>110</y>
+     <width>18</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="CTimeAreaDeleteAll">
+   <property name="geometry">
+    <rect>
+     <x>337</x>
+     <y>340</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>DeleteAll</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Time_14">
+   <property name="geometry">
+    <rect>
+     <x>326</x>
+     <y>50</y>
+     <width>12</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>14</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="Week1checkBox">
+   <property name="geometry">
+    <rect>
+     <x>598</x>
+     <y>158</y>
+     <width>18</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Week2">
+   <property name="geometry">
+    <rect>
+     <x>628</x>
+     <y>112</y>
+     <width>36</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Tues</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Time_18">
+   <property name="geometry">
+    <rect>
+     <x>412</x>
+     <y>50</y>
+     <width>12</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>18</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="Week7checkBox">
+   <property name="geometry">
+    <rect>
+     <x>598</x>
+     <y>230</y>
+     <width>18</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="CTimeAreaDeleate">
+   <property name="geometry">
+    <rect>
+     <x>418</x>
+     <y>340</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Delete</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Time_04">
+   <property name="geometry">
+    <rect>
+     <x>111</x>
+     <y>50</y>
+     <width>12</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>04</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="Week5checkBox">
+   <property name="geometry">
+    <rect>
+     <x>598</x>
+     <y>206</y>
+     <width>18</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Time_00">
+   <property name="geometry">
+    <rect>
+     <x>25</x>
+     <y>50</y>
+     <width>12</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>00</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Time_08">
+   <property name="geometry">
+    <rect>
+     <x>197</x>
+     <y>50</y>
+     <width>12</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>08</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Week7">
+   <property name="geometry">
+    <rect>
+     <x>628</x>
+     <y>200</y>
+     <width>36</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sun</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Time_10">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>50</y>
+     <width>12</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>10</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Time_22">
+   <property name="geometry">
+    <rect>
+     <x>498</x>
+     <y>50</y>
+     <width>12</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>22</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Week4">
+   <property name="geometry">
+    <rect>
+     <x>628</x>
+     <y>83</y>
+     <width>36</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Thur</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Time_12">
+   <property name="geometry">
+    <rect>
+     <x>283</x>
+     <y>50</y>
+     <width>12</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>12</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="WidGetTitle" native="true">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>671</width>
+     <height>33</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>33</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>33</height>
+    </size>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_3">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item row="0" column="2" colspan="2">
+     <widget class="QLabel" name="LabTitle">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>33</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>33</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>TimeSelect</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="LabIco">
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>33</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>33</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QPushButton" name="BtnClose">
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="autoDefault">
+       <bool>true</bool>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QLabel" name="Time_06">
+   <property name="geometry">
+    <rect>
+     <x>154</x>
+     <y>50</y>
+     <width>12</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>06</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="Week3checkBox">
+   <property name="geometry">
+    <rect>
+     <x>598</x>
+     <y>182</y>
+     <width>18</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Week3">
+   <property name="geometry">
+    <rect>
+     <x>628</x>
+     <y>259</y>
+     <width>36</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Wed</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Time_16">
+   <property name="geometry">
+    <rect>
+     <x>369</x>
+     <y>50</y>
+     <width>12</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>16</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="Week6checkBox">
+   <property name="geometry">
+    <rect>
+     <x>598</x>
+     <y>134</y>
+     <width>18</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Time_02">
+   <property name="geometry">
+    <rect>
+     <x>68</x>
+     <y>50</y>
+     <width>12</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>02</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Time_20">
+   <property name="geometry">
+    <rect>
+     <x>455</x>
+     <y>50</y>
+     <width>12</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>12</width>
+     <height>12</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>20</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="CTimeAreaCancel">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>340</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

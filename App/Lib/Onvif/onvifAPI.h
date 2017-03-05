@@ -36,6 +36,47 @@ extern "C" {
 #define KEY_PROBE				1
 #endif
 
+enum _Time_Tz
+{
+	TZ_GMT_0	= 0,	//0时区
+	TZ_GMT_E_01,		// 东1时区
+	TZ_GMT_E_02,		
+	TZ_GMT_E_03,		
+	TZ_GMT_E_03_30,		
+	TZ_GMT_E_04,
+	TZ_GMT_E_04_30,	
+	TZ_GMT_E_05,	
+	TZ_GMT_E_05_30,	
+	TZ_GMT_E_05_45,	
+	TZ_GMT_E_06,		
+	TZ_GMT_E_06_30,		
+	TZ_GMT_E_07,		
+	TZ_GMT_E_08,		
+	TZ_GMT_E_09,		
+	TZ_GMT_E_09_30,		
+	TZ_GMT_E_10,		
+	TZ_GMT_E_11,		
+//	TZ_GMT_E_11_30,		
+	TZ_GMT_E_12,		
+//	TZ_GMT_E_12_45,		
+	TZ_GMT_E_13,		
+	
+	TZ_GMT_W_01,		// 西1时区
+	TZ_GMT_W_02,		
+	TZ_GMT_W_03,		
+	TZ_GMT_W_03_30,		
+	TZ_GMT_W_04,		
+//	TZ_GMT_W_04_30,		
+	TZ_GMT_W_05,		
+	TZ_GMT_W_06,		
+	TZ_GMT_W_07,		
+	TZ_GMT_W_08,		
+	TZ_GMT_W_09,		
+	TZ_GMT_W_10,		
+	TZ_GMT_W_11,		
+	TZ_GMT_W_12,		
+};
+
 typedef enum _ENUM_DEVTYPE_E{
 	ENUM_DEVTYPE_IPC = 0x00,
 	ENUM_DEVTYPE_NVR,
@@ -150,7 +191,6 @@ typedef struct _AudioEncode_S{
 }AudioEncode_S;
 
 
-
 typedef struct _NetProtocolInfo_S{
 	int 	onvifPort;
 	int		rtspPort;
@@ -219,6 +259,29 @@ typedef struct _PtzConfig_S{
 	int timeOut;
 }PtzConfig_S;
 
+typedef enum _PTZDIRECTION_E{
+	Ptz_STOP 			= 0x00,
+	PtzDirection_UP,
+	PtzDirection_DOWN,
+	PtzDirection_LEFT,
+	PtzDirection_RIGHT,
+	PtzDirection_LEFT_UP,
+	PtzDirection_LEFT_DOWN,
+	PtzDirection_RIGHT_UP,
+	PtzDirection_RIGHT_DOWN,
+	PtzDirection_ZOOM_ADD,
+	PtzDirection_ZOOM_DEC,
+}PTZDIRECTION_E;
+
+typedef struct _PtzParam_T{
+	PTZDIRECTION_E direction; 
+	float speedx;//必须填写
+	float posx;//ContinueMove 不填
+	float posy;//ContinueMove 不填
+	float posz;//ContinueMove 不填
+}PtzParam_T;
+
+
 typedef struct _OnvifApiSerHandle_S{
 	int (*pGetDeviceInfo)(DeviceInfo_S *info);
 	int (*pSetDeviceInfo)(DeviceInfo_S *info);
@@ -241,6 +304,9 @@ typedef struct _OnvifApiSerHandle_S{
 	int (*pGetPtzCab)(PtzCab_S *info);
 	int (*pGetPtzConfig)(PtzConfig_S *info);
 	int (*pSetPtzConfig)(PtzConfig_S *info);
+	int (*pSetPtzContinueMove)(PtzParam_T *info);
+	int (*pSetPtzAbsoluteMove)(PtzParam_T *info);
+	int (*pSetPtzRelativeMove)(PtzParam_T *info);
 }OnvifSerHandle_S;
 
 int ONVIFAPI_Init(OnvifSerHandle_S *handle);//初始化

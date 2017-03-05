@@ -7,7 +7,7 @@
 #include <QCursor>
 #include <QApplication>
 #include "frmmessagebox.h"
-
+#include <QTextCodec>  
 
 
 #define AvQDebug av_msg
@@ -33,13 +33,13 @@ public:
     }
 
     //设置编码为UTF8
-    static void SetUTF8Code()
+	static void SetUTF8Code()
     {
-#if (QT_VERSION <= QT_VERSION_CHECK(5,0,0))
+#if (QT_VERSION <= QT_VERSION_CHECK(5,8,0))
         QTextCodec *codec = QTextCodec::codecForName("UTF-8");
         QTextCodec::setCodecForLocale(codec);
-        QTextCodec::setCodecForCStrings(codec);
-        QTextCodec::setCodecForTr(codec);
+//         QTextCodec::setCodecForCStrings(codec);
+//         QTextCodec::setCodecForTr(codec);
 #endif
     }
 
@@ -59,7 +59,13 @@ public:
     static void SetChinese()
     {
         QTranslator *translator = new QTranslator(qApp);
-        translator->load(":/image/qt_zh_CN.qm");
+        //translator->load(":/image/qt_zh_CN.qm");
+		bool ret = translator->load("Zh_Cn.qm");
+		
+		//bool ret = translator->load("en_US.qm");
+		if (ret != true){
+			printf("load Zh_cn.qm Error\n");
+		}
         qApp->installTranslator(translator);
     }
 
@@ -146,6 +152,38 @@ public:
 		deskRect = desktopWidget->availableGeometry(curMonitor);
 		return deskRect;
 	}
+
+	static QString GBK2UTF8(const QString &inStr)
+	{
+		QTextCodec *gbk = QTextCodec::codecForName("GB18030");
+		QTextCodec *utf8 = QTextCodec::codecForName("UTF-8");
+
+		QString g2u = gbk->toUnicode(gbk->fromUnicode(inStr));              // gbk  convert utf8  
+		return g2u;
+	}
+
+	static QString UTF82GBK(const QString &inStr)
+	{
+		//QTextCodec *gbk = QTextCodec::codecForName("GB18030");
+		QTextCodec *gbk = QTextCodec::codecForName("GB2312");
+		QTextCodec *utf8 = QTextCodec::codecForName("UTF-8");
+
+		QString utf2gbk = gbk->toUnicode(inStr.toLocal8Bit());
+		return utf2gbk;
+	}
+
+	static std::string gbk2utf8(const QString &inStr)
+	{
+		return GBK2UTF8(inStr).toStdString();
+	}
+
+	static QString utf82gbk(const std::string &inStr)
+	{
+		QString str = QString::fromStdString(inStr);
+
+		return UTF82GBK(str);
+	}
+
 };
 
 

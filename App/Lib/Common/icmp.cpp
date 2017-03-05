@@ -22,7 +22,6 @@ typedef struct tagIPHDR
 	struct  in_addr iaDst;  // Internet Address - Destination  
 }IPHDR, *PIPHDR;
 
-
 // ICMP Header - RFC 792  
 typedef struct tagICMPHDR
 {

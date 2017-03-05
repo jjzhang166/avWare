@@ -48,25 +48,18 @@ static int DDNS_Active(ENU_DDNS nType, char *pDoamain,char *pName, char *pPwd)
 		DDNS_DEBUG("BASE64 FAILED");
 		return -1;
 	}
-	DDNS_DEBUG("=====ddns=========00========\n");
 
-	if(DDNS_3322 == nType)
-	{
+
+	if(DDNS_3322 == nType) {
 		sprintf(Buffer,FORMAT_3322,pDoamain,EncInfo);
 		snprintf(ServerName, sizeof(ServerName), "%s", "www.3322.org");
-	}
-	else if(DDNS_DYNDNS == nType)
-	{
+	} else if(DDNS_DYNDNS == nType) {
 		sprintf(Buffer,FORMAT_DYNDNS,pDoamain,EncInfo);
 		snprintf(ServerName, sizeof(ServerName), "%s", "www.dyndns.org");
-	}
-	else if(DDNS_DNSDYNMAIC == nType)
-	{
+	} else if(DDNS_DNSDYNMAIC == nType) {
 		sprintf(Buffer,FORMAT_DNSDYNAMIC,pDoamain,EncInfo);
 		snprintf(ServerName, sizeof(ServerName), "%s", "www.dnsdynamic.org");
-	}
-	else
-	{
+	} else {
 		return -1;
 	}
 	//create socket

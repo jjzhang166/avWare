@@ -42,7 +42,7 @@ DlgFactorySet::DlgFactorySet(QWidget *parent) :
 	IconComm::Instance()->SetIcon(ui->BtnMenu, QChar(0xf0c9), 10);
 	IconComm::Instance()->SetIcon(ui->LabIco, QChar(0xf015), 12);
 
-	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
+	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool );
 	this->setAttribute(Qt::WA_DeleteOnClose);
 
 	FixDlgUi();
@@ -68,7 +68,7 @@ void DlgFactorySet::SetModifyDeviceList(std::list<C_DevSearch> &ModifyList)
 	for (ilist = m_ModifyList->begin(); ilist != m_ModifyList->end(); ilist++){
 		DevSearchInfo = *ilist;
 		m_TviewDeviceTableModel->setItem(i, 0, new QStandardItem(QString::number(i)));
-		m_TviewDeviceTableModel->setItem(i, 1, new QStandardItem(QString(ilist->DevStatusInfo.devname)));
+		m_TviewDeviceTableModel->setItem(i, 1, new QStandardItem(QString(ilist->DevStatusInfo.DeviceName)));
 		m_TviewDeviceTableModel->setItem(i, 2, new QStandardItem(QString(ilist->NetWorkProfile.Ipv4)));
 		QIcon icon(":/image/info.png");
 		m_TviewDeviceTableModel->setItem(i, 3, new QStandardItem(icon, QString("Wait")));
@@ -107,13 +107,13 @@ void DlgFactorySet::FixDlgUi()
 
 void DlgFactorySet::FillInUiOptions()
 {
-	ui->CBoxLogoType->setStyleSheet("color:black");
-	ui->CBoxChipModel->setStyleSheet("color:black");
-	ui->CBoxMaxChannel->setStyleSheet("color:black");
-	ui->CBoxSensorModel->setStyleSheet("color:black");
+// 	ui->CBoxLogoType->setStyleSheet("color:black");
+// 	ui->CBoxChipModel->setStyleSheet("color:black");
+// 	ui->CBoxMaxChannel->setStyleSheet("color:black");
+// 	ui->CBoxSensorModel->setStyleSheet("color:black");
 
 
-	for (int i = AvChip_H18EV100; i < AvChip_A66; i++){
+	for (int i = AvChip_H18EV100; i < AvChip_WINDOWS_32; i++){
 		ui->CBoxChipModel->addItem(AvUiLangsAvChip((AvChip)i));
 	}
 	for (int i = AvSensor_NONE +1; i < AvSensor_LAST; i++){

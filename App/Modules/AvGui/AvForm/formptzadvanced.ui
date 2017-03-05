@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FormPtzAdvanced</class>
+ <widget class="QWidget" name="FormPtzAdvanced">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>670</width>
+    <height>380</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>6</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <property name="bottomMargin">
+    <number>6</number>
+   </property>
+   <property name="spacing">
+    <number>4</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="GBoxPtzALineScan">
+     <property name="title">
+      <string>Line Scan</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <layout class="QHBoxLayout" name="HLayoutPtzALineScan">
+        <item>
+         <widget class="QLineEdit" name="LiEditPtzALineScan"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="BtnPtzALineScanSetLeftBorder">
+          <property name="text">
+           <string>LeftBorder</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="BtnPtzALineScanSetRightBorder">
+          <property name="text">
+           <string>RightBorder</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QGroupBox" name="GBoxStudy">
+     <property name="title">
+      <string>study</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <layout class="QHBoxLayout" name="HLayoutStudy">
+        <item>
+         <widget class="QLineEdit" name="LiEditPtzAStudy"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="BtnPtzAStudyStartRecord">
+          <property name="text">
+           <string>Start Record</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="BtnPtzAStudyStopRecord">
+          <property name="text">
+           <string>Stop Record</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="GBoxPtzAScene">
+     <property name="title">
+      <string>scene</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <layout class="QGridLayout" name="GLayoutPtzAScene">
+        <item row="2" column="1">
+         <widget class="QComboBox" name="CBoxPtzASceneFocuArea"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="LabPtzASceneFocuSpeed">
+          <property name="text">
+           <string>FocuSpeed</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="LabPtzASceneFocuArea">
+          <property name="text">
+           <string>FocuArea</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="LabPtzASceneFocuMode">
+          <property name="text">
+           <string>FocuMode</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="LabPtzASceneFocuSearch">
+          <property name="text">
+           <string>FocuSearch</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="LabPtzASceneFocuIrisMode">
+          <property name="text">
+           <string>IrIsMode</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QComboBox" name="CBoxPtzASceneFocuSearch"/>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="CBoxPtzASceneFocuMode"/>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="LabPtzASceneZoomSpeed">
+          <property name="text">
+           <string>ZoomSpeed</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <widget class="QPushButton" name="BtnPtzASceneSubmit">
+          <property name="text">
+           <string>Submit</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QSlider" name="HSliderPtzASceneZoomSpeed">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QComboBox" name="CBoxPtzASceneIrisMode"/>
+        </item>
+        <item row="2" column="3">
+         <widget class="QCheckBox" name="CBoxPtzASceneDZoom">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLabel" name="LabPtzASceneDZoom">
+          <property name="text">
+           <string>DZoom</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLineEdit" name="LiEditPtzASceneFocuSpeed">
+            <property name="maximumSize">
+             <size>
+              <width>40</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="LabPtzASceneFocuSpeedMax">
+            <property name="text">
+             <string>(1-255)</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QGroupBox" name="GBoxPtzAPreset">
+     <property name="title">
+      <string>Preset</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_6">
+      <item row="0" column="0">
+       <layout class="QHBoxLayout" name="HLayoutPtzAPreset">
+        <item>
+         <widget class="QLabel" name="LabPtzAPresetNo">
+          <property name="text">
+           <string>No.</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="LiEditPtzAPresetNo"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="LabPtzAPresetName">
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="LiEditPtzAPresetName"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="BtnPtzAPresetAdd">
+          <property name="text">
+           <string>Add</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QTableView" name="TviewPtzAPreset"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QGroupBox" name="GBoxPtzAAutoTour">
+     <property name="title">
+      <string>Auto Tour</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0">
+       <layout class="QHBoxLayout" name="HLayoutPtzAAutoTour">
+        <item>
+         <widget class="QLabel" name="LabPtzAAutoTourNo">
+          <property name="text">
+           <string>AutoTour</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="CBoxPtzAAutoTourNo"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="LabPtzAAutoTourPreset">
+          <property name="text">
+           <string>Preset</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="CBoxPtzAAutoTourPresetNo"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="LabPtzAAutoTourStayTime">
+          <property name="text">
+           <string>StayTime</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="CBoxPtzAAutoTourStayTime"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="LabPtzAAutoTourSpeed">
+          <property name="text">
+           <string>Speed</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="CBoxPtzAAutoTourSpeed"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="BtnPtzAAutoTourAdd">
+          <property name="text">
+           <string>Add</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="BtnPtzAAutoTourDelGroup">
+          <property name="text">
+           <string>DelGroup</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QTableView" name="TviewPtzAAutoTour"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

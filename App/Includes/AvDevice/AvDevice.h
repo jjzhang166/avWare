@@ -107,6 +107,7 @@ public:
 	static av_bool GetEncodeCaps	(av_ushort Channel, C_EncodeCaps &EncodeCaps);
 	static av_bool GetDecodeCaps	(av_ushort Channel);
 	static av_bool GetSerialCaps	(C_SerialCaps &SerialCaps);
+//	static av_bool GetPtzCameraLensCaps(C_PtzAdvancedCaps &PtzCameraLensCaps);
 	static av_bool GetNetCommCaps	(C_NetCommCaps &NetCommCaps);
 	static av_bool SetNetCommAttribute(NetCommT comt, C_NetCommAttribute &NetCommAttribute);
 	static av_bool GetNetCommAttribute(NetCommT comt, C_NetCommAttribute &NetCommAttribute);
@@ -136,9 +137,11 @@ private:
 	static C_UpgradeProgress m_SystemUpgradeProgress;
 	
 public:
-	static av_bool GetMemLoadInfo(C_MemoryLoadInfo &MemLoadInfo);
-	static av_bool GetNetLoadInfo(C_NetLoadInfo &NetLoadInfo);
-	static av_bool GetCpuLoadInfo(C_CpuLoadInfo &CpuLoadInfo);
+// 	static av_bool GetMemLoadInfo(C_MemoryLoadInfo &MemLoadInfo);
+// 	static av_bool GetNetLoadInfo(C_NetLoadInfo &NetLoadInfo);
+// 	static av_bool GetCpuLoadInfo(C_CpuLoadInfo &CpuLoadInfo);
+	static av_bool GetNetStatusInfo(C_NetStatusInfo &NetStatusInfo);
+	static av_bool GetCpuMemStatusInfo(C_CpuMemStatusInfo &CpuMemStatusInfo);
 	static av_bool GetStartUpGuid(std::string &guid);
 private:
 	CAvDevice();

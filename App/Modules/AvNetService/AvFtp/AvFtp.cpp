@@ -166,6 +166,8 @@ av_bool CAvFtp::Upload(std::string SendFile)
 	
 	return av_true;
 }
+
+
 av_bool CAvFtp::Upload(std::string FileName, av_uchar *data, av_u32 datalen)
 {
 	int ret = 0;
@@ -196,18 +198,11 @@ av_bool CAvFtp::Upload(std::string FileName, av_uchar *data, av_u32 datalen)
 		return av_false;
 	}
 
-	ret = m_Ftp.AVFtpAppend(FileName.c_str());
-	if (ret < FTP_OK)
-	{
-		av_error("FtpAppend error...\n");
-		return av_false;
-	}
-
 	ret = m_Ftp.AVFtpStor(FileName.c_str());
 	if (ret < FTP_OK)
 	{
 		av_error("FtpStor error...\n");
-		return av_false;
+		//return av_false;
 	}
 
 	ret = m_Ftp.AVFtpSendData((const char *)data, (int &)datalen);
@@ -219,9 +214,9 @@ av_bool CAvFtp::Upload(std::string FileName, av_uchar *data, av_u32 datalen)
 	}
 
 	m_Ftp.AVFtpCloseData();
-
 	return av_true;
 }
+
 
 av_bool CAvFtp::Mkdir(std::string dirName)
 {

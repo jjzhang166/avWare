@@ -41,9 +41,9 @@ struct listnode
 #define list_for_each_reverse(node, list) \
     for (node = (list)->prev; node != (list); node = node->prev)
 
-void list_init(struct listnode *list);
-void list_add_tail(struct listnode *list, struct listnode *item);
-void list_remove(struct listnode *item);
+void onvif_list_init(struct listnode *list);
+void onvif_list_add_tail(struct listnode *list, struct listnode *item);
+void onvif_list_remove(struct listnode *item);
 
 #define list_empty(list) ((list) == (list)->next)
 #define list_head(list) ((list)->next)

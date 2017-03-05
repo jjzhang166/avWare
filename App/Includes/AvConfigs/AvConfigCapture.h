@@ -32,16 +32,11 @@ typedef struct{
 
 
 typedef struct {
-	C_CoverFormats CHLFormats[ConfMaxCover];
-}ConfigCoverFormats;
-
-typedef struct{
-	C_WaterMarkingFormats CHLFormats[ConfMaxWaterMarking];
-}ConfigWaterMarkingFormats;
+	C_OverLayProfile OverlayProfile[OverLayType_Last];
+}ConfigOverLayProfile;
 
 
-
-
+typedef C_CoverProfile ConfigCoverProfile;
 
 typedef C_ProtoFormats ConfigProtoFormats;
 
@@ -58,9 +53,9 @@ typedef TAvConfig<ConfigImageProfile, 0, SYS_LOCALCAPTURE_CHN> CAvConfigImage;
 
 typedef TAvConfig<ConfigCaptureProfile, 0, SYS_LOCALCAPTURE_CHN> CAvConfigCapture;
 
-typedef TAvConfig<ConfigCoverFormats, 0, SYS_LOCALCAPTURE_CHN>CAvConfigCover;
+typedef TAvConfig<ConfigCoverProfile, 0, SYS_LOCALCAPTURE_CHN>CAvConfigCover;
 
-typedef TAvConfig<ConfigWaterMarkingFormats, 0, SYS_LOCALCAPTURE_CHN>CAvConfigWaterMarking;
+typedef TAvConfig<ConfigOverLayProfile, 0, SYS_LOCALCAPTURE_CHN>CAvConfigOverLay;
 
 typedef TAvConfig<ConfigProtoFormats, 0, SYS_REMOTECAPTURE_CHN>CAvConfigProtocol;
 

@@ -41,13 +41,11 @@ public:
     void    setLayoutMode(int layoutMode);
     void    setLayout(int rows, int cols, LayoutZoneList & zones, bool syncFlag = false);
 	void	setVideoInfoWindows();
-
     VideoWidget * GetSelectedWidget();
     VideoWidget * GetIdleWidget();
-
+	int		GetSplitCount();
 private:
 	bool	m_bOpenVideoInfoWindows;
-
 	
 protected:
     void    paintEvent(QPaintEvent * event);
@@ -62,7 +60,7 @@ private:
     QRect   getZoneRect(int w, int h, LayoutZone & zone);
     void    setVideoWidgetRect(WidgetZone & widgetZone);
     void    resizeVideoWidgets(int w, int h);
-    void    initVideoWidget(VideoWidget * widget, WidgetZone & widgetZone);
+	void    initVideoWidget(VideoWidget * widget, WidgetZone & widgetZone,int ScreenID);
 
 public slots:
 	void	SlotOnPreviewStart(int Channel, int Slave, bool bOpen);
@@ -71,14 +69,15 @@ public slots:
 	void	SlotWidgetSelecting(QWidget *pWidget);
 	void	SlotSpiltScreen(int Screens);
 	void    SlotMaxWindows(QWidget *pWidget, bool bMax);
+	void	SlotVideoInfoOnUiMsg(WGET_VIDEOINFO_UIMSG eUiMsg);
 signals:
     void    SignalsWidgetSelecting(QWidget *);
 
 private:
-    WidgetLayout    m_WidgetLayout;
-    VideoWidgetList m_VideoWidgets;
-	WgetVideoInfo	*m_WgetVideoInfo;
-	int				m_WidgetLayoutNum;
+    WidgetLayout		m_WidgetLayout;
+    VideoWidgetList		m_VideoWidgets;
+	WgetVideoInfo	*	m_WgetVideoInfo;
+	int					m_WidgetLayoutNum;
 };
 
 

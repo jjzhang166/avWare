@@ -31,7 +31,12 @@ set(AvGuiSRC_LIST
 		AvForm/dlgdeviceset.cpp
 		AvForm/dlgptzwindows.cpp
 		AvForm/wgetvideoinfo.cpp
-#		AvForm/videotoolwidget.cpp
+		AvForm/formptzadvanced.cpp
+		AvForm/dlgareaselect.cpp
+		AvForm/dlgoverlay.cpp
+		#AvForm/ctimearea.cpp
+		AvForm/dlgtimeselect.cpp
+		AvForm/dlgabout.cpp
 		AvUiComm/IconComm.cpp
 		AvUiComm/IpAddrEdit.cpp
 		AvUiComm/IpPartLineEdit.cpp
@@ -59,7 +64,12 @@ set(AvGuiHeader_LIST
 		AvForm/dlgdeviceset.h
 		AvForm/dlgptzwindows.h
 		AvForm/wgetvideoinfo.h
-#		AvForm/videotoolwidget.h
+		AvForm/formptzadvanced.h
+		AvForm/dlgareaselect.h
+		AvForm/dlgoverlay.h
+		#AvForm/ctimearea.h
+		AvForm/dlgtimeselect.h
+		AvForm/dlgabout.h
 		AvUiComm/IconComm.h
 		AvUiComm/AvUiComm.h
 		AvUiComm/IpAddrEdit.h
@@ -79,8 +89,6 @@ set(AvGuiHeader_LIST
 		AvGuiSystem.h
 		
 	)
-
-
 set (SOURCE_UI
 	AvForm/frmmessagebox.ui
 	AvForm/frmmainwindows.ui
@@ -93,9 +101,26 @@ set (SOURCE_UI
 	AvForm/dlgdeviceset.ui
 	AvForm/dlgptzwindows.ui
 	AvForm/wgetvideoinfo.ui
-#	AvForm/videotoolwidget.ui
+	AvForm/formptzadvanced.ui
+	AvForm/dlgareaselect.ui
+	AvForm/dlgoverlay.ui
+	#AvForm/ctimearea.ui
+	AvForm/dlgtimeselect.ui
+	AvForm/dlgabout.ui
 )
-
+if (COMPILER MATCHES "HISI_3536" OR COMPILER MATCHES "PC_WIN32" )
+	set(AvGuiSRC_LIST ${AvGuiSRC_LIST}
+		AvForm/frmmainmenu.cpp
+	)
+	
+	set(AvGuiHeader_LIST ${AvGuiHeader_LIST}
+		AvForm/frmmainmenu.h
+	)
+	
+	set (SOURCE_UI ${SOURCE_UI}
+		AvForm/frmmainmenu.ui
+	)
+endif()
 
 set (SOURCE_RC 
 	AvResource/avWare.qrc
@@ -118,20 +143,12 @@ add_custom_target (uiLanguage ALL DEPENDS ${QM_FILES})
 set_property(TARGET uiLanguage PROPERTY FOLDER "AvQui")
 
 
-#ADD_CUSTOM_TARGET (
-#    TsUpdate
-    #COMMAND QT5_CREATE_TRANSLATION(QM_FILES ${CMAKE_SOURCE_DIR} ${SOURCE_TRANSLATIONS} OPTIONS -I ${CMAKE_SOURCE_DIR})
-#	lupdate OPTIONS -I ${CMAKE_SOURCE_DIR}
-#)
-
-#ADD_CUSTOM_TARGET (
-#    TsRelease
-#    COMMAND QT5_CREATE_TRANSLATION(QM_FILES ${CMAKE_SOURCE_DIR} ${SOURCE_TRANSLATIONS} OPTIONS -no-obsolete -I ${CMAKE_SOURCE_DIR})
-#)
-
 add_library(AvGui STATIC ${AvGuiSRC_LIST} ${AvGuiHeader_LIST} ${UI_FILES} ${RC_FILES})
 set_property(TARGET AvGui PROPERTY FOLDER "AvQui")
 target_link_libraries(AvGui Qt5::Widgets)
+#target_link_libraries(AvGui Qt5::Core)
+#target_link_libraries(AvGui Qt5::Gui)
+
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../)
 

@@ -11,8 +11,9 @@
 class CAvPreview:public CAvObject
 {
 
+
+
 public:
-//	CAvPreview(unsigned int hWid, int ScreenID);
 	CAvPreview();
 	~CAvPreview();
 
@@ -20,11 +21,18 @@ public:
 	av_bool Start(int Channel, int Slave);
 	av_bool GetChannleSlave(int &Channel, int &Slave);
 	av_bool Stop();
+	av_bool Pause(av_bool bPause = av_false);
+	av_bool RenderResize(C_RECT &RenderRect);
+
 	av_bool StartAudio(av_bool bOpen = av_true);
 	av_bool SetStatistics(av_bool bOpen);
 	av_bool GetStatistics(std::string &ImageSize, std::string &Comp, std::string &FrameRate, std::string &BitRate);
 	av_void OnStream(int Channel, int Slave, CAvPacket *Pack);
 	av_void OnTimer(CAvTimer &Timer);
+
+
+public:
+	static  av_void SetSpiltScreen(int SpiltScreenNum);
 
 private:
 	av_bool			m_bStatistics;
@@ -43,8 +51,10 @@ private:
 private:
 	unsigned int	m_hWid;
 	int				m_ScreenID;
+	C_RECT			m_RenderRect;
 	int				m_Channel;
 	int				m_Slave;
+	av_bool			m_bPause;
 	av_bool			m_isStarted;
 	Capture		*	m_Capture;
 	av_bool			m_bAudioOpen;

@@ -178,26 +178,6 @@ av_bool AvRtmp::Start(av_uchar Channel, av_uchar Slave, std::string url)
 	
 	
 	sprintf(m_Url, "%s", url.c_str());
-	m_RtmpHandle = RTMP_Alloc();
-
-	RTMP_Init(m_RtmpHandle);
-
-	m_RtmpHandle->Link.timeout = 30;
-
-	RTMP_SetupURL(m_RtmpHandle, m_Url);
-
-
-	
-	if (m_RtmpMode == RTMP_PULL){
-		av_msg("Start Pull RtmpStream [%s]\n", m_Url);
-	}
-	else if (m_RtmpMode == RTMP_PUSH){
-		av_msg("Start Push RtmpStream [%s]\n", m_Url);
-		RTMP_EnableWrite(m_RtmpHandle);
-	}
-	else{
-		assert(0);
-	}
 	
 	
 
@@ -228,7 +208,8 @@ av_void AvRtmp::OnStream(av_uchar Channel, av_uchar Slave, CAvPacket *AvPacket)
 		m_AudioCfgSampleBits = AvPacket->SampleBits();
 		m_AudioComp = AvPacket->Comp();
 	}
-	if ((m_GetIFrame == av_true && AvPacket->FrameType() != avFrameT_I) || m_AudioCfgSampleRate == -1){
+	//if ((m_GetIFrame == av_true && AvPacket->FrameType() != avFrameT_I) || m_AudioCfgSampleRate == -1){
+	if ((m_GetIFrame == av_true && AvPacket->FrameType() != avFrameT_I)){
 		return;
 	}
 	if (m_Avpacket.size() > 100){
@@ -535,6 +516,9 @@ av_int  AvRtmp::PushMediaData(CAvPacket *AvPacket)
 			break;
 		}
 		if (ret <= 0){
+			m_PicHeigh = -1;
+			m_PicWidth = -1;
+			//重连接时 会发送metapacket
 			return -1;
 		}
 	}
@@ -664,17 +648,35 @@ av_bool AvRtmp::RtmpPushTask()
 
 	while (m_Loop == av_true)
 	{
+		av_msg("RtmpPushTask Connect [%s]\n", m_Url);
 		while (m_Loop == av_true)
 		{
 	
+			m_RtmpHandle = RTMP_Alloc();
+
+			RTMP_Init(m_RtmpHandle);
+
+			m_RtmpHandle->Link.timeout = 30;
+
+			RTMP_SetupURL(m_RtmpHandle, m_Url);
+
+
+			RTMP_EnableWrite(m_RtmpHandle);
+
 			if (!RTMP_Connect(m_RtmpHandle, NULL)){
 				av_error("Drop clent reconnect\n");
+				RTMP_Close(m_RtmpHandle);
+				RTMP_Free(m_RtmpHandle);
+				m_RtmpHandle = NULL;
 				av_msleep(2 * 1000);
 				continue;
 			}
 
 			if (!RTMP_ConnectStream(m_RtmpHandle, 0)){
 				av_error("Drop ConnectStream reconnect\n");
+				RTMP_Close(m_RtmpHandle);
+				RTMP_Free(m_RtmpHandle);
+				m_RtmpHandle = NULL;
 				av_msleep(2 * 1000);
 				continue;
 			}
@@ -689,7 +691,6 @@ av_bool AvRtmp::RtmpPushTask()
 
 		while (m_Loop == av_true)
 		{
-			//av_warning("m_loop = %d\n", m_Loop);
 			m_Mutex.Enter();
 			if (m_Avpacket.empty() == true){
 				m_Mutex.Leave();
@@ -716,11 +717,19 @@ av_bool AvRtmp::RtmpPushTask()
 				if (iRet <= 0){
 					RTMP_DeleteStream(m_RtmpHandle);
 					RTMP_Close(m_RtmpHandle);
+					RTMP_Free(m_RtmpHandle);
+					m_RtmpHandle = NULL;
+					av_warning("Send Error ReConnect\n");
+					//down stream;
+					av_msleep(2 * 1000);
+					break;
 				}
 			}
 
 		}
 	}
+
+	av_warning("RtmpPushTask Exit\n");
 	return av_true;
 }
 

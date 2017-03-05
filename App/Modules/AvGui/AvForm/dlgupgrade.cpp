@@ -6,7 +6,7 @@
 #include "AvGui/AvGui.h"
 #include "Apis/AvEnum.h"
 #include "Apis/AvEnuminline.h"
-
+#include "Common/gtkutf8.h"
 
 #define AV_PACKET_VER  1
 #define AV_PACKET_SYNC 0XBF78AAFF
@@ -58,7 +58,7 @@ DlgUpgrade::DlgUpgrade(QWidget *parent) :
 {
     ui->setupUi(this);
 
-	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
+	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool );
 	this->setAttribute(Qt::WA_DeleteOnClose);
 
 	IconComm::Instance()->SetIcon(ui->BtnClose, QChar(0xf00d), 10);
@@ -91,8 +91,8 @@ void DlgUpgrade::SetModifyDeviceList(std::list<C_DevSearch> &ModifyList)
 	status += QString(tr("WaitForModify"));
 	for (ilist = m_ModifyList->begin(); ilist != m_ModifyList->end(); ilist++){
 		DevSearchInfo = *ilist;
-		ilist->DevStatusInfo.uptime = ProgressStatus_UpgradeStart << 16 | 0x00;
-		data.append(QStringList() << QString::number(i + 1) << QString::fromLocal8Bit(DevSearchInfo.DevStatusInfo.devname)
+		ilist->DevStatusInfo.UpTime = ProgressStatus_UpgradeStart << 16 | 0x00;
+		data.append(QStringList() << QString::number(i + 1) << QString::fromLocal8Bit(DevSearchInfo.DevStatusInfo.DeviceName)
 			<< QString(DevSearchInfo.NetWorkProfile.Ipv4) << status);
 		i++;
 	}
@@ -126,13 +126,8 @@ void DlgUpgrade::FixDlgUpgradeUi()
 }
 void DlgUpgrade::resizeEvent(QResizeEvent * event)
 {
-	QRect Rect = this->rect();
-	ui->TviewDeviceList->setFixedWidth(Rect.width() / 3 * 2);
-	QSize viewSize = ui->TviewDeviceList->viewport()->size();
-	ui->TviewDeviceList->setColumnWidth(0, 0.20*viewSize.width());
-	ui->TviewDeviceList->setColumnWidth(1, 0.20*viewSize.width());
-	ui->TviewDeviceList->setColumnWidth(2, 0.20*viewSize.width());
-	ui->TviewDeviceList->setColumnWidth(3, 0.40*viewSize.width());
+	AvQDebug("resizeEvent DlgUpgrade\n");
+
 
 	int i = 0;
 	//m_FirmwareStandardItem->clear();
@@ -154,7 +149,7 @@ void DlgUpgrade::resizeEvent(QResizeEvent * event)
 	ui->TviewPacket->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	ui->TviewPacket->setStyleSheet("selection-background-color:skyblue");
 	ui->TviewPacket->horizontalHeader()->setStyleSheet("QHeaderView::section{background:skyblue;}");
-	m_FirmwareStandardItem->setHeaderData(0, Qt::Horizontal, QString("PacketName"));
+	m_FirmwareStandardItem->setHeaderData(0, Qt::Horizontal, QString(tr("PacketName")));
 	ui->TviewPacket->setModel(m_FirmwareStandardItem);
 	ui->TviewPacket->setColumnWidth(0, ui->TviewPacket->width());
 
@@ -163,6 +158,13 @@ void DlgUpgrade::resizeEvent(QResizeEvent * event)
 	ui->TviewPacket->setContextMenuPolicy(Qt::CustomContextMenu);
 	ui->TviewPacket->verticalHeader()->hide();
 
+	QRect Rect = this->rect();
+	ui->TviewDeviceList->setFixedWidth(Rect.width() / 3 * 2);
+	QSize viewSize = ui->TviewDeviceList->viewport()->size();
+	ui->TviewDeviceList->setColumnWidth(0, 0.20*viewSize.width());
+	ui->TviewDeviceList->setColumnWidth(1, 0.20*viewSize.width());
+	ui->TviewDeviceList->setColumnWidth(2, 0.20*viewSize.width());
+	ui->TviewDeviceList->setColumnWidth(3, 0.40*viewSize.width());
 
 	AvQDebug("resizeEvent\n");
 }
@@ -197,12 +199,19 @@ void DlgUpgrade::on_BtnDelPacket_clicked()
 #define  UPGRADE_KEY_FIRMWARE_PATH "UpgradeKeyFirmwarePath"
 void DlgUpgrade::on_BtnAddPacket_clicked()
 {
+	char localBuffer[1024];
+	char *buffer = localBuffer;
+	unsigned int len = sizeof(localBuffer);
+
 	QVariant Var = CAvUiConfigIni::Instance()->InigetValue(QString(UPGRADE_SECTION), QString(UPGRADE_KEY_FIRMWARE_PATH));
 	QString FirmwarePath = Var.toString();
 
 	QStringList FirwarePathList = QFileDialog::getOpenFileNames(this, tr("Select Firmware"), FirmwarePath, tr("Firmware Files (*.img)"));
 	QList<QString>::Iterator iList;
-	if (FirwarePathList.size() == 0) return;
+	if (FirwarePathList.size() == 0) {
+		av_error("Have No Select Packet\n");
+		return;
+	}
 	C_FirmwarePacketInfo FirmwarePacketInfo;
 	for (iList = FirwarePathList.begin(); iList != FirwarePathList.end(); iList++){
 		if (iList->size() >= 128){
@@ -212,9 +221,27 @@ void DlgUpgrade::on_BtnAddPacket_clicked()
 			CAvUiComm::ShowMessageBoxError(FullPach);
 			continue;
 		}
-		sprintf(FirmwarePacketInfo.FirmwarePath,"%s", iList->toStdString().c_str());
+
+		
+		utf8_to_gbk(iList->toLocal8Bit().data(), iList->toLocal8Bit().size(), &buffer, &len);
+		sprintf(FirmwarePacketInfo.FirmwarePath, "%s", buffer);
 		char *filename = strrchr(FirmwarePacketInfo.FirmwarePath, '/') == NULL ? FirmwarePacketInfo.FirmwarePath : strrchr(FirmwarePacketInfo.FirmwarePath, '/') + 1;
 		sprintf(FirmwarePacketInfo.FirmwareNames, filename);
+		std::list <C_FirmwarePacketInfo>::iterator iList;
+		
+		for (iList = m_FirmwareList.begin(); iList != m_FirmwareList.end(); iList++){
+			if (0 == strcasecmp(FirmwarePacketInfo.FirmwareNames, iList->FirmwareNames)){
+				QString ErrorMsg;
+				ErrorMsg += QObject::tr("Packet");
+				ErrorMsg += QString("\n");
+				ErrorMsg += QString(FirmwarePacketInfo.FirmwareNames);
+				ErrorMsg += QString("\n");
+				ErrorMsg += QObject::tr("Has alread load");
+				CAvUiComm::ShowMessageBoxError(ErrorMsg);
+				return;
+			}
+		}
+
 		{//read file
 			FILE *fpSrc = NULL;
 			fpSrc = fopen(FirmwarePacketInfo.FirmwarePath, "rb");
@@ -235,12 +262,12 @@ void DlgUpgrade::on_BtnAddPacket_clicked()
 			FirmwarePacketInfo.base = (char *)malloc(sizeof(char)*fileSize);
 			qDebug("read file mallocaddr [%p][%s] size[%d]", FirmwarePacketInfo.base, FirmwarePacketInfo.FirmwareNames, fileSize);
 			int ret = 0, i = 0;
-			int readlen = 1024;
+			int readlen = 8192;
 			do
 			{
 				ret = fread(&(FirmwarePacketInfo.base[i*readlen]), 1, readlen, fpSrc);
 				i++;
-			} while (ret == 1024);
+			} while (ret == 8192);
 			FirmwarePacketInfo.len = fileSize;
 			FirmwarePacketInfo.FirmwareInfo.ChipMask = 0xffffffff;
 			FirmwarePacketInfo.FirmwareInfo.SensorMask = 0xffffffff;
@@ -263,18 +290,25 @@ void DlgUpgrade::on_BtnAddPacket_clicked()
 		}
 
 	}
-	char *dirpath = NULL;
 
-	if (NULL != (dirpath = strrchr(FirmwarePacketInfo.FirmwarePath, '/'))){
-		*dirpath = '\0';
-		dirpath = FirmwarePacketInfo.FirmwarePath;
-	}
-	else{
-		dirpath = FirmwarePacketInfo.FirmwarePath;
-		sprintf(dirpath, ".");
+	{
+		char *dirpath = NULL;
+
+		if (NULL != (dirpath = strrchr(FirmwarePacketInfo.FirmwarePath, '/'))){
+			*dirpath = '\0';
+			dirpath = FirmwarePacketInfo.FirmwarePath;
+		}
+		else{
+			dirpath = FirmwarePacketInfo.FirmwarePath;
+			sprintf(dirpath, ".");
+		}
+
+
+		len = sizeof(localBuffer);
+		gbk_to_utf8(dirpath, strlen(dirpath), &buffer, &len);
+		CAvUiConfigIni::Instance()->InisetValue(QString(UPGRADE_SECTION), QString(UPGRADE_KEY_FIRMWARE_PATH), QString(buffer));
 	}
 	
-	CAvUiConfigIni::Instance()->InisetValue(QString(UPGRADE_SECTION), QString(UPGRADE_KEY_FIRMWARE_PATH), QString(dirpath));
 
 
 	std::list <C_FirmwarePacketInfo>::iterator  iFirmList;
@@ -302,7 +336,7 @@ void DlgUpgrade::on_BtnSubmit_clicked()
 	for (iList = m_ModifyList->begin(); iList != m_ModifyList->end(); iList++){
 		ArgsIsVaild = false;
 		sprintf(FirmWareUpgrade.DeviceMac, iList->NetWorkProfile.Mac);
-		sprintf(FirmWareUpgrade.DeviceName, iList->DevStatusInfo.devname);
+		sprintf(FirmWareUpgrade.DeviceName, iList->DevStatusInfo.DeviceName);
 		sprintf(FirmWareUpgrade.IpAddr, iList->NetWorkProfile.Ipv4);
 		sprintf(FirmWareUpgrade.Usrname, "admin");
 		sprintf(FirmWareUpgrade.Passwd, "admin");

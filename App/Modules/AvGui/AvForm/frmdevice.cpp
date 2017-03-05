@@ -24,7 +24,7 @@ FrmDevice::FrmDevice(QWidget *parent) :
 	IconComm::Instance()->SetIcon(ui->BtnMenu, QChar(0xf0c9), 10);
 	IconComm::Instance()->SetIcon(ui->LabIco, QChar(0xf015), 12);
 
-	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
+	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
 	this->setAttribute(Qt::WA_DeleteOnClose);
 
 
@@ -90,14 +90,14 @@ void FrmDevice::FixDlgUi()
 
 	m_SearchItemModel = new QStandardItemModel;
 	m_SearchItemModel->setColumnCount(D_SEARCHITEM_HEADSECTION_NR);
-	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_NO,		Qt::Horizontal, "Nu");
-	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_DEVNAME,	Qt::Horizontal, "DevName");
-	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_IPADDR,	Qt::Horizontal, "StrIp");
-	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_GATEWAY,	Qt::Horizontal, "GateWay");
-	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_MACADDR,	Qt::Horizontal, "StrMac");
-	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_CHANNELS, Qt::Horizontal, "Chns");
-	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_PORTS,	Qt::Horizontal, "PortNu");
-	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_STARTUP,	Qt::Horizontal, "Startup");
+	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_NO,		Qt::Horizontal, tr("Nu"));
+	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_DEVNAME,	Qt::Horizontal, tr("DevName"));
+	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_IPADDR, Qt::Horizontal, tr("StrIp"));
+	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_GATEWAY, Qt::Horizontal, tr("GateWay"));
+	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_MACADDR, Qt::Horizontal, tr("StrMac"));
+	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_CHANNELS, Qt::Horizontal, tr("Chns"));
+	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_PORTS, Qt::Horizontal, tr("PortNu"));
+	m_SearchItemModel->setHeaderData(D_SEARCHITEM_HEADSECTION_STARTUP, Qt::Horizontal, tr("Startup"));
 	
 	ui->TviewSearchDevice->setModel(m_SearchItemModel);
 	ui->TviewSearchDevice->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -108,11 +108,11 @@ void FrmDevice::FixDlgUi()
 
 	m_DevicesItemModel = new QStandardItemModel;
 	m_DevicesItemModel->setColumnCount(D_DEVICES_HEADSECTION_NR);
-	m_DevicesItemModel->setHeaderData(D_DEVICES_HEADSECTION_CHNO, Qt::Horizontal, "Chno");
-	m_DevicesItemModel->setHeaderData(D_DEVICES_HEADSECTION_IPADDR, Qt::Horizontal, "IpAddr");
-	m_DevicesItemModel->setHeaderData(D_DEVICES_HEADSECTION_PORT, Qt::Horizontal, "Port");
-	m_DevicesItemModel->setHeaderData(D_DEVICES_HEADSECTION_PROTOCOL, Qt::Horizontal, "Protocol");
-	m_DevicesItemModel->setHeaderData(D_DEVICES_HEADSECTION_STAT, Qt::Horizontal, "Status");
+	m_DevicesItemModel->setHeaderData(D_DEVICES_HEADSECTION_CHNO, Qt::Horizontal, tr("Chno"));
+	m_DevicesItemModel->setHeaderData(D_DEVICES_HEADSECTION_IPADDR, Qt::Horizontal, tr("IpAddr"));
+	m_DevicesItemModel->setHeaderData(D_DEVICES_HEADSECTION_PORT, Qt::Horizontal, tr("Port"));
+	m_DevicesItemModel->setHeaderData(D_DEVICES_HEADSECTION_PROTOCOL, Qt::Horizontal, tr("Protocol"));
+	m_DevicesItemModel->setHeaderData(D_DEVICES_HEADSECTION_STAT, Qt::Horizontal, tr("Status"));
 	ui->TviewChnDevice->setModel(m_DevicesItemModel);
 	ui->TviewChnDevice->setSelectionBehavior(QAbstractItemView::SelectRows);
 	ui->TviewChnDevice->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -133,7 +133,7 @@ void FrmDevice::FixDlgUi()
 	av_u32 protolMask = 0;
 	CAvGui::NetCaptureProtocolsMask(protolMask);
 	ui->CBoxProtoType->clear();
-	ui->CBoxProtoType->setStyleSheet("color:black");
+	//ui->CBoxProtoType->setStyleSheet("color:black");
 
 	for (int i = 0; i < sizeof(protolMask); i++){
 		if (!(AvMask(i) & protolMask)) continue;
@@ -151,11 +151,11 @@ void FrmDevice::resizeEvent(QResizeEvent * event)
 	QSize viewSize = ui->TviewSearchDevice->viewport()->size();
 	int TviewWidth = viewSize.width() + 3;
 	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_NO,			0.08*TviewWidth);
-	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_DEVNAME,		0.15*TviewWidth);
+	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_DEVNAME,		0.13*TviewWidth);
 	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_IPADDR,		0.15*TviewWidth);
 	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_GATEWAY,		0.15*TviewWidth);
 	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_MACADDR,		0.15*TviewWidth);
-	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_CHANNELS,	0.05*TviewWidth);
+	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_CHANNELS,	0.07*TviewWidth);
 	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_PORTS,		0.10*TviewWidth);
 	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_STARTUP,		0.17*TviewWidth);
 	
@@ -177,7 +177,7 @@ void FrmDevice::DrawItemForLinkView()
 	std::list<C_DevSearch>::iterator iList;
 	int i = m_DevicesItemModel->rowCount();
 	for ( iList = m_LinkDeviceList.begin(); iList != m_LinkDeviceList.end(); iList++, i++){
-		m_DevicesItemModel->setItem(i, D_DEVICES_HEADSECTION_CHNO, new QStandardItem(QString::number(i)));
+		m_DevicesItemModel->setItem(i, D_DEVICES_HEADSECTION_CHNO, new QStandardItem(QString::number(iList->ManufacturerInfo.FacTime)));
 		m_DevicesItemModel->item(i, D_DEVICES_HEADSECTION_CHNO)->setCheckable(true);
 		m_DevicesItemModel->setItem(i, D_DEVICES_HEADSECTION_IPADDR, new QStandardItem(QString(iList->NetWorkProfile.Ipv4)));
 		m_DevicesItemModel->setItem(i, D_DEVICES_HEADSECTION_PORT, new QStandardItem(QString::number(iList->NetWorkProfile.ServicePort)));
@@ -204,16 +204,19 @@ void FrmDevice::DrawItemLinkView()
 			switch (ProtoFormats.ProtoMode)
 			{
 			case ProtocolOnvif:
+				ProtoString.append(AvUiLangsLinkProtocol(LinkProtocol_Onvif));
 				break;
 			case 	ProtocolRtmp:
+				ProtoString.append(AvUiLangsLinkProtocol(LinkProtocol_RTSP));
 				break;
 			case 	ProtocolRtsp:
+				ProtoString.append(AvUiLangsLinkProtocol(LinkProtocol_RTSP));
 				break;
 			case 	ProtocolMoon:
 			{
 				Address.append(ProtoFormats.MoonFormats.Url);
 				ServicePort = QString::number(ProtoFormats.MoonFormats.Port);
-				ProtoString.append("Moon");
+				ProtoString.append(AvUiLangsLinkProtocol(LinkProtocol_Moon));
 			}
 			break;
 
@@ -239,16 +242,21 @@ void FrmDevice::DrawItemForSearchView()
 {
 	std::list<C_DevSearch>::iterator iList;
 	int i = 0;
+	
+	//del old item;
+	//m_SearchItemModel->removeColumns(1, m_SearchItemModel->columnCount() -1);
+	m_SearchItemModel->removeRows(0, m_SearchItemModel->rowCount());
+
 	for ( iList = m_DeviceList.begin(); iList != m_DeviceList.end(); iList++, i++){
 		m_SearchItemModel->setItem(i, 0, new QStandardItem(QString::number(i + 1)));
 		m_SearchItemModel->item(i, 0)->setCheckable(true);
-		m_SearchItemModel->setItem(i, 1, new QStandardItem(QString::fromLocal8Bit(iList->DevStatusInfo.devname)));
+		m_SearchItemModel->setItem(i, 1, new QStandardItem(QString::fromLocal8Bit(iList->DevStatusInfo.DeviceName)));
 		m_SearchItemModel->setItem(i, 2, new QStandardItem(iList->NetWorkProfile.Ipv4));
 		m_SearchItemModel->setItem(i, 3, new QStandardItem(iList->NetWorkProfile.GateWay));
 		m_SearchItemModel->setItem(i, 4, new QStandardItem(iList->NetWorkProfile.Mac));
 		m_SearchItemModel->setItem(i, 5, new QStandardItem(QString::number(iList->ManufacturerInfo.ChannelMax)));
 		m_SearchItemModel->setItem(i, 6, new QStandardItem(QString::number(iList->NetWorkProfile.ServicePort)));
-		int uptime = iList->DevStatusInfo.uptime;
+		int uptime = iList->DevStatusInfo.UpTime;
 		int day, hour, min, sec;
 		day = uptime / (3600 * 24);
 		hour = (uptime % (3600 * 24)) / 3600;
@@ -381,7 +389,7 @@ void FrmDevice::SlotsDevicesViewRightMenuSelectOther()
 }
 void FrmDevice::SlotsInitTimer()
 {
-	m_DeviceSet = new DlgDeviceSet;
+	m_DeviceSet = new DlgDeviceSet(this);
 	m_DeviceSet->hide();
 	AvQDebug("Init over\n");
 }
@@ -471,7 +479,8 @@ void FrmDevice::on_BtnModifNet_clicked()
 	DlgNetSet *DlgnetSet = new DlgNetSet;
 
 	DlgnetSet->SetModifyDeviceList(m_ForModifyDeviceList);
-	DlgnetSet->move(this->pos());
+	DlgnetSet->move(pos());
+	DlgnetSet->resize(size());
 	DlgnetSet->exec();
 }
 
@@ -480,7 +489,8 @@ void FrmDevice::on_BtnUpgrade_clicked()
 	GetSelectForModiyDevies();
 	DlgUpgrade *Dlgupgrade = new DlgUpgrade;
 	Dlgupgrade->SetModifyDeviceList(m_ForModifyDeviceList);
-	Dlgupgrade->move(this->pos());
+	Dlgupgrade->move(pos());
+	Dlgupgrade->resize(size());
 	Dlgupgrade->exec();
 }
 
@@ -490,7 +500,8 @@ void FrmDevice::on_BtnFacInfo_clicked()
 	DlgFactorySet *Factory = new DlgFactorySet;
 	
 	Factory->SetModifyDeviceList(m_ForModifyDeviceList);
-	Factory->move(this->pos());
+	Factory->move(pos());
+	Factory->resize(size());
 	Factory->exec();
 }
 
@@ -503,6 +514,8 @@ void FrmDevice::on_BtnChnDeleteDevice_clicked()
 			CAvGui::NetCaptureDelDevice(i);
 		}
 	}
+
+
 	DrawItemLinkView();
 
 	QApplication::sendEvent(this, new QEvent(QEvent::Resize));
@@ -517,6 +530,8 @@ void FrmDevice::on_BtnChnModifDevice_clicked()
 	
 	m_DeviceSet->move(this->pos());
 	hide();
+	m_DeviceSet->move(pos());
+	//m_DeviceSet->resize(size());
 	m_DeviceSet->show();
 
 	m_DeviceSet->exec();
@@ -546,7 +561,7 @@ void FrmDevice::on_BtnAddDevice_clicked()
 {
 	GetSelectForModiyDevies();
 	m_LinkDeviceList = m_ForModifyDeviceList;
-	DrawItemForLinkView();
+	
 
 	std::list<C_DevSearch>::iterator iList;
 
@@ -555,6 +570,7 @@ void FrmDevice::on_BtnAddDevice_clicked()
 	for (iList = m_LinkDeviceList.begin(); iList != m_LinkDeviceList.end(); iList++){
 		ProtoFormats.MoonFormats.Port = iList->NetWorkProfile.ServicePort == 0 ? 5000 : iList->NetWorkProfile.ServicePort;
 		sprintf(ProtoFormats.MoonFormats.Url, iList->NetWorkProfile.Ipv4);
+		sprintf(ProtoFormats.CheckAliveAddress, iList->NetWorkProfile.Ipv4);
 		sprintf(ProtoFormats.UsrName, "admin");
 		sprintf(ProtoFormats.Passwd, "admin");
 		ProtoFormats.ProtoMode = ProtocolMoon;
@@ -565,14 +581,12 @@ void FrmDevice::on_BtnAddDevice_clicked()
 			CAvUiComm::ShowMessageBoxError(QString(tr("Have not Empty Channel!")));
 		}
 		else{
+			iList->ManufacturerInfo.FacTime = emptyChn;
 			CAvGui::NetCaptureAddDevice(emptyChn, ProtoFormats);
 			emit SignalPreviewStart(emptyChn, 0, true);
 		}
-
-		
-
 	}
-
+	DrawItemForLinkView();
 	QApplication::sendEvent(this, new QEvent(QEvent::Resize));
 }
 

@@ -53,7 +53,7 @@ class CmpareStartUpFromLargeToSmall
 {
 public:
 	bool operator()(const C_DevSearch s1, const C_DevSearch s2) const {
-		return s1.DevStatusInfo.uptime > s2.DevStatusInfo.uptime;
+		return s1.DevStatusInfo.UpTime > s2.DevStatusInfo.UpTime;
 	}
 
 };
@@ -62,7 +62,7 @@ class CmpareStartUpFromSmallToLarge
 {
 public:
 	bool operator()(const C_DevSearch s1, const C_DevSearch s2) const {
-		return s1.DevStatusInfo.uptime < s2.DevStatusInfo.uptime;
+		return s1.DevStatusInfo.UpTime < s2.DevStatusInfo.UpTime;
 	}
 
 };

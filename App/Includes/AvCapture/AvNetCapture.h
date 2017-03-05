@@ -37,15 +37,10 @@ public:
 
 	av_bool Start(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnData);
 	av_bool Stop(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnData);
-
-// 	av_bool SetProfile(av_int Slave, C_EnCodeProfile &Profile);
-// 	av_bool GetProfile(av_int Slave, C_EnCodeProfile &Profile);
-// 	av_bool GetCaps(C_EncodeCaps &Caps);
-
-	av_bool SetTime(av_timeval &atv);
-	av_bool SetIFrame(av_int Slave = CHL_MAIN_T);
 	EAvCaptureStatus GetCaptureStatus(av_int Slave = -1);
-	CAvPacket *GetSnap(av_int Slave = CHL_SUB1_T);
+
+	//CAvPakcet over , usr call packet->Release();
+	CAvPacket * Snapshot(av_bool bRealTime = av_false, av_uint SnapshotInterval = 0, av_uint ContinuousTimes = 0);
 
 
 public:
@@ -70,6 +65,10 @@ public:
 	av_bool PtzSetProfile(C_PtzProfile &PtzProfile);
 	av_bool PtzSetCommand(C_PtzCmd &PtzCmd);
 
+	av_bool AdvancedSystemGetCaps(C_AdvancedSystemCaps &AdvancedSystemCaps);
+	av_bool AdvancedSystemGetProfile(C_AdvancedSystemProfile &AdvancedSystemProfile);
+	av_bool AdvancedSystemSetProfile(C_AdvancedSystemProfile &AdvancedSystemProfile);
+
 public:
 	av_bool StartNetCapture(CAvNetProto *Handle);
 	av_bool StopNetCapture();
@@ -83,7 +82,8 @@ private:
 private:
 	CAvTimer		m_Timer;
 	av_uint			m_TimerLastRecFrameNm[CHL_NR_T];
-	av_bool			m_Linked;
+	I_RET			m_LinkStatus;
+
 private:
 	av_int			m_Channel;
 	av_int			m_RemoteChannel;

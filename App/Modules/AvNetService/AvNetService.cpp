@@ -21,6 +21,7 @@
 #include "AvNetService/AvNtpCli.h"
 //#include "AvProtocol/Moon/AvMoon.h"
 #include "AvNetService/AvProtoMoon.h"
+#include "Rtsp/LibRtspClient.h"
 
 
 
@@ -38,10 +39,42 @@ av_bool CAvNetService::Initialize()
 	{
 		m_ConfigRtmp.Update();
 		m_ConfigRtmp.Attach(this, (AvConfigCallBack)&CAvNetService::OnConfigRtmpModify);
+
+		m_ConfigRtsp.Update();
+		m_ConfigRtsp.Attach(this, (AvConfigCallBack)&CAvNetService::OnConfigRtspModify);
+
+
+		m_ConfigP2p.Update();
+		m_ConfigP2p.Attach(this, (AvConfigCallBack)&CAvNetService::OnConfigP2pModify);
+
+
+		m_ConfigUpnp.Update();
+		m_ConfigUpnp.Attach(this, (AvConfigCallBack)&CAvNetService::OnConfigUpnpModify);
+
+
+		m_ConfigNtp.Update();
+		m_ConfigNtp.Attach(this, (AvConfigCallBack)&CAvNetService::OnConfigNtpModify);
+
+
+		m_ConfigDdns.Update();
+		m_ConfigDdns.Attach(this, (AvConfigCallBack)&CAvNetService::OnConfigDdnsModify);
+
+
+		m_ConfigSmtp.Update();
+		m_ConfigSmtp.Attach(this, (AvConfigCallBack)&CAvNetService::OnConfigEmailModify);
+
+
+		m_ConfigFtp.Update();
+		m_ConfigFtp.Attach(this, (AvConfigCallBack)&CAvNetService::OnConfigFtpModify);
+
+
 	}
 	av_bool ret = Start();
 
-
+	{
+// 		CRtspClient *R = new CRtspClient;
+// 		R->Connect("rtsp://192.168.1.89:554/c=0&s=0");
+	}
 	//CThread::run();
 	return ret;
 }
@@ -60,12 +93,12 @@ av_bool CAvNetService::Start()
 		for (int i = 0; i < SYS_CHN_NUM; i++){
 			RtmpUrl.clear();
 			ConfigRtmp &RtmpConfig = m_ConfigRtmp.GetConfig(i);
-			if (RtmpConfig.RtmpFormats.bEnable == av_true){
+			if (RtmpConfig.bEnable == av_true){
 				pRtmp = new AvRtmp(AvRtmp::RTMP_PUSH);
-				RtmpUrl.append(RtmpConfig.RtmpFormats.RtmpAddress);
+				RtmpUrl.append(RtmpConfig.PushServer);
 				RtmpUrl.append("/");
-				RtmpUrl.append(RtmpConfig.RtmpFormats.RtmpString);
-				pRtmp->Start(i, RtmpConfig.RtmpFormats.Slave, RtmpUrl);
+				RtmpUrl.append(RtmpConfig.PushStrings);
+				pRtmp->Start(i, RtmpConfig.PushStream, RtmpUrl);
 				m_AvRtmpMap[i] = pRtmp;
 			}
 		}
@@ -114,13 +147,13 @@ av_void CAvNetService::OnConfigRtmpModify(CAvConfigRtmp *configRtmp, int &result
 				delete pRtmp;
 			}
 
-			if (NewConfig.RtmpFormats.bEnable == av_true){
+			if (NewConfig.bEnable == av_true){
 				RtmpUrl.clear();
 				pRtmp = new AvRtmp(AvRtmp::RTMP_PUSH);
-				RtmpUrl.append(NewConfig.RtmpFormats.RtmpAddress);
+				RtmpUrl.append(NewConfig.PushServer);
 				RtmpUrl.append("/");
-				RtmpUrl.append(NewConfig.RtmpFormats.RtmpString);
-				pRtmp->Start(i, NewConfig.RtmpFormats.Slave, RtmpUrl);
+				RtmpUrl.append(NewConfig.PushStrings);
+				pRtmp->Start(i, NewConfig.PushStream, RtmpUrl);
 				m_AvRtmpMap[i] = pRtmp;
 
 				OldConfig = NewConfig;
@@ -130,4 +163,34 @@ av_void CAvNetService::OnConfigRtmpModify(CAvConfigRtmp *configRtmp, int &result
 	}
 
 	result = 1;
+}
+
+
+av_void CAvNetService::OnConfigRtspModify(CAvConfigNetRtsp *Config, int &Result)
+{
+	av_msg("%s\n", __FUNCTION__);
+}
+av_void CAvNetService::OnConfigP2pModify(CAvConfigNetP2p *Config, int &Result)
+{
+	av_msg("%s\n", __FUNCTION__);
+}
+av_void CAvNetService::OnConfigUpnpModify(CAvConfigNetUpnp *Config, int &Result)
+{
+	av_msg("%s\n", __FUNCTION__);
+}
+av_void CAvNetService::OnConfigNtpModify(CAvConfigNetNtp *Config, int &Result)
+{
+	av_msg("%s\n", __FUNCTION__);
+}
+av_void CAvNetService::OnConfigDdnsModify(CAvConfigNetDdns *Config, int &Result)
+{
+	av_msg("%s\n", __FUNCTION__);
+}
+av_void CAvNetService::OnConfigEmailModify(CAvConfigNetSmtp *Config, int &Result)
+{
+	av_msg("%s\n", __FUNCTION__);
+}
+av_void CAvNetService::OnConfigFtpModify(CAvConfigNetFtp *Config, int &Result)
+{
+	av_msg("%s\n", __FUNCTION__);
 }

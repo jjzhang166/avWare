@@ -14,7 +14,7 @@ DlgNetSet::DlgNetSet(QWidget *parent) :
 
 
 
-	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
+	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
 	this->setAttribute(Qt::WA_DeleteOnClose);
 
 	IconComm::Instance()->SetIcon(ui->BtnClose, QChar(0xf00d), 10);
@@ -41,7 +41,7 @@ void DlgNetSet::SetModifyDeviceList(std::list<C_DevSearch> &ModifyList)
 	for (ilist = m_ModifyList->begin(); ilist != m_ModifyList->end(); ilist++){
 		DevSearchInfo = *ilist;
 		m_TviewDeviceTableModel->setItem(i, 0, new QStandardItem(QString::number(i)));
-		m_TviewDeviceTableModel->setItem(i, 1, new QStandardItem(QString(ilist->DevStatusInfo.devname)));
+		m_TviewDeviceTableModel->setItem(i, 1, new QStandardItem(QString(ilist->DevStatusInfo.DeviceName)));
 		m_TviewDeviceTableModel->setItem(i, 2, new QStandardItem(QString(ilist->NetWorkProfile.Mac)));
 		QIcon icon(":/image/info.png");
 		m_TviewDeviceTableModel->setItem(i, 3, new QStandardItem(icon, QString("Wait")));

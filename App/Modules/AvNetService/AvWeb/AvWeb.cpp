@@ -171,7 +171,7 @@ int CAvWebSer::WebCallBackGetSnap(int Channel, std::string &SnapData)
 	}
 	Capture *CapSnap = g_AvManCapture.GetAvCaptureInstance(Channel);
 	
-	CAvPacket *CapSnapData = CapSnap->GetSnap();
+	CAvPacket *CapSnapData = CapSnap->Snapshot();
 	if (NULL == CapSnapData){
 		SnapData.clear();
 		return 0;

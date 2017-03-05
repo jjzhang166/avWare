@@ -490,10 +490,10 @@ int av_web::AvWebGetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &ha
 	rtmp.Update();
 	ConfigRtmp &conf_rtmp = rtmp.GetConfig(channel);
 	
-	web_resp["RtmpAddr"] = conf_rtmp.RtmpFormats.RtmpAddress;
-	web_resp["RtmpString"] = conf_rtmp.RtmpFormats.RtmpString;
-	web_resp["Enable"] = conf_rtmp.RtmpFormats.bEnable;
-	web_resp["RtmpAudio"] = conf_rtmp.RtmpFormats.bAudio;
+	web_resp["RtmpAddr"] = conf_rtmp.PushServer;
+	web_resp["RtmpString"] = conf_rtmp.PushStrings;
+	web_resp["Enable"] = conf_rtmp.bEnable;
+	web_resp["RtmpAudio"] = conf_rtmp.bEnableAudio;
 	
 	have_resp_param = av_true;
 	return WEB_STATUS_OK;
@@ -511,10 +511,12 @@ int av_web::AvWebSetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &ha
 	rtmp.Update();
 	ConfigRtmp &conf_rtmp = rtmp.GetConfig(channel);
 	
-	strcpy(conf_rtmp.RtmpFormats.RtmpAddress, web_req["RtmpAddr"].asCString());
-	strcpy(conf_rtmp.RtmpFormats.RtmpString, web_req["RtmpString"].asCString());
-	conf_rtmp.RtmpFormats.bEnable = web_req["Enable"].asInt() == 1 ? av_true:av_false;
-	conf_rtmp.RtmpFormats.bAudio = web_req["RtmpAudio"].asInt() == 1 ? av_true : av_false;
+	strcpy(conf_rtmp.PushServer, web_req["RtmpAddr"].asCString());
+	strcpy(conf_rtmp.PushStrings, web_req["RtmpString"].asCString());
+	conf_rtmp.bEnable = web_req["Enable"].asInt() == 1 ? av_true:av_false;
+	conf_rtmp.bEnableAudio = web_req["RtmpAudio"].asInt() == 1 ? av_true : av_false;
+	conf_rtmp.PushStream = slave;
+
 
 	return (0 == rtmp.SettingUp(channel)) ? WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
 }

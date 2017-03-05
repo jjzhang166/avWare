@@ -31,6 +31,7 @@
 #define HTTPHEAD_HOST				"Host"
 #define HTTPHEAD_CLIETN_ADDRESS		"X-Client-Address"
 #define HTTPHEAD_CONTENT_LENGTH		"Content-Length"
+#define HTTPHEAD_CONTENT_LENGTH2	"Content-length"
 #define HTTPHEAD_ACCEPT				"Accept"
 #define HTTPHEAD_DATE				"Date"
 #define HTTPHEAD_SERVER				"Server"
@@ -46,6 +47,11 @@
 #define HTTPHEAD_ACCEPT_LANGUAGE	"Accept-Language"
 
 
+#define SDP_CONTROL					"a=control"
+#define SDP_RTPMAP					"a=rtpmap"
+#define SDP_FMTP					"a=fmtp"
+
+
 #define HTTPHEAD_RTSP_RANGE			"Range"
 #define HTTPHEAD_RTSP_CSEQ			"CSeq"
 #define HTTPHEAD_RTSP_CSEQEX		"Cseq"
@@ -54,6 +60,11 @@
 #define HTTPHEAD_RTSP_TIMESTAMP		"Timestamp"
 #define HTTPHEAD_RTSP_TRANSPORT		"Transport"
 
+
+typedef enum {
+	Rtsp_Server,
+	Rtsp_Client,
+}RTSP_SER_CLI_E;
 
 
 class RtspHttp
@@ -70,6 +81,7 @@ public:
 
 
 public:
+	RTSP_SER_CLI_E _x_SerCli_Mode;
 	std::string _x_accept;
 	std::string _x_rtp_info;
 	std::string _x_timestamp;
@@ -87,9 +99,14 @@ public:
 	std::string _x_version;
 	std::string _x_method;
 	std::string _x_authorization;
-
-
+	std::string _x_status_code;
 	std::string _x_transport;
+
+
+	int		_x_sdp_index;
+	std::string _x_sdp_control[2];
+	std::string _x_sdp_rtpmap[2];
+	std::string _x_sdp_fmtp[2];
 	};
 
 

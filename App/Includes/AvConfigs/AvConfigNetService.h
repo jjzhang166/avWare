@@ -14,7 +14,7 @@
 ******************************************************************/
 #ifndef _AVCONFIGS_NETSERVICE_H_
 #define _AVCONFIGS_NETSERVICE_H_
-
+#include "Apis/AvWareStruct.h"
 #include "Apis/AvWareCplusplus.h"
 #include "AvNetService/AvSmtp.h"
 #include "AvNetService/AvUpnp.h"
@@ -24,67 +24,7 @@
 #include "Apis/LibSystem.h"
 #include "AvConfigs/AvConfigTable.h"
 
-////////////////////////////////////
-//Smtp
-
-#define MAX_EMAIL_STRING_LEN 64
-#define MAX_EMAIL_RECEIVER 5
-#define MAX_PASSDW_LEN 64
-#define MAX_SERVERIP_LEN	16
-#define PATH_LEN	240
-#define PORT_MAP_NUM 3
-
 #define MAX_CONF_ROUTER_LINK 10
-
-typedef enum {
-	Mapping_RTSP,
-	Mapping_Web,
-	Mapping_SelfProtol,
-	Mapping_NR,
-}MappedType;
-
-typedef struct {
-	av_bool enable;
-	int port;
-	int save_mode;
-	char smtp_server[MAX_EMAIL_STRING_LEN];
-	char account[MAX_EMAIL_STRING_LEN];
-	char password[MAX_EMAIL_STRING_LEN];
-	char sender[MAX_EMAIL_STRING_LEN];
-	char receiver[MAX_EMAIL_RECEIVER][MAX_EMAIL_STRING_LEN];
-	char title[MAX_EMAIL_STRING_LEN];
-}ConfigNetSerSmtp;
-
-typedef struct{
-	av_bool Enable;
-	int Port;
-	char FtpServer[MAX_SERVERIP_LEN];
-	char UsrName[MAX_PASSDW_LEN];
-	char Passwd[MAX_PASSDW_LEN];
-	char RemotePathName[PATH_LEN];
-	av_bool Anonymity;
-}ConfigNetFtp;
-
-typedef struct{
-	av_bool Enable;
-	char Server[MAX_PASSDW_LEN];
-	char UsrName[MAX_PASSDW_LEN];
-	char Passwd[MAX_PASSDW_LEN];
-}ConfigNetDdns;
-
-typedef struct{
-	av_bool Enable;
-	char Name[MAX_PASSDW_LEN];
-	int TranMode;
-	int LocalPort[Mapping_NR];
-	int RouterPort[Mapping_NR];
-}ConfigNetUpnp;
-
-typedef struct{
-	av_bool Enable;
-	char Server[MAX_PASSDW_LEN];
-	int Zone;
-}ConfigNetNtp;
 
 
 
@@ -92,6 +32,14 @@ typedef struct{
 typedef C_LanAttribute ConfigLanAttribute;
 typedef C_BlueToothAttribute ConfigBlueTooth;
 typedef C_SimAttribute	ConfigSimAttribute;
+typedef C_SmtpProfile			ConfigNetSmtp;
+typedef C_FtpProfile			ConfigNetFtp;
+typedef C_DdnsProfile			ConfigNetDdns;
+typedef C_RtmpNodeProfile		ConfigRtmp;
+typedef C_UpnpProfile			ConfigNetUpnp;
+typedef C_NtpProfile			ConfigNetNtp;
+typedef C_RtspProfile			ConfigNetRtsp;
+typedef C_P2pProfile			ConfigNetP2p;
 
 typedef struct {
 	C_WirelessAttribute RouterLinkInfo[MAX_CONF_ROUTER_LINK];
@@ -114,26 +62,17 @@ typedef struct {
 	};
 }ConfigNetComm;
 
-typedef struct{
-	av_char RtmpAddress[128];
-	av_char RtmpString[128];
-	av_uint Slave;
-	av_bool bEnable;
-	av_bool bAudio;
-}C_RtmpFormats;
-
-typedef struct{
-	C_RtmpFormats RtmpFormats;
-}ConfigRtmp;
 
 
 
 
-typedef TAvConfig<ConfigNetSerSmtp>	CAvConfigNetSerSmtp;
+typedef TAvConfig<ConfigNetSmtp>	CAvConfigNetSmtp;
 typedef TAvConfig<ConfigNetFtp>		CAvConfigNetFtp;
 typedef TAvConfig<ConfigNetDdns>	CAvConfigNetDdns;
 typedef TAvConfig<ConfigNetUpnp>	CAvConfigNetUpnp;
 typedef TAvConfig<ConfigNetNtp>		CAvConfigNetNtp;
+typedef TAvConfig<ConfigNetP2p>		CAvConfigNetP2p;
+typedef TAvConfig<ConfigNetRtsp>	CAvConfigNetRtsp;
 typedef TAvConfig<ConfigNetComm, 0, ConfMaxNetComm> CAvConfigNetComm;
 typedef TAvConfig<ConfigRtmp, 0, SYS_CHN_NUM>		CAvConfigRtmp;
 

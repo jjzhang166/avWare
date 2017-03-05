@@ -53,10 +53,9 @@ public:
 	virtual av_bool Start(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnData) = 0;
 	virtual av_bool Stop(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnData) = 0;
 
-	virtual av_bool SetTime(av_timeval &atv) = 0;
-
 	virtual EAvCaptureStatus GetCaptureStatus(av_int Slave = -1) = 0;
-	virtual CAvPacket *GetSnap(av_int Slave = CHL_SUB1_T) = 0;
+
+
 
 
 public:
@@ -80,10 +79,17 @@ public:
 	virtual av_bool PtzGetProfile		(C_PtzProfile &PtzProfile) = 0;
 	virtual av_bool PtzSetProfile		(C_PtzProfile &PtzProfile) = 0;
 	virtual av_bool PtzSetCommand		(C_PtzCmd &PtzCmd) = 0;
+
+	virtual av_bool AdvancedSystemGetCaps		(C_AdvancedSystemCaps &AdvancedSystemCaps) = 0;
+	virtual av_bool AdvancedSystemGetProfile	(C_AdvancedSystemProfile &AdvancedSystemProfile) = 0;
+	virtual av_bool AdvancedSystemSetProfile	(C_AdvancedSystemProfile &AdvancedSystemProfile) = 0;
+
+
 	virtual av_bool StartNetCapture		(CAvNetProto *Handle);
 	virtual av_bool StopNetCapture		();
 	virtual CAvNetProto *AvNetProtoHandle();
 
+	virtual CAvPacket * Snapshot(av_bool bRealTime = av_false, av_uint SnapshotInterval = 0, av_uint ContinuousTimes = 0) = 0;
 protected:
 	CAvNetProto *m_NetProtoHandle;
 };

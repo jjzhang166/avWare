@@ -41,7 +41,6 @@ typedef struct {
 
 
 typedef struct {
-//	unsigned int Platform;
 	unsigned int Version;
 	unsigned int ChipMask;
 	unsigned int SensorMask;
@@ -116,8 +115,10 @@ typedef struct {
 
 
 typedef struct {
-	time_t	uptime;
-	char	devname[64];
+	time_t				UpTime;
+	char				DeviceName[64];
+	C_NetStatusInfo		NetStatus[NetCommT_LAST];
+	C_CpuMemStatusInfo	CpuMemStatus[32];
 }C_DevStatusInfo;
 
 
@@ -144,28 +145,44 @@ typedef struct {
 }C_LogIn;
 
 
-
-
 typedef struct {
-	unsigned int AlarmEventMask;
-	int MaxAlmIn;
-	int MaxAlmOut;
-}C_AlarmCaps;
+	int WeekIndex;
+	unsigned int StartSec;
+	unsigned int StopSec;
+}C_TimeArea;
+
+
 
 typedef struct {
 	av_bool RegisterStatus;
 	unsigned int AlarmEventMask;
 }C_AlarmRegister;
-#if 0
+
 typedef struct {
-	unsigned int AlarmEventMask;
-	av_bool AlarmStatus;
-	unsigned int AlarmTime;
-	unsigned int AlarmPortInNuMask;
-	unsigned int  MotionDetection;
-	C_RECT MotionTrace;
+	av_u32		AlarmEventMask;
+	av_bool		AlarmbEnable;
+	C_TimeArea  AlarmTimeArea[AvMaxWeeks][AvMaxTimeArea];
+	av_u32		AlarmMotionArea[ConfMotionDetectionLine];
+	av_u32		AlarmMotionLevel;
+	av_bool		AlarmbLinkageEmail;
+	av_bool		AlarmbLinkageFtp;
+	av_u32		AlarmLinkagePrerecordSec;
+	av_bool		AlarmbLinkageSnapshot;
+	av_bool		AlarmbLinkageAlmOut;
+	av_bool		AlarmbLinkageBeep;
+	av_bool		AlarmbLinkagePtz;
+	av_bool		AlarmbLinkageRecord;
+}C_AlarmProfile;
+
+
+typedef struct {
+	AlarmEvent	AlarmEventName;
+	av_bool		AlarmbStat;
+	av_u32		AlarmTime;
+	av_u32		AlarmPortInNuMask;
+	av_u32		AlarmMotionArea[ConfMotionDetectionLine];
 }C_Alarm;
-#endif
+
 
 typedef struct {
 	///单位M
@@ -200,43 +217,61 @@ typedef struct {
 	RecordFileDownloadCtrl DownloadCtrl;
 }C_RecordFileDownloadCtrl;
 
+
 typedef struct {
-	av_bool FtpbEnable;
-	char FtpServerAddr[64];
-	unsigned int FtpServerPort;
-	char FtpUserName[32];
-	char FtpUserPasswd[32];
+	av_bool bEnable;
+	EmailEncodeType EncodeType;
+	int ServicePort;
+	char ServerAddress[64];
+	char UserName[64];
+	char PassWord[64];
+	char Sender[64];
+	char Receiver1[64];
+	char Receiver2[64];
+	char Title[64];
+}C_SmtpProfile;
+
+typedef struct {
+	av_bool bEnable;
+	int		ServicePort;
+	char	ServerAddress[64];
+	char	UserName[64];
+	char	PassWord[64];
+	char	RemotePath[64];
 }C_FtpProfile;
 
 typedef struct {
-	char EmailSmtpServer[32];
-	unsigned int EmailPort;
-	av_bool EmailEnable;
-	av_bool EmailSSl;
-	char EmailSender[32];
-	char EmailUserName[32];
-	char EmailUserPasswd[32];
-	char EmailTitle[32];
-	char EmailRecver1[32];
-	char EmailRecver2[32];
-	char EmailRecver3[32];
-}C_EmailProfile;
+	av_bool bEnable;
+	DdnsType Type;
+	char ServerAddress[64];
+	char UserName[64];
+	char PassWord[64];
+	int  UpdateInterval;
+}C_DdnsProfile;
 
 typedef struct {
-	av_bool UpnpEnable;
-	unsigned int UpnpHttpPort;
-	unsigned int UpnpTcpPort;
-	unsigned int UpnpRtspPort;
+	av_bool bEnableHttpPort;
+	av_bool bEnableMoonProtoPort;
+	av_bool bEnableRtspPort;
 }C_UpnpProfile;
 
 
+typedef struct
+{
+	av_bool bEnable;
+	av_bool bUseLinkId;
+	char LinkId[64];
+	char ServerAddress[64];
+	unsigned int ServicePort;
+	char UserName[32];
+	char PassWord[32];
+}C_P2pProfile;
 
 typedef struct {
-	av_bool NtpbEnable;
-	char NtpServer[64];
-	unsigned int NtpPort;
-	int NtpTimeZone;
-	unsigned int  NtpUpdateTime;
+	av_bool bEnable;
+	char ServerAddress[64];
+	TimeZone Timezone;
+	unsigned int  UpdateInterval;
 }C_NtpProfile;
 
 typedef struct {
@@ -247,43 +282,22 @@ typedef struct {
 
 
 typedef struct {
-	av_bool RtspbEnable;
-	unsigned int RtspPort;
+	av_bool bEnable;
+	unsigned int ServicePort;
 }C_RtspProfile;
 
 typedef struct {
-	char DdnsServerName[64];
-	char DdnsServerAddr[64];
-	char DdnsUserName[32];
-	char DdnsUserPasswd[32];
-	int  DdnsPort;
-}C_DdnsInfo;
-
-typedef struct {
-	unsigned int DdnsIndex;
-	av_bool DdnsbEnable;
-	std::list<C_DdnsInfo> DdnsList;
-}C_DdnsProfile;//这个结构在使用过程中，一定要使用new  不能用malloc替代
-
-
-typedef struct
-{
-	av_bool P2pbEnable;
-	av_bool P2pbUseLinkId;
-	char P2pLinkId[32];
-	char P2pServerIP[32];
-	unsigned int P2pPort;
-	char P2pUsername[32];
-	char P2pUserPasswd[32];
-}C_P2pProfile;
-
-typedef struct {
-	av_bool RtmpbEnable;
-	char RtmpPushServer[64];
-	char RtmpPushID[64];
-	av_bool RtmpbEnableAudio;
-	av_bool RtmpbPushMainStream;
+	av_bool bEnable;
+	char PushServer[64];
+	char PushStrings[64];
+	av_bool bEnableAudio;
+	unsigned int PushStream;
+	unsigned int PushChannel;
 	av_bool RtmpbPushStreamAdaptiveNetSpeed;
+}C_RtmpNodeProfile;
+
+typedef struct {
+	C_RtmpNodeProfile RtmpNodeProfile[SYS_CHN_NUM];
 }C_RtmpProfile;
 
 typedef struct {
@@ -317,46 +331,9 @@ typedef struct {
 
 
 
-typedef struct {
-	unsigned int		VideoCoverMax;
-	av_bool				VideoCoverEnable;
-	std::list<C_RECT>	VideoCoverZone;
-}C_VideoCoverProfile;
 
 
-typedef struct {
-	av_bool TimeAreaUseWeek;
-	av_bool TimeAreaUseMon;
-	///若使用week 则表示每周几，0表示周一至周日
-	///若使用mon 则表示每月TimeAreaIndex号 若0表示每天
-	int TimeAreaIndex;
-	unsigned int TimeAreaStartSec;
-	unsigned int TimeAreaStopSec;
-}C_TimeArea;
 
-typedef struct {
-	AlarmEvent AlarmEventName;
-	std::list <C_TimeArea> AlarmTimeArea;
-	unsigned int AlarmVideoAreaMax;
-	std::list <C_RECT> AlarmVideoArea;
-	av_bool AlarmEnable;
-	av_bool AlarmLinkageEmail;
-	av_bool AlarmLinkageFtp;
-	av_bool AlarmLinkageRecord;
-	unsigned int AlarmLinkagePrerecordSec;
-	av_bool AlarmLinkageSnapshot;
-	av_bool AlarmLinkageAlmOut;
-	av_bool AlarmLinkageBeep;
-	av_bool AlarmLinkagePtz;
-	///第一个uint 0-31通道 第二个uint 32-64通道，以此类推,Channel 标识需按位与
-	std::list <unsigned int > AlarmLinkageRecordChannel;
-	///第一个uint 0-31通道 第二个uint 32-64通道，以此类推,Channel 标识需按位与
-	std::list <unsigned int >AlarmLinkageSnapshotChannel;
-}C_AlarmProfileInfo;
-
-typedef struct{
-	std::list <C_AlarmProfileInfo> AlarmProfileInfo;
-}C_AlarmProfile;
 
 typedef struct {
 	char Server[64];
@@ -385,7 +362,11 @@ typedef struct {
 }C_LogContent;
 
 
-
+typedef struct {
+	av_uint ContinuousTimes;
+	av_uint SnapshotInterval;
+	av_bool bRealTime;
+}C_Snapshot;
 
 typedef struct {
 	unsigned int		_msg;
@@ -408,9 +389,59 @@ typedef struct {
 		C_FirmwareInfo		FirmwareInfo;
 		C_AudioCaps			AudioCaps;
 		C_AudioProfile		AudioProfile;
+		C_PtzAdvancedCameraLensCaps		PtzCameralensCaps;
+		C_PtzAdvancedCameraLensProfile	PtzAdvancedCameraLensProfile;
+
+		C_SmtpProfile					SmtpProfile;
+		C_RtspProfile					RtspProfile;
+		C_FtpProfile					FtpProfile;
+		C_CoverProfile					CoverProfile;
+		C_OverLayCaps					OverLayCaps;
+		C_OverLayProfile				OverLayProfile;
+		C_UpnpProfile					UpnpProfile;
+		C_NtpProfile					NtpProfile;
+		C_P2pProfile					P2pProfile;
+		C_DdnsProfile					DdnsProfile;
+		C_AlarmCaps						AlarmCaps;
+		C_AlarmProfile					AlarmProfile;
 	};
 }NetProtocolParam;
 
+
+
+typedef struct {
+	__Msg _msg;
+	union{
+		C_LogCaps							LogCaps;
+		C_PtzAdvancedCameraLensCaps			PtzCameralensCaps;
+		C_OverLayCaps						OverLayCaps;
+		C_AlarmCaps							AlarmCaps;
+	};
+}C_AdvancedSystemCaps;
+
+
+typedef struct {
+	__Msg _msg;
+	union {
+		C_DevStatusInfo						DevStatusInfo;
+		C_SmtpProfile						SmtpProfile;
+		C_FtpProfile						FtpProfile;
+		C_UpnpProfile						UpnpProfile;
+		C_RtmpProfile						RtmpProfile;
+		C_RtspProfile						RtspProfile;
+		C_LogProfile						LogProfile;
+		C_FirmwareInfo						FirmwareInfo;
+		C_ManufacturerInfo					ManufacturerInfo;
+		C_PtzAdvancedCameraLensProfile		PtzAdvancedCameraLensProfile;
+		C_CoverProfile						CoverProfile;
+		C_OverLayProfile					OverLayProfile;
+		C_NtpProfile						NtpProfile;
+		C_DdnsProfile						DdnsProfile;
+		C_NetWorkProfile					NetWorkProfile;
+		C_P2pProfile						P2pProfile;
+		C_AlarmProfile						AlarmProfile;
+	};
+}C_AdvancedSystemProfile;
 
 #endif
 

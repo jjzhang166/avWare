@@ -360,6 +360,7 @@ av_bool CAvDevice::GetSerialCaps(C_SerialCaps &SerialCaps)
 	return AvSerialCaps(&SerialCaps);
 }
 
+
 av_bool CAvDevice::GetNetCommCaps(C_NetCommCaps &NetCommCaps)
 {
 	memset(&NetCommCaps, 0x00, sizeof(C_NetCommCaps));
@@ -582,17 +583,13 @@ av_u32  CAvDevice::SystemUpgradeProgress()
 	return (av_u32)(m_SystemUpgradeProgress.ProgressCmd << 16 | m_SystemUpgradeProgress.ProgressValue);
 }
 
-av_bool CAvDevice::GetMemLoadInfo(C_MemoryLoadInfo &MemLoadInfo)
+av_bool CAvDevice::GetNetStatusInfo(C_NetStatusInfo &NetStatusInfo)
 {
-	return AvGetMemLoadInfo(&MemLoadInfo);
+	return avGetNetStatusInfo(&NetStatusInfo);
 }
-av_bool CAvDevice::GetNetLoadInfo(C_NetLoadInfo &NetLoadInfo)
+av_bool CAvDevice::GetCpuMemStatusInfo(C_CpuMemStatusInfo &CpuMemStatusInfo)
 {
-	return AvGetNetLoadInfo(&NetLoadInfo);
-}
-av_bool CAvDevice::GetCpuLoadInfo(C_CpuLoadInfo &CpuLoadInfo)
-{
-	return AvGetCpuLoadInfo(&CpuLoadInfo);
+	return avGetCpuMemStatusInfo(&CpuMemStatusInfo);
 }
 
 av_bool CAvDevice::GetStartUpGuid(std::string &guid)

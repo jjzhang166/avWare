@@ -7,8 +7,10 @@ include_directories(Lib/Common)
 set(SRC_LIST 
 		MainSrc/main.cpp
 	)
+file(GLOB_RECURSE ApisHeaders ${CMAKE_CURRENT_SOURCE_DIR}/Includes/Apis/*.h)
 set(SRC_HEADER 
 	${PROJECT_BINARY_DIR}/../config.h
+	${ApisHeaders}
 	)
 set (target avWare)
 ##全局变量使用
@@ -39,6 +41,10 @@ endif()
 
 set (CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR})
 
+if (${FaceDetect_LMX} STREQUAL "ON")
+target_link_libraries(${target} AvIntelligentAnalysis)
+endif()
+
 
 #Moudles
 target_link_libraries(${target} AvDevice)
@@ -51,7 +57,6 @@ target_link_libraries(${target} AvCapture)
 
 if (${CMAKE_WITH_UI} STREQUAL "ON")
 	target_link_libraries(${target} AvGui)
-#	target_link_libraries(${target} AvPlayer)
 	link_directories(${CMAKE_QT_PATH}/bin/)
 endif()
 target_link_libraries(${target} AvThread)
@@ -83,6 +88,7 @@ target_link_libraries(${target} Rtmp)
 target_link_libraries(${target} Lua)
 target_link_libraries(${target} SQLite)
 
+
 #UI
 if (${CMAKE_WITH_UI} STREQUAL "ON")
 		if (!CMAKE_QT_PATH)
@@ -94,7 +100,8 @@ if (${CMAKE_WITH_UI} STREQUAL "ON")
 	find_package(Qt5Quick)
 	ADD_DEFINITIONS (${QT_DEFINITIONS})
 	#target_link_libraries(${target} Qt5::Widgets)
-	#qt5_use_modules(${PROJECT_NAME} Core Widgets OpenGL Xml Gui)
+	#qt5_use_modules(${target} Core Widgets Gui)
+	#get_target_property(${target} Qt5::Core LOCATION)
 endif()
 
 ##third lib
@@ -125,4 +132,4 @@ elseif (UNIX)
 endif()
 
 include (CPack.CMake)
-include (CheckHeadLibsFiles.CMake)
+#include (CheckHeadLibsFiles.CMake)

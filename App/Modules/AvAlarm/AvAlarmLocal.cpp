@@ -42,31 +42,31 @@ av_bool CAvAlmLocal::SendAlmMsg(CAvAlarm::AlmMsg  &msg)
 	return AlarmMsgQueue.QmSnd((av_char *)&msg, msglen);
 }
 
-av_bool CAvAlmLocal::PacketAlmIo(C_AlmIoResult *Result)
+av_bool CAvAlmLocal::PacketAlmIo(av_u32 Result, av_bool bOpen)
 {
 	//是否开启了almio in 配置
 
 	CAvAlarm::AlmMsg msg;
 	msg.AlmTmSec = (av_u32)time(NULL);
-	msg.AlmType = CAvAlarm::AvAlmT_PORT_In;
+	msg.AlmType = AlarmEvent_PORT_In;
 	msg.Channel = -1;
 	msg.Slave = CHL_NR_T;
 
-	msg.AlmStatus = Result->AlmIoCount == 0 ? CAvAlarm::AvAlm_Stat_Close:CAvAlarm::AvAlm_Stat_Open;
-	msg.IoResult = *Result;
+	msg.AlmStatus = bOpen == av_false ? CAvAlarm::AvAlm_Stat_Close : CAvAlarm::AvAlm_Stat_Open;
+	msg.IoResult = Result;
 
 	return SendAlmMsg(msg);
 }
-av_bool CAvAlmLocal::PacketAlmMd(C_AlmMdResult *Result)
+av_bool CAvAlmLocal::PacketAlmMd(av_u32 Result[], av_bool bOpen)
 {
 	CAvAlarm::AlmMsg msg;
 	msg.AlmTmSec = (av_u32)time(NULL);
-	msg.AlmType = CAvAlarm::AvAlmT_VIDEO_MotionDetection;
+	msg.AlmType = AlarmEvent_VIDEO_MotionDetection;
 	msg.Channel = -1;
 	msg.Slave = CHL_NR_T;
 
-	msg.AlmStatus = Result->AlmAreaCount == 0 ? CAvAlarm::AvAlm_Stat_Close : CAvAlarm::AvAlm_Stat_Open;
-	msg.MdResult = *Result;
+	msg.AlmStatus = bOpen == av_false ? CAvAlarm::AvAlm_Stat_Close : CAvAlarm::AvAlm_Stat_Open;
+	memcpy(msg.MdResult, Result, sizeof(msg.MdResult));
 
 	return SendAlmMsg(msg);
 }
@@ -76,54 +76,80 @@ void CAvAlmLocal::ThreadProc()
 	av_bool bRet = av_false;
 	av_u32  AlmIoMask = 0;
 
-	C_AlmIoResult AlmIoResult;
-	C_AlmIoResult AlmIoLastResult;
-	memset(&AlmIoResult, 0x00, sizeof(C_AlmIoResult));
-	memset(&AlmIoLastResult, 0x00, sizeof(C_AlmIoResult));
+	av_u32 AlmIoResult = 0, AlmIoLastResult = 0;
 
-	av_bool bSuportMd = av_false;
-	av_u32  AlmMdLastResultCount = 0;
-	C_AlmMdResult AlmMdResult;
-	memset(&AlmMdResult, 0x00, sizeof(C_AlmMdResult));
+	av_u32  AlmMdResult[ConfMotionDetectionLine] = {0};
+	av_u32	AlmMdLastResult[ConfMotionDetectionLine] = {0};
+	av_u32	AlmMdZeroResult[ConfMotionDetectionLine] = {0};
+	av_bool	AlmMdlastbOpen = av_false;
 
-	if (m_AlmMdCaps.MaxLine > 0 && m_AlmMdCaps.MaxLine < 16 && m_AlmMdCaps.MaxLine > 0 && m_AlmMdCaps.MaxLine < 16){
-		bSuportMd = av_true;
-	}
+	avAlarmCreate();
 
-	for (int i = 0; i < m_AlmIoCaps.MaxAlmInNum; i++){
-		AlmIoMask = AlmIoMask << 1  | 0x01;
-	}
 	while (av_true == m_Loop){
-		if (0 != m_AlmIoCaps.MaxAlmInNum && av_true == CheckConfIo()){
-			bRet = AvGetIoAlmStatus(AlmIoMask, &AlmIoResult);
-			if (bRet == av_true && AlmIoResult.AlmIoStatusMask != AlmIoLastResult.AlmIoStatusMask){
-				//alm io
-				PacketAlmIo(&AlmIoResult);
+		if (0 != m_AlarmCaps.MaxAlmIn && av_true == CheckConfIo()){
+			bRet = AvGetIoAlmStatus(&AlmIoResult);
+			if (bRet == av_true && AlmIoResult != AlmIoLastResult){
+				PacketAlmIo(AlmIoResult, AlmIoResult == 0?av_false:av_true);
 				AlmIoLastResult = AlmIoResult;
 			}
 		}
 
-		if (av_true == bSuportMd && av_true == CheckConfMd()){
-			bRet = avGetMdAlmStatus(&AlmMdResult);
-			if (bRet == av_true && AlmMdResult.AlmAreaCount != AlmMdLastResultCount){
+		if (av_true == CheckConfMd() && (m_AlarmCaps.AlarmEventMask & AvMask(AlarmEvent_VIDEO_MotionDetection))){
+			bRet = avGetMdAlmStatus(AlmMdResult);
+			if (bRet == av_true && 0 != memcmp(AlmMdResult, AlmMdLastResult, sizeof(AlmMdLastResult))){
 				//alm md
-				PacketAlmMd(&AlmMdResult);
-				AlmMdLastResultCount = AlmMdResult.AlmAreaCount;
+				PacketAlmMd(AlmMdResult, av_true);
+				memcpy(AlmMdLastResult, AlmMdResult, sizeof(AlmMdLastResult));
+				AlmMdlastbOpen = av_true;
+			}
+			else if (bRet == av_true && AlmMdlastbOpen  == av_true && 0 == memcmp(AlmMdResult, AlmMdZeroResult, sizeof(AlmMdZeroResult))){
+				PacketAlmMd(AlmMdZeroResult, av_false);
+				memcpy(AlmMdLastResult, AlmMdZeroResult, sizeof(AlmMdZeroResult));
+				AlmMdlastbOpen = av_false;
 			}
 		}
 
 		av_msleep(100);
 	}
+
+	avAlarmDestory();
 }
 
-
+#include <cmath>
 av_bool CAvAlmLocal::Initialize()
 {
 	av_bool bRet = av_false;
-	bRet = AvGetIoAlmCaps(&m_AlmIoCaps);
 
-	bRet = avGetMdAlmCaps(&m_AlmMdCaps);
+	bRet = AvAlarmCaps(&m_AlarmCaps);
+
 	CThread::ThreadStart();
+
+#if 0 //For MD Test 
+	C_AlmMdParam param = {0};
+	param.Enable = 1;
+	param.Level = 6;
+	int i = 0;
+	for (; i < 18; i++) {
+		//*
+		//上半部区域
+		if (i < 9) {
+			param.Win[i] = 4294967295;
+		} else {
+			param.Win[i] = 0;
+		}
+		//*/
+		
+		/*
+		//左半边区域
+		int line_base = (int)pow(2, 11);
+		line_base -= 1;
+		line_base = line_base << 21;
+		param.Win[i] = line_base;
+		*/
+	}
+	AvMdAlmSetParameter(0, &param);
+#endif
+
 	return av_true;
 }
 

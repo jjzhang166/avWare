@@ -109,11 +109,8 @@ typedef unsigned long long int  av_u64, av_ulonglong;
 #endif
 
 
-
-
-// #ifndef ConfMaxCaptureChn
-// #define ConfMaxCaptureChn		1
-// #endif
+#define AV_WARE_COVER_RECT_WIDTH 10000
+#define AV_WARE_COVER_RECT_HEITH 10000
 
 #ifndef ConfMaxSerial
 #define ConfMaxSerial			4
@@ -123,8 +120,12 @@ typedef unsigned long long int  av_u64, av_ulonglong;
 #define ConfMaxCover			4
 #endif
 
-#ifndef ConfMaxWaterMarking
-#define ConfMaxWaterMarking		2
+#ifndef ConfMotionDetectionRows 
+#define  ConfMotionDetectionRows 22
+#endif
+
+#ifndef ConfMotionDetectionLine
+#define ConfMotionDetectionLine 18
 #endif
 
 #ifndef ConfMaxNetComm
@@ -135,13 +136,18 @@ typedef unsigned long long int  av_u64, av_ulonglong;
 #define ConfMaxIoAlarmIn		1
 #endif
 
-// #ifndef ConfMaxDecodeChn
-// #define ConfMaxDecodeChn		32
-// #endif
-
 #ifndef ConfMaxUser
 #define ConfMaxUser 10
 #endif
+
+#ifndef AvMaxWeeks
+#define AvMaxWeeks 7
+#endif
+
+#ifndef AvMaxTimeArea
+#define AvMaxTimeArea 3
+#endif
+
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -167,15 +173,6 @@ typedef unsigned long long int  av_u64, av_ulonglong;
 	#endif
 #endif
 
-// #define open	_open
-// #define write	_write
-// #define read	_read
-// #define close	_close
-
-//#ifndef inline
-//#define inline __inline
-//#endif
-
 #ifndef strcasecmp
 #define strcasecmp _stricmp
 #endif
@@ -191,8 +188,6 @@ typedef enum{
 	av_false = 0,
 	av_true	 = 1,
 }av_bool;
-// static const char sAvBoolStrings[][10] = { "av_true", "av_false" };
-// #define GetAvBoolString(b) sAvBoolStrings[b]
 
 typedef struct{
 	char *base;
@@ -208,6 +203,7 @@ typedef void av_cond;
 
 #if defined(WIN32)
 #include <pthread.h>
+#include <semaphore.h>
 typedef pthread_t av_thread_t;
 #else
 typedef pthread_t av_thread_t;

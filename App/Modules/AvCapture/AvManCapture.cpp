@@ -4,6 +4,7 @@
 #include "Apis/AvWareCplusplus.h"
 
 #include "AvNetService/AvProtoMoon.h"
+#include "AvNetService/AvOnvifClient.h"
 
 
 SINGLETON_IMPLEMENT(CManCapture)
@@ -61,6 +62,9 @@ av_bool CManCapture::NetCaptureSearch(LinkProtocol ProType, av_bool bClearCache)
 	}
 		break;
 	case LinkProtocol_Onvif:
+	{
+		CAvOnvifClient::SearchCmdStart(bClearCache);
+	}
 		break;
 	case LinkProtocol_RTSP:
 	case LinkProtocol_GBT28181:
@@ -80,6 +84,9 @@ av_bool CManCapture::NetCaptureSearchResult(LinkProtocol ProType, std::list<C_De
 	}
 	break;
 	case LinkProtocol_Onvif:
+	{
+		CAvOnvifClient::SearchResult(SearchList);
+	}
 		break;
 	case LinkProtocol_RTSP:
 	case LinkProtocol_GBT28181:
@@ -97,6 +104,9 @@ av_bool CManCapture::NetCaptureAddDevice(int Channel, C_ProtoFormats &ProtoForma
 	switch (ProtoFormats.ProtoMode)
 	{
 	case	ProtocolOnvif:
+	{
+		pNetProto = new CAvOnvifClient;
+	}
 		break;
 	case 	ProtocolRtmp:
 		break;
@@ -195,8 +205,6 @@ av_bool CManCapture::NetCaptureProtoUpgradeProgress(std::list <C_FirmWareUpgrade
 		(*iProtoList)->RemoteFirmWareUpgradeGetProgress(Progress);
 		ilist->_status = (ProgressStatus)((Progress >> 16) & 0xffff);
 		ilist->_value = Progress & 0xff;
-
-
 	}
 
 	return av_true;
@@ -211,7 +219,7 @@ av_bool CManCapture::NetCaptureProtoUpgradeOver()
 		pAvPrtoMoon = *iProtoList;
 		
 		iProtoList = g_CAvProtoMoonUpgrade.erase(iProtoList);
-		//delete pAvPrtoMoon;
+		delete pAvPrtoMoon;
 	}
 
 	return av_true;

@@ -23,7 +23,7 @@ CAvNetCapture::CAvNetCapture()
 	m_NetProtoHandle = NULL;
 	m_RemoteChannel = 0;
 	m_Channel = 0;
-	m_Linked = av_false;
+	m_LinkStatus  = IRet_uninitialized;
 
 	for (int i = CHL_MAIN_T; i < CHL_NR_T; i++){
 		m_RecvFrameNm[i] = 0;
@@ -31,14 +31,14 @@ CAvNetCapture::CAvNetCapture()
 	}
 
  	m_Timer.SetContinual(av_true);
-	m_Timer.SetInterlvalMsec(3000);
+	m_Timer.SetInterlvalMsec(10000);
 	m_Timer.SetStartRunMSec(0);
 	m_Timer.SetOnTimerProc(this, (CAvTimer::ONTIMER_PROC)&CAvNetCapture::OnTimer);
 
 }
 CAvNetCapture::~CAvNetCapture()
 {
-
+	m_LinkStatus = IRet_uninitialized;
 }
 
 av_bool CAvNetCapture::Initialize(av_int Channel)
@@ -79,15 +79,13 @@ av_bool CAvNetCapture::Stop(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnDat
 		return av_true;
 	}
 }
+CAvPacket * CAvNetCapture::Snapshot(av_bool bRealTime, av_uint SnapshotInterval, av_uint ContinuousTimes)
+{
+	if (m_NetProtoHandle == NULL) return NULL;
+	return m_NetProtoHandle->RemoteSnapshot(m_RemoteChannel, bRealTime, SnapshotInterval, ContinuousTimes);
+}
 
-av_bool CAvNetCapture::SetTime(av_timeval &atv)
-{
-	return av_true;
-}
-av_bool CAvNetCapture::SetIFrame(av_int Slave)
-{
-	return av_true;
-}
+
 Capture::EAvCaptureStatus CAvNetCapture::GetCaptureStatus(av_int Slave)
 {
 	if (Slave == -1){
@@ -100,11 +98,7 @@ Capture::EAvCaptureStatus CAvNetCapture::GetCaptureStatus(av_int Slave)
 	}
 	return Capture::EAvCapture_STOP;
 }
-CAvPacket *CAvNetCapture::GetSnap(av_int Slave)
-{
-	
-	return NULL;
-}
+
 
 av_bool CAvNetCapture::CaptureGetCaps(C_CaptureCaps &CaptureCaps)
 {
@@ -161,7 +155,7 @@ av_bool CAvNetCapture::ImageGetCaps(C_ImageCaps &ImageCaps)
 av_bool CAvNetCapture::ImageGetProfile(C_ImageProfile &ImageProfile)
 {
 	if (m_NetProtoHandle == NULL) return av_false;
-	return m_NetProtoHandle->RemoteImageGetrofile(m_RemoteChannel, ImageProfile) == IRet_succeed ? av_true : av_false;
+	return m_NetProtoHandle->RemoteImageGetProfile(m_RemoteChannel, ImageProfile) == IRet_succeed ? av_true : av_false;
 }
 av_bool CAvNetCapture::ImageSetProfile(C_ImageProfile &ImageProfile)
 {
@@ -189,8 +183,22 @@ av_bool CAvNetCapture::PtzSetCommand(C_PtzCmd &PtzCmd)
 	if (m_NetProtoHandle == NULL) return av_false;
 	return m_NetProtoHandle->RemotePtzSetCommand(m_RemoteChannel, PtzCmd) == IRet_succeed ? av_true : av_false;
 }
+av_bool  CAvNetCapture::AdvancedSystemGetCaps(C_AdvancedSystemCaps &AdvancedSystemCaps)
+{
+	if (m_NetProtoHandle == NULL) return av_false;
+	return m_NetProtoHandle->RemoteAdvancedSystemGetCaps(m_RemoteChannel, AdvancedSystemCaps) == IRet_succeed ? av_true : av_false;
+}
+av_bool  CAvNetCapture::AdvancedSystemGetProfile(C_AdvancedSystemProfile &AdvancedSystemProfile)
+{
+	if (m_NetProtoHandle == NULL) return av_false;
+	return m_NetProtoHandle->RemoteAdvancedSystemGetProfile(m_RemoteChannel, AdvancedSystemProfile) == IRet_succeed ? av_true : av_false;
+}
+av_bool  CAvNetCapture::AdvancedSystemSetProfile(C_AdvancedSystemProfile &AdvancedSystemProfile)
+{
+	if (m_NetProtoHandle == NULL) return av_false;
+	return m_NetProtoHandle->RemoteAdvancedSystemSetProfile(m_RemoteChannel, AdvancedSystemProfile) == IRet_succeed ? av_true : av_false;
 
-
+}
 av_bool CAvNetCapture::LoadConfigs()
 {
 	CAvConfigProtocol NetProtocol;
@@ -206,27 +214,27 @@ void CAvNetCapture::ThreadProc()
 	CAvPacket *pAcket = NULL;
 	av_bool bSleep = av_true;
 	av_msg("Start NetCapture Channel %d\n", m_Channel);
-
+	m_LinkStatus = IRet_linking;
 	I_RET ret = m_NetProtoHandle->Connect();
 	if (ret != IRet_succeed){
 		av_error("Link Server Error exit NetCapture Thread\n");
+		m_LinkStatus = IRet_droplinked;
 		return;
 	}
-	m_Linked = av_true;
+	m_LinkStatus = IRet_succeed;
 	Start(CHL_MAIN_T);
 	Start(CHL_SUB1_T);
-	Start(CHL_JPEG_T);
+	//Start(CHL_JPEG_T);
 
 
 	while (m_Loop == av_true){
 		bSleep = av_true;
-		for (int i = CHL_MAIN_T; i < CHL_NR_T; i++){
+		for (int i = CHL_MAIN_T; i < CHL_NR_T && m_Loop == av_true; i++){
 			pAcket = m_NetProtoHandle->RemoteStreamGet(m_RemoteChannel, i);
 			if (pAcket != NULL){
 				bSleep = av_false;
 				m_RecvFrameNm[i]++;
 				pAcket->ConvertLocalChannel(m_Channel);
-				//av_warning("Recv Packet = %d %d, \n", pAcket->Channel(), pAcket->Slave());
 				m_StreamSignal[i](m_Channel, i, pAcket);
 				pAcket->Release();
 			}
@@ -242,7 +250,7 @@ void CAvNetCapture::ThreadProc()
 	Stop(CHL_JPEG_T);
 
 	m_NetProtoHandle->Disconnect();
-	m_Linked = av_false;
+	m_LinkStatus = IRet_closeed;
 
 	av_warning("Stop NetCapture Thread Channel %d m_NetProtoHandle not free\n", m_Channel);
 	//delete m_NetProtoHandle;
@@ -258,7 +266,7 @@ void CAvNetCapture::OnTimer(CAvTimer &Timer)
 {
 	av_bool bMainStreamOff = av_false;
 	av_bool bSubStreamOff = av_false;
-	if (m_Linked == av_true){
+	if (m_LinkStatus == IRet_succeed){
 		if (m_TimerLastRecFrameNm[CHL_MAIN_T] == m_RecvFrameNm[CHL_MAIN_T]){
 			bMainStreamOff = av_true;
 		}
@@ -279,16 +287,18 @@ void CAvNetCapture::OnTimer(CAvTimer &Timer)
 			Start(CHL_SUB1_T);
 		}
 	}
-	else {
+	else if (m_LinkStatus != IRet_linking && NULL != m_NetProtoHandle){
 		CICMPPing ICMPPing;
-		ICMPPing.SetRemoteHost("192.168.1.90");
+		C_ProtoFormats &ProtoFormats = m_NetProtoHandle->ProtoFromats();
+		ICMPPing.SetRemoteHost(ProtoFormats.CheckAliveAddress);
 		ICMPPing.SetTimeOut(200 * 1000);
 		if (1 == ICMPPing.Ping()){
+			av_warning("ping [%s] is ok relink server CThread::ThreadStart\n", ProtoFormats.CheckAliveAddress);
 			CThread::ThreadStart();
 		}
-		else{
+	}
+	else{
 
-		}
 	}
 	m_TimerLastRecFrameNm[CHL_MAIN_T] = m_RecvFrameNm[CHL_MAIN_T];
 	m_TimerLastRecFrameNm[CHL_SUB1_T] = m_RecvFrameNm[CHL_SUB1_T];

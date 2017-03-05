@@ -51,8 +51,8 @@ static av_bool PtzCmd2Buffer(C_PtzCmd &PtzCmd, av_buf &buf)
 	const char PELCO_D[10] = { 0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01 };
 	memcpy(pData, PELCO_D, sizeof(PELCO_D));
 
-	av_msg("PtzCmd[%s], Value = %d\n", 
-		EnumNamePtzCommand((PtzCommand)PtzCmd.PtzCmd), PtzCmd.Value);
+	av_msg("PtzCmd[%s], Value[%d], Speed[%d]\n", 
+		EnumNamePtzCommand((PtzCommand)PtzCmd.PtzCmd), PtzCmd.Value, PtzCmd.PtzSpeed);
 	switch (PtzCmd.PtzCmd)
 	{
 	case PtzCommand_NONE:
@@ -96,14 +96,18 @@ static av_bool PtzCmd2Buffer(C_PtzCmd &PtzCmd, av_buf &buf)
 			///变倍
 	case PtzCommand_ZOOM_WIDE:
 		pData[3] = 0x40;
+		pData[4] = PtzCmd.PtzSpeed/4;
 		break;
 	case PtzCommand_ZOOM_TELE:
 		pData[3] = 0x20;
+		pData[4] = PtzCmd.PtzSpeed/4;
 		break;
 			///聚焦
 	case PtzCommand_FOCUS_FAR:
+		pData[2] = 0x01;
 		break;
 	case PtzCommand_FOCUS_NEAR:
+		pData[3] = 0x80;
 		break;
 			///光圈
 	case PtzCommand_IRIS_LARGE:
@@ -181,8 +185,8 @@ static av_bool PtzCmd2Buffer(C_PtzCmd &PtzCmd, av_buf &buf)
 		break;
 	case PtzCommand_AUX_OFF:
 		pData[3] = 0x0b;
-		pData[4] = PtzCmd.Value;
-		av_msg("Auto Cali \n");
+		pData[5] = PtzCmd.Value;
+		av_msg("Auto Cali [%d]\n", pData[5]);
 		break;
 			///球机菜单
 	case PtzCommand_MENU:
@@ -230,7 +234,13 @@ av_bool CAvUart::Initialize()
 	AvSerialInit();
 	UartCaps();
 	int i = 0;
+	{
+		m_Config.Attach(this, (AvConfigCallBack)&CAvUart::OnConfigsModify);
+		m_ConfigPtzCameraLensProfile.Attach(this, (AvConfigCallBack)&CAvUart::OnConfigPtzCameralensModify);
 	m_Config.Update();
+		m_ConfigPtzCameraLensProfile.Update();
+	}
+
 	
 	for (i = 0; i < m_SerialCaps.TotalSerials; i++){
 		if (av_true != UartOpen(i)){
@@ -319,6 +329,82 @@ av_bool CAvUart::PtzSetCommand(C_PtzCmd &PtzCmd)
 	return Write(index, buf);
 }
 
+
+av_bool CAvUart::PtzGetAdvancedCaps(C_AdvancedSystemCaps &PtzAdvancedCaps)
+{
+	//这里面有一个  共用体不可以消除
+	//memset(&PtzCameraLensCaps, 0x00, sizeof(C_PtzAdvancedCaps));
+	//return AvPtzCameraLensCaps(&PtzCameraLensCaps);
+
+	switch (PtzAdvancedCaps._msg)
+	{
+	case __MsgPtzCameraLensCaps:
+		return AvPtzAdvancedCameraLensCaps(&PtzAdvancedCaps.PtzCameralensCaps);
+		break;
+	default:
+		return av_false;
+	}
+}
+
+av_bool CAvUart::PtzGetAdvancedProfile(C_AdvancedSystemProfile &AdvancedSystemProfile)
+{
+
+	switch (AdvancedSystemProfile._msg)
+	{
+	case __MsgPtzCameraLensProfile:
+	{
+		AdvancedSystemProfile.PtzAdvancedCameraLensProfile = m_ConfigPtzCameraLensProfile.GetConfig();
+// 		av_msg("PtzSetAdvancedProfile ==> bFigureZoom %d, FocusCtrlMode = %d,FocusRegion=%d,  FocusSearchMode = %d, \
+// 			   FocusSensitivity = %d, IrisCtrlMode = %d, ZoomSpeed = %d\n",
+// 			   AdvancedSystemProfile.PtzAdvancedCameraLensProfile.bFigureZoom, AdvancedSystemProfile.PtzAdvancedCameraLensProfile.FocusCtrlMode, AdvancedSystemProfile.PtzAdvancedCameraLensProfile.FocusRegion,
+// 			   AdvancedSystemProfile.PtzAdvancedCameraLensProfile.FocusSearchMode, AdvancedSystemProfile.PtzAdvancedCameraLensProfile.FocusSensitivity, AdvancedSystemProfile.PtzAdvancedCameraLensProfile.IrisCtrlMode, AdvancedSystemProfile.PtzAdvancedCameraLensProfile.ZoomSpeed);
+
+	}
+	
+		break;
+	default:
+		return av_false;
+	}
+
+	return av_true;
+}
+av_bool CAvUart::PtzSetAdvancedProfile(C_AdvancedSystemProfile &AdvancedSystemProfile)
+{
+	switch (AdvancedSystemProfile._msg)
+	{
+	case __MsgPtzCameraLensProfile:
+	{
+		CAvConfigPtzCameraLensProfile ConfigPtzCameraLens;
+		ConfigPtzCameraLens.Update();
+		ConfigPtzCameraLensProfile &ConfigProfile = ConfigPtzCameraLens.GetConfig();
+		ConfigProfile = AdvancedSystemProfile.PtzAdvancedCameraLensProfile;
+		av_msg("PtzSetAdvancedProfile ==> bFigureZoom %d, FocusCtrlMode = %d,FocusRegion=%d,  FocusSearchMode = %d, \
+			   			   			   				   FocusSensitivity = %d, IrisCtrlMode = %d, ZoomSpeed = %d\n",
+													   ConfigProfile.bFigureZoom, ConfigProfile.FocusCtrlMode, ConfigProfile.FocusRegion,
+													   ConfigProfile.FocusSearchMode, ConfigProfile.FocusSensitivity, ConfigProfile.IrisCtrlMode, ConfigProfile.ZoomSpeed);
+		ConfigPtzCameraLens.SettingUp();
+	}
+		AdvancedSystemProfile.PtzAdvancedCameraLensProfile = m_ConfigPtzCameraLensProfile.GetConfig();
+		break;
+	default:
+		return av_false;
+	}
+
+	return av_true;
+	
+}
+av_void CAvUart::OnConfigPtzCameralensModify(CAvConfigPtzCameraLensProfile *Config, int &result)
+{
+	av_msg("%s\n", __FUNCTION__);
+	ConfigPtzCameraLensProfile &newPtzCameraLensProfile = Config->GetConfig();
+	ConfigPtzCameraLensProfile &oldPtzCameraLensProfile = m_ConfigPtzCameraLensProfile.GetConfig();
+	if (0 != memcmp(&newPtzCameraLensProfile, &oldPtzCameraLensProfile, sizeof(ConfigPtzCameraLensProfile))){
+		C_PtzAdvancedCameraLensProfile PtzAdvancedProfile;
+		PtzAdvancedProfile = newPtzCameraLensProfile;
+		AvPtzAdvancedCameraLensProfile(&PtzAdvancedProfile);
+		oldPtzCameraLensProfile = newPtzCameraLensProfile;
+	}
+}
 
 av_bool CAvUart::UartOpen(av_uchar index)
 {

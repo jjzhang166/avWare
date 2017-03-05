@@ -93,17 +93,27 @@ set (CommonSRC_ICMP_LIST
 set (CommonINC_ICMP_LIST
 		Common/icmp.h
 )
+
+set (CommonSRC_ARP_LIST
+		Common/arp.cpp
+)
+set (CommonINC_ARP_LIST
+		Common/arp.h
+)
+
 set (CommonSRC_LIST
 	${CommonSRC_JSONCPP_LIST}
 	${CommonSRC_BASE64_LIST}
 	${CommonSRC_GTKUTF8_LIST}
 	${CommonSRC_ICMP_LIST}
+	${CommonSRC_ARP_LIST}
 	)
 set (CommonINC_LIST
 	${CommonINC_JSONCPP_LIST}
 	${CommonINC_BASE64_LIST}
 	${CommonINC_GTKUTF8_LIST}
 	${CommonINC_ICMP_LIST}
+	${CommonINC_ARP_LIST}
 	)
 	
 add_library(Common STATIC ${CommonSRC_LIST} ${CommonINC_LIST})

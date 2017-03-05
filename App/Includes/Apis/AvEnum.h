@@ -11,6 +11,9 @@ typedef enum {
 	IRet_timeout,
 	IRet_unlogin,
 	IRet_unsupport,
+	IRet_linking,
+	IRet_droplinked,
+	IRet_closeed,
 }I_RET;
 
 
@@ -19,7 +22,7 @@ typedef enum {
 	CHL_SUB1_T = 1,
 	CHL_SUB2_T = 2,
 	CHL_SUB3_T = 3,
-	CHL_SUB4_T = 4,
+	CHL_SNAP_T = 4,
 	CHL_JPEG_T = 5,
 	CHL_NR_T = 6,
 }E_EncodeCHL;
@@ -579,6 +582,42 @@ typedef enum  {
 }AudioVoiceQualityEnhancement;
 
 typedef enum  {
+	OverLayType_Title = 0,
+	OverLayType_Time = 1,
+	OverLayType_Last = 2
+}OverLayType;
+
+
+ typedef enum {
+	FontSize_None = 0,
+	FontSize__8 = 1,
+	FontSize__16 = 2,
+	FontSize__24 = 3,
+	FontSize__32 = 4,
+	FontSize__48 = 5,
+	FontSize__64 = 6,
+	FontSize__128 = 7,
+	FontSize_Last = 8
+ }FontSize;
+
+
+ typedef enum {
+	OverLayDateTimeStyle_None = 0,
+	OverLayDateTimeStyle_Y_M_D_H_M_S = 1,
+	OverLayDateTimeStyle_Y_M_D_M_H_M_S = 2,
+	OverLayDateTimeStyle_H_M_S_Y_M_D = 3,
+	OverLayDateTimeStyle_Last = 4
+ }OverLayDateTimeStyle;
+
+typedef enum {
+	OverLayDateTimeSplit_None = 0,
+	OverLayDateTimeSplit_Split_Symbol = 1,
+	OverLayDateTimeSplit_Split_Word = 2,
+	OverLayDateTimeSplit_Last = 3
+} OverLayDateTimeSplit;
+
+
+typedef enum  {
 		PtzCommand_NONE = 0,
 		///方向
 		PtzCommand_STOP = 1,
@@ -689,15 +728,129 @@ enum ProgressStatus {
 	ProgressStatus_Last = 14
 };
 
+
+typedef enum  {
+	PtzCameraLensFocusCtrlMode_None = 0,
+	PtzCameraLensFocusCtrlMode_Auto = 1,
+	PtzCameraLensFocusCtrlMode_SemiAutomatic = 2,
+	PtzCameraLensFocusCtrlMode_Manual = 3,
+	PtzCameraLensFocusCtrlMode_Last = 4
+}PtzCameraLensFocusCtrlMode;
+
+///PtzCameraLensFocusSensitivity
+typedef enum  {
+	PtzCameraLensFocusRegion_None = 0,
+	PtzCameraLensFocusRegion_AllRegion = 1,
+	PtzCameraLensFocusRegion_CentralRegion = 2,
+	PtzCameraLensFocusRegion_Last = 3
+}PtzCameraLensFocusRegion;
+
+
+typedef enum  {
+	PtzCameraLensFocusSearchMode_None = 0,
+	///全景
+	PtzCameraLensFocusSearchMode_FullView = 1,
+	PtzCameraLensFocusSearchMode_FAR_1_5M = 2,
+	PtzCameraLensFocusSearchMode_FAR_3_0M = 3,
+	PtzCameraLensFocusSearchMode_FAR_6_0M = 4,
+	PtzCameraLensFocusSearchMode_FAR_8_0M = 5,
+	///无穷远
+	PtzCameraLensFocusSearchMode_FAR_Infinity = 6,
+	PtzCameraLensFocusSearchMode_Last = 7
+}PtzCameraLensFocusSearchMode;
+
+
+
+typedef enum  {
+	PtzCameraLensIrisCtrlMode_None = 0,
+	PtzCameraLensIrisCtrlMode_Auto = 1,
+	PtzCameraLensIrisCtrlMode_Manual = 2,
+	PtzCameraLensIrisCtrlMode_Last = 3
+}PtzCameraLensIrisCtrlMode;
+
+
+typedef enum EmailEncodeType{
+	EmailEncodeType_None = 0,
+	EmailEncodeType_TLS = 1,
+	EmailEncodeType_SSL = 2,
+	EmailEncodeType_NULL = 3,
+	EmailEncodeType_Last = 4
+};
+
+typedef enum DdnsType{
+	DdnsType_None = 0,
+	DdnsType_DynDns = 1,
+	DdnsType_Ddns3322 = 2,
+	DdnsType_DnsDynMaic = 3,
+	DdnsType_DdnsExt1 = 4,
+	DdnsType_DdnsExt2 = 5,
+	DdnsType_Last = 6
+};
+typedef enum  {
+	RenewalInterval_None = 0,
+	RenewalInterval_HalfHour = 1,
+	RenewalInterval_OneHour = 2,
+	RenewalInterval_ThreeHour = 3,
+	RenewalInterval_SixHour = 4,
+	RenewalInterval_TwelveHour = 5,
+	RenewalInterval_OneDay = 6,
+	RenewalInterval_OneWeek = 7,
+	RenewalInterval_OneMonth = 8,
+	RenewalInterval_Last = 9
+}RenewalInterval;
+
 typedef enum  {
   LinkProtocol_None = 0,
   LinkProtocol_Moon = 1,
   LinkProtocol_Onvif = 2,
   LinkProtocol_GBT28181 = 3,
   LinkProtocol_RTSP = 4,
-  LinkProtocol_Last = 5
+	LinkProtocol_RTMP = 5,
+	LinkProtocol_Last = 6
 }LinkProtocol;
 
+
+typedef enum  {
+	TimeZone_UTC_None = 0,
+	TimeZone_UTC_W12 = 1,
+	TimeZone_UTC_W11 = 2,
+	TimeZone_UTC_W10 = 3,
+	TimeZone_UTC_W9_30 = 4,
+	TimeZone_UTC_W9 = 5,
+	TimeZone_UTC_W8 = 6,
+	TimeZone_UTC_W7 = 7,
+	TimeZone_UTC_W6 = 8,
+	TimeZone_UTC_W5 = 9,
+	TimeZone_UTC_W4 = 10,
+	TimeZone_UTC_W3_30 = 11,
+	TimeZone_UTC_W3 = 12,
+	TimeZone_UTC_W2 = 13,
+	TimeZone_UTC_W1 = 14,
+	TimeZone_UTC_0 = 15,
+	TimeZone_UTC_E1 = 16,
+	TimeZone_UTC_E2 = 17,
+	TimeZone_UTC_E3 = 18,
+	TimeZone_UTC_E3_30 = 19,
+	TimeZone_UTC_E4 = 20,
+	TimeZone_UTC_E4_30 = 21,
+	TimeZone_UTC_E5 = 22,
+	TimeZone_UTC_E5_30 = 23,
+	TimeZone_UTC_E5_45 = 24,
+	TimeZone_UTC_E6 = 25,
+	TimeZone_UTC_E6_30 = 26,
+	TimeZone_UTC_E7 = 27,
+	TimeZone_UTC_E8 = 28,
+	TimeZone_UTC_E8_45 = 29,
+	TimeZone_UTC_E9 = 30,
+	TimeZone_UTC_E9_30 = 31,
+	TimeZone_UTC_E10 = 32,
+	TimeZone_UTC_E10_30 = 33,
+	TimeZone_UTC_E11 = 34,
+	TimeZone_UTC_E12 = 35,
+	TimeZone_UTC_E13 = 36,
+	TimeZone_UTC_E14 = 37,
+	TimeZone_UTC_Last = 38
+}TimeZone;
 
 typedef enum _ {
   __NONE = 0,
@@ -709,7 +862,7 @@ typedef enum _ {
   __MsgManufacturerInfo = 6,
   __MsgEcho = 7,
   __MsgDspCaps = 8,
-  __MsgSysTime = 9,
+  __MsgSystemTimeProfile = 9,
   __MsgStreamStart = 10,
   __MsgStreamData = 11,
   __MsgStreamStop = 12,
@@ -734,7 +887,7 @@ typedef enum _ {
   __MsgLogList = 31,
   __MsgLogCaps = 32,
   __MsgLogProfile = 33,
-  __MsgDevStatusInfo = 34,
+  __MsgDeviceStatusInfo = 34,
   __MsgAlarmCaps = 35,
   __MsgAlarmRegister = 36,
   __MsgAlarmProfile = 37,
@@ -757,7 +910,13 @@ typedef enum _ {
   __MsgFirmwareUpgrade = 54,
   __MsgFirmwareData = 55,
   __MsgFirmwareUpgradeProgress = 56,
-  __MsgConnectDevice = 57
+  __MsgConnectDevice = 57,
+  __MsgPtzCameraLensCaps = 58,
+  __MsgPtzCameraLensProfile = 59,
+  __MsgOverLayProfile = 60,
+  __MsgSyncSystemTime = 61,
+  __MsgSnapshot = 62,
+  __MsgOverLayCaps = 63,
 }__Msg;
 
 

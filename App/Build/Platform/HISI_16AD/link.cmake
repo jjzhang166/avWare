@@ -15,3 +15,6 @@ target_link_libraries(${target} mtd)
 target_link_libraries(${target} hbmp)
 target_link_libraries(${target} aacenc)
 target_link_libraries(${target} aacdec)
+
+#face detect zhonghao
+target_link_libraries(${target} symboltek_facedet_lib)

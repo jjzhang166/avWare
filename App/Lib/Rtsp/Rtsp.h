@@ -31,10 +31,7 @@ typedef enum {
 }RTSP_METHOD_E;
 
 
-typedef enum {
-	Rtsp_Server,
-	Rtsp_Client,
-}RTSP_SER_CLI_E;
+
 
 #define RTSP_SESSION_RTP_OVER_TCP "RTP/AVP/TCP;unicast"
 #define RTSP_SESSION_RTP_OVER_UDP "RTP/AVP;unicast"
@@ -50,8 +47,9 @@ public:
 	int parseBody(const std::string data);
 	int packetAckBody(std::string &AckString);
 	int packetAckAppend(std::string &src, std::string &value);
+	int parseSdp(RtspHttp &Http);
 
-
+	int GetOptionClientCmd(std::string &ReqString);
 public:
 	RTSP_METHOD_E	m_Method;
 	std::string		m_Session;
@@ -71,6 +69,13 @@ public:
 	std::string		m_SerRtcpPort;
 	std::string		m_MediaEncodecVideo;
 	std::string		m_MediaEncodecAudio;
+
+	int				m_TrackIndex;
+	std::string		m_TrackID[3];
+	std::string		m_Encode[3];
+	std::string		m_Packetization_mode[3];
+	std::string		m_Profile_level_id[3];
+	std::string		m_Sprop_parameter_sets[3];
 private:
 
 	RTSP_SER_CLI_E  m_ServiceType;

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>303</width>
-    <height>143</height>
+    <height>144</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -224,7 +224,7 @@
               <string notr="true"/>
              </property>
              <property name="text">
-              <string>确定(&amp;O)</string>
+              <string>Submit</string>
              </property>
              <property name="icon">
               <iconset>
@@ -250,7 +250,7 @@
               <string notr="true"/>
              </property>
              <property name="text">
-              <string>取消(&amp;C)</string>
+              <string>cannel</string>
              </property>
              <property name="icon">
               <iconset>
@@ -269,7 +269,7 @@
          <item row="0" column="1">
           <widget class="QLabel" name="labInfo">
            <property name="text">
-            <string>确定要删除吗?</string>
+            <string>Are you sure delete it</string>
            </property>
            <property name="scaledContents">
             <bool>false</bool>

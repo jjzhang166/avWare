@@ -32,15 +32,21 @@ av_bool CAvGuiApp::Initialize()
 	m_MainWindows->show();
 	CAvUiComm::FormInCenter(m_MainWindows);
 
+#if defined (WIN32)
 	FloatingButton	*m_FloatButton = new FloatingButton;
-	// 	QPoint point = this->pos();
-	// 	QRect rect = this->rect();
-	// 	point.setX(point.x() + rect.width() / 3 * 2);
-	// 	point.setY(point.y() + rect.height() / 3 * 2);
-	// 	m_FloatButton->move(point);
 	QObject::connect(m_FloatButton, SIGNAL(SignalsButtonClick()), m_MainWindows, SLOT(on_BtnOpenMenu_clicked()));
-
 	m_FloatButton->show();
+
+#else
+	QAvEvent e(QAvEvent::QAvEvent_MaxVideoAreaWindows);
+	CAvGuiApp::PostQAvEvent(e);
+
+
+// 	QAvEvent e(QAvEvent::QAvEvent_MaxWindows);
+// 	CAvGuiApp::PostQAvEvent(e);
+#endif
+
+
 
 	return av_true;
 }
@@ -57,7 +63,10 @@ av_void CAvGuiApp::exec()
 
 }
 
-
+FrmMainWindows *CAvGuiApp::GetMainWindows()
+{
+	return m_MainWindows;
+}
 av_bool CAvGuiApp::PostQAvEvent(QAvEvent &event)
 {
 	QApplication::postEvent(m_MainWindows, new QAvEvent(event));

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>437</width>
-    <height>296</height>
+    <width>331</width>
+    <height>338</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,19 +15,16 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
     <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>6</number>
-   </property>
-   <property name="spacing">
-    <number>4</number>
+    <number>0</number>
    </property>
    <item row="0" column="0">
     <widget class="QWidget" name="WidGetTitle" native="true">
@@ -244,132 +241,145 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <layout class="QFormLayout" name="formLayout">
-     <property name="horizontalSpacing">
-      <number>12</number>
-     </property>
-     <property name="verticalSpacing">
-      <number>12</number>
-     </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
      <property name="leftMargin">
-      <number>16</number>
-     </property>
-     <property name="topMargin">
-      <number>16</number>
+      <number>6</number>
      </property>
      <property name="rightMargin">
-      <number>16</number>
+      <number>6</number>
      </property>
      <property name="bottomMargin">
-      <number>16</number>
+      <number>6</number>
      </property>
-     <item row="1" column="0">
-      <widget class="QLabel" name="LabProtocol">
-       <property name="text">
-        <string>Protocol</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="LabAddrIip">
-       <property name="text">
-        <string>AddrIp</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="LabPort">
-       <property name="text">
-        <string>Port</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="LabUserName">
-       <property name="text">
-        <string>UsrName</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="LabPasswd">
-       <property name="text">
-        <string>Passwd</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="LabConnectUrl">
-       <property name="text">
-        <string>ConnectUrl</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="LabTcpUdp">
-       <property name="text">
-        <string>TcpUdp</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="CBoxProtocol"/>
-     </item>
-     <item row="2" column="1">
-      <widget class="IpAddrEdit" name="LiEditAddrIp">
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="LiEditPort"/>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="LiEditUsrName"/>
-     </item>
-     <item row="5" column="1">
-      <widget class="QLineEdit" name="LiEditPasswd"/>
-     </item>
-     <item row="6" column="1">
-      <widget class="QLineEdit" name="LiEditConnectUrl"/>
-     </item>
-     <item row="7" column="1">
-      <widget class="QComboBox" name="CBoxTcpUdp"/>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="0">
-    <layout class="QHBoxLayout" name="HorSubCannelBtn">
      <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="horizontalSpacing">
+        <number>12</number>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
+       <property name="verticalSpacing">
+        <number>12</number>
        </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="BtnSubmit">
-       <property name="text">
-        <string>Submit</string>
+       <property name="leftMargin">
+        <number>16</number>
        </property>
-      </widget>
+       <property name="topMargin">
+        <number>16</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
+        <number>16</number>
+       </property>
+       <item row="1" column="0">
+        <widget class="QLabel" name="LabProtocol">
+         <property name="text">
+          <string>Protocol</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="LabAddrIip">
+         <property name="text">
+          <string>AddrIp</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="LabPort">
+         <property name="text">
+          <string>Port</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="LabUserName">
+         <property name="text">
+          <string>UsrName</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="LabPasswd">
+         <property name="text">
+          <string>Passwd</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="LabConnectUrl">
+         <property name="text">
+          <string>ConnectUrl</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="LabTcpUdp">
+         <property name="text">
+          <string>TcpUdp</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="CBoxProtocol"/>
+       </item>
+       <item row="2" column="1">
+        <widget class="IpAddrEdit" name="LiEditAddrIp">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="LiEditPort"/>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="LiEditUsrName"/>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="LiEditPasswd"/>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLineEdit" name="LiEditConnectUrl"/>
+       </item>
+       <item row="7" column="1">
+        <widget class="QComboBox" name="CBoxTcpUdp"/>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="BtnCannel">
-       <property name="text">
-        <string>Cannel</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="HorSubCannelBtn">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="BtnSubmit">
+         <property name="text">
+          <string>Submit</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="BtnCannel">
+         <property name="text">
+          <string>Cannel</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

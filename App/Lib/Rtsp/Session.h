@@ -132,17 +132,35 @@ class CRtspSessionCli:public CRtspSession
 public:
 	CRtspSessionCli();
 	virtual ~CRtspSessionCli();
+	av_bool  SplitUrl();
+protected:
+	av_int		m_RtspSock;
+	av_int		m_RtpSock[4];//0 video rtp; 1 video rtcp ; 2 audio rtp; 3 audio rtcp
+
+
+protected:
+	char			m_RemoteIpAddr[64];
+	int				m_RemotePort;
+	char			m_RtspUrl[128];
+	CRBuffer		m_RBuffer;
+	RTSP_METHOD_E	m_ReqMethod;
+	int				m_CSeq;
+
 public:
-	virtual int OnOptions();
-	virtual int OnDescribe();
-	virtual int OnSetup();
-	virtual int OnRecord();
-	virtual int OnPlay();
-	virtual int OnPause();
-	virtual int OnGetParameter();
-	virtual int OnSetParameter();
-	virtual int OnTeardown();
-	virtual int OnError ();
+	av_void OnData(const char *buffer, int bufferlen);
+
+public:
+	virtual int PduRtsp(const char *data, int len);
+	virtual int OnOptions(CRtspPdu &pdu);
+	virtual int OnDescribe(CRtspPdu &pdu);
+	virtual int OnSetup(CRtspPdu &pdu);
+	virtual int OnRecord(CRtspPdu &pdu);
+	virtual int OnPlay(CRtspPdu &pdu);
+	virtual int OnPause(CRtspPdu &pdu);
+	virtual int OnGetParameter(CRtspPdu &pdu);
+	virtual int OnSetParameter(CRtspPdu &pdu);
+	virtual int OnTeardown(CRtspPdu &pdu);
+	virtual int OnError(CRtspPdu &pdu);
 
 };
 

@@ -5,13 +5,19 @@
 #include "AvForm/frmdevice.h"
 #include "AvForm/dlgnetset.h"
 #include "AvUiComm/FloatingButton.h"
+#include "AvDevice/AvDevice.h"
+#include "AvForm/dlgabout.h"
 FrmMainWindows::FrmMainWindows(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FrmMainWindows)
 {
     ui->setupUi(this);
 	CAvUiComm::FormInCenter(this);
-	
+	setWindowTitle("avWare");
+	m_VideoWidowsMax = false;
+// #if !defined(WIN32)
+// 	setWindowState(Qt::WindowMaximized);
+// #endif
 
 	setWindowFlags(Qt::FramelessWindowHint);
 	setAttribute(Qt::WA_DeleteOnClose);
@@ -22,22 +28,24 @@ FrmMainWindows::FrmMainWindows(QWidget *parent) :
 
 	m_bOpenedMenu = false;
 	ui->FrmMenu->hide();
+
+	m_FrmMainMenu = NULL;
 	
 	IconComm::Instance()->SetIcon(ui->BtnClose, QChar(0xf00d), 8);
 	IconComm::Instance()->SetIcon(ui->BtnMax,   QChar(0xf096), 8);
 	IconComm::Instance()->SetIcon(ui->BtnMin,   QChar(0xf068), 8);
-	IconComm::Instance()->SetIcon(ui->BtnMenu,  QChar(0xf0c9), 8);
+	IconComm::Instance()->SetIcon(ui->BtnAbout, QChar(0xf06b), 8);
 	IconComm::Instance()->SetIcon(ui->BtnVideoWindowInfo, QChar(0xf129), 8);
-	IconComm::Instance()->SetIcon(ui->LabIco,   QChar(0xf015), 8);
+	IconComm::Instance()->SetIcon(ui->LabIco, QChar(0xf015), 8);
 
-// 	m_FloatButton = new FloatingButton(parent);
-// 	QPoint point = this->pos();
-// 	QRect rect = this->rect();
-// 	point.setX(point.x() + rect.width() / 3 * 2);
-// 	point.setY(point.y() + rect.height() / 3 * 2);
-// 	m_FloatButton->move(point);
-// 	QObject::connect(m_FloatButton, SIGNAL(SignalsButtonClick()), this, SLOT(on_BtnOpenMenu_clicked()));
-// 	m_FloatButton->show();
+	// 	m_FloatButton = new FloatingButton(parent);
+	// 	QPoint point = this->pos();
+	// 	QRect rect = this->rect();
+	// 	point.setX(point.x() + rect.width() / 3 * 2);
+	// 	point.setY(point.y() + rect.height() / 3 * 2);
+	// 	m_FloatButton->move(point);
+	// 	QObject::connect(m_FloatButton, SIGNAL(SignalsButtonClick()), this, SLOT(on_BtnOpenMenu_clicked()));
+	// 	m_FloatButton->show();
 
 
 }
@@ -48,6 +56,22 @@ FrmMainWindows::~FrmMainWindows()
     delete ui;
 }
 
+QPoint	 FrmMainWindows::GetVideoAreaToGlobal()
+{
+
+	if (m_VideoWidowsMax == true){
+		AvQDebug("Is Max Video Windows\n");
+		return QPoint(0, 0);
+	}
+	QPoint FrmmainWindows = pos();
+	QPoint FrmUsrWindowsPoint = ui->FrmUsrWindows->pos();
+	QPoint VideoAreaPoint = ui->FrmVideoArea->pos();
+
+	QPoint GlobalPoint;
+	GlobalPoint.setX(FrmmainWindows.x() + FrmUsrWindowsPoint.x() + VideoAreaPoint.x());
+	GlobalPoint.setY(FrmmainWindows.y() + FrmUsrWindowsPoint.y() + VideoAreaPoint.y());
+	return GlobalPoint;
+}
 
 bool FrmMainWindows::eventFilter(QObject *obj, QEvent *event)
 {
@@ -95,21 +119,65 @@ void FrmMainWindows::customEvent(QEvent* event)
 {
 	switch (event->type())
 	{
+	case QAvEvent::QAvEvent_MaxWindows:{
+		AvQDebug("max windows\n");
+		CAvPreview::SetSpiltScreen(ui->FrmVideoArea->GetSplitCount());
+		on_BtnMax_clicked();
+	}break;
 	case QAvEvent::QAvEvent_SearchDevice:{
 		AvQDebug("Recv QavEvent \n");
+	}break;
+
+	case QAvEvent::QAvEvent_ShowMainMenum:{
+		AvQDebug("Open main Menum\n");
+		if (m_FrmMainMenu == NULL){
+			m_FrmMainMenu = new FrmMainMenu;
+		}
+		m_FrmMainMenu->show();
+		CAvUiComm::FormInCenter(m_FrmMainMenu);
+	}break;
+
+	case QAvEvent::QAvEvent_MainMenuDevices_Click:{
+		AvQDebug("Recv QavEvent MainMenuDevices\n");
+		on_BtnDevices_clicked();
+	}break;
+	case QAvEvent::QAvEvent_MainMenuSystemSet_Click:{
+		AvQDebug("Recv QavEvent MainMenuSystemSet\n");
+		on_BtnSysSet_clicked();
+	}break;
+	case QAvEvent::QAvEvent_MainMenuAlarm_Click:{
+		AvQDebug("Recv QavEvent MainMenuAlarm\n");
+		on_BtnAlarm_clicked();
+	}break;
+	case QAvEvent::QAvEvent_MainMenuSysTools_Click:{
+		AvQDebug("Recv QavEvent MainMenuSysTools\n");
+		on_BtnSysInfo_clicked();
+	}break;
+	case QAvEvent::QAvEvent_MainMenuRecord_Click:{
+		AvQDebug("Recv QavEvent MainMenuRecord\n");
+	}break;
+	case QAvEvent::QAvEvent_MainMenuIntelligenceAlgorthm_Click:{
+		AvQDebug("Recv QavEvent MainMenuIntelligenceAlgorthm\n");
+	}break;
+	case QAvEvent::QAvEvent_MainMenuSystemInfo_Click:{
+		AvQDebug("Recv QavEvent MainMenuSystemInfo\n");
+	}break;
+
+	case QAvEvent::QAvEvent_MaxVideoAreaWindows:{
+		AvQDebug("Recv QAvEvent_MaxVideoAreaWindows\n");
+		CAvPreview::SetSpiltScreen(ui->FrmVideoArea->GetSplitCount());
+		m_VideoWidowsMax = true;
+		ui->FrmVideoArea->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+		ui->FrmVideoArea->showMaximized();
+		QRect cur = CAvUiComm::GetWindowsOnScreen();
+		ui->FrmVideoArea->setGeometry(cur);
 		
-	}
-		break;
+	}break;
 
 	default:
 		break;
 	}
 
-}
-
-void FrmMainWindows::on_BtnMenu_clicked()
-{
-	CAvUiComm::ShowMessageBoxInfo(QString(tr("This is a Test Box info")));
 }
 
 void FrmMainWindows::on_BtnMin_clicked()
@@ -146,6 +214,19 @@ void FrmMainWindows::on_BtnClose_clicked()
 
 void FrmMainWindows::on_BtnOpenMenu_clicked()
 {
+	std::string Value;
+	if (av_true == CAvDevice::GetEnv(EKey_Chip, Value)){
+		if (Value == std::string("H3536")){
+			return;
+		}
+		else{
+			AvQDebug("GetEnv Key_Chip [%s]\n", Value.c_str());
+		}
+	}
+	else{
+		AvQDebug("Get Chip Error return Error\n");
+		return;
+	}
 	if (m_bOpenedMenu == false){
 		ui->FrmMenu->show();
 	}
@@ -194,4 +275,10 @@ void FrmMainWindows::on_BtnVideoWindowInfo_clicked()
 
 	ui->FrmVideoArea->setVideoInfoWindows();
 
+}
+
+void FrmMainWindows::on_BtnAbout_clicked()
+{
+    DlgAbout *about = new DlgAbout;
+    about->exec();
 }

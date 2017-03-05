@@ -48,7 +48,7 @@ CAvPreview::CAvPreview()
 	m_ImageHeigh = 0;
 	m_FrameRate = 0;
 	m_BitRate = 0;
-
+	m_bPause = av_false;
 	m_bStartDecode = av_false;
 
 	m_Timer.SetContinual(av_true);
@@ -78,7 +78,10 @@ av_bool CAvPreview::Start(int Channel, int Slave)
 	m_Channel = Channel;
 	m_Slave = Slave;
 	m_Capture = g_AvManCapture.GetAvCaptureInstance(Channel);
-	AvDecodeStart(m_ScreenID, m_hWid);
+
+	AvDecodeStartByWid(m_ScreenID, m_hWid);
+
+
 	m_Capture->Start(m_Slave, this, (Capture::SIG_PROC_ONDATA)&CAvPreview::OnStream);
 	m_isStarted = av_true;
 
@@ -149,7 +152,8 @@ av_bool CAvPreview::Stop()
 {
 	m_bStartDecode = av_false;
 	m_Capture->Stop(m_Slave, this, (Capture::SIG_PROC_ONDATA)&CAvPreview::OnStream);
-	AvDecodeStop(m_ScreenID);
+	AvDecodeStopByPos(m_ScreenID);
+	AvDecodeStopByWid(m_ScreenID);
 	m_Slave = -1;
 	m_Channel = -1;
 	m_Capture = NULL;
@@ -157,7 +161,23 @@ av_bool CAvPreview::Stop()
 	CAvTimer::StopTimer(m_Timer);
 	return av_true;
 }
+av_bool CAvPreview::Pause(av_bool bPause)
+{
+	m_bPause = bPause;
+	return av_true;
+}
+av_bool  CAvPreview::RenderResize(C_RECT &RenderRect)
+{
 
+	Pause(av_true);
+	m_RenderRect = RenderRect;
+	AvDecodeStopByPos(m_ScreenID);
+
+	AvDecodeStartByPos(m_ScreenID, &m_RenderRect);
+	Pause(av_false);
+
+	return av_true;
+}
 av_void CAvPreview::OnStream(int Channel, int Slave, CAvPacket *Pack)
 {
 	
@@ -180,10 +200,12 @@ av_void CAvPreview::OnStream(int Channel, int Slave, CAvPacket *Pack)
 	}
 
 	if (m_bStartDecode == av_false && Pack->FrameType() != avFrameT_I){
-		av_warning("Start Decode Can't find First I Frame\n");
 		return;
 	}
 	AvDecodeRenderBuffer(m_ScreenID, (unsigned char *)Pack->GetBuffer(), Pack->GetLength());
+	if (m_bStartDecode == av_false){
+		av_warning("Start Decode Can't find First I Frame\n");
+	}
 	m_bStartDecode = av_true;
 }
 
@@ -195,4 +217,9 @@ av_void CAvPreview::OnTimer(CAvTimer &Timer)
 	m_StatisticsBitRate = 0;
 	m_StatisticsFrameRate = 0;
 	m_StatisticsGop = 0;
+}
+
+av_void CAvPreview::SetSpiltScreen(int SpiltScreenNum)
+{
+	AvDecodeSplit(SpiltScreenNum);
 }

@@ -4,7 +4,10 @@
 #include "AvUiComm/IconComm.h"
 #include "AvCapture/AvManCapture.h"
 #include "AvSource/AvQStringsLanguage.h"
-
+#include "AvForm/dlgareaselect.h"
+#include "AvForm/dlgoverlay.h"
+//#include "AvForm/ctimearea.h"
+#include "AvForm/dlgtimeselect.h"
 
 typedef enum {
 	TabWidgetDeviceSet_Capture,
@@ -17,8 +20,19 @@ typedef enum {
 	TabWidgetDeviceSet_UserManager,
 	TabWidgetDeviceSet_Log,
 	TabWidgetDeviceSet_Ptz,
-
 }TabWidgetDeviceSet;
+
+typedef enum {
+	TboxNetWorkEnum_NetSet,
+	TboxNetWorkEnum_Ftp,
+	TboxNetWorkEnum_Email,
+	TboxNetWorkEnum_Upnp,
+	TboxNetWorkEnum_Rtsp,
+	TboxNetWorkEnum_Ddns,
+	TboxNetWorkEnum_P2p,
+	TboxNetWorkEnum_Rtmp,
+	TboxNetWorkEnum_Ntp,
+}TboxNetWorkEnum;
 
 
 DlgDeviceSet::DlgDeviceSet(QWidget *parent) :
@@ -68,7 +82,7 @@ void DlgDeviceSet::FixDlgUi()
 		ui->CBoxSettingChannel->addItem(CboxSettingChanelItem);
 	}
 
-	ui->CBoxSettingChannel->setStyleSheet("color:black");
+	//ui->CBoxSettingChannel->setStyleSheet("color:black");
 	FixDlgUiCapture();
 	FixDlgUiEncode();
 	FixDlgUiNetWork();
@@ -79,34 +93,34 @@ void DlgDeviceSet::FixDlgUi()
 
 void DlgDeviceSet::FixDlgUiCapture()
 {
-	ui->CBoxIrCut->setStyleSheet("color:black");
-	ui->CBoxAnitFlicker->setStyleSheet("color:black");
-	ui->CBoxExposureMode->setStyleSheet("color:black");
-	ui->CBoxWhitBalance->setStyleSheet("color:black");
-	ui->CBoxRotateMode->setStyleSheet("color:black");
-	ui->CBoxCvbs->setStyleSheet("color:black");
+// 	ui->CBoxIrCut->setStyleSheet("color:black");
+// 	ui->CBoxAnitFlicker->setStyleSheet("color:black");
+// 	ui->CBoxExposureMode->setStyleSheet("color:black");
+// 	ui->CBoxWhitBalance->setStyleSheet("color:black");
+// 	ui->CBoxRotateMode->setStyleSheet("color:black");
+// 	ui->CBoxCvbs->setStyleSheet("color:black");
 }
 void DlgDeviceSet::FixDlgUiEncode()
 {
-	ui->CBoxMBitRateCtrl->setStyleSheet("color:black");
-	ui->CBoxMBitRateQlevel->setStyleSheet("color:black");
-	ui->CBoxMEnFormat->setStyleSheet("color:black");
-	ui->CBoxMFrameRate->setStyleSheet("color:black");
-	ui->CBoxMImageSize->setStyleSheet("color:black");
-	
-	ui->CBoxSBitRateCtrl->setStyleSheet("color:black");
-	ui->CBoxSBitRateQlevel->setStyleSheet("color:black");
-	ui->CBoxSSlaveNumber->setStyleSheet("color:black");
-	ui->CBoxSFrameRate->setStyleSheet("color:black");
-	ui->CBoxSImageSize->setStyleSheet("color:black");
+// 	ui->CBoxMBitRateCtrl->setStyleSheet("color:black");
+// 	ui->CBoxMBitRateQlevel->setStyleSheet("color:black");
+// 	ui->CBoxMEnFormat->setStyleSheet("color:black");
+// 	ui->CBoxMFrameRate->setStyleSheet("color:black");
+// 	ui->CBoxMImageSize->setStyleSheet("color:black");
+// 	
+// 	ui->CBoxSBitRateCtrl->setStyleSheet("color:black");
+// 	ui->CBoxSBitRateQlevel->setStyleSheet("color:black");
+// 	ui->CBoxSSlaveNumber->setStyleSheet("color:black");
+// 	ui->CBoxSFrameRate->setStyleSheet("color:black");
+// 	ui->CBoxSImageSize->setStyleSheet("color:black");
 
 }
 void DlgDeviceSet::FixDlgUiAudio()
 {
-	ui->CBoxAiSoundMode->setStyleSheet("color:black");
-	ui->CBoxAiEncodeType->setStyleSheet("color:black");
-	ui->CBoxAiSampleBits->setStyleSheet("color:black");
-	ui->CBoxAiSampleRate->setStyleSheet("color:black");
+// 	ui->CBoxAiSoundMode->setStyleSheet("color:black");
+// 	ui->CBoxAiEncodeType->setStyleSheet("color:black");
+// 	ui->CBoxAiSampleBits->setStyleSheet("color:black");
+// 	ui->CBoxAiSampleRate->setStyleSheet("color:black");
 }
 void DlgDeviceSet::FixDlgUiVersion()
 {
@@ -155,13 +169,9 @@ void DlgDeviceSet::FixDlgPtz()
 
 void DlgDeviceSet::FillInCapture()
 {
-	int Channel = ui->CBoxSettingChannel->currentIndex();
 
-	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(Channel);
-
-	Capture::EAvCaptureStatus stat = pCapture->GetCaptureStatus();
-	if (stat != Capture::EAvCapture_ING){
-		ShowErrorConnectMesageBox();
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
 		return;
 	}
 	av_bool bRet = av_false;
@@ -290,13 +300,8 @@ void DlgDeviceSet::FillInCapture()
 }
 void DlgDeviceSet::FillInEncode()
 {
-	int Channel = ui->CBoxSettingChannel->currentIndex();
-
-	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(Channel);
-
-	Capture::EAvCaptureStatus stat = pCapture->GetCaptureStatus();
-	if (stat != Capture::EAvCapture_ING){
-		ShowErrorConnectMesageBox();
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
 		return;
 	}
 
@@ -394,7 +399,7 @@ void DlgDeviceSet::FillInEncode()
 
 
 	ui->CBoxSSlaveNumber->clear();
-	for (int i = CHL_MAIN_T; i < CHL_NR_T; i++){
+	for (int i = CHL_SUB1_T; i < CHL_NR_T; i++){
 		if (EncodeCaps.ExtChannelMask &AvMask(i)){
 			ui->CBoxSSlaveNumber->addItem(AvUiLangsCHL((E_EncodeCHL)i));
 		}
@@ -539,14 +544,8 @@ void DlgDeviceSet::FillInEncode()
 }
 void DlgDeviceSet::FillInAudio()
 {
-	//caps
-	int Channel = ui->CBoxSettingChannel->currentIndex();
-
-	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(Channel);
-
-	Capture::EAvCaptureStatus stat = pCapture->GetCaptureStatus();
-	if (stat != Capture::EAvCapture_ING){
-		ShowErrorConnectMesageBox();
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
 		return;
 	}
 // 	C_AudioCaps AudioCaps;
@@ -578,11 +577,14 @@ void DlgDeviceSet::FillInAudio()
 
 	QString SamplebitsStr;
 	QString SampleRateStr;
+	char StrFomat[64] = { 0 };
 	for (int i = AvComp_H264; i < AvComp_LAST; i++){
 		if (AvMask(i) & m_CurrentAudioCaps.CompMask){
-			SamplebitsStr += AvUiLangsAvComp((AvComp)i);
+			sprintf(StrFomat, "%6s", AvUiLangsAvComp((AvComp)i).toStdString().c_str());
+			SamplebitsStr += QString(StrFomat);
 			SamplebitsStr += QString(" [ ");
-			SampleRateStr += AvUiLangsAvComp((AvComp)i);
+
+			SampleRateStr += QString(StrFomat);
 			SampleRateStr += QString(" [ ");
 			for (int j = AudioSampleBits_NONE; j < AudioSampleBits_LAST; j++){
 				if (AvMask(j) & m_CurrentAudioCaps.SampleBitsMask[i]){
@@ -667,42 +669,8 @@ void DlgDeviceSet::FillInAudio()
 		ui->RBtnAiMicIn->setChecked(true);
 	}
 
-
-
-
-
 }
 void DlgDeviceSet::FillInVersion()
-{
-
-}
-void DlgDeviceSet::FillInRecord()
-{
-
-}
-void DlgDeviceSet::FillInNetWork()
-{
-
-}
-void DlgDeviceSet::FillInAlarm()
-{
-
-}
-void DlgDeviceSet::FillInUserManager()
-{
-
-}
-void DlgDeviceSet::FillInLog()
-{
-
-}
-void DlgDeviceSet::FillInPtz()
-{
-
-}
-
-
-void DlgDeviceSet::SubmitCapture()
 {
 	int Channel = ui->CBoxSettingChannel->currentIndex();
 
@@ -710,7 +678,595 @@ void DlgDeviceSet::SubmitCapture()
 
 	Capture::EAvCaptureStatus stat = pCapture->GetCaptureStatus();
 	if (stat != Capture::EAvCapture_ING){
-		ShowErrorConnectMesageBox();
+		//ShowErrorConnectMesageBox();
+		return ;
+	}
+
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	AdvancedSystemProfile._msg = __MsgFirmwareVersion;
+	av_bool bRet = pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile);
+	if (bRet != av_true){
+		av_error("AdvancedSystemGetProfile __MsgFirmwareVersion error\n");
+		return;
+	}
+	unsigned int &Version = AdvancedSystemProfile.FirmwareInfo.Version;
+	QString Qstr;
+	Qstr.clear();
+	Qstr = Qstr.sprintf("%d.%d.%d.%d", Version>>24&0xff, Version>>16&0xff, Version>>8&0xff, Version&0xff);
+	ui->LabSoftWareShow->setText(Qstr);
+	
+	ui->LabBuildTimeShow->setText(QString(AdvancedSystemProfile.FirmwareInfo.BuildTime));
+	ui->LabKernelShow->setText(QString(AdvancedSystemProfile.FirmwareInfo.KernelVersion));
+	ui->LabFileSysShow->setText(QString(AdvancedSystemProfile.FirmwareInfo.FilesystemVerion));
+	ui->LabProtoShow->setText(QString(AdvancedSystemProfile.FirmwareInfo.ProtoVersion));
+
+	AdvancedSystemProfile._msg = __MsgManufacturerInfo;
+	bRet = pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile);
+	if (bRet != av_true){
+		av_error("AdvancedSystemGetProfile __MsgManufacturerInfo error\n");
+		return;
+	}
+	ui->LabFactoryNameShow->setText(AdvancedSystemProfile.ManufacturerInfo.FacManufacturer);
+	struct tm factm;
+	time_t facTime = AdvancedSystemProfile.ManufacturerInfo.FacTime;
+#if defined(WIN32)
+	localtime_s(&factm, &facTime);
+#else
+	localtime_r((time_t*)&facTime, &factm);
+#endif
+	Qstr.clear();
+	Qstr = Qstr.sprintf("%d-%02d-%02d", factm.tm_year + 1900, factm.tm_mon + 1, factm.tm_mday);
+	ui->LabFactoryTimeShow->setText(Qstr);
+
+	ui->LabFactoryNameShow->setText(AdvancedSystemProfile.ManufacturerInfo.FacManufacturer);
+	ui->LabProductModelShow->setText(AdvancedSystemProfile.ManufacturerInfo.FacProductionModel);
+	ui->LabHardWareShow->setText(AdvancedSystemProfile.ManufacturerInfo.HardWareVersion);
+	ui->LabIDNumberShow->setText(AdvancedSystemProfile.ManufacturerInfo.FacProductionSerialNo);
+
+}
+void DlgDeviceSet::FillInRecord()
+{
+
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+
+
+
+
+}
+void DlgDeviceSet::FillInNetWork()
+{
+	ui->TBoxNetWork->setCurrentIndex(TboxNetWorkEnum_NetSet);
+	FillInNetWorkNetSet();
+}
+void DlgDeviceSet::FillInAlarm()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	AdvancedSystemProfile._msg = __MsgAlarmProfile;
+
+	C_AdvancedSystemCaps AdvancedSystemCaps;
+	AdvancedSystemCaps._msg = __MsgAlarmCaps;
+
+	{
+		//ui show item
+		C_AlarmCaps &AlarmCaps = AdvancedSystemCaps.AlarmCaps;
+		av_bool abRet = pCapture->AdvancedSystemGetCaps(AdvancedSystemCaps);
+		if (abRet != av_true){
+			AvQDebug("AdvancedSystemGetCaps error  return\n");
+			return;
+		}
+
+		if (AlarmCaps.AlarmEventMask & AvMask(AlarmEvent_PORT_In)){
+			ui->CBoxAlmLEnablePortIn->show();
+		}
+		else{
+			ui->CBoxAlmLEnablePortIn->hide();
+		}
+		if (AlarmCaps.AlarmEventMask & AvMask(AlarmEvent_VIDEO_MotionDetection)){
+			ui->CBoxAlmEnableMotionDetection->show();
+			ui->LabAlmMotionLevel->show();
+			ui->CBoxAlmMotionLevel->show();
+		}
+		else{
+			ui->CBoxAlmEnableMotionDetection->hide();
+			ui->LabAlmMotionLevel->hide();
+			ui->CBoxAlmMotionLevel->hide();
+		}
+
+		ui->CBoxalmPreRcordSecond->clear();
+		for (int i = 0; i < 4; i++){
+			ui->CBoxalmPreRcordSecond->addItem(QString::number(i * 5));
+		}
+
+		ui->CBoxAlmMotionLevel->clear();
+		for (int i = 1; i < 5; i++){
+			ui->CBoxAlmMotionLevel->addItem(QString::number(i));
+		}
+	}
+
+
+	{
+		//profile
+		C_AlarmProfile &AlarmProfile = AdvancedSystemProfile.AlarmProfile;
+		av_bool abRet = pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile);
+		if (abRet != av_true){
+			AvQDebug("AdvancedSystemGetCaps error  return\n");
+			return;
+		}
+
+		if (AlarmProfile.AlarmbEnable == av_true){
+			ui->CBoxAlmEnable->setChecked(true);
+			on_CBoxAlmEnable_clicked(true);
+		}
+		else{
+			ui->CBoxAlmEnable->setChecked(false);
+			on_CBoxAlmEnable_clicked(false);
+		}
+
+		if (AlarmProfile.AlarmEventMask & AvMask(AlarmEvent_PORT_In)){
+			ui->CBoxAlmLEnablePortIn->setChecked(true);
+		}
+		else{
+			ui->CBoxAlmLEnablePortIn->setChecked(false);
+		}
+		
+		if (AlarmProfile.AlarmEventMask & AvMask(AlarmEvent_VIDEO_MotionDetection)){
+			ui->CBoxAlmEnableMotionDetection->setChecked(true);
+		}
+		else{
+			ui->CBoxAlmEnableMotionDetection->setChecked(false);
+		}
+
+		if (AlarmProfile.AlarmbLinkageEmail == av_true){
+			ui->CBoxAlmLinkageEmail->setChecked(true);
+		}
+		else{
+			ui->CBoxAlmLinkageEmail->setChecked(false);
+		}
+
+		if (AlarmProfile.AlarmbLinkageFtp == av_true){
+			ui->CBoxAlmLinkageFtp->setChecked(true);
+		}
+		else{
+			ui->CBoxAlmLinkageFtp->setChecked(false);
+		}
+
+		if (AlarmProfile.AlarmLinkagePrerecordSec == 0){
+			ui->CBoxAlmLinkageRecord->setChecked(false);
+		}
+		else{
+			ui->CBoxAlmLinkageRecord->setChecked(true);
+		}
+
+		if (AlarmProfile.AlarmbLinkageSnapshot == av_true){
+			ui->CBoxAlmLinkageSnapshort->setChecked(true);
+		}
+		else{
+			ui->CBoxAlmLinkageSnapshort->setChecked(false);
+		}
+
+		if (AlarmProfile.AlarmbLinkageBeep == av_true){
+			ui->CBoxAlmLinkageBeep->setChecked(true);
+		}
+		else{
+			ui->CBoxAlmLinkageBeep->setChecked(false);
+		}
+
+		if (AlarmProfile.AlarmbLinkagePtz == av_true){
+			ui->CBoxAlmLinkagePtz->setChecked(true);
+		}
+		else{
+			ui->CBoxAlmLinkagePtz->setChecked(false);
+		}
+
+		if (AlarmProfile.AlarmbLinkageAlmOut == av_true){
+			ui->CBoxAlmLinkagePortOut->setChecked(true);
+		}
+		else{
+			ui->CBoxAlmLinkagePortOut->setChecked(false);
+		}
+		ui->CBoxalmPreRcordSecond->setCurrentText(QString::number(AlarmProfile.AlarmLinkagePrerecordSec));
+		ui->CBoxAlmMotionLevel->setCurrentText(QString::number(AlarmProfile.AlarmMotionLevel));
+		
+		memcpy(m_AlarmMotionArea, AlarmProfile.AlarmMotionArea, sizeof(m_AlarmMotionArea));
+		memcpy(m_AlarmTimeArea, AlarmProfile.AlarmTimeArea, sizeof(m_AlarmTimeArea));
+	}
+
+
+
+
+}
+void DlgDeviceSet::FillInUserManager()
+{
+// 	Capture *pCapture = GetChannelHandle();
+// 	if (pCapture == NULL){
+// 		return;
+// 	}
+}
+void DlgDeviceSet::FillInLog()
+{
+// 	Capture *pCapture = GetChannelHandle();
+// 	if (pCapture == NULL){
+// 		return;
+// 	}
+}
+void DlgDeviceSet::FillInPtz()
+{
+// 	Capture *pCapture = GetChannelHandle();
+// 	if (pCapture == NULL){
+// 		return;
+// 	}
+}
+
+
+void DlgDeviceSet::FillInNetWorkNetSet()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	C_NetWorkProfile &NetWorkProfile = AdvancedSystemProfile.NetWorkProfile;
+	AdvancedSystemProfile._msg = __MsgNetWorkProfile;
+	av_bool ret = pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile);
+
+	if (ret == av_true){
+		ui->CBoxNetWorkIfrName->clear();
+		ui->CBoxNetWorkIfrName->addItem(AvUiLangsNetCommT(NetWorkProfile.NetDevice));
+		ui->CBoxNetWorkGetMode->clear();
+		ui->CBoxNetWorkGetMode->addItem(AvUiLangsNetCommGetMode(NetWorkProfile.NetGetType));
+		ui->LiEditNetWorkIpV4Addr->setText(QString(NetWorkProfile.Ipv4));
+		ui->LiEditNetWorkIpV6Addr->setText(QString(NetWorkProfile.Ipv6));
+		ui->LiEditNetWorkGateWay->setText(QString(NetWorkProfile.GateWay));
+		ui->LiEditNetWorkSubMask->setText(QString(NetWorkProfile.SubMask));
+		ui->LiEditNetWorkDns1->setText(QString(NetWorkProfile.DnsI));
+		ui->LiEditNetWorkDns2->setText(QString(NetWorkProfile.DnsII));
+		ui->LiEditNetWorkServicePort->setText(QString::number(NetWorkProfile.ServicePort));
+		ui->LiEditNetWorkMacAddr->setText(QString(NetWorkProfile.Mac));
+		ui->LiEditNetWorkMacAddr->setEnabled(false);
+	}
+
+
+}
+void DlgDeviceSet::FillInNetWorkFtp()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	C_FtpProfile &FtpProfile = AdvancedSystemProfile.FtpProfile;
+	AdvancedSystemProfile._msg = __MsgFtpProfile;
+	pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile);
+
+	{
+		if (FtpProfile.bEnable == av_true){
+			ui->CBoxNetWorkFtpEnable->setChecked(true);
+// 			ui->LiEditNetWorkFtpServer->setEnabled(true);
+// 			ui->LiEditNetWorkFtpPasswd->setEnabled(true);
+// 			ui->LiEditNetWorkFtpPort->setEnabled(true);
+// 			ui->LiEditNetWorkFtpUserName->setEnabled(true);
+		}
+		else{
+			ui->LiEditNetWorkFtpServer->setEnabled(false);
+// 			ui->LiEditNetWorkFtpPasswd->setEnabled(false);
+// 			ui->LiEditNetWorkFtpPort->setEnabled(false);
+// 			ui->LiEditNetWorkFtpUserName->setEnabled(false);
+		}
+		ui->LiEditNetWorkFtpServer->setText(FtpProfile.ServerAddress);
+		ui->LiEditNetWorkFtpPasswd->setText(FtpProfile.PassWord);
+		ui->LiEditNetWorkFtpPort->setText(QString::number(FtpProfile.ServicePort));
+		ui->LiEditNetWorkFtpUserName->setText(FtpProfile.UserName);
+		ui->LiEditNetWorkFtpRemotePath->setText(FtpProfile.RemotePath);
+	}
+
+}
+void DlgDeviceSet::FillInNetWorkEmail()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	C_SmtpProfile &EmailProfile = AdvancedSystemProfile.SmtpProfile;
+	AdvancedSystemProfile._msg = __MsgEmailProfile;
+	av_bool ret = pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile);
+	if (ret != av_true){
+		return;
+	}
+
+	if (EmailProfile.bEnable == av_true){
+		ui->CBoxNetWorkEmailEnable->setChecked(true);
+// 		ui->LiEditNetWorkEmailPasswd->setEnabled(true);
+// 		ui->LiEditNetWorkEmailPort->setEnabled(true);
+// 		ui->LiEditNetWorkEmailReceiver1->setEnabled(true);
+// 		ui->LiEditNetWorkEmailReceiver2->setEnabled(true);
+// 		ui->LiEditNetWorkEmailSender->setEnabled(true);
+// 		ui->LiEditNetWorkEmailSmtpServer->setEnabled(true);
+// 		ui->LiEditNetWorkEmailTitle->setEnabled(true);
+// 		ui->LiEditNetWorkEmailUserName->setEnabled(true);
+// 		ui->CBoxNetWorkEmailEncodeType->setEnabled(true);
+	}
+	else{
+
+		ui->CBoxNetWorkEmailEnable->setChecked(false);
+// 		ui->LiEditNetWorkEmailPasswd->setEnabled(false);
+// 		ui->LiEditNetWorkEmailPort->setEnabled(false);
+// 		ui->LiEditNetWorkEmailReceiver1->setEnabled(false);
+// 		ui->LiEditNetWorkEmailReceiver2->setEnabled(false);
+// 		ui->LiEditNetWorkEmailSender->setEnabled(false);
+// 		ui->LiEditNetWorkEmailSmtpServer->setEnabled(false);
+// 		ui->LiEditNetWorkEmailTitle->setEnabled(false);
+// 		ui->LiEditNetWorkEmailUserName->setEnabled(false);
+// 		ui->CBoxNetWorkEmailEncodeType->setEnabled(false);
+	}
+
+	ui->CBoxNetWorkEmailEncodeType->clear();
+	for (int i = EmailEncodeType_None + 1; i < EmailEncodeType_Last; i++){
+		ui->CBoxNetWorkEmailEncodeType->addItem(AvUiLangsEmailEncodeType((EmailEncodeType)i));
+	}
+
+	ui->LiEditNetWorkEmailPasswd->setText(EmailProfile.PassWord);
+	ui->LiEditNetWorkEmailPort->setText(QString::number(EmailProfile.ServicePort));
+	ui->LiEditNetWorkEmailReceiver1->setText(EmailProfile.Receiver1);
+	ui->LiEditNetWorkEmailReceiver2->setText(EmailProfile.Receiver2);
+	ui->LiEditNetWorkEmailSender->setText(EmailProfile.Sender);
+	ui->LiEditNetWorkEmailSmtpServer->setText(EmailProfile.ServerAddress);
+	ui->LiEditNetWorkEmailTitle->setText(EmailProfile.Title);
+	ui->LiEditNetWorkEmailUserName->setText(EmailProfile.UserName);
+}
+void DlgDeviceSet::FillInNetWorkUpnp()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	C_UpnpProfile &UpnpProfile = AdvancedSystemProfile.UpnpProfile;
+	AdvancedSystemProfile._msg = __MsgUpnpProfile;
+	av_bool ret = pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile);
+	if (ret != av_true){
+		return;
+	}
+
+	if (UpnpProfile.bEnableHttpPort == av_true){
+		ui->CBoxNetWorkUpnpWeb->setChecked(true);
+	}
+	else{
+		ui->CBoxNetWorkUpnpWeb->setChecked(false);
+	}
+
+	if (UpnpProfile.bEnableMoonProtoPort == av_true){
+		ui->CBoxNetWorkUpnpProtoPort->setChecked(true);
+	}
+	else{
+		ui->CBoxNetWorkUpnpProtoPort->setChecked(false);
+	}
+
+	if (UpnpProfile.bEnableRtspPort == av_true){
+		ui->CBoxNetWorkUpnpRtsp->setChecked(true);
+	}
+	else{
+		ui->CBoxNetWorkUpnpRtsp->setChecked(false);
+	}
+}
+void DlgDeviceSet::FillInNetWorkRtsp()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	C_RtspProfile &RtspProfile = AdvancedSystemProfile.RtspProfile;
+	AdvancedSystemProfile._msg = __MsgRtspProfile;
+	av_bool ret = pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile);
+	if (ret != av_true){
+		return;
+	}
+
+	if (RtspProfile.bEnable == av_true){
+		ui->CBoxNetWorkRtspEnable->setChecked(true);
+	}
+	else{
+		ui->CBoxNetWorkRtspEnable->setChecked(false);
+	}
+
+	ui->LiEditNetWorkRtspPort->setText(QString::number(RtspProfile.ServicePort));
+
+}
+void DlgDeviceSet::FillInNetWorkDDNS()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	C_DdnsProfile &DdnsProfile = AdvancedSystemProfile.DdnsProfile;
+	AdvancedSystemProfile._msg = __MsgDdnsProfile;
+	av_bool ret = pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile);
+	if (ret != av_true){
+		return;
+	}
+	
+	if (DdnsProfile.bEnable == av_true){
+		ui->CBoxNetWorkDdnsEnable->setChecked(true);
+	}
+	else{
+		ui->CBoxNetWorkDdnsEnable->setChecked(false);
+	}
+	ui->CBoxNetWorkDdnsDdnsType->clear();
+	for (int i = DdnsType_None + 1; i < DdnsType_Last; i++){
+		ui->CBoxNetWorkDdnsDdnsType->addItem(AvUiLangsDdnsType((DdnsType)i));
+	}
+	ui->CBoxNetWorkDdnsDdnsType->setCurrentText(AvUiLangsDdnsType(DdnsProfile.Type));
+
+	ui->CBoxNetWorkDdnsUpdateInterval->clear();
+
+	for (int i = RenewalInterval_HalfHour; i < RenewalInterval_SixHour; i++){
+		ui->CBoxNetWorkDdnsUpdateInterval->addItem(AvUiLangsRenewalInterval((RenewalInterval)i));
+	}
+	
+	if (DdnsProfile.UpdateInterval == 30 * 60){
+		ui->CBoxNetWorkDdnsUpdateInterval->setCurrentText(AvUiLangsRenewalInterval(RenewalInterval_HalfHour));
+	}
+	else if(DdnsProfile.UpdateInterval == 1 * 3600){
+		ui->CBoxNetWorkDdnsUpdateInterval->setCurrentText(AvUiLangsRenewalInterval(RenewalInterval_OneHour));
+	}
+	else if (DdnsProfile.UpdateInterval == 3 * 3600){
+		ui->CBoxNetWorkDdnsUpdateInterval->setCurrentText(AvUiLangsRenewalInterval(RenewalInterval_ThreeHour));
+	}
+	else{
+		ui->CBoxNetWorkDdnsUpdateInterval->setCurrentText(AvUiLangsRenewalInterval(RenewalInterval_SixHour));
+	}
+
+
+	ui->LiEditNetWorkDdnsPasswd->setText(QString(DdnsProfile.PassWord));
+	ui->LiEditNetWorkDdnsServerAddr->setText(QString(DdnsProfile.ServerAddress));
+	ui->LiEditNetWorkDdnsUserName->setText(QString(DdnsProfile.UserName));
+	
+}
+void DlgDeviceSet::FillInNetWorkP2P()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	C_P2pProfile &P2pProfile = AdvancedSystemProfile.P2pProfile;
+	AdvancedSystemProfile._msg = __MsgP2pProfile;
+	av_bool ret = pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile);
+	if (ret != av_true){
+		return;
+	}
+
+	if (P2pProfile.bEnable == av_true){
+		ui->CBoxNetWorkP2PEnable->setChecked(true);
+	}
+	else{
+		ui->CBoxNetWorkP2PEnable->setChecked(false);
+	}
+
+	if (P2pProfile.bUseLinkId == av_true){
+		ui->CBoxNetWorkP2PUseLinkID->setChecked(true);
+		
+		ui->LiEditNetWorkP2PServer->hide();
+		ui->LabNetWorkP2PServer->hide();
+
+		ui->LiEditNetWorkP2PPort->hide();
+		ui->LabNetWorkP2PPort->hide();
+
+		ui->LiEditNetWorkP2PUsrName->hide();
+		ui->LabNetWorkP2PUsrName->hide();
+
+		ui->LiEditNetWorkP2PPasswd->hide();
+		ui->LabNetWorkP2PPasswd->hide();
+
+		ui->LiEditNetWorkP2PLinkID->show();
+		ui->LabNetWorkP2PLinkID->show();
+	}
+	else{
+		ui->CBoxNetWorkP2PUseLinkID->setChecked(false);
+
+		ui->LiEditNetWorkP2PServer->show();
+		ui->LabNetWorkP2PServer->show();
+
+		ui->LiEditNetWorkP2PPort->show();
+		ui->LabNetWorkP2PPort->show();
+
+		ui->LiEditNetWorkP2PUsrName->show();
+		ui->LabNetWorkP2PUsrName->show();
+
+		ui->LiEditNetWorkP2PPasswd->show();
+		ui->LabNetWorkP2PPasswd->show();
+
+		ui->LiEditNetWorkP2PLinkID->hide();
+		ui->LabNetWorkP2PLinkID->hide();
+	}
+
+	ui->LiEditNetWorkP2PServer->setText(QString(P2pProfile.ServerAddress));
+	ui->LiEditNetWorkP2PPort->setText(QString::number(P2pProfile.ServicePort));
+	ui->LiEditNetWorkP2PUsrName->setText(QString(P2pProfile.UserName));
+	ui->LiEditNetWorkP2PPasswd->setText(QString(P2pProfile.PassWord));
+	ui->LiEditNetWorkP2PLinkID->setText(QString(P2pProfile.LinkId));
+
+}
+
+void DlgDeviceSet::FillInNetWorkRTMP()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	C_NetWorkProfile &NetWorkProfile = AdvancedSystemProfile.NetWorkProfile;
+	AdvancedSystemProfile._msg = __MsgRtmpProfile;
+	pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile);
+}
+void DlgDeviceSet::FillInNetWorkNTP()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	C_NtpProfile &NtpProfile = AdvancedSystemProfile.NtpProfile;
+	AdvancedSystemProfile._msg = __MsgNtpProfile;
+	av_bool ret = pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile);
+	if (ret != av_true){
+		return;
+	}
+	
+	ui->CBoxNetWorkTimetimeZone->clear();
+	for (int i = TimeZone_UTC_None + 1; i < TimeZone_UTC_Last; i++){
+		ui->CBoxNetWorkTimetimeZone->addItem(AvUiLangsTimeZone((TimeZone)i));
+	}
+
+
+	ui->CBoxNetWorkTimeUpdateTime->clear();
+
+	for (int i = RenewalInterval_HalfHour; i < RenewalInterval_SixHour; i++){
+		ui->CBoxNetWorkTimeUpdateTime->addItem(AvUiLangsRenewalInterval((RenewalInterval)i));
+	}
+
+	if (NtpProfile.UpdateInterval == 30 * 60){
+		ui->CBoxNetWorkTimeUpdateTime->setCurrentText(AvUiLangsRenewalInterval(RenewalInterval_HalfHour));
+	}
+	else if (NtpProfile.UpdateInterval == 1 * 3600){
+		ui->CBoxNetWorkTimeUpdateTime->setCurrentText(AvUiLangsRenewalInterval(RenewalInterval_OneHour));
+	}
+	else if (NtpProfile.UpdateInterval == 3 * 3600){
+		ui->CBoxNetWorkTimeUpdateTime->setCurrentText(AvUiLangsRenewalInterval(RenewalInterval_ThreeHour));
+	}
+	else{
+		ui->CBoxNetWorkTimeUpdateTime->setCurrentText(AvUiLangsRenewalInterval(RenewalInterval_SixHour));
+	}
+	ui->CBoxNetWorkTimeServer->clear();
+	ui->CBoxNetWorkTimeServer->addItem(QString("time.windows.com"));
+	ui->CBoxNetWorkTimeServer->addItem(QString("time.nist.gov"));
+	ui->CBoxNetWorkTimeServer->addItem(QString("s2g.time.edu.cn"));
+	
+	ui->CBoxNetWorkTimeServer->setCurrentText(QString(NtpProfile.ServerAddress));
+}
+
+void DlgDeviceSet::SubmitCapture()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
 		return;
 	}
 
@@ -796,13 +1352,8 @@ void DlgDeviceSet::SubmitCapture()
 
 void DlgDeviceSet::SubmitEncode()
 {
-	int Channel = ui->CBoxSettingChannel->currentIndex();
-
-	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(Channel);
-
-	Capture::EAvCaptureStatus stat = pCapture->GetCaptureStatus();
-	if (stat != Capture::EAvCapture_ING){
-		ShowErrorConnectMesageBox();
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
 		return;
 	}
 
@@ -902,13 +1453,8 @@ void DlgDeviceSet::SubmitEncode()
 void DlgDeviceSet::SubmitAudio()
 {
 	C_AudioProfile AudioProfile;
-	int Channel = ui->CBoxSettingChannel->currentIndex();
-
-	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(Channel);
-
-	Capture::EAvCaptureStatus stat = pCapture->GetCaptureStatus();
-	if (stat != Capture::EAvCapture_ING){
-		ShowErrorConnectMesageBox();
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
 		return;
 	}
 
@@ -980,30 +1526,252 @@ void DlgDeviceSet::SubmitVersion()
 
 void DlgDeviceSet::SubmitRecord()
 {
-
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
 }
 
 void DlgDeviceSet::SubmitNetWork()
 {
-
+	int TabToolsIndex = ui->TBoxNetWork->currentIndex();
+	switch (TabToolsIndex)
+	{
+	case TboxNetWorkEnum_NetSet:
+		SubmitNetWorkNetSet();
+		break;
+	case TboxNetWorkEnum_Ftp:
+		SubmitNetWorkFtp();
+		break;
+	case TboxNetWorkEnum_Email:
+		SubmitNetWorkEmail();
+		break;
+	case TboxNetWorkEnum_Upnp:
+		SubmitNetWorkUpnp();
+		break;
+	case TboxNetWorkEnum_Rtsp:
+		SubmitNetWorkRtsp();
+		break;
+	case TboxNetWorkEnum_Ddns:
+		SubmitNetWorkDDNS();
+		break;
+	case TboxNetWorkEnum_P2p:
+		SubmitNetWorkP2P();
+		break;
+	case TboxNetWorkEnum_Rtmp:
+		SubmitNetWorkRTMP();
+		break;
+	case TboxNetWorkEnum_Ntp:
+		SubmitNetWorkNTP();
+		break;
+	default:
+		break;
+	}
 }
 
 void DlgDeviceSet::SubmitAlarm()
 {
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	memset(&AdvancedSystemProfile, 0x00, sizeof(C_AdvancedSystemProfile));
+	AdvancedSystemProfile._msg = __MsgAlarmProfile;
+	C_AlarmProfile &AlarmProfile = AdvancedSystemProfile.AlarmProfile;
+	if (true == ui->CBoxAlmEnable->isChecked()){
+		AlarmProfile.AlarmbEnable = av_true;
+	}
+	else{
+		AlarmProfile.AlarmbEnable = av_false;
+	}
+
+	if (true == ui->CBoxAlmLEnablePortIn->isChecked()){
+		AlarmProfile.AlarmEventMask |= AvMask(AlarmEvent_PORT_In);
+	}
+
+	if (true == ui->CBoxAlmEnableMotionDetection->isChecked()){
+		AlarmProfile.AlarmEventMask |= AvMask(AlarmEvent_VIDEO_MotionDetection);
+	}
+
+	if (true == ui->CBoxAlmLinkageEmail->isChecked()){
+		AlarmProfile.AlarmbLinkageEmail = av_true;
+	}
+	else{
+		AlarmProfile.AlarmbLinkageEmail = av_false;
+	}
+
+	if (true == ui->CBoxAlmLinkageFtp->isChecked()){
+		AlarmProfile.AlarmbLinkageFtp = av_true;
+	}
+	else{
+		AlarmProfile.AlarmbLinkageFtp = av_false;
+	}
+
+	if (true == ui->CBoxAlmLinkageRecord->isChecked()){
+		AlarmProfile.AlarmbLinkageRecord = av_true;
+	}
+	else{
+		AlarmProfile.AlarmbLinkageRecord = av_false;
+	}
+
+	if (true == ui->CBoxAlmLinkageSnapshort->isChecked()){
+		AlarmProfile.AlarmbLinkageSnapshot = av_true;
+	}
+	else{
+		AlarmProfile.AlarmbLinkageSnapshot = av_false;
+	}
+
+	if (true == ui->CBoxAlmLinkageBeep->isChecked()){
+		AlarmProfile.AlarmbLinkageBeep = av_true;
+	}
+	else{
+		AlarmProfile.AlarmbLinkageBeep = av_false;
+	}
+
+	if (true == ui->CBoxAlmLinkagePtz->isChecked()){
+		AlarmProfile.AlarmbLinkagePtz = av_true;
+	}
+	else{
+		AlarmProfile.AlarmbLinkagePtz = av_false;
+	}
+	if (true == ui->CBoxAlmLinkagePortOut->isChecked()){
+		AlarmProfile.AlarmbLinkageAlmOut = av_true;
+	}
+	else{
+		AlarmProfile.AlarmbLinkageAlmOut = av_false;
+	}
+	
+	AlarmProfile.AlarmLinkagePrerecordSec = atoi(ui->CBoxalmPreRcordSecond->currentText().toStdString().c_str());
+	AlarmProfile.AlarmMotionLevel = atoi(ui->CBoxAlmMotionLevel->currentText().toStdString().c_str());
+	memcpy(AlarmProfile.AlarmTimeArea, m_AlarmTimeArea, sizeof(m_AlarmTimeArea));
+	memcpy(AlarmProfile.AlarmMotionArea, m_AlarmMotionArea, sizeof(m_AlarmMotionArea));
+
+	av_bool abRet = pCapture->AdvancedSystemSetProfile(AdvancedSystemProfile);
+	if (abRet == av_true){
+
+	}
+	else{
+
+	}
+
+
 
 }
 
 void DlgDeviceSet::SubmitUserManager()
 {
-
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
 }
 
 void DlgDeviceSet::SubmitLog()
 {
-
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
 }
 
 void DlgDeviceSet::SubmitPtz()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+}
+
+
+
+void DlgDeviceSet::SubmitNetWorkNetSet()
+{
+
+}
+void DlgDeviceSet::SubmitNetWorkFtp()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	AdvancedSystemProfile._msg = __MsgFtpProfile;
+	C_FtpProfile &FtpProfile = AdvancedSystemProfile.FtpProfile;
+
+	if (true == ui->CBoxNetWorkFtpEnable->isChecked()){
+		FtpProfile.bEnable = av_true;
+	}
+	else{
+		FtpProfile.bEnable = av_false;
+	}
+
+	sprintf(FtpProfile.ServerAddress, "%s", ui->LiEditNetWorkFtpServer->text().toStdString().c_str());
+	sprintf(FtpProfile.UserName, "%s", ui->LiEditNetWorkFtpUserName->text().toStdString().c_str());
+	sprintf(FtpProfile.PassWord, "%s", ui->LiEditNetWorkFtpPasswd->text().toStdString().c_str());
+	sprintf(FtpProfile.RemotePath, "%s", ui->LiEditNetWorkFtpRemotePath->text().toStdString().c_str());
+	FtpProfile.ServicePort = atoi(ui->LiEditNetWorkFtpPort->text().toStdString().c_str());
+
+	pCapture->AdvancedSystemSetProfile(AdvancedSystemProfile);
+
+}
+void DlgDeviceSet::SubmitNetWorkEmail()
+{
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	AdvancedSystemProfile._msg = __MsgFtpProfile;
+	C_SmtpProfile &EmailProfile = AdvancedSystemProfile.SmtpProfile;
+
+	if (ui->CBoxNetWorkEmailEnable->isChecked() == true){
+		EmailProfile.bEnable = av_true;
+	}
+	else{
+		EmailProfile.bEnable = av_false;
+	}
+
+	for (int i = EmailEncodeType_None; i < EmailEncodeType_Last; i++){
+		if (AvUiLangsEmailEncodeType((EmailEncodeType)i) == ui->CBoxNetWorkEmailEncodeType->currentText()){
+			EmailProfile.EncodeType = (EmailEncodeType)i;
+			break;
+		}
+	}
+	EmailProfile.ServicePort = atoi(ui->LiEditNetWorkEmailPort->text().toStdString().c_str());
+	sprintf(EmailProfile.Receiver1, ui->LiEditNetWorkEmailReceiver1->text().toStdString().c_str());
+	sprintf(EmailProfile.Receiver2, ui->LiEditNetWorkEmailReceiver2->text().toStdString().c_str());
+	sprintf(EmailProfile.Sender, ui->LiEditNetWorkEmailSender->text().toStdString().c_str());
+	sprintf(EmailProfile.ServerAddress, ui->LiEditNetWorkEmailSmtpServer->text().toStdString().c_str());
+	sprintf(EmailProfile.Title, ui->LiEditNetWorkEmailTitle->text().toStdString().c_str());
+	sprintf(EmailProfile.UserName, ui->LiEditNetWorkEmailUserName->text().toStdString().c_str());
+	sprintf(EmailProfile.PassWord, ui->LiEditNetWorkEmailPasswd->text().toStdString().c_str());
+
+	pCapture->AdvancedSystemSetProfile(AdvancedSystemProfile);
+}
+
+void DlgDeviceSet::SubmitNetWorkUpnp()
+{
+
+}
+void DlgDeviceSet::SubmitNetWorkRtsp()
+{
+
+}
+void DlgDeviceSet::SubmitNetWorkDDNS()
+{
+
+}
+void DlgDeviceSet::SubmitNetWorkP2P()
+{
+
+}
+void DlgDeviceSet::SubmitNetWorkRTMP()
+{
+
+}
+void DlgDeviceSet::SubmitNetWorkNTP()
 {
 
 }
@@ -1030,6 +1798,20 @@ DlgDeviceSet::~DlgDeviceSet()
     delete ui;
 }
 
+Capture * DlgDeviceSet::GetChannelHandle()
+{
+	int Channel = ui->CBoxSettingChannel->currentIndex();
+
+	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(Channel);
+
+	Capture::EAvCaptureStatus stat = pCapture->GetCaptureStatus();
+	if (stat != Capture::EAvCapture_ING){
+		ShowErrorConnectMesageBox();
+		return NULL;
+	}
+	return pCapture;
+}
+
 void DlgDeviceSet::SlotsTviewRtmpLinkInfoHorizontalScrollBarRangChanged(int min, int max)
 {
 	AvQDebug("SlotsTviewRtmpLinkInfoHorizontalScrollBarRangChanged min = %d, max = %d\n", min, max);
@@ -1042,6 +1824,12 @@ void DlgDeviceSet::resizeEvent(QResizeEvent * event)
 	AvQDebug("DlgDeviceSet::resizeEvent\n");
 }
 
+void DlgDeviceSet::showEvent(QShowEvent *event)
+{
+	ui->TabWidgetDeviceSet->setCurrentIndex(TabWidgetDeviceSet_Version);
+	FixDlgUiVersion();
+	FillInVersion();
+}
 
 void DlgDeviceSet::on_BtnClose_clicked()
 {
@@ -1058,15 +1846,40 @@ void DlgDeviceSet::on_TBoxNetWork_currentChanged(int index)
 	printf("TBoxNetWork_currentChanged %d\n", index);
 	ui->StWidgetNetWork->setCurrentIndex(index);
 
-#if 0
-	QSize viewSize = ui->TviewRtmpLinkInfo->viewport()->size();
-	ui->TviewRtmpLinkInfo->setColumnWidth(0, 0.10*viewSize.width());
-	ui->TviewRtmpLinkInfo->setColumnWidth(1, 0.50*viewSize.width());
-	ui->TviewRtmpLinkInfo->setColumnWidth(2, 0.10*viewSize.width());
-	ui->TviewRtmpLinkInfo->setColumnWidth(3, 0.10*viewSize.width());
-	ui->TviewRtmpLinkInfo->setColumnWidth(4, 0.10*viewSize.width());
-	ui->TviewRtmpLinkInfo->setColumnWidth(5, 0.10*viewSize.width());
-#endif
+	switch (index)
+	{
+	case 	TboxNetWorkEnum_NetSet:
+		FillInNetWorkNetSet();
+		break;
+	case 		TboxNetWorkEnum_Ftp:
+		FillInNetWorkFtp();
+		break;
+	case 		TboxNetWorkEnum_Email:
+		FillInNetWorkEmail();
+		break;
+	case 		TboxNetWorkEnum_Upnp:
+		FillInNetWorkUpnp();
+		break;
+	case 		TboxNetWorkEnum_Rtsp:
+		FillInNetWorkRtsp();
+		break;
+	case 		TboxNetWorkEnum_Ddns:
+		FillInNetWorkDDNS();
+		break;
+	case 		TboxNetWorkEnum_P2p:
+		FillInNetWorkP2P();
+		break;
+	case 		TboxNetWorkEnum_Rtmp:
+		FillInNetWorkRTMP();
+		break;
+	case 		TboxNetWorkEnum_Ntp:
+		FillInNetWorkNTP();
+		break;
+
+	default:
+		break;
+	}
+
 }
 
 void DlgDeviceSet::on_BtnNetWorkRTMPAdd_clicked()
@@ -1340,7 +2153,7 @@ void DlgDeviceSet::on_CBoxMImageSize_currentIndexChanged(const QString &arg1)
 		ShowErrorGetArgs();
 		return;
 	}
-
+	AvQDebug("current Main Image Size Channge [%s]\n", arg1.toStdString().c_str());
 	QString SImageIndexSize = ui->CBoxSImageSize->currentText();
 	ui->CBoxSImageSize->clear();
 	for (int i = CaptureSize_Self; i < CaptureSize_SNR; i++){
@@ -1512,4 +2325,224 @@ void DlgDeviceSet::on_CBoxAiEncodeType_currentIndexChanged(const QString &arg1)
 
 	ui->CBoxAiSampleRate->setCurrentText(AvUiLangsAudioSampleRate(m_CurrentAudioProfile.SampleRate));
 	ui->CBoxAiSampleBits->setCurrentText(AvUiLangsAudioSampleBits(m_CurrentAudioProfile.SampleBits));
+}
+
+void DlgDeviceSet::on_BtnVideoCover_clicked()
+{
+	DlgAreaSelect *AreaSelect = new DlgAreaSelect(this);
+	int Channel = ui->CBoxSettingChannel->currentIndex();
+	AreaSelect->SetStyle(DlgAreaSelect::AreaSelect);
+	AreaSelect->SetChannel(Channel);
+	AreaSelect->exec();
+}
+
+
+
+void DlgDeviceSet::on_BtnOverlay_clicked()
+{
+	DlgOverLay *OverLay = new DlgOverLay(this);
+	int Channel = ui->CBoxSettingChannel->currentIndex();
+	OverLay->SetChannel(Channel);
+	OverLay->exec();
+}
+
+void DlgDeviceSet::on_BtnAlmTimeSelect_clicked()
+{
+	DlgTimeSelect *TimeSelect = new DlgTimeSelect(this);
+
+	TimeSelect->CTimeAreaArrary2UiPos(m_AlarmTimeArea);
+	TimeSelect->exec();
+	TimeSelect->CTimeAreaUi2ArraryPos(m_AlarmTimeArea);
+	delete TimeSelect;
+}
+
+void DlgDeviceSet::on_BtnAlmAreaSelect_clicked()
+{
+	DlgAreaSelect *AreaSelect = new DlgAreaSelect (this);
+	int Channel = ui->CBoxSettingChannel->currentIndex();
+	AreaSelect->SetChannel(Channel);
+	AreaSelect->SetStyle(DlgAreaSelect::GriddingSelect);
+	AreaSelect->MotionDetectionArrary2UiPos(m_AlarmMotionArea);
+	AreaSelect->exec();
+
+	AreaSelect->MotionDetectionUiPos2Arrary(m_AlarmMotionArea);
+
+	delete AreaSelect;
+
+}
+
+void DlgDeviceSet::on_CBoxNetWorkFtpEnable_clicked(bool checked)
+{
+	if (checked == true){
+            ui->CBoxNetWorkFtpEnable->setChecked(true);
+            ui->LiEditNetWorkFtpServer->setEnabled(true);
+            ui->LiEditNetWorkFtpPasswd->setEnabled(true);
+            ui->LiEditNetWorkFtpPort->setEnabled(true);
+            ui->LiEditNetWorkFtpUserName->setEnabled(true);
+    }
+    else{
+            ui->LiEditNetWorkFtpServer->setEnabled(false);
+            ui->LiEditNetWorkFtpPasswd->setEnabled(false);
+            ui->LiEditNetWorkFtpPort->setEnabled(false);
+            ui->LiEditNetWorkFtpUserName->setEnabled(false);
+    }
+}
+
+void DlgDeviceSet::on_CBoxNetWorkEmailEnable_clicked(bool checked)
+{
+	if (checked == true){
+		ui->CBoxNetWorkEmailEnable->setChecked(true);
+		ui->LiEditNetWorkEmailPasswd->setEnabled(true);
+		ui->LiEditNetWorkEmailPort->setEnabled(true);
+		ui->LiEditNetWorkEmailReceiver1->setEnabled(true);
+		ui->LiEditNetWorkEmailReceiver2->setEnabled(true);
+		ui->LiEditNetWorkEmailSender->setEnabled(true);
+		ui->LiEditNetWorkEmailSmtpServer->setEnabled(true);
+		ui->LiEditNetWorkEmailTitle->setEnabled(true);
+		ui->LiEditNetWorkEmailUserName->setEnabled(true);
+		ui->CBoxNetWorkEmailEncodeType->setEnabled(true);
+	}
+	else{
+
+		ui->CBoxNetWorkEmailEnable->setChecked(false);
+		ui->LiEditNetWorkEmailPasswd->setEnabled(false);
+		ui->LiEditNetWorkEmailPort->setEnabled(false);
+		ui->LiEditNetWorkEmailReceiver1->setEnabled(false);
+		ui->LiEditNetWorkEmailReceiver2->setEnabled(false);
+		ui->LiEditNetWorkEmailSender->setEnabled(false);
+		ui->LiEditNetWorkEmailSmtpServer->setEnabled(false);
+		ui->LiEditNetWorkEmailTitle->setEnabled(false);
+		ui->LiEditNetWorkEmailUserName->setEnabled(false);
+		ui->CBoxNetWorkEmailEncodeType->setEnabled(false);
+	}
+}
+// 
+// void DlgDeviceSet::on_CBoxNetWorkUpnpEnable_clicked(bool checked)
+// {
+// 	if (true == checked){
+// 		ui->CBoxNetWorkUpnpProtoPort->setCheckable(true);
+// 		ui->CBoxNetWorkUpnpRtsp->setCheckable(true);
+// 		ui->CBoxNetWorkUpnpWeb->setCheckable(true);
+// 	}
+// 	else{
+// 		ui->CBoxNetWorkUpnpProtoPort->setCheckable(false);
+// 		ui->CBoxNetWorkUpnpRtsp->setCheckable(false);
+// 		ui->CBoxNetWorkUpnpWeb->setCheckable(false);
+// 	}
+// }
+
+void DlgDeviceSet::on_CBoxNetWorkRtspEnable_clicked(bool checked)
+{
+	if (checked == true){
+		ui->LiEditNetWorkRtspPort->setEnabled(true);
+	}
+	else{
+		ui->LiEditNetWorkRtspPort->setEnabled(false);
+	}
+}
+
+void DlgDeviceSet::on_CBoxNetWorkDdnsEnable_clicked(bool checked)
+{
+	if (checked == true){
+		ui->LiEditNetWorkDdnsPasswd->setEnabled(true);
+		ui->LiEditNetWorkDdnsServerAddr->setEnabled(true);
+		ui->LiEditNetWorkDdnsUserName->setEnabled(true);
+		ui->CBoxNetWorkDdnsDdnsType->setEnabled(true);
+	}
+	else{
+		ui->LiEditNetWorkDdnsPasswd->setEnabled(false);
+		ui->LiEditNetWorkDdnsServerAddr->setEnabled(false);
+		ui->LiEditNetWorkDdnsUserName->setEnabled(false);
+		ui->CBoxNetWorkDdnsDdnsType->setEnabled(false);
+	}
+}
+
+void DlgDeviceSet::on_CBoxNetWorkP2PEnable_clicked(bool checked)
+{
+	if (checked == true){
+		ui->CBoxNetWorkP2PUseLinkID->setEnabled(true);
+		ui->LiEditNetWorkP2PServer->setEnabled(true);
+		ui->LiEditNetWorkP2PPort->setEnabled(true);
+		ui->LiEditNetWorkP2PUsrName->setEnabled(true);
+		ui->LiEditNetWorkP2PPasswd->setEnabled(true);
+		ui->LiEditNetWorkP2PLinkID->setEnabled(true);
+	}
+	else{
+		ui->CBoxNetWorkP2PUseLinkID->setEnabled(false);
+		ui->LiEditNetWorkP2PServer->setEnabled(false);
+		ui->LiEditNetWorkP2PPort->setEnabled(false);
+		ui->LiEditNetWorkP2PUsrName->setEnabled(false);
+		ui->LiEditNetWorkP2PPasswd->setEnabled(false);
+		ui->LiEditNetWorkP2PLinkID->setEnabled(false);
+	}
+}
+
+void DlgDeviceSet::on_CBoxNetWorkP2PUseLinkID_clicked(bool checked)
+{
+	if (checked == true){
+		ui->LabNetWorkP2PServer->hide();
+		ui->LiEditNetWorkP2PServer->hide();
+		ui->LabNetWorkP2PPort->hide();
+		ui->LiEditNetWorkP2PPort->hide();
+		ui->LabNetWorkP2PUsrName->hide();
+		ui->LiEditNetWorkP2PUsrName->hide();
+		ui->LabNetWorkP2PPasswd->hide();
+		ui->LiEditNetWorkP2PPasswd->hide();
+		ui->LabNetWorkP2PLinkID->show();
+		ui->LiEditNetWorkP2PLinkID->show();
+	}
+	else{
+		ui->LabNetWorkP2PServer->show();
+		ui->LiEditNetWorkP2PServer->show();
+		ui->LabNetWorkP2PPort->show();
+		ui->LiEditNetWorkP2PPort->show();
+		ui->LabNetWorkP2PUsrName->show();
+		ui->LiEditNetWorkP2PUsrName->show();
+		ui->LabNetWorkP2PPasswd->show();
+		ui->LiEditNetWorkP2PPasswd->show();
+		ui->LabNetWorkP2PLinkID->hide();
+		ui->LiEditNetWorkP2PLinkID->hide();
+	}
+}
+
+void DlgDeviceSet::on_CBoxNetWorkTimeEnable_clicked(bool checked)
+{
+
+}
+
+void DlgDeviceSet::on_CBoxNetWorkUpnpWeb_clicked(bool checked)
+{
+
+}
+
+void DlgDeviceSet::on_CBoxNetWorkUpnpProtoPort_clicked(bool checked)
+{
+
+}
+
+void DlgDeviceSet::on_CBoxNetWorkUpnpRtsp_clicked(bool checked)
+{
+
+}
+
+void DlgDeviceSet::on_CBoxAlmEnable_clicked(bool checked)
+{
+	AvQDebug("on_CBoxAlmEnable_clicked clicked [%s]\n", checked == true ? "true" : "false");
+	bool enable = false;
+	if (checked == true){
+		enable = true;
+	}
+
+	ui->CBoxAlmEnableMotionDetection->setCheckable(enable);
+	ui->CBoxAlmLEnablePortIn->setCheckable(enable);
+	ui->BtnAlmTimeSelect->setEnabled(enable);
+	ui->BtnAlmAreaSelect->setEnabled(enable);
+	ui->CBoxAlmLinkageBeep->setCheckable(enable);
+	ui->CBoxAlmLinkageEmail->setCheckable(enable);
+	ui->CBoxAlmLinkageFtp->setCheckable(enable);
+	ui->CBoxAlmLinkagePtz->setCheckable(enable);
+	ui->CBoxAlmLinkageRecord->setCheckable(enable);
+	ui->CBoxAlmLinkageSnapshort->setCheckable(enable);
+	ui->CBoxalmPreRcordSecond->setEnabled(enable);
+
 }

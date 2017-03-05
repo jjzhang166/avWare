@@ -17,7 +17,6 @@
 
 #include "common.h"
 #include "xml.h"
-
 int CmdDistribution(XmlElementObj_S *reqObj,XmlElementObj_S *respObj);
 
 #define DF_SOCPEITEM_VIDEOENCODER	"onvif://www.onvif.org/type/video_encoder"

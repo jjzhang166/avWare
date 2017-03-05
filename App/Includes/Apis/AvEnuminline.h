@@ -327,6 +327,106 @@ inline PtzProtocol PtzProtocolStr2EnumValue(const char *EName)
 	return (PtzProtocol)EnumName2EnumComm(EName, EnumNamesPtzProtocol(), PtzProtocol_None, PtzProtocol_Last);
 }
 //////////////////////////////////////////////////////////////////////////
+
+inline const char **EnumNamesOverLayType() {
+	static const char *names[] = { "Title", "Time", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNameOverLayType(OverLayType e) { return EnumNamesOverLayType()[e]; }
+
+
+inline OverLayType OverLayTypeStr2EnumValue(const char *EName)
+{
+	return (OverLayType)EnumName2EnumComm(EName, EnumNamesOverLayType(), OverLayType_Title, OverLayType_Last);
+}
+
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesFontSize() {
+	static const char *names[] = { "None", "_8", "_16", "_24", "_32", "_48", "_64", "_128", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNameFontSize(FontSize e) { return EnumNamesFontSize()[e]; }
+
+inline FontSize FontSizeStr2EnumValue(const char *EName)
+{
+	return (FontSize)EnumName2EnumComm(EName, EnumNamesFontSize(), FontSize_None, FontSize_Last);
+}
+
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesOverLayDateTimeStyle() {
+	static const char *names[] = { "None", "Y_M_D_H_M_S", "Y_M_D_M_H_M_S", "H_M_S_Y_M_D", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNameOverLayDateTimeStyle(OverLayDateTimeStyle e) { return EnumNamesOverLayDateTimeStyle()[e]; }
+
+inline OverLayDateTimeStyle OverLayDateTimeStyleStr2EnumValue(const char *EName)
+{
+	return (OverLayDateTimeStyle)EnumName2EnumComm(EName, EnumNamesOverLayDateTimeStyle(), OverLayDateTimeStyle_None, OverLayDateTimeStyle_Last);
+}
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesOverLayDateTimeSplit() {
+	static const char *names[] = { "None", "Split_Symbol", "Split_Word", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNameOverLayDateTimeSplit(OverLayDateTimeSplit e) { return EnumNamesOverLayDateTimeSplit()[e]; }
+
+inline OverLayDateTimeSplit OverLayDateTimeSplitStr2EnumValue(const char *EName)
+{
+	return (OverLayDateTimeSplit)EnumName2EnumComm(EName, EnumNamesOverLayDateTimeSplit(), OverLayDateTimeSplit_None, OverLayDateTimeSplit_Last);
+}
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesPtzCameraLensFocusCtrlMode() {
+	static const char *names[] = { "None", "Auto", "SemiAutomatic", "Manual", "Last", nullptr };
+	return names;
+}
+inline const char *EnumNamePtzCameraLensFocusCtrlMode(PtzCameraLensFocusCtrlMode e) { return EnumNamesPtzCameraLensFocusCtrlMode()[e]; }
+inline PtzCameraLensFocusCtrlMode PtzCameraLensFocusCtrlModeStr2EnumValue(const char *EName)
+{
+	return (PtzCameraLensFocusCtrlMode)EnumName2EnumComm(EName, EnumNamesPtzCameraLensFocusCtrlMode(),
+		PtzCameraLensFocusCtrlMode_None, PtzCameraLensFocusCtrlMode_Last);
+}
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesPtzCameraLensFocusRegion() {
+	static const char *names[] = { "None", "AllRegion", "CentralRegion", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNamePtzCameraLensFocusRegion(PtzCameraLensFocusRegion e) { return EnumNamesPtzCameraLensFocusRegion()[e]; }
+
+inline PtzCameraLensFocusRegion PtzCameraLensFocusRegionStr2EnumValue(const char *EName)
+{
+	return (PtzCameraLensFocusRegion)EnumName2EnumComm(EName, EnumNamesPtzCameraLensFocusRegion(),
+		PtzCameraLensFocusRegion_None, PtzCameraLensFocusRegion_Last);
+}
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesPtzCameraLensFocusSearchMode() {
+	static const char *names[] = { "None", "FullView", "FAR_1_5M", "FAR_3_0M", "FAR_6_0M", "FAR_8_0M", "FAR_Infinity", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNamePtzCameraLensFocusSearchMode(PtzCameraLensFocusSearchMode e) { return EnumNamesPtzCameraLensFocusSearchMode()[e]; }
+inline PtzCameraLensFocusSearchMode PtzCameraLensFocusSearchModeStr2EnumValue(const char *EName)
+{
+	return (PtzCameraLensFocusSearchMode)EnumName2EnumComm(EName, EnumNamesPtzCameraLensFocusSearchMode(),
+		PtzCameraLensFocusSearchMode_None, PtzCameraLensFocusSearchMode_Last);
+}
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesPtzCameraLensIrisCtrlMode() {
+	static const char *names[] = { "None", "Auto", "Manual", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNamePtzCameraLensIrisCtrlMode(PtzCameraLensIrisCtrlMode e) { return EnumNamesPtzCameraLensIrisCtrlMode()[e]; }
+inline PtzCameraLensIrisCtrlMode PtzCameraLensIrisCtrlModeStr2EnumValue(const char *EName)
+{
+	return (PtzCameraLensIrisCtrlMode)EnumName2EnumComm(EName, EnumNamesPtzCameraLensIrisCtrlMode(),
+		PtzCameraLensIrisCtrlMode_None, PtzCameraLensIrisCtrlMode_Last);
+}
+//////////////////////////////////////////////////////////////////////////
 inline const char **EnumNamesAudioSampleRate() {
   static const char *names[] = { "NONE", "R8000", "R11025", "R12000", "R16000", "R22050", "R24000", "R32000", "R44100", "R48000", "R64000", "R88200", "R96000", "R192000", "LAST", nullptr };
   return names;
@@ -389,6 +489,7 @@ inline const char **EnumNamesProgressStatus() {
   return names;
 }
 inline const char *EnumNameProgressStatus(ProgressStatus e) { return EnumNamesProgressStatus()[e]; }
+
 inline ProgressStatus ProgressStatusStr2EnumValue(const char *EName)
 {
 	return (ProgressStatus)EnumName2EnumComm(EName, EnumNamesProgressStatus(), ProgressStatus_None, ProgressStatus_Last);
@@ -396,6 +497,53 @@ inline ProgressStatus ProgressStatusStr2EnumValue(const char *EName)
 //////////////////////////////////////////////////////////////////////////
 
 
+inline const char **EnumNamesEmailEncodeType() {
+	static const char *names[] = { "None", "TLS", "SSL", "NULL", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNameEmailEncodeType(EmailEncodeType e) { return EnumNamesEmailEncodeType()[e]; }
+
+inline EmailEncodeType EmailEncodeTypeStr2EnumValue(const char *EName)
+{
+	return (EmailEncodeType)EnumName2EnumComm(EName, EnumNamesEmailEncodeType(), EmailEncodeType_None, EmailEncodeType_Last);
+}
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesDdnsType() {
+	static const char *names[] = { "None", "DynDns", "Ddns3322", "DnsDynMaic", "DdnsExt1", "DdnsExt2", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNameDdnsType(DdnsType e) { return EnumNamesDdnsType()[e]; }
+
+
+inline DdnsType DdnsTypeStr2EnumValue(const char *EName)
+{
+	return (DdnsType)EnumName2EnumComm(EName, EnumNamesDdnsType(), DdnsType_None, DdnsType_Last);
+}
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesRenewalInterval() {
+	static const char *names[] = { "None", "HalfHour", "OneHour", "ThreeHour", "SixHour", "TwelveHour", "OneDay", "OneWeek", "OneMonth", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNameRenewalInterval(RenewalInterval e) { return EnumNamesRenewalInterval()[e]; }
+inline RenewalInterval RenewalIntervalStr2EnumValue(const char *EName)
+{
+	return (RenewalInterval)EnumName2EnumComm(EName, EnumNamesDdnsType(), RenewalInterval_None, RenewalInterval_Last);
+}
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesTimeZone() {
+	static const char *names[] = { "UTC_None", "UTC_W12", "UTC_W11", "UTC_W10", "UTC_W9_30", "UTC_W9", "UTC_W8", "UTC_W7", "UTC_W6", "UTC_W5", "UTC_W4", "UTC_W3_30", "UTC_W3", "UTC_W2", "UTC_W1", "UTC_0", "UTC_E1", "UTC_E2", "UTC_E3", "UTC_E3_30", "UTC_E4", "UTC_E4_30", "UTC_E5", "UTC_E5_30", "UTC_E5_45", "UTC_E6", "UTC_E6_30", "UTC_E7", "UTC_E8", "UTC_E8_45", "UTC_E9", "UTC_E9_30", "UTC_E10", "UTC_E10_30", "UTC_E11", "UTC_E12", "UTC_E13", "UTC_E14", "UTC_Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNameTimeZone(TimeZone e) { return EnumNamesTimeZone()[e]; }
+inline TimeZone TimeZoneStr2EnumValue(const char *EName)
+{
+	return (TimeZone)EnumName2EnumComm(EName, EnumNamesTimeZone(), TimeZone_UTC_None, TimeZone_UTC_Last);
+}
+//////////////////////////////////////////////////////////////////////////
 
 inline const char **EnumNamesLinkProtocol() {
   static const char *names[] = { "None", "Moon", "Onvif", "GBT28181", "RTSP", "Last", nullptr };

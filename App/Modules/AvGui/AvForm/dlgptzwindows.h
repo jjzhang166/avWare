@@ -4,6 +4,7 @@
 #include <QDialog>
 #include "AvCapture/AvManCapture.h"
 #include "Apis/AvWareStruct.h"
+#include "formptzadvanced.h"
 namespace Ui {
 class DlgPtzWindows;
 }
@@ -23,6 +24,9 @@ public:
 	void mouseMoveEvent(QMouseEvent *e);
 	void mousePressEvent(QMouseEvent *e);
 	void mouseReleaseEvent(QMouseEvent *e);
+
+public:
+	void movePtzAdvanced();
 private:
 	bool	m_mousePressed;
 	QPoint  m_mousePoint;
@@ -132,6 +136,9 @@ private:
 	bool			m_bAutoTour;
 	bool			m_bAutoScan;
 	bool			m_bAutoPan;
+
+	FormPtzAdvanced *m_FormPtzAdvanced;
+	bool			m_bFromPtzAdvancedShow;
 };
 
 #endif // DLGPTZWINDOWS_H

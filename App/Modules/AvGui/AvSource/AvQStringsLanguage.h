@@ -548,6 +548,53 @@ inline QString AvUiLangsAudioSampleBits(AudioSampleBits e) {
 }
 
 
+inline QString AvUiLangsPtzCameraLensFocusCtrlMode(PtzCameraLensFocusCtrlMode e){
+	static QString names[] = {
+		QObject::tr("None"),
+		QObject::tr("Auto"),
+		QObject::tr("SemiAutomatic"),
+		QObject::tr("Manual"),
+		QObject::tr("Last"),
+	};
+	return names[e];
+}
+
+inline QString AvUiLangsPtzCameraLensIrisCtrlMode(PtzCameraLensIrisCtrlMode e)
+{
+	static QString names[] = {
+		QObject::tr("None"),
+		QObject::tr("Auto"),
+		QObject::tr("Manual"),
+		QObject::tr("Last"),
+	};
+	return names[e];
+}
+inline QString AvUiLangsPtzCameraLensFocusRegion(PtzCameraLensFocusRegion e)
+{
+	static QString names[] = {
+		QObject::tr("None"),
+		QObject::tr("AllRegion"),
+		QObject::tr("CentralRegion"),
+		QObject::tr("Last"),
+	};
+	return names[e];
+}
+
+inline QString AvUiLangsPtzCameraLensFocusSearchMode(PtzCameraLensFocusSearchMode e)
+{
+	static QString names[] = {
+		QObject::tr("None"),
+		QObject::tr("FullView"),
+		QObject::tr("FAR_1_5M"),
+		QObject::tr("FAR_3_0M"),
+		QObject::tr("FAR_6_0M"),
+		QObject::tr("FAR_8_0M"),
+		QObject::tr("FAR_Infinity"),
+		QObject::tr("Last"),
+	};
+	return names[e];
+}
+
 
 inline QString AvUiLangsAudioSoundMode(AudioSoundMode e) {
 	static QString names[] = {
@@ -606,12 +653,127 @@ inline QString AvUiLangsLinkProtocol(LinkProtocol e) {
 	return names[e];
 }
 
+inline QString AvUiLangsOverLayDateTimeStyle(OverLayDateTimeStyle e) {
+	static QString names[] = {
+		QObject::tr("None"),
+		QObject::tr("Y_M_D_H_M_S"),
+		QObject::tr("Y_M_D_M_H_M_S"),
+		QObject::tr("H_M_S_Y_M_D"),
+		QObject::tr("Last"),
 
+	};
+	return names[e];
+}
+inline QString AvUiLangsOverLayDateTimeSplit(OverLayDateTimeSplit e) {
+	static QString names[] = {
+		QObject::tr("None"),
+		QObject::tr("Split_Symbol"),
+		QObject::tr("Split_Word"),
+		QObject::tr("Last"),
+	};
+	return names[e];
+}
 
+inline QString AvUiLangsFontSize(FontSize e) {
+	static QString names[] = {
+		QObject::tr("None"),
+		QObject::tr("_8"),
+		QObject::tr("_16"),
+		QObject::tr("_24"),
+		QObject::tr("_32"),
+		QObject::tr("_48"),
+		QObject::tr("_64"),
+		QObject::tr("_128"),
+		QObject::tr("Last"),
+	};
+	return names[e];
+}
 
+inline QString AvUiLangsEmailEncodeType(EmailEncodeType e) {
+	static QString names[] = {
+		QObject::tr("None"),
+		QObject::tr("TLS"),
+		QObject::tr("SSL"),
+		QObject::tr("NULL"),
+		QObject::tr("Last"),
+	};
+	return names[e];
+}
 
+inline QString AvUiLangsDdnsType(DdnsType e) {
+	static QString names[] = {
+		QObject::tr("None"),
+		QObject::tr("DynDns"),
+		QObject::tr("Ddns3322"),
+		QObject::tr("DnsDynMaic"),
+		QObject::tr("DdnsExt1"),
+		QObject::tr("DdnsExt2"),
+		QObject::tr("Last"),
+	};
+	return names[e];
+}
 
+inline QString AvUiLangsRenewalInterval(RenewalInterval e) {
+	static QString names[] = {
+		QObject::tr("None"),
+		QObject::tr("HalfHour"),
+		QObject::tr("OneHour"),
+		QObject::tr("ThreeHour"),
+		QObject::tr("SixHour"),
+		QObject::tr("TwelveHour"),
+		QObject::tr("OneDay"),
+		QObject::tr("OneWeek"),
+		QObject::tr("OneMonth"),
+		QObject::tr("Last"),
+	};
+	return names[e];
+}
 
+  
+inline QString AvUiLangsTimeZone(TimeZone e) {
+	static QString names[] = {
+		QObject::tr("UTC_None"),
+		QObject::tr("UTC_W12"),
+		QObject::tr("UTC_W11"),
+		QObject::tr("UTC_W10"),
+		QObject::tr("UTC_W9_30"),
+		QObject::tr("UTC_W9"),
+		QObject::tr("UTC_W8"),
+		QObject::tr("UTC_W7"),
+		QObject::tr("UTC_W6"),
+		QObject::tr("UTC_W5"),
+		QObject::tr("UTC_W4"),
+		QObject::tr("UTC_W3_30"),
+		QObject::tr("UTC_W3"),
+		QObject::tr("UTC_W2"),
+		QObject::tr("UTC_W1"),
+		QObject::tr("UTC_0"),
+		QObject::tr("UTC_E1"),
+		QObject::tr("UTC_E2"),
+		QObject::tr("UTC_E3"),
+		QObject::tr("UTC_E3_30"),
+		QObject::tr("UTC_E4"),
+		QObject::tr("UTC_E4_30"),
+		QObject::tr("UTC_E5"),
+		QObject::tr("UTC_E5_30"),
+		QObject::tr("UTC_E5_45"),
+		QObject::tr("UTC_E6"),
+		QObject::tr("UTC_E6_30"),
+		QObject::tr("UTC_E7"),
+		QObject::tr("UTC_E8"),
+		QObject::tr("UTC_E8_45"),
+		QObject::tr("UTC_E9"),
+		QObject::tr("UTC_E9_30"),
+		QObject::tr("UTC_E10"),
+		QObject::tr("UTC_E10_30"),
+		QObject::tr("UTC_E11"),
+		QObject::tr("UTC_E12"),
+		QObject::tr("UTC_E13"),
+		QObject::tr("UTC_E14"),
+		QObject::tr("UTC_Last"),
+	};
+	return names[e];
+}
 
 #endif
 

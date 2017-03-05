@@ -2,6 +2,7 @@
 #include "ui_dlgptzwindows.h"
 #include "AvUiComm/AvUiComm.h"
 #include "AvUiComm/IconComm.h"
+#include "formptzadvanced.h"
 DlgPtzWindows::DlgPtzWindows(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgPtzWindows)
@@ -11,7 +12,7 @@ DlgPtzWindows::DlgPtzWindows(QWidget *parent) :
 	IconComm::Instance()->SetIcon(ui->BtnClose, QChar(0xf00d), 10);
 	IconComm::Instance()->SetIcon(ui->LabIco, QChar(0xf015), 12);
 
-	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
+	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool );
 	this->setAttribute(Qt::WA_DeleteOnClose);
 
 	IconComm::Instance()->SetIcon(ui->BtnPtzAuto, QChar(0xf01e), 10);
@@ -27,6 +28,7 @@ DlgPtzWindows::DlgPtzWindows(QWidget *parent) :
 	IconComm::Instance()->SetIcon(ui->BtnPtzIrisReduce, QChar(0xf068), 10);
 	IconComm::Instance()->SetIcon(ui->BtnPtzIrisAdd, QChar(0xf067), 10);
 
+
 	m_WidowsMax = false;
 	m_mousePressed = false;
 	m_bAutoTour = false;
@@ -34,6 +36,8 @@ DlgPtzWindows::DlgPtzWindows(QWidget *parent) :
 	m_bAutoPan = false;
 	m_PtzValue = 0xff;
 	m_PtzSpeed = 50;
+	m_FormPtzAdvanced = NULL;
+	m_bFromPtzAdvancedShow = false;
 	FixUi();
 }
 
@@ -54,7 +58,12 @@ void DlgPtzWindows::FixUi()
 	m_Capture = g_AvManCapture.GetAvCaptureInstance(m_Channel);
 
 	m_Capture->ImageGetProfile(m_ImageProfile);
-
+	{
+		ui->HSliderBrightness->setTickInterval(5);
+		ui->HSliderContrast->setTickInterval(5);
+		ui->HSliderHue->setTickInterval(5);
+		ui->HSliderSaturation->setTickInterval(5);
+	}
 
 	ui->BtnAutoPan->setText(QObject::tr("Pan On"));
 	ui->BtnAutoScan->setText(QObject::tr("Scan On"));
@@ -68,6 +77,9 @@ void DlgPtzWindows::mouseMoveEvent(QMouseEvent *e)
 {
 	if (m_mousePressed && (e->buttons() && Qt::LeftButton) && !m_WidowsMax) {
 		this->move(e->globalPos() - m_mousePoint);
+		if (m_bFromPtzAdvancedShow == true){
+			movePtzAdvanced();
+		}
 		e->accept();
 	}
 }
@@ -89,13 +101,30 @@ void DlgPtzWindows::mouseReleaseEvent(QMouseEvent *e)
 
 }
 
+void DlgPtzWindows::movePtzAdvanced()
+{
+	if (m_bFromPtzAdvancedShow == true){
+		QRect PtzWindwosRect = geometry();
+		QPoint newPoint; 
+		QSize PtzWindowsSize = size();
+		newPoint.setX(PtzWindwosRect.x() + PtzWindowsSize.width());
+		newPoint.setY(PtzWindwosRect.y());
+		m_FormPtzAdvanced->move(newPoint);
+	}
+	
+}
 void DlgPtzWindows::on_BtnClose_clicked()
 {
+	if (m_FormPtzAdvanced != NULL){
+		delete m_FormPtzAdvanced;
+		m_FormPtzAdvanced = NULL;
+	}
     this->close();
 }
 void DlgPtzWindows::PtzStop()
 {
-	C_PtzCmd Command;
+	C_PtzCmd Command ;
+	memset(&Command, 0x00, sizeof(C_PtzCmd));
 	Command.PtzCmd = PtzCommand_STOP;
 	Command.bEnAck = av_false;
 	Command.Value = m_PtzValue;
@@ -105,10 +134,13 @@ void DlgPtzWindows::PtzStop()
 }
 void DlgPtzWindows::PtzStart(PtzCommand Command, C_PtzCmd *pCmd)
 {
-	C_PtzCmd Cmd;
+	m_PtzValue = ui->LiEditPtzValue->text().toInt();
+	C_PtzCmd Cmd ;
+	memset(&Cmd, 0x00, sizeof(C_PtzCmd));
 	Cmd.PtzCmd = Command;
 	Cmd.PtzSpeed = m_PtzSpeed;
 	Cmd.bEnAck = av_false;
+	Cmd.Value = m_PtzValue;
 	if (pCmd != NULL){
 		Cmd = *pCmd;
 		Cmd.Value = m_PtzValue;
@@ -340,7 +372,20 @@ void DlgPtzWindows::on_BtnPattem_clicked()
 
 void DlgPtzWindows::on_BtnPtzConfig_clicked()
 {
-
+    if (NULL == m_FormPtzAdvanced){
+            m_FormPtzAdvanced = new FormPtzAdvanced(this);
+    }
+    //m_FormPtzAdvanced->setMouseTracking(true);
+    if (m_bFromPtzAdvancedShow == false){
+            m_bFromPtzAdvancedShow = !m_bFromPtzAdvancedShow;
+            movePtzAdvanced();
+            m_FormPtzAdvanced->show();
+            m_FormPtzAdvanced->SetCurrentChannel(m_Capture);
+    }
+    else{
+            m_bFromPtzAdvancedShow = !m_bFromPtzAdvancedShow;
+            m_FormPtzAdvanced->hide();
+    }
 }
 void DlgPtzWindows::on_BtnAuxOn_clicked()
 {
@@ -354,7 +399,7 @@ void DlgPtzWindows::on_BtnAuxOff_clicked()
 
 void DlgPtzWindows::on_BtnPtzZoomAdd_pressed()
 {
-	PtzStart(PtzCommand_ZOOM_WIDE);
+	PtzStart(PtzCommand_ZOOM_TELE);
 }
 
 void DlgPtzWindows::on_BtnPtzZoomAdd_released()
@@ -384,7 +429,7 @@ void DlgPtzWindows::on_BtnPtzFocusAdd_released()
 
 void DlgPtzWindows::on_BtnPtzZoomReduce_pressed()
 {
-	PtzStart(PtzCommand_ZOOM_TELE);
+	PtzStart( PtzCommand_ZOOM_WIDE);
 }
 
 void DlgPtzWindows::on_BtnPtzZoomReduce_released()

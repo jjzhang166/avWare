@@ -5,6 +5,7 @@
 #include "QMouseEvent"
 #include "QAvEvent.h"
 #include "AvUiComm/FloatingButton.h"
+#include "AvForm/frmmainmenu.h"
 
 
 
@@ -18,6 +19,7 @@ class FrmMainWindows : public QWidget
 public:
 	explicit FrmMainWindows(QWidget *parent = 0);
 	~FrmMainWindows();
+	QPoint	 GetVideoAreaToGlobal();
 public:
 	bool eventFilter(QObject *obj, QEvent *event);
 	void mouseMoveEvent(QMouseEvent *e);
@@ -27,7 +29,6 @@ protected:
 	void customEvent(QEvent* event);
 
 private slots:
-        void on_BtnMenu_clicked();
 
         void on_BtnMin_clicked();
 
@@ -51,16 +52,19 @@ private slots:
 
         void on_BtnVideoWindowInfo_clicked();
 
+        void on_BtnAbout_clicked();
+
 private:
 	QRect	m_localRect;
 	bool	m_mousePressed;
 	QPoint  m_mousePoint;
 	bool	m_WidowsMax;
-
 	bool	m_bOpenedMenu;
+	bool	m_VideoWidowsMax;
 private:
-    Ui::FrmMainWindows *ui;
-	FloatingButton		*		m_FloatButton;
+    Ui::FrmMainWindows	*	ui;
+	FloatingButton		*	m_FloatButton;
+	FrmMainMenu			*	m_FrmMainMenu;
 };
 
 #endif // FRMMAINWINDOWS_H

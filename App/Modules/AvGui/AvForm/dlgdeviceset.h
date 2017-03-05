@@ -4,6 +4,7 @@
 #include <QDialog>
 #include "AvUiComm/tablemodel.h"
 #include "Apis/AvWareStruct.h"
+#include "AvCapture/AvCapture.h"
 
 namespace Ui {
 class DlgDeviceSet;
@@ -16,6 +17,8 @@ class DlgDeviceSet : public QDialog
 public:
     explicit DlgDeviceSet(QWidget *parent = 0);
     ~DlgDeviceSet();
+	Capture * GetChannelHandle();
+
 	void FixDlgUi();
 	void FixDlgUiCapture();
 	void FixDlgUiEncode();
@@ -53,6 +56,29 @@ public:
 
 
 public:
+	void FillInNetWorkNetSet();
+	void FillInNetWorkFtp();
+	void FillInNetWorkEmail();
+	void FillInNetWorkUpnp();
+	void FillInNetWorkRtsp();
+	void FillInNetWorkDDNS();
+	void FillInNetWorkP2P();
+	void FillInNetWorkRTMP();
+	void FillInNetWorkNTP();
+
+
+	void SubmitNetWorkNetSet();
+	void SubmitNetWorkFtp();
+	void SubmitNetWorkEmail();
+	void SubmitNetWorkUpnp();
+	void SubmitNetWorkRtsp();
+	void SubmitNetWorkDDNS();
+	void SubmitNetWorkP2P();
+	void SubmitNetWorkRTMP();
+	void SubmitNetWorkNTP();
+
+
+public:
 	void ShowErrorConnectMesageBox();
 	void ShowErrorGetArgs();
 	void ShowSucceedSetArgs();
@@ -60,7 +86,7 @@ public:
 
 private:
 	void resizeEvent(QResizeEvent * event);
-
+	void showEvent(QShowEvent *event);
 private slots:
     void on_BtnClose_clicked();
 
@@ -115,14 +141,49 @@ private slots:
 
         void on_CBoxAiEncodeType_currentIndexChanged(const QString &arg1);
 
+        void on_BtnVideoCover_clicked();
+
+        void on_BtnOverlay_clicked();
+
+        void on_BtnAlmTimeSelect_clicked();
+
+        void on_BtnAlmAreaSelect_clicked();
+
+        void on_CBoxNetWorkFtpEnable_clicked(bool checked);
+
+        void on_CBoxNetWorkEmailEnable_clicked(bool checked);
+
+       // void on_CBoxNetWorkUpnpEnable_clicked(bool checked);
+
+        void on_CBoxNetWorkRtspEnable_clicked(bool checked);
+
+        void on_CBoxNetWorkDdnsEnable_clicked(bool checked);
+
+        void on_CBoxNetWorkP2PEnable_clicked(bool checked);
+
+        void on_CBoxNetWorkP2PUseLinkID_clicked(bool checked);
+
+        void on_CBoxNetWorkTimeEnable_clicked(bool checked);
+
+        void on_CBoxNetWorkUpnpWeb_clicked(bool checked);
+
+        void on_CBoxNetWorkUpnpProtoPort_clicked(bool checked);
+
+        void on_CBoxNetWorkUpnpRtsp_clicked(bool checked);
+
+        void on_CBoxAlmEnable_clicked(bool checked);
+
 private:
 	TableModel			* m_TviewRtmpListTableModel;
 private:
     Ui::DlgDeviceSet *ui;
 	bool	m_UiInitedOver;
-
 	C_AudioCaps		m_CurrentAudioCaps;
 	C_AudioProfile	m_CurrentAudioProfile;
+
+	C_TimeArea  m_AlarmTimeArea[AvMaxWeeks][AvMaxTimeArea];
+	av_u32		m_AlarmMotionArea[ConfMotionDetectionLine];
+
 };
 
 #endif // DLGDEVICESET_H

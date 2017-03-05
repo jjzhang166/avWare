@@ -41,7 +41,7 @@ private:
 	CAvConfigNetUpnp m_AvConfigNetUpnp;
 
 	char m_LocalIP[16];
-	int m_InternalPort[Mapping_NR];
+	int m_InternalPort[10];
 };
 
 #define g_AvDdnsCli (*CAvUpnpCli::instance())

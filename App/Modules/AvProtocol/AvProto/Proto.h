@@ -73,7 +73,7 @@ public:
 	I_RET RemoteAudioSetProfile(int Channel, C_AudioProfile &AudioProfile);
 
 	I_RET RemoteImageGetCaps(int Channel, C_ImageCaps &ImageCaps);
-	I_RET RemoteImageGetrofile(int Channel, C_ImageProfile &ImageProfile);
+	I_RET RemoteImageGetProfile(int Channel, C_ImageProfile &ImageProfile);
 	I_RET RemoteImageSetProfile(int Channel, C_ImageProfile &ImageProfile);
 
 	I_RET RemotePtzGetCaps(int Channel, C_PtzCaps &PtzCaps);
@@ -81,21 +81,29 @@ public:
 	I_RET RemotePtzSetProfile(int Channel, C_PtzProfile &PtzProfile);
 	I_RET RemotePtzSetCommand(int Channel, C_PtzCmd &PtzCmd);
 
+
+	I_RET RemoteAdvancedSystemGetCaps(int Channel, C_AdvancedSystemCaps &AdvancedSystemCaps);
+	I_RET RemoteAdvancedSystemGetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile);
+	I_RET RemoteAdvancedSystemSetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile);
+
+
 	I_RET RemoteFactoryInfoGet(C_ManufacturerInfo &ManfacturerInfo);
 	
 
 	I_RET RemoteNetCommGetCaps(C_NetCommCaps &NetCommCaps);
 	I_RET RemoteNetCommGetProfile(C_NetWorkProfile &NetWorkProfile);
 	
-
-	I_RET RemoteFirmWareGetInfo(C_FirmwareInfo &FirmwareInfo);
 	I_RET RemoteFirmWareUpgrade(C_FirmWareUpgrade &FirmWareUpgrade);
 	I_RET RemoteFirmWareUpgradeGetProgress(int &Progress);
+
+
 	I_RET RemoteStreamStart(int Channel, int Slave);
 	I_RET RemoteStreamStop(int Channel, int Slave);
 	I_RET RemoteSendAvPacket(int Channel, int Slave, CAvPacket *pack);
 	
-
+	I_RET		RemoteSyncSystemTime(av_timeval &atv);
+	I_RET		RemoteRequestIdrFrame(av_int Slave = CHL_MAIN_T);
+	CAvPacket * RemoteSnapshot(int Channel, av_bool bRealTime = av_false, av_uint SnapshotInterval = 0, av_uint ContinuousTimes = 0);
 
 public:
 	virtual I_RET RemoteOnAvPacket(int Channel, int Slave, CAvPacket *pack) = 0;
@@ -125,19 +133,27 @@ public:
 	virtual I_RET  LocalPtzSetProfile(int Channel, C_PtzProfile &PtzProfile) = 0;
 	virtual I_RET  LocalPtzSetCommand(int Channel, C_PtzCmd &PtzCmd) = 0;
 
-	virtual I_RET  LocalFactoryInfoGet(C_ManufacturerInfo &ManfacturerInfo) = 0;
-	virtual I_RET  LocalFactoryInfoSet(C_ManufacturerInfo &ManfacturerInfo) = 0;
+	virtual I_RET  LocalAdvancedSystemGetCaps(int Channel, C_AdvancedSystemCaps &AdvancedSystemCaps) = 0;
+	virtual I_RET  LocalAdvancedSystemGetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile) = 0;
+	virtual I_RET  LocalAdvancedSystemSetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile) = 0;
 
 	virtual I_RET  LocalNetCommGetCaps(C_NetCommCaps &NetCommCaps) = 0;
 	virtual I_RET  LocalNetCommGetProfile(C_NetWorkProfile &NetWorkProfile) = 0;
 	virtual I_RET  LocalNetCommSetProfile(C_NetWorkProfile &NetWorkProfile) = 0;
-	virtual I_RET  LocalFirmWareGetInfo(C_FirmwareInfo &FirmwareInfo) = 0;
+
+
 	virtual I_RET  LocalFirmWareUpgrade(C_FirmwareData &FirmwareData) = 0;
 	virtual I_RET  LocalFirmWareUpgradeGetProgress(int &Progress) = 0;
 
 	virtual I_RET  LocalStreamStart(int Channel, int Slave) = 0;
 	virtual I_RET  LocalStreamStop(int Channel, int Slave) = 0;
-	virtual I_RET  LocalDeviceStatus(C_DevStatusInfo &DeviceStat) = 0;
+
+	virtual CAvPacket * LocalSnapshot(int Channel, av_bool bRealTime = av_false, av_uint SnapshotInterval = 0, av_uint ContinuousTimes = 0) = 0;
+
+	virtual I_RET  LocalSyncSystemTime(int Channel, av_timeval &atv) = 0;
+	virtual I_RET  LocalRequestIdrFrame(int Channel, int Slave) = 0;
+
+
 	virtual CNetUv *OnConnect(const char *remoteAddr, const int remotePort);
 	virtual I_RET  LocalCheckAuthorization(const char *usrname, const char *passwd, unsigned int &UsrAccess) = 0;
 

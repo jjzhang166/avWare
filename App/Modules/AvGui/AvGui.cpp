@@ -21,7 +21,7 @@ SINGLETON_IMPLEMENT(CAvGui);
 
 CAvGui::CAvGui()
 {
-
+	
 }
 CAvGui::~CAvGui()
 {

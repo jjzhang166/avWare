@@ -17,13 +17,16 @@ VideoWidgetManager::VideoWidgetManager(QWidget *parent)
     initVideoWidgetManager();
     this->setMouseTracking(true);
 
-
 	m_WgetVideoInfo = new WgetVideoInfo(this);
 	m_WgetVideoInfo->setMouseTracking(true);
 	m_WgetVideoInfo->setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
 	m_WgetVideoInfo->setAttribute(Qt::WA_TranslucentBackground, true);
 	m_WgetVideoInfo->hide();
 	m_bOpenVideoInfoWindows = false;
+	
+	connect(m_WgetVideoInfo, SIGNAL(SignalsUiButtonMessage(WGET_VIDEOINFO_UIMSG)), this, SLOT(SlotVideoInfoOnUiMsg(WGET_VIDEOINFO_UIMSG)));
+
+
 	startTimer(1000);
 
 }
@@ -36,7 +39,7 @@ VideoWidgetManager::~VideoWidgetManager()
 
 void VideoWidgetManager::initVideoWidgetManager()
 {    
-	setLayoutMode(LAYOUT_MODE_EIGHT);
+	setLayoutMode(LAYOUT_MODE_FOUR);
 	//setLayoutMode(LAYOUT_MODE_SIZTYFOUR);
 }
 
@@ -133,6 +136,7 @@ void VideoWidgetManager::drawGrid(QPainter & painter, int rows, int cols)
 
 void VideoWidgetManager::setLayoutMode(int layoutMode)
 {
+	CAvPreview::SetSpiltScreen(layoutMode);
 	m_WidgetLayoutNum = layoutMode;
     LayoutZoneList zones;
     switch (layoutMode)
@@ -444,7 +448,7 @@ void VideoWidgetManager::setLayout(int rows, int cols, LayoutZoneList & zones, b
             widget = m_VideoWidgets.takeAt(0);
         }
         
-        initVideoWidget(widget, widgetZone);
+        initVideoWidget(widget, widgetZone, i);
         
         m_WidgetLayout.zones.push_back(widgetZone);
     }
@@ -463,7 +467,7 @@ void VideoWidgetManager::setLayout(int rows, int cols, LayoutZoneList & zones, b
     update();
 }
 
-void VideoWidgetManager::initVideoWidget(VideoWidget * widget, WidgetZone & widgetZone)
+void VideoWidgetManager::initVideoWidget(VideoWidget * widget, WidgetZone & widgetZone, int ScreenID)
 {
     if (widget)
     {
@@ -473,7 +477,7 @@ void VideoWidgetManager::initVideoWidget(VideoWidget * widget, WidgetZone & widg
     else
     {
 		widgetZone.widget = new VideoWidget(this);
-		
+		widgetZone.widget->BindWidgetScreenID(ScreenID);
         widgetZone.widget->m_filePath = widgetZone.zone.filePath;
         QObject::connect(widgetZone.widget, SIGNAL(videoWidgetResize()), this, SLOT(SlotVideoWidgetReSize()));
 		QObject::connect(widgetZone.widget, SIGNAL(widgetSelecting(QWidget*)), this, SLOT(SlotWidgetSelecting(QWidget*)));
@@ -537,7 +541,10 @@ VideoWidget * VideoWidgetManager::GetSelectedWidget()
 
     return pSelectedWidget;
 }
-
+int		VideoWidgetManager::GetSplitCount()
+{
+	return m_WidgetLayoutNum;
+}
 VideoWidget * VideoWidgetManager::GetIdleWidget()
 {
     VideoWidget * pIdleWidget = NULL;
@@ -558,6 +565,7 @@ VideoWidget * VideoWidgetManager::GetIdleWidget()
 
 void VideoWidgetManager::SlotOnPreviewStart(int Channel, int Slave, bool bOpen)
 {
+	av_warning("mark \n");
 	if (Channel >= m_WidgetLayout.zones.size()){
 		AvQDebug("channel = %d  zones.size = %d\n", Channel, m_WidgetLayout.zones.size());
 		return;
@@ -571,8 +579,9 @@ void VideoWidgetManager::SlotOnPreviewStart(int Channel, int Slave, bool bOpen)
 	else {
 		Slave = CHL_SUB1_T;
 	}
-	
+	av_warning("mark \n");
 	widgetZone.widget->PreviewStart(Channel, Slave, bOpen);
+	av_warning("mark \n");
 
 }
 void	VideoWidgetManager::SlotOnShowInfoWidget(QWidget *pWidget, bool bShow)
@@ -616,12 +625,46 @@ void    VideoWidgetManager::SlotMaxWindows(QWidget *pWidget, bool bMax)
 	m_WgetVideoInfo->move(tmpPos);
 	m_WgetVideoInfo->raise();
 }
-
+void	VideoWidgetManager::SlotVideoInfoOnUiMsg(WGET_VIDEOINFO_UIMSG eUiMsg)
+{
+	switch (eUiMsg)
+	{
+	case UIMSG_START_LISTEN:
+		av_msg("UIMSG_START_LISTEN\n");
+		break;
+	case UIMSG_STOP_LISTEN:
+		av_msg("UIMSG_STOP_LISTEN\n");
+		break;
+	case UIMSG_START_RECORD:
+		av_msg("UIMSG_START_RECORD\n");
+		break;
+	case UIMSG_STOP_RECORD:
+		av_msg("UIMSG_STOP_RECORD\n");
+		break;
+	case UIMSG_START_SPEAKLISTEN:
+		av_msg("UIMSG_START_SPEAKLISTEN\n");
+		break;
+	case UIMSG_STOP_SPEAKLISTEN:
+		av_msg("UIMSG_STOP_SPEAKLISTEN\n");
+		break;
+	case UIMSG_START_VIDEO:
+		av_msg("UIMSG_START_VIDEO\n");
+		break;
+	case UIMSG_STOP_VIDEO:
+		av_msg("UIMSG_STOP_VIDEO\n");
+		break;
+	case UIMSG_REQUEST_SNAP:
+		av_msg("UIMSG_REQUEST_SNAP\n");
+		break;
+	default:
+		break;
+	}
+}
 
 void	VideoWidgetManager::SlotSpiltScreen(int Screens)
 {
+
 	setLayoutMode(Screens);
 	m_WgetVideoInfo->hide();
 	m_bOpenVideoInfoWindows = false;
-
 }

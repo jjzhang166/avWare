@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>450</height>
+    <width>669</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,21 +15,15 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <property name="leftMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
     <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
-   <property name="bottomMargin">
-    <number>6</number>
-   </property>
-   <property name="spacing">
-    <number>4</number>
-   </property>
-   <item row="0" column="0" colspan="2">
+   <item row="0" column="0">
     <widget class="QWidget" name="WidGetTitle" native="true">
      <property name="enabled">
       <bool>true</bool>
@@ -83,7 +77,7 @@
          </size>
         </property>
         <property name="text">
-         <string>NetSetDlg</string>
+         <string>Upgrade</string>
         </property>
        </widget>
       </item>
@@ -243,145 +237,159 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" rowspan="3">
-    <widget class="QTableView" name="TviewDeviceList"/>
-   </item>
-   <item row="1" column="1">
-    <widget class="QTableView" name="TviewPacket"/>
-   </item>
-   <item row="2" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QPushButton" name="BtnDelPacket">
-       <property name="text">
-        <string>DelPacket</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="BtnAddPacket">
-       <property name="text">
-        <string>AddPacket</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="3" column="1">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>PacketInfo</string>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="leftMargin">
+      <number>6</number>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <layout class="QFormLayout" name="formLayout">
-        <property name="horizontalSpacing">
-         <number>16</number>
-        </property>
-        <property name="verticalSpacing">
-         <number>12</number>
-        </property>
-        <property name="leftMargin">
-         <number>16</number>
-        </property>
-        <property name="topMargin">
-         <number>16</number>
-        </property>
-        <property name="rightMargin">
-         <number>16</number>
-        </property>
-        <property name="bottomMargin">
-         <number>16</number>
-        </property>
-        <item row="0" column="0">
-         <widget class="QLabel" name="LabPacketSoftVer">
-          <property name="text">
-           <string>SoftVer</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="LabPacketHardPlation">
-          <property name="text">
-           <string>HardPlation</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="LabPacketCustom">
-          <property name="text">
-           <string>Custom</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="LabPacketBuildTime">
-          <property name="text">
-           <string>BuilTime</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="LabPacketMsgSoftVer">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLabel" name="LabPacketMsgHardPlation">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="LabPacketMsgCustom">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLabel" name="LabPacketMsgBuildTime">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="HorSubCannelBtn">
+     <property name="rightMargin">
+      <number>6</number>
+     </property>
      <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
+      <widget class="QTableView" name="TviewDeviceList"/>
      </item>
      <item>
-      <widget class="QPushButton" name="BtnSubmit">
-       <property name="text">
-        <string>Submit</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="BtnCannel">
-       <property name="text">
-        <string>Cannel</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QTableView" name="TviewPacket"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QPushButton" name="BtnDelPacket">
+           <property name="text">
+            <string>DelPacket</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="BtnAddPacket">
+           <property name="text">
+            <string>AddPacket</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>PacketInfo</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <layout class="QFormLayout" name="formLayout">
+            <property name="horizontalSpacing">
+             <number>16</number>
+            </property>
+            <property name="verticalSpacing">
+             <number>12</number>
+            </property>
+            <property name="leftMargin">
+             <number>16</number>
+            </property>
+            <property name="topMargin">
+             <number>16</number>
+            </property>
+            <property name="rightMargin">
+             <number>16</number>
+            </property>
+            <property name="bottomMargin">
+             <number>16</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="LabPacketSoftVer">
+              <property name="text">
+               <string>SoftVer</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="LabPacketHardPlation">
+              <property name="text">
+               <string>HardPlation</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="LabPacketCustom">
+              <property name="text">
+               <string>Custom</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="LabPacketBuildTime">
+              <property name="text">
+               <string>BuilTime</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="LabPacketMsgSoftVer">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="LabPacketMsgHardPlation">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="LabPacketMsgCustom">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLabel" name="LabPacketMsgBuildTime">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="HorSubCannelBtn">
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="BtnSubmit">
+           <property name="text">
+            <string>Submit</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="BtnCannel">
+           <property name="text">
+            <string>Cannel</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

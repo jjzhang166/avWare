@@ -43,14 +43,12 @@ private:
 
 private:
 	av_bool SendAlmMsg(CAvAlarm::AlmMsg  &msg);
-	av_bool PacketAlmIo(C_AlmIoResult *Result);
-	av_bool PacketAlmMd(C_AlmMdResult *Result);
+	av_bool PacketAlmIo(av_u32 Result, av_bool bOpen = av_false);
+	av_bool PacketAlmMd(av_u32 Result[], av_bool bOpen = av_false);
 
 
 public:
-	C_AlmIoCaps m_AlmIoCaps;
-	C_AlmMdCaps m_AlmMdCaps;
-
+	C_AlarmCaps m_AlarmCaps;
 
 private:
 	void ThreadProc();

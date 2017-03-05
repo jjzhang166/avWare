@@ -172,8 +172,8 @@ static int	GetDeviceCab(DeviceCab_S *info)
 	info->chnelCount = 1;
 	info->streamCount= 2;
 	info->AnalyticsEnable = 0;
-	info->AudioEnable = 0;
-	info->PtzEnable = 0;
+	info->AudioEnable = -1;
+	info->PtzEnable = -1;
 	info->VideoEnable = 0;
 	return 0;
 }
@@ -297,31 +297,28 @@ static int	GetVideoEncodeCab(int chn, int streamId, VedioEncodeCab_S *info)
 	CAvConfigEncode ConfigEncode;
 	ConfigEncodeProfile &Profile = ConfigEncode.GetConfig(chn);
 
+
+
+	
 	for (int i = 0; i < AvComp_LAST; i++){
-		if (streamId == CHL_MAIN_T){
 			if (!(AvMask(i) & EncodeCaps.CompMask)) continue;
-		}
-		else if (streamId == CHL_SUB1_T){
-			if (!(AvMask(i) & EncodeCaps.ExtImageSizeMask[Profile.CHLProfile[CHL_MAIN_T].Profile.ImageSize])) continue;
-		}
-		else{
-			av_error("Onvif Stream id = %d  bad number\n", streamId);
-			break;
-		}
-		
 		switch (i)
 		{
 		case AvComp_MJPEG:
 			info->encodingCab = (VideoEncoding_E)(info->encodingCab | VideoEncoding__JPEG);
+			av_msg("AvComp_MJPEG\r\n");
 			break;
 		case AvComp_H264:
 			info->encodingCab = (VideoEncoding_E)(info->encodingCab | VideoEncoding__H264);
+			av_msg("VideoEncoding__H264\r\n");
 			break;
 		case AvComp_H265:
 			info->encodingCab = (VideoEncoding_E)(info->encodingCab | VideoEncoding__H265);
+			av_msg("VideoEncoding__H265\r\n");
 			break;
 		case AvComp_JPEG:
 			info->encodingCab = (VideoEncoding_E)(info->encodingCab | VideoEncoding__JPEG);
+			av_msg("VideoEncoding__JPEG\r\n");
 			break;
 		default:
 			break;
@@ -336,8 +333,23 @@ static int	GetVideoEncodeCab(int chn, int streamId, VedioEncodeCab_S *info)
 	info->qulityRange.max = 10;
 	info->qulityRange.min = 1;
 	int pos = 0;
+
 	for (int i = CaptureSize_HC8K; i > CaptureSize_Self; i--){
+		//if (!(AvMask(i) & EncodeCaps.ImageSizeMask)) continue; 
+		if (CHL_MAIN_T == streamId) {
 		if (!(AvMask(i) & EncodeCaps.ImageSizeMask)) continue;
+		}
+		else if ((CHL_SUB1_T == streamId) && (EncodeCaps.ExtChannelMask & AvMask(streamId))) {
+			CAvConfigEncode	conf_encode;
+			conf_encode.Update(chn);
+			ConfigEncodeProfile &profile = conf_encode.GetConfig(chn);
+
+			int tmp = profile.CHLProfile[CHL_MAIN_T].Profile.ImageSize;
+			if (!(AvMask(i) & EncodeCaps.ExtImageSizeMask[tmp])){
+				continue;
+			}
+		}
+		av_msg("chn = %d,slave = %d,i = %d",chn,streamId,i);
 		switch (i)
 		{
 		case CaptureSize_QVGAEX:	//320*180
@@ -405,6 +417,7 @@ static int	GetVideoEncodeCab(int chn, int streamId, VedioEncodeCab_S *info)
 			assert(0);
 			break;
 		}
+		av_msg("chn = %d,slave = %d,i= %d,res=[%dx%d]",chn,streamId,i,info->resSupport[pos-1].width,info->resSupport[pos-1].height);
 	}
 	info->resSupportNum = pos;
 	assert(pos);
@@ -451,7 +464,7 @@ static int	SetSystemTime(SystemTime_S *info)
 	
 	struct tm t;
 	t.tm_year = info->year - 1900;
-	t.tm_mon = info->month;
+	t.tm_mon = info->month - 1;
 	t.tm_mday = info->day;
 	t.tm_hour = info->hour;
 	t.tm_min = info->min;
@@ -565,6 +578,23 @@ static	int	SetPtzConfig(PtzConfig_S *info)
 	return 0;
 }
 
+static int SetPtzContinueMove(PtzParam_T *info)
+{
+	
+	return 0;
+}
+
+static int SetPtzAbsoluteMove(PtzParam_T *info)
+{
+	return 0;
+}
+
+static int SetPtzRelativeMove(PtzParam_T *info)
+{
+	return 0;
+}
+
+
 SINGLETON_IMPLEMENT(CAvOnvifSer)
 
 av_bool CAvOnvifSer::InitCbfun()
@@ -591,6 +621,9 @@ av_bool CAvOnvifSer::InitCbfun()
 	m_OnvifSerHandle.pGetPtzCab				= GetPtzCab;
 	m_OnvifSerHandle.pGetPtzConfig			= GetPtzConfig;
 	m_OnvifSerHandle.pSetPtzConfig			= SetPtzConfig;
+	m_OnvifSerHandle.pSetPtzContinueMove	= SetPtzContinueMove;
+	m_OnvifSerHandle.pSetPtzAbsoluteMove	= SetPtzAbsoluteMove;
+	m_OnvifSerHandle.pSetPtzRelativeMove	= SetPtzRelativeMove;
 	return av_true;
 }
 

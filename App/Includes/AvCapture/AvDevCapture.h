@@ -16,6 +16,7 @@
 #define _AV_DEVCAPTURE_H_
 #include "AvCapture/AvCapture.h"
 #include "AvConfigs/AvConfigCapture.h"
+#include "AvConfigs/AvConfigAlarm.h"
 #include "AvProc/AvProc.h"
 
 class CAvDevCapture:public Capture
@@ -31,10 +32,10 @@ public:
 	av_bool Start(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnData);
 	av_bool Stop(av_int Slave, CAvObject *obj, SIG_PROC_ONDATA pOnData);
 
-	av_bool SetTime(av_timeval &atv);
-	av_bool SetIFrame(av_int Slave = CHL_MAIN_T);
 	EAvCaptureStatus GetCaptureStatus(av_int Slave = -1);
-	CAvPacket *GetSnap(av_int Slave = CHL_SUB1_T);
+
+	//CAvPakcet over , usr call packet->Release();
+	CAvPacket * Snapshot(av_bool bRealTime = av_false, av_uint SnapshotInterval = 0, av_uint ContinuousTimes = 0);
 
 public:
 	av_bool CaptureGetCaps(C_CaptureCaps &CaptureCaps);
@@ -58,6 +59,20 @@ public:
 	av_bool PtzSetProfile(C_PtzProfile &PtzProfile);
 	av_bool PtzSetCommand(C_PtzCmd &PtzCmd);
 
+	av_bool AdvancedSystemGetCaps(C_AdvancedSystemCaps &AdvancedSystemCaps);
+	av_bool AdvancedSystemGetProfile(C_AdvancedSystemProfile &AdvancedSystemProfile);
+	av_bool AdvancedSystemSetProfile(C_AdvancedSystemProfile &AdvancedSystemProfile);
+
+
+private:
+	av_bool CoverGetProfile(C_CoverProfile &CoverProfile);
+	av_bool CoverSetProfile(C_CoverProfile &CoverProfile);
+	av_bool OverLayGetCaps(C_OverLayCaps &OverLayCaps);
+	av_bool OverLayGetProfile(C_OverLayProfile &OverlayProfile);
+	av_bool OverLaySetProfile(C_OverLayProfile &OverlayProfile);
+	av_bool AlarmGetCaps(C_AlarmCaps &AlarmCaps);
+	av_bool AlarmSetProfile(C_AlarmProfile &AlmProfile);
+	av_bool AlarmGetProfile(C_AlarmProfile &AlmProfile);
 private:
 	av_uint m_RecvFrameNu[CHL_NR_T];
 	av_uint m_ContinuousErrFrameNu[CHL_NR_T];
@@ -93,17 +108,18 @@ private:
 	av_void OnConfigEncodeModify(CAvConfigEncode *ConfigEncode, int &result);
 	av_void OnConfigImageModify(CAvConfigImage *ConfigImage, int &result);
 	av_void OnConfigCoverModify(CAvConfigCover *ConfigCover, int &result);
-	av_void OnConfigWaterMarkingModify(CAvConfigWaterMarking *ConfigWaterMarking, int &result);
+	av_void OnConfigOverLayModify(CAvConfigOverLay *ConfigOverLay, int &result);
 	av_void OnConfigCaptureModify(CAvConfigCapture *ConfigCapture, int &result);
 	av_void OnConfigAudioModify(CAvConfigAudio *ConfigAudio, int &result);
-
+	av_void OnConfigAlarmModify(CAvConfigAlarm *Configalarm, int &result);
 private:
 	CAvConfigEncode			m_ConfigEncode;
 	CAvConfigImage			m_ConfigImage;
 	CAvConfigCover			m_ConfigCover;
-	CAvConfigWaterMarking	m_ConfigWaterMark;
+	CAvConfigOverLay		m_ConfigOverLay;
 	CAvConfigCapture		m_ConfigCapture;
 	CAvConfigAudio			m_ConfigAudioCapture;
+	CAvConfigAlarm			m_ConfigAlarm;
 };
 
 

@@ -32,7 +32,7 @@ av_bool CAvUpnpCli::Start()
 {
 	int ret = 0;
 	memcpy(m_LocalIP, CAvConfigNetComm::GetEnvConfig().LanAttr.IpAddr, 16);
-	memcpy(m_InternalPort, CAvConfigNetUpnp::GetEnvConfig().LocalPort, sizeof(m_InternalPort));
+	//memcpy(m_InternalPort, CAvConfigNetUpnp::GetEnvConfig().LocalPort, sizeof(m_InternalPort));
 	
 	m_AvConfigNetUpnp.Attach(this ,(AvConfigCallBack)&CAvUpnpCli::AvConfigUpnp);
 	//StartTimer(1*1000, 5*1000, av_true, av_true);
@@ -60,6 +60,7 @@ av_void CAvUpnpCli::OnTime()
 
 av_bool CAvUpnpCli::UpnpUpdateConfig()
 {
+#if 0
 	int i = 0;
 	int ret = 0;
 	int upnp_status[Mapping_NR] = {0};
@@ -67,7 +68,7 @@ av_bool CAvUpnpCli::UpnpUpdateConfig()
 	m_AvConfigNetUpnp.Update();
 	ConfigNetUpnp &upnp_config = m_AvConfigNetUpnp.GetConfig();
 
-	if (upnp_config.Enable == av_true)
+	if (upnp_config.bEnable == av_true)
 	{
 		CAvConfigNetComm AvConfigNetComm;
 		AvConfigNetComm.Update();
@@ -110,7 +111,7 @@ av_bool CAvUpnpCli::UpnpUpdateConfig()
 		//Ã·Ωª
 		m_AvConfigNetUpnp.SettingUp();
 	}
-
+#endif
 	return av_true;
 }
 

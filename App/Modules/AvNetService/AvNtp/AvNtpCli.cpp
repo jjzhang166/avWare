@@ -50,22 +50,22 @@ av_void CAvNtpCli::OnTime()
 	CAvNtp AvNtp;
 	m_AvConfigNetNtp.Update();
 	ConfigNetNtp ntp_config = m_AvConfigNetNtp.GetConfig();
-	AvNtp.SetNtpServer(ntp_config.Server);
-	AvNtp.SetTimeZone((av_timezone_t)ntp_config.Zone);
+	AvNtp.SetNtpServer(ntp_config.ServerAddress);
+	AvNtp.SetTimeZone((av_timezone_t)ntp_config.Timezone);
 	AvNtp.Start();
 }
 
 av_void CAvNtpCli::AvConfigNtp(CAvConfigNetNtp* obj, int &num)
 {
 	ConfigNetNtp ntp_config = obj->GetConfig();
-	av_msg("CAvNtpCli::AvConfigNtp Enable = %d\n", ntp_config.Enable);
+	av_msg("CAvNtpCli::AvConfigNtp Enable = %d\n", ntp_config.bEnable);
 
 // 	if (GetStatus() != UnStart)
 // 	{
 // 		StopTimer();
 // 	}
 	
-	if (ntp_config.Enable == av_true)
+	if (ntp_config.bEnable == av_true)
 	{		
 /*		StartTimer(1*1000, 5*1000, av_true, av_true);*/
 	}

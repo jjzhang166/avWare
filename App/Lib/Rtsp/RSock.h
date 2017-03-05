@@ -39,6 +39,7 @@ public:
 	static int Raccept(int sock, struct sockaddr *addr, socklen_t *addrlen);
 	static int Rsetopt(int sock, int sndBufSize = 320 * 1024, int rcvBufSize = 320 * 1024);
 	static int Rconnect(int sock, struct sockaddr *addr, socklen_t *addrlen);
+	static int Rconnect(int sock, struct sockaddr *addr, socklen_t *addrlen, struct timeval *timeo);
 	static int Rclosesock(int sock);
 
 

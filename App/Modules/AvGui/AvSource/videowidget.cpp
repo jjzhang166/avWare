@@ -6,6 +6,8 @@
 #include <QIcon>
 #include "Layout.h"
 #include "AvForm/dlgptzwindows.h"
+#include "AvGuiApplication.h"
+
 
 VideoWidget::VideoWidget(QWidget *parent) :
     QWidget(parent)
@@ -18,23 +20,25 @@ VideoWidget::VideoWidget(QWidget *parent) :
 
     m_bSelected = false;
     this->setMouseTracking(true);
-	m_VideoInfoWindows = NULL;
 	m_Channel = 0;
 	m_TotalWindows = 0;
-// 	m_VideoInfoWindows = new WgetVideoInfo(parent);
-// 	QObject::connect(m_VideoInfoWindows, SIGNAL(SignalsMousePress(QMouseEvent *)), this, SLOT(mousePressEvent(QMouseEvent *)));
-// 	QObject::connect(m_VideoInfoWindows, SIGNAL(SignalsMouseDoubleClickEvent(QMouseEvent *)), this, SLOT(mouseDoubleClickEvent(QMouseEvent *)));
-// 	QObject::connect(m_VideoInfoWindows, SIGNAL(SignalsContextMenuEvent(QContextMenuEvent*)), this, SLOT(SlotsContextMenuEvent(QContextMenuEvent *)));
-// 	
 	m_Preview = new CAvPreview;
 	m_bPreview = false;
 }
 
+void	VideoWidget::BindWidgetScreenID(int ScreenID)
+{
+	m_ScreenID = ScreenID;
+#if defined(WIN32)
+	m_Preview->Set(-1, m_ScreenID);
+#else
+	//why nvr 3536 is place error, second add device , mouse is display;
+	m_Preview->Set(winId(), m_ScreenID);
+#endif
+}
 VideoWidget::~VideoWidget()
 {
-	if (NULL != m_VideoInfoWindows) {
-		delete m_VideoInfoWindows;
-	}
+
 }
 void VideoWidget::SetTotalWindows(int totalWins)
 {
@@ -59,6 +63,10 @@ void VideoWidget::PreviewGetStatistics(QString &ImageSize, QString &Comp, QStrin
 	else{
 
 	}
+}
+void VideoWidget::SelectWindowsLive()
+{
+	m_Preview->StartAudio(av_false);
 }
 void VideoWidget::SlotsMenuTriggered(QAction *Action)
 {
@@ -98,9 +106,11 @@ void VideoWidget::SlotsMenuTriggered(QAction *Action)
 		DlgPtzWindows *PtzWindows = new DlgPtzWindows;
 		PtzWindows->exec();
 	}
-	if (NULL != m_VideoInfoWindows){
-		m_VideoInfoWindows->raise();
+	else if (text == tr("MainMenu")){
+		QAvEvent AvEvent(QAvEvent::QAvEvent_ShowMainMenum);
+		g_AvGuiApp.PostQAvEvent(AvEvent);
 	}
+
 
 }
 
@@ -139,7 +149,9 @@ void VideoWidget::contextMenuEvent(QContextMenuEvent *event)
 	Menu->addAction(new QAction("   stop", this));
 	Menu->addAction(new QAction("   save", this));
 	Menu->addAction(new QAction("Ptz", this));
-
+#if !defined(WIN32)
+	Menu->addAction(new QAction(tr("MainMenu"), this));
+#endif
 
 
 	Menu->move(cursor().pos());
@@ -160,10 +172,6 @@ void VideoWidget::setGeometry(const QRect &Rect)
 {
 	
 	QWidget::setGeometry(Rect);
-	if (NULL != m_VideoInfoWindows){
-		m_VideoInfoWindows->setGeometry(Rect);
-		m_VideoInfoWindows->raise();
-	}
 
 }
 // void VideoWidget::show()
@@ -192,9 +200,7 @@ void VideoWidget::mousePressEvent(QMouseEvent *event)
 		emit widgetSelecting(this);
 	}
 		
-	if (NULL != m_VideoInfoWindows){
-		m_VideoInfoWindows->raise();
-	}
+
 }
 
 void VideoWidget::mouseDoubleClickEvent(QMouseEvent *)
@@ -203,13 +209,10 @@ void VideoWidget::mouseDoubleClickEvent(QMouseEvent *)
     {
         this->setWindowFlags(Qt::SubWindow);
         this->showNormal();
-		if (NULL != m_VideoInfoWindows){
-			m_VideoInfoWindows->setWindowFlags(Qt::SubWindow);
-			m_VideoInfoWindows->showNormal();
-		}
+
         emit videoWidgetResize();
 		emit SignalsMaxWindows(this, false);
-		//PreviewStart(m_Channel, CHL_SUB1_T, true);
+		
 		int Slave = CHL_SUB1_T;
 		if (m_TotalWindows <= 4 || (m_TotalWindows < 9 && m_Channel == 0)){
 			Slave = CHL_MAIN_T;
@@ -224,10 +227,7 @@ void VideoWidget::mouseDoubleClickEvent(QMouseEvent *)
     {
         this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
         this->showMaximized();
-		if (NULL != m_VideoInfoWindows){
-			m_VideoInfoWindows->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-			m_VideoInfoWindows->showMaximized();
-		}
+
 		QRect cur = CAvUiComm::GetWindowsOnScreen();
 		this->setGeometry(cur);
 		emit SignalsMaxWindows(this, true);
@@ -258,4 +258,20 @@ void VideoWidget::PreviewStart(int Channel, int Slave, bool bOpen)
 		m_bPreview = true;
 	}
 
+}
+
+void VideoWidget::resizeEvent(QResizeEvent *e)
+{
+	QPoint point = pos();
+	//g_AvGuiApp.GetMainWindows(),
+	//QPoint gPoint = mapFromGlobal( point);
+	QPoint gPoint = g_AvGuiApp.GetMainWindows()->GetVideoAreaToGlobal();
+
+	C_RECT Rect;
+	Rect.Sx = point.x() + gPoint.x();
+	Rect.Sy = point.y() + gPoint.y();
+
+	Rect.Width = e->size().width();
+	Rect.Heigh = e->size().height();
+	m_Preview->RenderResize(Rect);
 }

@@ -36,42 +36,7 @@ private:
 	CAvAlarm();
 	~CAvAlarm();
 public:
-	enum AvAlarmType
-	{
-		AvAlmT_NONE = 0,
-		AvAlmT_PORT_In = 1,
-		AvAlmT_PORT_Out = 2,
-		///人脸识别
-		AvAlmT_VIDEO_FaceRecognition = 3,
-		///人脸检测
-		AvAlmT_VIDEO_FaceDetection = 4,
-		///移动帧测
-		AvAlmT_VIDEO_MotionDetection = 5,
-		///移动跟踪
-		AvAlmT_VIDEO_MotionFollow = 6,
-		///车牌识别
-		AvAlmT_VIDEO_PlatenumberRecognition = 7,
-		///设备掉线
-		AvAlmT_VIDEO_DevOffline = 8,
-		///视频丢失
-		AvAlmT_VIDEO_Lost = 9,
-		///视频遮挡
-		AvAlmT_VIDEO_Blind = 10,
-		///物品遗失
-		AvAlmT_VIDEO_SomethingLoss = 11,
-		///硬盘
-		AvAlmT_DISK_ERROR = 12,
-		AvAlmT_DISK_LOST = 13,
-		AvAlmT_LAST = 14
-	};
-	inline static std::string GetCAvAlarmAlarmTypeString(AvAlarmType e)
-	{
-		static std::string sCAvAlarmAlarmTypeString[AvAlmT_LAST + 1] =
-		{ "None", "Port In", "Port Out", "FaceRecognition", "FaceDetection", "MotionDetection", "MotionFollow", "PlatenumberRecognition",
-		"DevOffline", "VIDEO_Lost", "VIDEO_Blind", "SomethingLoss",
-		"DISK_ERROR", "DISK_LOST" };
-		return sCAvAlarmAlarmTypeString[e];
-	};
+
 	enum AvAlarmStat{
 		AvAlm_Stat_NONE,
 		AvAlm_Stat_Open,
@@ -81,7 +46,7 @@ public:
 	};
 
 	typedef struct {
-		CAvAlarm::AvAlarmType	AlmType;
+		AlarmEvent				AlmType;
 		av_u32					AlmTmSec;
 		AvAlarmStat				AlmStatus;//av_ture open; av_false close
 		av_uchar				Channel;
@@ -89,8 +54,8 @@ public:
 
 		union 
 		{
-			C_AlmMdResult MdResult;
-			C_AlmIoResult IoResult;
+			av_u32	MdResult[ConfMotionDetectionLine];
+			av_u32	IoResult;
 		};
 
 	}AlmMsg;
@@ -132,7 +97,7 @@ private:
 	av_void OnSendEmail();
 	av_void OnFtpSend();
 	av_bool CheckEmailStartUp();
-	av_bool CheckTimeSection(C_WeekSpan *pWeekSpan);
+	//av_bool CheckTimeSection(C_WeekSpan *pWeekSpan);
 	
 	CAvAlarm::AlmMsg m_AlmMsg;
 	TSignal1<CAvAlarm::AlmMsg &> *m_AlarmSignal;

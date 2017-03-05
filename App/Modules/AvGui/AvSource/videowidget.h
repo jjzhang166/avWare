@@ -19,17 +19,16 @@ class VideoWidget : public QWidget
 public:
 	void SetTotalWindows(int totalWins);
     explicit VideoWidget(QWidget *parent = 0);
+	void	BindWidgetScreenID(int ScreenID);
     ~VideoWidget();
 	void PreviewSetStatistics(bool bOpen = true);
 	void PreviewGetStatistics(QString &ImageSize, QString &Comp, QString &FrameRate, QString &BitRate);
+	void SelectWindowsLive();
 public:
 	void PreviewStart(int Channel, int Slave, bool bOpen);
-//	void move(const QPoint &);
+	void resizeEvent(QResizeEvent *e);
+
 	void setGeometry(const QRect &);
-// 	void show();
-// 	void hide();
-private:
-	WgetVideoInfo		*	m_VideoInfoWindows;
 private:
 	void contextMenuEvent(QContextMenuEvent *event);
 
@@ -54,6 +53,7 @@ public:
 	CAvPreview	*	m_Preview;
 	bool		m_bPreview;
 	int			m_Channel;
+	int			m_ScreenID;
 	int			m_TotalWindows;
 
 };

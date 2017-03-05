@@ -23,14 +23,14 @@ class CAvGuiApp:public QObject
 public:
 	av_bool Initialize();
 	av_void exec();
-
+	FrmMainWindows *GetMainWindows();
 public:
 	SINGLETON_DECLARE(CAvGuiApp);
 	CAvGuiApp();
 private:
 	~CAvGuiApp();
 
-private:
+public:
 	av_bool PostQAvEvent(QAvEvent &event);
 
 private:

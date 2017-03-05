@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>506</height>
+    <width>805</width>
+    <height>524</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,19 +15,16 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
     <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>6</number>
-   </property>
-   <property name="spacing">
-    <number>4</number>
+    <number>0</number>
    </property>
    <item row="0" column="0">
     <widget class="QWidget" name="WidGetTitle" native="true">
@@ -243,2393 +240,2571 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="0">
-    <layout class="QHBoxLayout" name="HorSubCannelBtn">
-     <item>
-      <widget class="QComboBox" name="CBoxSettingChannel">
-       <item>
-        <property name="text">
-         <string>Chn0</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Chn1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Chn2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Chn3</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Chn4</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Chn5</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="BtnSubmit">
-       <property name="text">
-        <string>Submit</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="BtnUpdate">
-       <property name="text">
-        <string>Update</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
    <item row="1" column="0">
-    <widget class="QTabWidget" name="TabWidgetDeviceSet">
-     <property name="currentIndex">
-      <number>2</number>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="leftMargin">
+      <number>6</number>
      </property>
-     <widget class="QWidget" name="TabCapture">
-      <attribute name="title">
-       <string>Capture</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_4">
-       <item row="0" column="1" rowspan="2">
-        <layout class="QFormLayout" name="FLayoutCapture">
-         <property name="horizontalSpacing">
-          <number>16</number>
-         </property>
-         <property name="verticalSpacing">
-          <number>16</number>
-         </property>
-         <property name="leftMargin">
-          <number>16</number>
-         </property>
-         <property name="topMargin">
-          <number>16</number>
-         </property>
-         <property name="rightMargin">
-          <number>16</number>
-         </property>
-         <property name="bottomMargin">
-          <number>16</number>
-         </property>
+     <property name="rightMargin">
+      <number>6</number>
+     </property>
+     <property name="bottomMargin">
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QTabWidget" name="TabWidgetDeviceSet">
+       <property name="currentIndex">
+        <number>6</number>
+       </property>
+       <widget class="QWidget" name="TabCapture">
+        <attribute name="title">
+         <string>Capture</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="2">
+          <spacer name="horizontalSpacer_20">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
          <item row="0" column="0">
-          <widget class="QLabel" name="LabIrCut">
-           <property name="text">
-            <string>IrCut</string>
+          <spacer name="horizontalSpacer_19">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="LabAnitFlicker">
-           <property name="text">
-            <string>AnitFlicker</string>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
            </property>
-          </widget>
+          </spacer>
          </item>
-         <item row="4" column="1">
-          <layout class="QHBoxLayout" name="HLayoutAnitFlicker">
-           <item>
-            <widget class="QLineEdit" name="LiEditAnitFlickerCustom"/>
-           </item>
-           <item>
-            <widget class="QLabel" name="LabAnitFlickerCustomPlan">
+         <item row="0" column="1" rowspan="3">
+          <layout class="QFormLayout" name="FLayoutCapture">
+           <property name="horizontalSpacing">
+            <number>16</number>
+           </property>
+           <property name="verticalSpacing">
+            <number>16</number>
+           </property>
+           <property name="leftMargin">
+            <number>16</number>
+           </property>
+           <property name="topMargin">
+            <number>16</number>
+           </property>
+           <property name="rightMargin">
+            <number>16</number>
+           </property>
+           <property name="bottomMargin">
+            <number>16</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="LabIrCut">
              <property name="text">
-              <string>1--10000</string>
+              <string>IrCut</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="LabAnitFlicker">
+             <property name="text">
+              <string>AnitFlicker</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <layout class="QHBoxLayout" name="HLayoutAnitFlicker">
+             <item>
+              <widget class="QLineEdit" name="LiEditAnitFlickerCustom"/>
+             </item>
+             <item>
+              <widget class="QLabel" name="LabAnitFlickerCustomPlan">
+               <property name="text">
+                <string>1--10000</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="5" column="1">
+            <widget class="QComboBox" name="CBoxExposureMode"/>
+           </item>
+           <item row="6" column="1">
+            <layout class="QHBoxLayout" name="HLayoutExposureMode">
+             <item>
+              <widget class="QLineEdit" name="LiEditExposureModeCustom"/>
+             </item>
+             <item>
+              <widget class="QLabel" name="LabExposureModePlan">
+               <property name="text">
+                <string>1--10000</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="LabExposureMode">
+             <property name="text">
+              <string>ExposureMode</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="QComboBox" name="CBoxWhitBalance"/>
+           </item>
+           <item row="8" column="1">
+            <layout class="QHBoxLayout" name="HLayoutWhitBalance">
+             <item>
+              <widget class="QLineEdit" name="LiEditWhitBalanceCustom"/>
+             </item>
+             <item>
+              <widget class="QLabel" name="LabWhitBalanceCustomPlan">
+               <property name="text">
+                <string>1--10000</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="LabWhitBalance">
+             <property name="text">
+              <string>WhitBalance</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="LabIrCutStime">
+             <property name="text">
+              <string>STime</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="LabIrCutEtime">
+             <property name="text">
+              <string>ETime</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QTimeEdit" name="TEditIrCutEtime"/>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="CBoxIrCut">
+             <property name="minimumSize">
+              <size>
+               <width>200</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QTimeEdit" name="TEditIrCutStime"/>
+           </item>
+           <item row="3" column="1">
+            <widget class="QComboBox" name="CBoxAnitFlicker"/>
+           </item>
+           <item row="9" column="1">
+            <widget class="QComboBox" name="CBoxCvbs"/>
+           </item>
+           <item row="9" column="0">
+            <widget class="QLabel" name="LabCvbs">
+             <property name="text">
+              <string>CVBS</string>
              </property>
             </widget>
            </item>
           </layout>
          </item>
-         <item row="5" column="1">
-          <widget class="QComboBox" name="CBoxExposureMode"/>
+         <item row="0" column="3">
+          <widget class="QGroupBox" name="GBoxCapture">
+           <property name="title">
+            <string>Rotate</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <property name="topMargin">
+             <number>18</number>
+            </property>
+            <property name="rightMargin">
+             <number>18</number>
+            </property>
+            <property name="bottomMargin">
+             <number>18</number>
+            </property>
+            <property name="spacing">
+             <number>18</number>
+            </property>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="CBoxRotateMode"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="LabRotateMode">
+              <property name="text">
+               <string>RotateMode</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="CBoxVertical">
+              <property name="text">
+               <string>Vertical</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="CBoxHorizontal">
+              <property name="text">
+               <string>Horizontal</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_18">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
          </item>
-         <item row="6" column="1">
-          <layout class="QHBoxLayout" name="HLayoutExposureMode">
-           <item>
-            <widget class="QLineEdit" name="LiEditExposureModeCustom"/>
-           </item>
-           <item>
-            <widget class="QLabel" name="LabExposureModePlan">
+         <item row="1" column="3">
+          <widget class="QGroupBox" name="groupBox_3">
+           <property name="title">
+            <string>Region</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_32">
+            <item row="0" column="0">
+             <widget class="QPushButton" name="BtnOverlay">
+              <property name="text">
+               <string>OverLay</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="BtnVideoCover">
+              <property name="text">
+               <string>VideoCover</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <spacer name="horizontalSpacer_25">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="TabEncode">
+        <attribute name="title">
+         <string>Encode</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="0" column="0">
+          <layout class="QFormLayout" name="FLayoutMainStream">
+           <property name="horizontalSpacing">
+            <number>16</number>
+           </property>
+           <property name="verticalSpacing">
+            <number>24</number>
+           </property>
+           <property name="leftMargin">
+            <number>32</number>
+           </property>
+           <property name="topMargin">
+            <number>32</number>
+           </property>
+           <property name="rightMargin">
+            <number>32</number>
+           </property>
+           <property name="bottomMargin">
+            <number>32</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="LabEnFormat">
              <property name="text">
-              <string>1--10000</string>
+              <string>EnFormat</string>
              </property>
             </widget>
            </item>
-          </layout>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="LabExposureMode">
-           <property name="text">
-            <string>ExposureMode</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="1">
-          <widget class="QComboBox" name="CBoxWhitBalance"/>
-         </item>
-         <item row="8" column="1">
-          <layout class="QHBoxLayout" name="HLayoutWhitBalance">
-           <item>
-            <widget class="QLineEdit" name="LiEditWhitBalanceCustom"/>
-           </item>
-           <item>
-            <widget class="QLabel" name="LabWhitBalanceCustomPlan">
+           <item row="1" column="0">
+            <widget class="QLabel" name="LabMImageSize">
              <property name="text">
-              <string>1--10000</string>
+              <string>ImageSize</string>
              </property>
             </widget>
            </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="LabFrameRate">
+             <property name="text">
+              <string>FrameRate</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="LabMBitRateCtrl">
+             <property name="text">
+              <string>BitRateCtrl</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="LabMBitRateQlevel">
+             <property name="text">
+              <string>BitRateQlevel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="LabIFrameSpan">
+             <property name="text">
+              <string>IFrameSpan</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QLineEdit" name="LiEditMIFrameSpan"/>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="CBoxMEnFormat"/>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="CBoxMImageSize"/>
+           </item>
+           <item row="2" column="1">
+            <widget class="QComboBox" name="CBoxMFrameRate"/>
+           </item>
+           <item row="3" column="1">
+            <widget class="QComboBox" name="CBoxMBitRateCtrl"/>
+           </item>
+           <item row="4" column="1">
+            <layout class="QHBoxLayout" name="HLayoutMBitRateValue">
+             <item>
+              <widget class="QComboBox" name="CBoxMBitRateQlevel"/>
+             </item>
+             <item>
+              <widget class="QLabel" name="LabMVcbr">
+               <property name="text">
+                <string>MaxCbr</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="LiEditMBitRateQlevel"/>
+             </item>
+            </layout>
+           </item>
           </layout>
-         </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="LabWhitBalance">
-           <property name="text">
-            <string>WhitBalance</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="LabIrCutStime">
-           <property name="text">
-            <string>STime</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="LabIrCutEtime">
-           <property name="text">
-            <string>ETime</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QTimeEdit" name="TEditIrCutEtime"/>
          </item>
          <item row="0" column="1">
-          <widget class="QComboBox" name="CBoxIrCut">
+          <layout class="QFormLayout" name="FLayoutSubStream">
+           <property name="horizontalSpacing">
+            <number>16</number>
+           </property>
+           <property name="verticalSpacing">
+            <number>24</number>
+           </property>
+           <property name="leftMargin">
+            <number>32</number>
+           </property>
+           <property name="topMargin">
+            <number>32</number>
+           </property>
+           <property name="rightMargin">
+            <number>32</number>
+           </property>
+           <property name="bottomMargin">
+            <number>32</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="LabSubSlaveNumber">
+             <property name="text">
+              <string>SubStream</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="LabSImageSize">
+             <property name="text">
+              <string>ImageSize</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="LabSFrameRate">
+             <property name="text">
+              <string>FrameRate</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="LabBitRateCtrl">
+             <property name="text">
+              <string>BitRateCtrl</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="LabSBitRateQlevel">
+             <property name="text">
+              <string>BitRateQlevel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="LabSIFramSpan">
+             <property name="text">
+              <string>IFramSpan</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="CBoxSSlaveNumber"/>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="CBoxSImageSize"/>
+           </item>
+           <item row="2" column="1">
+            <widget class="QComboBox" name="CBoxSFrameRate"/>
+           </item>
+           <item row="3" column="1">
+            <widget class="QComboBox" name="CBoxSBitRateCtrl"/>
+           </item>
+           <item row="5" column="1">
+            <widget class="QLineEdit" name="LiEditSIFrameSpan"/>
+           </item>
+           <item row="4" column="1">
+            <layout class="QHBoxLayout" name="HLayoutBitRateValue">
+             <item>
+              <widget class="QComboBox" name="CBoxSBitRateQlevel"/>
+             </item>
+             <item>
+              <widget class="QLabel" name="LabSVcbr">
+               <property name="text">
+                <string>MaxCbr</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="LiEditSBitRateQlevel"/>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="TabAudio">
+        <attribute name="title">
+         <string>Audio</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_31">
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>AudioIn</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_28">
+            <item row="0" column="0">
+             <layout class="QFormLayout" name="formLayout">
+              <property name="horizontalSpacing">
+               <number>32</number>
+              </property>
+              <property name="verticalSpacing">
+               <number>16</number>
+              </property>
+              <property name="leftMargin">
+               <number>32</number>
+              </property>
+              <property name="topMargin">
+               <number>32</number>
+              </property>
+              <property name="rightMargin">
+               <number>32</number>
+              </property>
+              <property name="bottomMargin">
+               <number>32</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>AiSoundMode</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="CBoxAiSoundMode"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="LabAiEncodeType">
+                <property name="text">
+                 <string>EncodeType</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="CBoxAiEncodeType"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="LabAisampleRate">
+                <property name="text">
+                 <string>SampleRate</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="CBoxAiSampleRate"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="LabAiSampleBits">
+                <property name="text">
+                 <string>SampleBits</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QComboBox" name="CBoxAiSampleBits"/>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="LabAiVolume">
+                <property name="text">
+                 <string>Volume</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QSlider" name="HSliderAiVolume">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item>
+                 <widget class="QRadioButton" name="RBtnAiMicIn">
+                  <property name="text">
+                   <string>MicIn</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="RBtnAiLineIn">
+                  <property name="text">
+                   <string>LineIn</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="6" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QCheckBox" name="CBoxAiAnr">
+                  <property name="text">
+                   <string>Anr</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="CBoxAiAec">
+                  <property name="text">
+                   <string>Aec</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="8" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout"/>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QGroupBox" name="groupBox_2">
+           <property name="title">
+            <string>AudioOut</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_30">
+            <item row="0" column="0">
+             <layout class="QFormLayout" name="formLayout_2">
+              <property name="horizontalSpacing">
+               <number>32</number>
+              </property>
+              <property name="verticalSpacing">
+               <number>16</number>
+              </property>
+              <property name="leftMargin">
+               <number>32</number>
+              </property>
+              <property name="topMargin">
+               <number>32</number>
+              </property>
+              <property name="rightMargin">
+               <number>32</number>
+              </property>
+              <property name="bottomMargin">
+               <number>32</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="LabAoSoundMode">
+                <property name="text">
+                 <string>SoundMode</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="LabAoEncodeType">
+                <property name="text">
+                 <string>EncodeType</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="LabAoSampleRate">
+                <property name="text">
+                 <string>SampleRate</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="LabAoSampleBits">
+                <property name="text">
+                 <string>SampleBits</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="LabAoVolume">
+                <property name="text">
+                 <string>Volume</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QSlider" name="HSliderAoVolume">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="LabAoSoundModeText">
+                <property name="text">
+                 <string>TextLabel</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="LabAoEncodeTypeText">
+                <property name="text">
+                 <string>TextLabel</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLabel" name="LabAoSampleRateText">
+                <property name="text">
+                 <string>TextLabel</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="LabAoSampleBitsText">
+                <property name="text">
+                 <string>TextLabel</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="TabVersion">
+        <attribute name="title">
+         <string>Version</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_8">
+         <property name="topMargin">
+          <number>12</number>
+         </property>
+         <property name="horizontalSpacing">
+          <number>24</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>12</number>
+         </property>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="GBoxManufactorInfo">
+           <property name="title">
+            <string>Manufactor Info</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="0" column="0">
+             <layout class="QFormLayout" name="FLayoutManufactorInfo">
+              <property name="horizontalSpacing">
+               <number>32</number>
+              </property>
+              <property name="verticalSpacing">
+               <number>12</number>
+              </property>
+              <property name="leftMargin">
+               <number>32</number>
+              </property>
+              <property name="topMargin">
+               <number>32</number>
+              </property>
+              <property name="rightMargin">
+               <number>12</number>
+              </property>
+              <property name="bottomMargin">
+               <number>12</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="LabProductModel">
+                <property name="text">
+                 <string>ProductModel</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="LabIDNumber">
+                <property name="text">
+                 <string>ID Number</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="LabFactoryTime">
+                <property name="text">
+                 <string>FactoryTime</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="LabFactoryName">
+                <property name="text">
+                 <string>FacotryName</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="LabProductModelShow">
+                <property name="text">
+                 <string>XXX-XXX</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="LabIDNumberShow">
+                <property name="text">
+                 <string>XXX-XXX</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLabel" name="LabFactoryTimeShow">
+                <property name="text">
+                 <string>XXX-XXX</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="LabFactoryNameShow">
+                <property name="text">
+                 <string>XXX-XXX</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="GBoxVersionInfo">
+           <property name="title">
+            <string>Version Info</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="0">
+             <layout class="QFormLayout" name="FLayoutVersionInfo">
+              <property name="horizontalSpacing">
+               <number>32</number>
+              </property>
+              <property name="verticalSpacing">
+               <number>12</number>
+              </property>
+              <property name="leftMargin">
+               <number>32</number>
+              </property>
+              <property name="topMargin">
+               <number>12</number>
+              </property>
+              <property name="rightMargin">
+               <number>12</number>
+              </property>
+              <property name="bottomMargin">
+               <number>12</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="LabSoftWare">
+                <property name="text">
+                 <string>SoftWare</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="LabBuildTime">
+                <property name="text">
+                 <string>BuildTime</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="LabHarWare">
+                <property name="text">
+                 <string>HardWare</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="LabProto">
+                <property name="text">
+                 <string>Proto</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="LabKernel">
+                <property name="text">
+                 <string>Kernel</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="LabFileSys">
+                <property name="text">
+                 <string>FileSys</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="LabSoftWareShow">
+                <property name="text">
+                 <string>SoftWareVersion</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="LabBuildTimeShow">
+                <property name="text">
+                 <string>BuildTimeVersion</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLabel" name="LabHardWareShow">
+                <property name="text">
+                 <string>HardWareVersion</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="LabProtoShow">
+                <property name="text">
+                 <string>ProtoVersion</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLabel" name="LabKernelShow">
+                <property name="text">
+                 <string>KernelVersion</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QLabel" name="LabFileSysShow">
+                <property name="text">
+                 <string>FileSysVersion</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="TabRecord">
+        <attribute name="title">
+         <string>Record</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="TabCommon">
+        <attribute name="title">
+         <string>Common</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_10">
+         <item row="0" column="1">
+          <widget class="QStackedWidget" name="StWidgetNetWork">
+           <property name="currentIndex">
+            <number>8</number>
+           </property>
+           <widget class="QWidget" name="StWdt_NetSet">
+            <layout class="QGridLayout" name="gridLayout_11">
+             <item row="0" column="0">
+              <widget class="QGroupBox" name="GBoxNetWork_NetSetting">
+               <property name="title">
+                <string>NetSetting</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_20">
+                <item row="0" column="0">
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>183</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="1">
+                 <layout class="QFormLayout" name="FLayoutNetWork">
+                  <property name="horizontalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="verticalSpacing">
+                   <number>12</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>16</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="LabNetWorkiFrName">
+                    <property name="text">
+                     <string>iFrName</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="LabNetWorkGetMode">
+                    <property name="text">
+                     <string>GetMode</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="LabNetWorkIpV4Addr">
+                    <property name="text">
+                     <string>IPv4Addr</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="LabNetWorkIpV6Addr">
+                    <property name="text">
+                     <string>IPv6Addr</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="LabNetWorkSubMask">
+                    <property name="text">
+                     <string>SubMask</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QLabel" name="LabNetWorkGateWay">
+                    <property name="text">
+                     <string>GateWay</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="0">
+                   <widget class="QLabel" name="LabNetWorkMacAddr">
+                    <property name="text">
+                     <string>MacAddr</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="7" column="0">
+                   <widget class="QLabel" name="LabNetWorkDns1">
+                    <property name="text">
+                     <string>Dns1</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="8" column="0">
+                   <widget class="QLabel" name="LabNetWorkDns2">
+                    <property name="text">
+                     <string>Dns2</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="9" column="0">
+                   <widget class="QLabel" name="LabNetWorkServicePort">
+                    <property name="text">
+                     <string>ServicePort</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QComboBox" name="CBoxNetWorkIfrName"/>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QComboBox" name="CBoxNetWorkGetMode"/>
+                  </item>
+                  <item row="9" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkServicePort"/>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkIpV4Addr"/>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkIpV6Addr"/>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkSubMask"/>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkGateWay"/>
+                  </item>
+                  <item row="6" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkMacAddr"/>
+                  </item>
+                  <item row="7" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkDns1"/>
+                  </item>
+                  <item row="8" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkDns2"/>
+                  </item>
+                 </layout>
+                </item>
+                <item row="0" column="2">
+                 <spacer name="horizontalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>182</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="StWdt_FTP">
+            <layout class="QGridLayout" name="gridLayout_12">
+             <item row="0" column="0">
+              <widget class="QGroupBox" name="GBoxNetWork_FTP">
+               <property name="title">
+                <string>FTP</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_21">
+                <item row="0" column="0">
+                 <spacer name="horizontalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>192</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="1">
+                 <layout class="QFormLayout" name="FLayoutNetWorkFtp">
+                  <property name="horizontalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="verticalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>16</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="LabNetWorkFtpEnable">
+                    <property name="text">
+                     <string>Enable</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QCheckBox" name="CBoxNetWorkFtpEnable">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="LabNetWorkFtpServer">
+                    <property name="text">
+                     <string>Server</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkFtpServer">
+                    <property name="minimumSize">
+                     <size>
+                      <width>180</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="LabNetWorkFtpPort">
+                    <property name="text">
+                     <string>Port</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkFtpPort"/>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkFtpUserName"/>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="LabNetWorkFtpPasswd">
+                    <property name="text">
+                     <string>Passwd</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkFtpPasswd"/>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="LabNetWorkFtpUserName">
+                    <property name="text">
+                     <string>UserName</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QLabel" name="LabNetWorkFtpRemotePath">
+                    <property name="text">
+                     <string>RemotePath</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkFtpRemotePath"/>
+                  </item>
+                 </layout>
+                </item>
+                <item row="0" column="2">
+                 <spacer name="horizontalSpacer_7">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>191</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="StWdt_EMAIL">
+            <layout class="QGridLayout" name="gridLayout_13">
+             <item row="0" column="0">
+              <widget class="QGroupBox" name="GBoxNetWork_EMAIL">
+               <property name="title">
+                <string>Email</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_22">
+                <item row="0" column="0">
+                 <spacer name="horizontalSpacer_8">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>186</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="1">
+                 <layout class="QFormLayout" name="FLayoutNetWorkEmail">
+                  <property name="horizontalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="verticalSpacing">
+                   <number>12</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>16</number>
+                  </property>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="LabNetWorkEmailSmtpServer">
+                    <property name="text">
+                     <string>SmtpServer</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkEmailSmtpServer">
+                    <property name="minimumSize">
+                     <size>
+                      <width>180</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="LabNetWorkEmailPort">
+                    <property name="text">
+                     <string>Port</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkEmailPort"/>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="LabNetWorkEmailSender">
+                    <property name="text">
+                     <string>Sender</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkEmailSender"/>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QLabel" name="LabNetWorkEmailUserName">
+                    <property name="text">
+                     <string>UserName</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkEmailUserName"/>
+                  </item>
+                  <item row="6" column="0">
+                   <widget class="QLabel" name="LabNetWorkEmailPasswd">
+                    <property name="text">
+                     <string>Passwd</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkEmailPasswd"/>
+                  </item>
+                  <item row="7" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkEmailTitle"/>
+                  </item>
+                  <item row="8" column="0">
+                   <widget class="QLabel" name="LabNetWorkEmailReceiver1">
+                    <property name="text">
+                     <string>Receiver1</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="8" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkEmailReceiver1"/>
+                  </item>
+                  <item row="9" column="0">
+                   <widget class="QLabel" name="LabNetWorkEmailReceiver2">
+                    <property name="text">
+                     <string>Receiver2</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="9" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkEmailReceiver2"/>
+                  </item>
+                  <item row="7" column="0">
+                   <widget class="QLabel" name="LabNetWorkEmailTitle">
+                    <property name="text">
+                     <string>Title</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QCheckBox" name="CBoxNetWorkEmailEnable">
+                    <property name="text">
+                     <string>Enable</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="LabNetWorkEmailEncodeType">
+                    <property name="text">
+                     <string>Codec</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QComboBox" name="CBoxNetWorkEmailEncodeType"/>
+                  </item>
+                 </layout>
+                </item>
+                <item row="0" column="2">
+                 <spacer name="horizontalSpacer_9">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>185</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="StWdt_UPNP">
+            <layout class="QGridLayout" name="gridLayout_14">
+             <item row="0" column="0">
+              <widget class="QGroupBox" name="GBoxNetWork_UPNP">
+               <property name="title">
+                <string>UPNP</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_23">
+                <item row="0" column="0">
+                 <spacer name="horizontalSpacer_10">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>189</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="1" rowspan="2">
+                 <layout class="QFormLayout" name="FLayoutNetWorkUpnp">
+                  <property name="horizontalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="verticalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>16</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="LabNetWorkUpnpWebPort">
+                    <property name="text">
+                     <string>Web</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="LabNetWorkUpnpProtoPort">
+                    <property name="text">
+                     <string>ProtoPort</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="LabNetWorkUpnpRtspPort">
+                    <property name="text">
+                     <string>RtspPort</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QCheckBox" name="CBoxNetWorkUpnpWeb">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QCheckBox" name="CBoxNetWorkUpnpProtoPort">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QCheckBox" name="CBoxNetWorkUpnpRtsp">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item row="1" column="2">
+                 <spacer name="horizontalSpacer_11">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>188</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="StWdt_RTSP">
+            <layout class="QGridLayout" name="gridLayout_15">
+             <item row="0" column="0">
+              <widget class="QGroupBox" name="GBoxNetWork_RTSP">
+               <property name="title">
+                <string>RTSP</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_24">
+                <item row="0" column="0">
+                 <spacer name="horizontalSpacer_12">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>198</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="1">
+                 <layout class="QFormLayout" name="FLayoutNetWorkRtsp">
+                  <property name="horizontalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="verticalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>16</number>
+                  </property>
+                  <item row="0" column="1">
+                   <widget class="QCheckBox" name="CBoxNetWorkRtspEnable">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="LabNetWorkRtspEnable">
+                    <property name="text">
+                     <string>Enable</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="LabNetWorkRtspPort">
+                    <property name="text">
+                     <string>Port</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkRtspPort"/>
+                  </item>
+                 </layout>
+                </item>
+                <item row="0" column="2">
+                 <spacer name="horizontalSpacer_13">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>197</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="StWdt_DDNS">
+            <layout class="QGridLayout" name="gridLayout_16">
+             <item row="0" column="0">
+              <widget class="QGroupBox" name="GBoxNetWork_DDNS">
+               <property name="title">
+                <string>DDNS</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_25">
+                <item row="0" column="0">
+                 <spacer name="horizontalSpacer_14">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>186</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="1">
+                 <layout class="QFormLayout" name="FLayoutNetWorkDdns">
+                  <property name="horizontalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="verticalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>16</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="LabNetWorkDdnsEnable">
+                    <property name="text">
+                     <string>Enable</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="LabNetWorkDdnsDdnsType">
+                    <property name="text">
+                     <string>DdnsType</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QComboBox" name="CBoxNetWorkDdnsDdnsType"/>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="LabNetWorkDdnsServerAddr">
+                    <property name="text">
+                     <string>ServerAddr</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkDdnsServerAddr">
+                    <property name="minimumSize">
+                     <size>
+                      <width>180</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="LabNetWorkDdnsUserName">
+                    <property name="text">
+                     <string>UserName</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkDdnsUserName"/>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="LabNetWorkDdnsPasswd">
+                    <property name="text">
+                     <string>Passwd</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkDdnsPasswd"/>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QCheckBox" name="CBoxNetWorkDdnsEnable">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QLabel" name="LabNetWorkDdnsUpdateInterval">
+                    <property name="text">
+                     <string>UpdateInt</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QComboBox" name="CBoxNetWorkDdnsUpdateInterval"/>
+                  </item>
+                 </layout>
+                </item>
+                <item row="0" column="2">
+                 <spacer name="horizontalSpacer_15">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>185</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="StWdt_P2P">
+            <layout class="QGridLayout" name="gridLayout_17">
+             <item row="0" column="0">
+              <widget class="QGroupBox" name="GBoxNetWork_P2P">
+               <property name="title">
+                <string>P2P</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_26">
+                <item row="0" column="0">
+                 <spacer name="horizontalSpacer_16">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>186</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="1" rowspan="2">
+                 <layout class="QFormLayout" name="FLayoutNetWorkP2P">
+                  <property name="horizontalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="verticalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>16</number>
+                  </property>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="LabNetWorkP2PServer">
+                    <property name="text">
+                     <string>Server</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="LabNetWorkP2PPort">
+                    <property name="text">
+                     <string>Port</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="LabNetWorkP2PUsrName">
+                    <property name="text">
+                     <string>UsrName</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="LabNetWorkP2PPasswd">
+                    <property name="text">
+                     <string>Passwd</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkP2PServer">
+                    <property name="minimumSize">
+                     <size>
+                      <width>180</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkP2PPort"/>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkP2PUsrName"/>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkP2PPasswd"/>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QCheckBox" name="CBoxNetWorkP2PEnable">
+                    <property name="text">
+                     <string>Enable</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QLineEdit" name="LiEditNetWorkP2PLinkID">
+                    <property name="minimumSize">
+                     <size>
+                      <width>180</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QCheckBox" name="CBoxNetWorkP2PUseLinkID">
+                    <property name="text">
+                     <string>UseLinkID</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QLabel" name="LabNetWorkP2PLinkID">
+                    <property name="text">
+                     <string>LinkID</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item row="1" column="2">
+                 <spacer name="horizontalSpacer_17">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>186</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="StWdt_RTMP">
+            <layout class="QGridLayout" name="gridLayout_18">
+             <item row="0" column="0">
+              <widget class="QGroupBox" name="GBoxNetWork_RTMP">
+               <property name="title">
+                <string>RTMP</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_29">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item row="1" column="0">
+                 <widget class="QTableView" name="TviewRtmpLinkInfo"/>
+                </item>
+                <item row="0" column="0">
+                 <layout class="QGridLayout" name="GLayoutNetWorkRTMP">
+                  <item row="0" column="2">
+                   <widget class="QLineEdit" name="LiEditNetWorkRTMPAddr"/>
+                  </item>
+                  <item row="0" column="4">
+                   <widget class="QComboBox" name="CBoxNetWorkRTMPChannel"/>
+                  </item>
+                  <item row="0" column="5">
+                   <widget class="QCheckBox" name="CBoxNetWorkRTMPAudio">
+                    <property name="text">
+                     <string>Audio</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="3">
+                   <widget class="QLabel" name="LabNetWorkRTMPChannel">
+                    <property name="text">
+                     <string>Channel</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLabel" name="LabNetWorkRTMPString">
+                    <property name="text">
+                     <string>string</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLabel" name="LabNetWorkRTMPAddr">
+                    <property name="text">
+                     <string>Addr</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="2">
+                   <widget class="QLineEdit" name="LiEditNetWorkRTMPString"/>
+                  </item>
+                  <item row="2" column="3">
+                   <widget class="QLabel" name="LabNetWorkRTMPStream">
+                    <property name="text">
+                     <string>Stream</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="4">
+                   <widget class="QComboBox" name="CBoxNetWorkRTMPStream"/>
+                  </item>
+                  <item row="0" column="0">
+                   <spacer name="horizontalSpacer_24">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Fixed</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="2" column="5">
+                   <layout class="QGridLayout" name="gridLayout_36">
+                    <item row="0" column="1">
+                     <widget class="QPushButton" name="BtnNetWorkRTMPAdd">
+                      <property name="minimumSize">
+                       <size>
+                        <width>24</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>24</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="flat">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="2">
+                     <widget class="QPushButton" name="BtnNetWorkRTMPDel">
+                      <property name="minimumSize">
+                       <size>
+                        <width>24</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>24</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="flat">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="StWdt_NTP">
+            <layout class="QGridLayout" name="gridLayout_19">
+             <item row="1" column="0">
+              <widget class="QGroupBox" name="GBoxNetWork_Time">
+               <property name="title">
+                <string>Time</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_27">
+                <item row="0" column="0">
+                 <layout class="QFormLayout" name="FLayoutNetWorkTime">
+                  <property name="horizontalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="verticalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>16</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="LabNetWorkTimeEnable">
+                    <property name="text">
+                     <string>Enable</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QCheckBox" name="CBoxNetWorkTimeEnable">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="LabNetWorkTimeServer">
+                    <property name="text">
+                     <string>Server</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QComboBox" name="CBoxNetWorkTimeServer"/>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="LabNetWorkTimeTimeZone">
+                    <property name="text">
+                     <string>TimeZone</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QComboBox" name="CBoxNetWorkTimetimeZone"/>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="LabNetWorkTimeUpdateTime">
+                    <property name="text">
+                     <string>UpdateTime</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QComboBox" name="CBoxNetWorkTimeUpdateTime"/>
+                  </item>
+                 </layout>
+                </item>
+                <item row="0" column="1">
+                 <layout class="QFormLayout" name="FLayoutNetWorkTime_2">
+                  <property name="horizontalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="verticalSpacing">
+                   <number>16</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>16</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>16</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="LabNetWorkTimeCurr">
+                    <property name="text">
+                     <string>CurrTime</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QDateTimeEdit" name="DTeditNetWorkTimeSelect"/>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QPushButton" name="BtnNetWorkTimeSyncPC">
+                    <property name="text">
+                     <string>SyncPc</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QToolBox" name="TBoxNetWork">
            <property name="minimumSize">
             <size>
-             <width>200</width>
+             <width>90</width>
              <height>0</height>
             </size>
            </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QTimeEdit" name="TEditIrCutStime"/>
-         </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="CBoxAnitFlicker"/>
-         </item>
-         <item row="9" column="1">
-          <widget class="QComboBox" name="CBoxCvbs"/>
-         </item>
-         <item row="9" column="0">
-          <widget class="QLabel" name="LabCvbs">
-           <property name="text">
-            <string>CVBS</string>
+           <property name="maximumSize">
+            <size>
+             <width>90</width>
+             <height>16777215</height>
+            </size>
            </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <widget class="QWidget" name="TBoxNetWorkNetSet">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>90</width>
+              <height>170</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>NetSet</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="TBoxNetWorkFtp">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>100</width>
+              <height>30</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>FTP</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="TBoxNetWorkEmail">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>100</width>
+              <height>30</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>Email</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="TBoxNetWorkUpnp">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>100</width>
+              <height>30</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>Upnp</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="TBoxNetWorkRtsp">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>100</width>
+              <height>30</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>RTSP</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="TBoxNetWorkDdns">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>100</width>
+              <height>30</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>DDNS</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="TBoxNetWorkP2p">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>100</width>
+              <height>30</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>P2P</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="TBoxNetWorkRtmp">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>100</width>
+              <height>30</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>RTMP</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="TBoxNetWorkTime">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>100</width>
+              <height>30</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>NTP</string>
+            </attribute>
+           </widget>
           </widget>
          </item>
         </layout>
-       </item>
-       <item row="1" column="3">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>304</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="0">
-        <spacer name="horizontalSpacer_19">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="3">
-        <widget class="QGroupBox" name="GBoxCapture">
-         <property name="title">
-          <string>Rotate</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="1" column="1">
-           <widget class="QComboBox" name="CBoxRotateMode"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="LabRotateMode">
-            <property name="text">
-             <string>RotateMode</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QCheckBox" name="CBoxVertical">
-            <property name="text">
-             <string>Vertical</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="CBoxHorizontal">
-            <property name="text">
-             <string>Horizontal</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <spacer name="horizontalSpacer_18">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <spacer name="horizontalSpacer_20">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="TabEncode">
-      <attribute name="title">
-       <string>Encode</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_5">
-       <item row="0" column="0">
-        <layout class="QFormLayout" name="FLayoutMainStream">
-         <property name="horizontalSpacing">
-          <number>16</number>
-         </property>
-         <property name="verticalSpacing">
-          <number>24</number>
-         </property>
-         <property name="leftMargin">
-          <number>32</number>
-         </property>
-         <property name="topMargin">
-          <number>32</number>
-         </property>
-         <property name="rightMargin">
-          <number>32</number>
-         </property>
-         <property name="bottomMargin">
-          <number>32</number>
-         </property>
+       </widget>
+       <widget class="QWidget" name="TabAlarm">
+        <attribute name="title">
+         <string>Alarm</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_35">
          <item row="0" column="0">
-          <widget class="QLabel" name="LabEnFormat">
-           <property name="text">
-            <string>EnFormat</string>
+          <widget class="QGroupBox" name="groupBox_5">
+           <property name="title">
+            <string>Local</string>
            </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="LabMImageSize">
-           <property name="text">
-            <string>ImageSize</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="LabFrameRate">
-           <property name="text">
-            <string>FrameRate</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="LabMBitRateCtrl">
-           <property name="text">
-            <string>BitRateCtrl</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="LabMBitRateQlevel">
-           <property name="text">
-            <string>BitRateQlevel</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="LabIFrameSpan">
-           <property name="text">
-            <string>IFrameSpan</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QLineEdit" name="LiEditMIFrameSpan"/>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="CBoxMEnFormat"/>
-         </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="CBoxMImageSize"/>
-         </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="CBoxMFrameRate"/>
-         </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="CBoxMBitRateCtrl"/>
-         </item>
-         <item row="4" column="1">
-          <layout class="QHBoxLayout" name="HLayoutMBitRateValue">
-           <item>
-            <widget class="QComboBox" name="CBoxMBitRateQlevel"/>
-           </item>
-           <item>
-            <widget class="QLabel" name="LabMVcbr">
-             <property name="text">
-              <string>MaxCbr</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="LiEditMBitRateQlevel"/>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </item>
-       <item row="0" column="1">
-        <layout class="QFormLayout" name="FLayoutSubStream">
-         <property name="horizontalSpacing">
-          <number>16</number>
-         </property>
-         <property name="verticalSpacing">
-          <number>24</number>
-         </property>
-         <property name="leftMargin">
-          <number>32</number>
-         </property>
-         <property name="topMargin">
-          <number>32</number>
-         </property>
-         <property name="rightMargin">
-          <number>32</number>
-         </property>
-         <property name="bottomMargin">
-          <number>32</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="LabSubSlaveNumber">
-           <property name="text">
-            <string>SubStream</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="LabSImageSize">
-           <property name="text">
-            <string>ImageSize</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="LabSFrameRate">
-           <property name="text">
-            <string>FrameRate</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="LabBitRateCtrl">
-           <property name="text">
-            <string>BitRateCtrl</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="LabSBitRateQlevel">
-           <property name="text">
-            <string>BitRateQlevel</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="LabSIFramSpan">
-           <property name="text">
-            <string>IFramSpan</string>
-           </property>
+           <layout class="QGridLayout" name="gridLayout_34">
+            <item row="1" column="2">
+             <widget class="QCheckBox" name="CBoxAlmEnableMotionDetection">
+              <property name="text">
+               <string>MotionDetection</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QCheckBox" name="CBoxAlmLEnablePortIn">
+              <property name="text">
+               <string>PortIn</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="CBoxAlmEnable">
+              <property name="text">
+               <string>AlarmEnable</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QPushButton" name="BtnAlmTimeSelect">
+              <property name="text">
+               <string>TimeSelect</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2">
+             <widget class="QPushButton" name="BtnAlmAreaSelect">
+              <property name="text">
+               <string>AreaSelect</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QComboBox" name="CBoxAlmMotionLevel"/>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="LabAlmMotionLevel">
+              <property name="text">
+               <string>MotionLevel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QComboBox" name="CBoxSSlaveNumber"/>
-         </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="CBoxSImageSize"/>
-         </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="CBoxSFrameRate"/>
-         </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="CBoxSBitRateCtrl"/>
-         </item>
-         <item row="5" column="1">
-          <widget class="QLineEdit" name="LiEditSIFrameSpan"/>
-         </item>
-         <item row="4" column="1">
-          <layout class="QHBoxLayout" name="HLayoutBitRateValue">
-           <item>
-            <widget class="QComboBox" name="CBoxSBitRateQlevel"/>
-           </item>
-           <item>
-            <widget class="QLabel" name="LabSVcbr">
-             <property name="text">
-              <string>MaxCbr</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="LiEditSBitRateQlevel"/>
-           </item>
-          </layout>
+          <widget class="QGroupBox" name="groupBox_4">
+           <property name="title">
+            <string>Linkage</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_33">
+            <item row="2" column="0">
+             <widget class="QCheckBox" name="CBoxAlmLinkageBeep">
+              <property name="text">
+               <string>Beep</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="CBoxAlmLinkageEmail">
+              <property name="text">
+               <string>Email</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="CBoxAlmLinkageFtp">
+              <property name="text">
+               <string>Ftp</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="CBoxAlmLinkageRecord">
+              <property name="text">
+               <string>Record</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QCheckBox" name="CBoxAlmLinkageSnapshort">
+              <property name="text">
+               <string>Snapshort</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QCheckBox" name="CBoxAlmLinkagePtz">
+              <property name="text">
+               <string>Ptz</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QComboBox" name="CBoxalmPreRcordSecond"/>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="LabAlmPreRecordSecond">
+              <property name="text">
+               <string>PreRecordSec</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QCheckBox" name="CBoxAlmLinkagePortOut">
+              <property name="text">
+               <string>PortOut</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="TabAudio">
-      <attribute name="title">
-       <string>Audio</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_31">
-       <item row="0" column="0">
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>AudioIn</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_28">
-          <item row="0" column="0">
-           <layout class="QFormLayout" name="formLayout">
-            <property name="horizontalSpacing">
-             <number>32</number>
-            </property>
-            <property name="verticalSpacing">
-             <number>16</number>
-            </property>
-            <property name="leftMargin">
-             <number>32</number>
-            </property>
-            <property name="topMargin">
-             <number>32</number>
-            </property>
-            <property name="rightMargin">
-             <number>32</number>
-            </property>
-            <property name="bottomMargin">
-             <number>32</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>AiSoundMode</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QComboBox" name="CBoxAiSoundMode"/>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="LabAiEncodeType">
-              <property name="text">
-               <string>EncodeType</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QComboBox" name="CBoxAiEncodeType"/>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="LabAisampleRate">
-              <property name="text">
-               <string>SampleRate</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QComboBox" name="CBoxAiSampleRate"/>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="LabAiSampleBits">
-              <property name="text">
-               <string>SampleBits</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QComboBox" name="CBoxAiSampleBits"/>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="LabAiVolume">
-              <property name="text">
-               <string>Volume</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QSlider" name="HSliderAiVolume">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="1">
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
-              <item>
-               <widget class="QRadioButton" name="RBtnAiMicIn">
-                <property name="text">
-                 <string>MicIn</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="RBtnAiLineIn">
-                <property name="text">
-                 <string>LineIn</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="6" column="1">
-             <layout class="QHBoxLayout" name="horizontalLayout_3">
-              <item>
-               <widget class="QCheckBox" name="CBoxAiAnr">
-                <property name="text">
-                 <string>Anr</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="CBoxAiAec">
-                <property name="text">
-                 <string>Aec</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="8" column="0">
-             <layout class="QHBoxLayout" name="horizontalLayout"/>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QGroupBox" name="groupBox_2">
-         <property name="title">
-          <string>AudioOut</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_30">
-          <item row="0" column="0">
-           <layout class="QFormLayout" name="formLayout_2">
-            <property name="horizontalSpacing">
-             <number>32</number>
-            </property>
-            <property name="verticalSpacing">
-             <number>16</number>
-            </property>
-            <property name="leftMargin">
-             <number>32</number>
-            </property>
-            <property name="topMargin">
-             <number>32</number>
-            </property>
-            <property name="rightMargin">
-             <number>32</number>
-            </property>
-            <property name="bottomMargin">
-             <number>32</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QLabel" name="LabAoSoundMode">
-              <property name="text">
-               <string>SoundMode</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="LabAoEncodeType">
-              <property name="text">
-               <string>EncodeType</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="LabAoSampleRate">
-              <property name="text">
-               <string>SampleRate</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="LabAoSampleBits">
-              <property name="text">
-               <string>SampleBits</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="LabAoVolume">
-              <property name="text">
-               <string>Volume</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QSlider" name="HSliderAoVolume">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="LabAoSoundModeText">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="LabAoEncodeTypeText">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLabel" name="LabAoSampleRateText">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QLabel" name="LabAoSampleBitsText">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="TabVersion">
-      <attribute name="title">
-       <string>Version</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_8">
-       <property name="topMargin">
-        <number>12</number>
-       </property>
-       <property name="horizontalSpacing">
-        <number>24</number>
-       </property>
-       <property name="verticalSpacing">
-        <number>12</number>
-       </property>
-       <item row="1" column="0">
-        <widget class="QGroupBox" name="GBoxManufactorInfo">
-         <property name="title">
-          <string>Manufactor Info</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_7">
-          <item row="0" column="0">
-           <layout class="QFormLayout" name="FLayoutManufactorInfo">
-            <property name="horizontalSpacing">
-             <number>32</number>
-            </property>
-            <property name="verticalSpacing">
-             <number>12</number>
-            </property>
-            <property name="leftMargin">
-             <number>32</number>
-            </property>
-            <property name="topMargin">
-             <number>32</number>
-            </property>
-            <property name="rightMargin">
-             <number>12</number>
-            </property>
-            <property name="bottomMargin">
-             <number>12</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QLabel" name="LabProductModel">
-              <property name="text">
-               <string>ProductModel</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="LabIDNumber">
-              <property name="text">
-               <string>ID Number</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="LabFactoryTime">
-              <property name="text">
-               <string>FactoryTime</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="LabFactoryName">
-              <property name="text">
-               <string>FacotryName</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="LabProductModelShow">
-              <property name="text">
-               <string>XXX-XXX</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="LabIDNumberShow">
-              <property name="text">
-               <string>XXX-XXX</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLabel" name="LabFactoryTimeShow">
-              <property name="text">
-               <string>XXX-XXX</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QLabel" name="LabFactoryNameShow">
-              <property name="text">
-               <string>XXX-XXX</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QGroupBox" name="GBoxVersionInfo">
-         <property name="title">
-          <string>Version Info</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_6">
-          <item row="0" column="0">
-           <layout class="QFormLayout" name="FLayoutVersionInfo">
-            <property name="horizontalSpacing">
-             <number>32</number>
-            </property>
-            <property name="verticalSpacing">
-             <number>12</number>
-            </property>
-            <property name="leftMargin">
-             <number>32</number>
-            </property>
-            <property name="topMargin">
-             <number>12</number>
-            </property>
-            <property name="rightMargin">
-             <number>12</number>
-            </property>
-            <property name="bottomMargin">
-             <number>12</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QLabel" name="LabSoftWare">
-              <property name="text">
-               <string>SoftWare</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="LabBuildTime">
-              <property name="text">
-               <string>BuildTime</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="LabHarWare">
-              <property name="text">
-               <string>HardWare</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="LabProto">
-              <property name="text">
-               <string>Proto</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="LabKernel">
-              <property name="text">
-               <string>Kernel</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="LabFileSys">
-              <property name="text">
-               <string>FileSys</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="LabSoftWareShow">
-              <property name="text">
-               <string>SoftWareVersion</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="LabBuildTimeShow">
-              <property name="text">
-               <string>BuildTimeVersion</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLabel" name="LabHardWareShow">
-              <property name="text">
-               <string>HardWareVersion</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QLabel" name="LabProtoShow">
-              <property name="text">
-               <string>ProtoVersion</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QLabel" name="LabKernelShow">
-              <property name="text">
-               <string>KernelVersion</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="1">
-             <widget class="QLabel" name="LabFileSysShow">
-              <property name="text">
-               <string>FileSysVersion</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="TabRecord">
-      <attribute name="title">
-       <string>Record</string>
-      </attribute>
-     </widget>
-     <widget class="QWidget" name="TabNetWork">
-      <attribute name="title">
-       <string>NetWork</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_10">
-       <item row="0" column="1">
-        <widget class="QStackedWidget" name="StWidgetNetWork">
-         <property name="currentIndex">
-          <number>7</number>
-         </property>
-         <widget class="QWidget" name="StWdt_NetSet">
-          <layout class="QGridLayout" name="gridLayout_11">
+       </widget>
+       <widget class="QWidget" name="TabUserManager">
+        <attribute name="title">
+         <string>UserManager</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="TabLog">
+        <attribute name="title">
+         <string>Log</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="TabPtz">
+        <attribute name="title">
+         <string>Ptz</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_9">
+         <item row="0" column="1">
+          <layout class="QFormLayout" name="FLayoutPtx">
+           <property name="horizontalSpacing">
+            <number>16</number>
+           </property>
+           <property name="verticalSpacing">
+            <number>16</number>
+           </property>
+           <property name="topMargin">
+            <number>16</number>
+           </property>
+           <property name="rightMargin">
+            <number>16</number>
+           </property>
+           <property name="bottomMargin">
+            <number>16</number>
+           </property>
            <item row="0" column="0">
-            <widget class="QGroupBox" name="GBoxNetWork_NetSetting">
-             <property name="title">
-              <string>NetSetting</string>
+            <widget class="QLabel" name="LabPtzProtocol">
+             <property name="text">
+              <string>Protocol</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout_20">
-              <item row="0" column="0">
-               <spacer name="horizontalSpacer_4">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>183</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="1">
-               <layout class="QFormLayout" name="FLayoutNetWork">
-                <property name="horizontalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="verticalSpacing">
-                 <number>12</number>
-                </property>
-                <property name="leftMargin">
-                 <number>16</number>
-                </property>
-                <property name="topMargin">
-                 <number>16</number>
-                </property>
-                <property name="rightMargin">
-                 <number>16</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>16</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="LabNetWorkiFrName">
-                  <property name="text">
-                   <string>iFrName</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="LabNetWorkGetMode">
-                  <property name="text">
-                   <string>GetMode</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="LabNetWorkIpV4Addr">
-                  <property name="text">
-                   <string>IPv4Addr</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="LabNetWorkIpV6Addr">
-                  <property name="text">
-                   <string>IPv6Addr</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="LabNetWorkSubMask">
-                  <property name="text">
-                   <string>SubMask</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="LabNetWorkGateWay">
-                  <property name="text">
-                   <string>GateWay</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="0">
-                 <widget class="QLabel" name="LabNetWorkMacAddr">
-                  <property name="text">
-                   <string>MacAddr</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="0">
-                 <widget class="QLabel" name="LabNetWorkDns1">
-                  <property name="text">
-                   <string>Dns1</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="8" column="0">
-                 <widget class="QLabel" name="LabNetWorkDns2">
-                  <property name="text">
-                   <string>Dns2</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="9" column="0">
-                 <widget class="QLabel" name="LabNetWorkServicePort">
-                  <property name="text">
-                   <string>ServicePort</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QComboBox" name="CBoxNetWorkIfrName"/>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QComboBox" name="CBoxNetWorkGetMode"/>
-                </item>
-                <item row="9" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkServicePort"/>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkIpV4Addr"/>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkIpV6Addr"/>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkSubMask"/>
-                </item>
-                <item row="5" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkGateWay"/>
-                </item>
-                <item row="6" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkMacAddr"/>
-                </item>
-                <item row="7" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkDns1"/>
-                </item>
-                <item row="8" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkDns2"/>
-                </item>
-               </layout>
-              </item>
-              <item row="0" column="2">
-               <spacer name="horizontalSpacer_5">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>182</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
             </widget>
            </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="StWdt_FTP">
-          <layout class="QGridLayout" name="gridLayout_12">
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="GBoxNetWork_FTP">
-             <property name="title">
-              <string>FTP</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_21">
-              <item row="0" column="0">
-               <spacer name="horizontalSpacer_6">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>192</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="1">
-               <layout class="QFormLayout" name="FLayoutNetWorkFtp">
-                <property name="horizontalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="verticalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="leftMargin">
-                 <number>16</number>
-                </property>
-                <property name="topMargin">
-                 <number>16</number>
-                </property>
-                <property name="rightMargin">
-                 <number>16</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>16</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="LabNetWorkFtpEnable">
-                  <property name="text">
-                   <string>Enable</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QCheckBox" name="CBoxNetWorkFtpEnable">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="LabNetWorkFtpServer">
-                  <property name="text">
-                   <string>Server</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkFtpServer"/>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="LabNetWorkFtpPort">
-                  <property name="text">
-                   <string>Port</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkFtpPort"/>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkFtpUserName"/>
-                </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="LabNetWorkFtpPasswd">
-                  <property name="text">
-                   <string>Passwd</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkFtpPasswd"/>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="LabNetWorkFtpUserName">
-                  <property name="text">
-                   <string>UserName</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item row="0" column="2">
-               <spacer name="horizontalSpacer_7">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>191</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="StWdt_EMAIL">
-          <layout class="QGridLayout" name="gridLayout_13">
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="GBoxNetWork_EMAIL">
-             <property name="title">
-              <string>Email</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_22">
-              <item row="0" column="0">
-               <spacer name="horizontalSpacer_8">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>186</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="1">
-               <layout class="QFormLayout" name="FLayoutNetWorkEmail">
-                <property name="horizontalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="verticalSpacing">
-                 <number>12</number>
-                </property>
-                <property name="leftMargin">
-                 <number>16</number>
-                </property>
-                <property name="topMargin">
-                 <number>16</number>
-                </property>
-                <property name="rightMargin">
-                 <number>16</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>16</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="LabNetWorkEmailSmtpServer">
-                  <property name="text">
-                   <string>SmtpServer</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkEmailSmtpServer"/>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="LabNetWorkEmailPort">
-                  <property name="text">
-                   <string>Port</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkEmailPort"/>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QCheckBox" name="CBoxNetWorkEmailEnable">
-                  <property name="text">
-                   <string>Enable</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QCheckBox" name="CBoxNetWorkEmailSSL">
-                  <property name="text">
-                   <string>SSL</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="LabNetWorkEmailSender">
-                  <property name="text">
-                   <string>Sender</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkEmailSender"/>
-                </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="LabNetWorkEmailUserName">
-                  <property name="text">
-                   <string>UserName</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkEmailUserName"/>
-                </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="LabNetWorkEmailPasswd">
-                  <property name="text">
-                   <string>Passwd</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkEmailPasswd"/>
-                </item>
-                <item row="6" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkEmailTitle"/>
-                </item>
-                <item row="7" column="0">
-                 <widget class="QLabel" name="LabNetWorkEmailReceiver1">
-                  <property name="text">
-                   <string>Receiver1</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkEmailReceiver1"/>
-                </item>
-                <item row="8" column="0">
-                 <widget class="QLabel" name="LabNetWorkEmailReceiver2">
-                  <property name="text">
-                   <string>Receiver2</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="8" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkEmailReceiver2"/>
-                </item>
-                <item row="6" column="0">
-                 <widget class="QLabel" name="LabNetWorkEmailTitle">
-                  <property name="text">
-                   <string>Title</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item row="0" column="2">
-               <spacer name="horizontalSpacer_9">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>185</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="StWdt_UPNP">
-          <layout class="QGridLayout" name="gridLayout_14">
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="GBoxNetWork_UPNP">
-             <property name="title">
-              <string>UPNP</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_23">
-              <item row="0" column="0">
-               <spacer name="horizontalSpacer_10">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>189</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="1" rowspan="2">
-               <layout class="QFormLayout" name="FLayoutNetWorkUpnp">
-                <property name="horizontalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="verticalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="leftMargin">
-                 <number>16</number>
-                </property>
-                <property name="topMargin">
-                 <number>16</number>
-                </property>
-                <property name="rightMargin">
-                 <number>16</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>16</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="LabNetWorkUpnpEnable">
-                  <property name="text">
-                   <string>Enable</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="LabNetWorkUpnpWebPort">
-                  <property name="text">
-                   <string>WebPort</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="LabNetWorkUpnpProtoPort">
-                  <property name="text">
-                   <string>ProtoPort</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="LabNetWorkUpnpRtspPort">
-                  <property name="text">
-                   <string>RtspPort</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QCheckBox" name="CBoxNetWorkUpnpEnable">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkUpnpWebPort"/>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkUpnpProtoPort"/>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkUpnpRtspPort"/>
-                </item>
-               </layout>
-              </item>
-              <item row="1" column="2">
-               <spacer name="horizontalSpacer_11">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>188</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="StWdt_RTSP">
-          <layout class="QGridLayout" name="gridLayout_15">
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="GBoxNetWork_RTSP">
-             <property name="title">
-              <string>RTSP</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_24">
-              <item row="0" column="0">
-               <spacer name="horizontalSpacer_12">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>198</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="1">
-               <layout class="QFormLayout" name="FLayoutNetWorkRtsp">
-                <property name="horizontalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="verticalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="leftMargin">
-                 <number>16</number>
-                </property>
-                <property name="topMargin">
-                 <number>16</number>
-                </property>
-                <property name="rightMargin">
-                 <number>16</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>16</number>
-                </property>
-                <item row="0" column="1">
-                 <widget class="QCheckBox" name="CBoxNetWorkRtspEnable">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="LabNetWorkRtspEnable">
-                  <property name="text">
-                   <string>Enable</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="LabNetWorkRtspPort">
-                  <property name="text">
-                   <string>Port</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkRtspPort"/>
-                </item>
-               </layout>
-              </item>
-              <item row="0" column="2">
-               <spacer name="horizontalSpacer_13">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>197</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="StWdt_DDNS">
-          <layout class="QGridLayout" name="gridLayout_16">
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="GBoxNetWork_DDNS">
-             <property name="title">
-              <string>DDNS</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_25">
-              <item row="0" column="0">
-               <spacer name="horizontalSpacer_14">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>186</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="1">
-               <layout class="QFormLayout" name="FLayoutNetWorkDdns">
-                <property name="horizontalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="verticalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="leftMargin">
-                 <number>16</number>
-                </property>
-                <property name="topMargin">
-                 <number>16</number>
-                </property>
-                <property name="rightMargin">
-                 <number>16</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>16</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="LabNetWorkDdnsEnable">
-                  <property name="text">
-                   <string>Enable</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="LabNetWorkDdnsDdnsType">
-                  <property name="text">
-                   <string>DdnsType</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QComboBox" name="CBoxNetWorkDdnsDdnsType"/>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="LabNetWorkDdnsServerAddr">
-                  <property name="text">
-                   <string>ServerAddr</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkDdnsServerAddr"/>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="LabNetWorkDdnsUserName">
-                  <property name="text">
-                   <string>UserName</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkDdnsUserName"/>
-                </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="LabNetWorkDdnsPasswd">
-                  <property name="text">
-                   <string>Passwd</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkDdnsPasswd"/>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QCheckBox" name="CBoxNetWorkDdnsEnable">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item row="0" column="2">
-               <spacer name="horizontalSpacer_15">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>185</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="StWdt_P2P">
-          <layout class="QGridLayout" name="gridLayout_17">
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="GBoxNetWork_P2P">
-             <property name="title">
-              <string>P2P</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_26">
-              <item row="0" column="0">
-               <spacer name="horizontalSpacer_16">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>186</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="1" rowspan="2">
-               <layout class="QFormLayout" name="FLayoutNetWorkP2P">
-                <property name="horizontalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="verticalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="leftMargin">
-                 <number>16</number>
-                </property>
-                <property name="topMargin">
-                 <number>16</number>
-                </property>
-                <property name="rightMargin">
-                 <number>16</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>16</number>
-                </property>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="LabNetWorkP2PServer">
-                  <property name="text">
-                   <string>Server</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="LabNetWorkP2PPort">
-                  <property name="text">
-                   <string>Port</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="LabNetWorkP2PUsrName">
-                  <property name="text">
-                   <string>UsrName</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="LabNetWorkP2PPasswd">
-                  <property name="text">
-                   <string>Passwd</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkP2PServer"/>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkP2PPort"/>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkP2PUsrName"/>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkP2PPasswd"/>
-                </item>
-                <item row="0" column="0">
-                 <widget class="QCheckBox" name="CBoxNetWorkP2PEnable">
-                  <property name="text">
-                   <string>Enable</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkP2PLinkID"/>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QCheckBox" name="CBoxNetWorkP2PUseLinkID">
-                  <property name="text">
-                   <string>UseLinkID</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="LabNetWorkP2PLinkID">
-                  <property name="text">
-                   <string>LinkID</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item row="1" column="2">
-               <spacer name="horizontalSpacer_17">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>186</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="StWdt_RTMP">
-          <layout class="QGridLayout" name="gridLayout_18">
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="GBoxNetWork_RTMP">
-             <property name="title">
-              <string>RTMP</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_29">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item row="0" column="0">
-               <layout class="QGridLayout" name="GLayoutNetWorkRTMP">
-                <item row="0" column="2">
-                 <widget class="QLineEdit" name="LiEditNetWorkRTMPAddr"/>
-                </item>
-                <item row="0" column="4">
-                 <widget class="QComboBox" name="CBoxNetWorkRTMPChannel"/>
-                </item>
-                <item row="0" column="5">
-                 <widget class="QCheckBox" name="CBoxNetWorkRTMPAudio">
-                  <property name="text">
-                   <string>Audio</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="3">
-                 <widget class="QLabel" name="LabNetWorkRTMPChannel">
-                  <property name="text">
-                   <string>Channel</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLabel" name="LabNetWorkRTMPString">
-                  <property name="text">
-                   <string>string</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QLabel" name="LabNetWorkRTMPAddr">
-                  <property name="text">
-                   <string>Addr</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="2">
-                 <widget class="QLineEdit" name="LiEditNetWorkRTMPString"/>
-                </item>
-                <item row="2" column="3">
-                 <widget class="QLabel" name="LabNetWorkRTMPStream">
-                  <property name="text">
-                   <string>Stream</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="4">
-                 <widget class="QComboBox" name="CBoxNetWorkRTMPStream"/>
-                </item>
-                <item row="0" column="0">
-                 <spacer name="horizontalSpacer_24">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </item>
-              <item row="1" column="0">
-               <layout class="QHBoxLayout" name="HLayoutNetWorkRTMP">
-                <item>
-                 <spacer name="horizontalSpacer_22">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_23">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="BtnNetWorkRTMPAdd">
-                  <property name="minimumSize">
-                   <size>
-                    <width>24</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>24</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string/>
-                  </property>
-                  <property name="flat">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="BtnNetWorkRTMPDel">
-                  <property name="minimumSize">
-                   <size>
-                    <width>24</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>24</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string/>
-                  </property>
-                  <property name="flat">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item row="2" column="0">
-               <widget class="QTableView" name="TviewRtmpLinkInfo"/>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="StWdt_NTP">
-          <layout class="QGridLayout" name="gridLayout_19">
            <item row="1" column="0">
-            <widget class="QGroupBox" name="GBoxNetWork_Time">
-             <property name="title">
-              <string>Time</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_27">
-              <item row="0" column="0">
-               <layout class="QFormLayout" name="FLayoutNetWorkTime">
-                <property name="horizontalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="verticalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="leftMargin">
-                 <number>16</number>
-                </property>
-                <property name="topMargin">
-                 <number>16</number>
-                </property>
-                <property name="rightMargin">
-                 <number>16</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>16</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="LabNetWorkTimeEnable">
-                  <property name="text">
-                   <string>Enable</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="LabNetWorkTimeServer">
-                  <property name="text">
-                   <string>Server</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="LabNetWorkTimePort">
-                  <property name="text">
-                   <string>Port</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="LabNetWorkTimeTimeZone">
-                  <property name="text">
-                   <string>TimeZone</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="LabNetWorkTimeUpdateTime">
-                  <property name="text">
-                   <string>UpdateTime</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QCheckBox" name="CBoxNetWorkTimeEnable">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkTimeServer"/>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="LiEditNetWorkTimePort"/>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QComboBox" name="ComBoxNetWorkTimetimeZone"/>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QComboBox" name="ComBoxNetWorkTimeUpdateTime"/>
-                </item>
-               </layout>
-              </item>
-              <item row="0" column="1">
-               <layout class="QFormLayout" name="FLayoutNetWorkTime_2">
-                <property name="horizontalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="verticalSpacing">
-                 <number>16</number>
-                </property>
-                <property name="leftMargin">
-                 <number>16</number>
-                </property>
-                <property name="topMargin">
-                 <number>16</number>
-                </property>
-                <property name="rightMargin">
-                 <number>16</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>16</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="LabNetWorkTimeCurr">
-                  <property name="text">
-                   <string>CurrTime</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QDateTimeEdit" name="DTeditNetWorkTimeSelect"/>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QPushButton" name="BtnNetWorkTimeSyncPC">
-                  <property name="text">
-                   <string>SyncPc</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QToolBox" name="TBoxNetWork">
-         <property name="minimumSize">
-          <size>
-           <width>90</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>90</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="currentIndex">
-          <number>8</number>
-         </property>
-         <widget class="QWidget" name="TBoxNetWorkNetSet">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>98</width>
-            <height>28</height>
-           </rect>
-          </property>
-          <attribute name="label">
-           <string>NetSet</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="TBoxNetWorkFtp">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>98</width>
-            <height>28</height>
-           </rect>
-          </property>
-          <attribute name="label">
-           <string>FTP</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="TBoxNetWorkEmail">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>98</width>
-            <height>28</height>
-           </rect>
-          </property>
-          <attribute name="label">
-           <string>Email</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="TBoxNetWorkUpnp">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>98</width>
-            <height>28</height>
-           </rect>
-          </property>
-          <attribute name="label">
-           <string>Upnp</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="TBoxNetWorkRtsp">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>98</width>
-            <height>28</height>
-           </rect>
-          </property>
-          <attribute name="label">
-           <string>RTSP</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="TBoxNetWorkDdns">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>98</width>
-            <height>28</height>
-           </rect>
-          </property>
-          <attribute name="label">
-           <string>DDNS</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="TBoxNetWorkP2p">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>98</width>
-            <height>28</height>
-           </rect>
-          </property>
-          <attribute name="label">
-           <string>P2P</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="TBoxNetWorkRtmp">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>98</width>
-            <height>28</height>
-           </rect>
-          </property>
-          <attribute name="label">
-           <string>RTMP</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="TBoxNetWorkTime">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>90</width>
-            <height>157</height>
-           </rect>
-          </property>
-          <attribute name="label">
-           <string>NTP</string>
-          </attribute>
-         </widget>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="TabAlarm">
-      <attribute name="title">
-       <string>Alarm</string>
-      </attribute>
-     </widget>
-     <widget class="QWidget" name="TabUserManager">
-      <attribute name="title">
-       <string>UserManager</string>
-      </attribute>
-     </widget>
-     <widget class="QWidget" name="TabLog">
-      <attribute name="title">
-       <string>Log</string>
-      </attribute>
-     </widget>
-     <widget class="QWidget" name="TabPtz">
-      <attribute name="title">
-       <string>Ptz</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_9">
-       <item row="0" column="1">
-        <layout class="QFormLayout" name="FLayoutPtx">
-         <property name="horizontalSpacing">
-          <number>16</number>
-         </property>
-         <property name="verticalSpacing">
-          <number>16</number>
-         </property>
-         <property name="topMargin">
-          <number>16</number>
-         </property>
-         <property name="rightMargin">
-          <number>16</number>
-         </property>
-         <property name="bottomMargin">
-          <number>16</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="LabPtzProtocol">
-           <property name="text">
-            <string>Protocol</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="LabPtzAddress">
-           <property name="text">
-            <string>Address</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="LabPtzBaudRate">
-           <property name="text">
-            <string>BaudRate</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="LabDataBit">
-           <property name="text">
-            <string>DataBit</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="LabPtzStopBit">
-           <property name="text">
-            <string>StopBit</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="LabPtzVerify">
-           <property name="text">
-            <string>Verify</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="CBoxPtzProtocol"/>
-         </item>
-         <item row="5" column="1">
-          <widget class="QComboBox" name="CBoxPtzVerify"/>
-         </item>
-         <item row="4" column="1">
-          <widget class="QComboBox" name="CBoxPtzStopBit"/>
-         </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="CBoxPtzDataBit"/>
-         </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="CBoxPtzBaudRate"/>
-         </item>
-         <item row="1" column="1">
-          <layout class="QHBoxLayout" name="HLayoutAddress">
-           <item>
-            <widget class="QLineEdit" name="LiEnitPtzAddress"/>
-           </item>
-           <item>
-            <widget class="QLabel" name="LabPtzAddressPlan">
+            <widget class="QLabel" name="LabPtzAddress">
              <property name="text">
-              <string>0-255</string>
+              <string>Address</string>
              </property>
             </widget>
            </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="LabPtzBaudRate">
+             <property name="text">
+              <string>BaudRate</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="LabDataBit">
+             <property name="text">
+              <string>DataBit</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="LabPtzStopBit">
+             <property name="text">
+              <string>StopBit</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="LabPtzVerify">
+             <property name="text">
+              <string>Verify</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="CBoxPtzProtocol"/>
+           </item>
+           <item row="5" column="1">
+            <widget class="QComboBox" name="CBoxPtzVerify"/>
+           </item>
+           <item row="4" column="1">
+            <widget class="QComboBox" name="CBoxPtzStopBit"/>
+           </item>
+           <item row="3" column="1">
+            <widget class="QComboBox" name="CBoxPtzDataBit"/>
+           </item>
+           <item row="2" column="1">
+            <widget class="QComboBox" name="CBoxPtzBaudRate"/>
+           </item>
+           <item row="1" column="1">
+            <layout class="QHBoxLayout" name="HLayoutAddress">
+             <item>
+              <widget class="QLineEdit" name="LiEnitPtzAddress"/>
+             </item>
+             <item>
+              <widget class="QLabel" name="LabPtzAddressPlan">
+               <property name="text">
+                <string>0-255</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
           </layout>
+         </item>
+         <item row="0" column="2">
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="0" column="0">
+          <spacer name="horizontalSpacer_21">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="HorSubCannelBtn">
+       <item>
+        <widget class="QComboBox" name="CBoxSettingChannel">
+         <item>
+          <property name="text">
+           <string>Chn0</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Chn1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Chn2</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Chn3</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Chn4</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Chn5</string>
+          </property>
+         </item>
+        </widget>
        </item>
-       <item row="0" column="2">
-        <spacer name="horizontalSpacer_3">
+       <item>
+        <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -2641,8 +2816,22 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="0">
-        <spacer name="horizontalSpacer_21">
+       <item>
+        <widget class="QPushButton" name="BtnSubmit">
+         <property name="text">
+          <string>Submit</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="BtnUpdate">
+         <property name="text">
+          <string>Update</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -2655,8 +2844,8 @@
         </spacer>
        </item>
       </layout>
-     </widget>
-    </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

@@ -151,7 +151,7 @@ start_ko()
 		script_ko = load3535;
 			;;
 		H36|h36)
-		script_ko = load3536;
+		./load3536 -i
 			;;
 		WIN32|win32)
 		script_ko = loadwin32;
@@ -197,6 +197,7 @@ start_app()
 	then
 		tar -xvf /app/avWare.tar.gz -C /tmp;
 		cd /tmp;
+		ulimit -s 4096;
 		./avWare &
 		sleep 1;
 		rm -rf /tmp/avWare;

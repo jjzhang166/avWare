@@ -36,12 +36,48 @@ typedef struct {
 	av_u32 NetCommGetModeMask[8];
 }C_NetCommCaps;
 
+typedef struct{
+	av_uint FocusCtrlModeMask;
+	av_uint FocusSensitivityMax;
+	av_uint FocusRegionMask;
+	av_uint FocusSearchModeMask;
+	av_uint IrisCtrlModeMask;
+	av_uint ZoomSpeedMax;
+	av_bool bSupportFigureZoom;
+}C_PtzAdvancedCameraLensCaps;
+
+typedef struct{
+	PtzCameraLensFocusCtrlMode FocusCtrlMode;
+	av_uint FocusSensitivity;
+	PtzCameraLensFocusRegion FocusRegion;
+	PtzCameraLensFocusSearchMode FocusSearchMode;
+	PtzCameraLensIrisCtrlMode IrisCtrlMode;
+	av_uint ZoomSpeed;
+	av_bool bFigureZoom;
+}C_PtzAdvancedCameraLensProfile;
+
+
+
+typedef struct{
+	NetCommT NetComm;
+	av_uint NetLinkStatMask;
+	av_uint	NetUploadRate;
+	av_uint NetDownLoadRate;
+}C_NetStatusInfo;
+
+typedef struct {
+	av_uint CpuFrequency;
+	av_uint CpuFreeRate;
+	av_uint MemTotal;
+	av_uint MemFree;
+}C_CpuMemStatusInfo;
+
 
 typedef struct {
 	av_u32	 CompMask;
 	av_u32	 ImageSizeMask;// CHL_MAIN_T
 	av_uchar MaxCover;
-	av_uchar MaxWaterMaring;
+	av_uchar OverLayMask;
 	av_uchar BitRateCtrlMask;
 
 	av_uchar ExtChannelMask;
@@ -83,6 +119,8 @@ typedef struct {
 	av_u32	nMaxDecodeChannel;
 	av_u32	nMaxDecodeExtChannel;
 }C_DspCaps;
+
+
 typedef C_DspCaps C_DeviceCaps;
 
 typedef struct {
@@ -131,5 +169,47 @@ typedef struct{
 	AudioCaptureDevice		CaptureDevice;
 	av_uint					VoiceQualityMask;
 }C_AudioProfile;
+
+
+
+typedef struct {
+	av_uint CoverbEnMask;
+	av_uint CoverBgRGB;
+	C_RECT  CoverZone[ConfMaxCover];
+}C_CoverProfile;
+
+typedef struct {
+	av_uint OverLayTypeMask;
+	av_bool bSupportBg;
+	av_bool bSupportFg;
+	av_uint OverLayDateTimeSplitMask;
+	av_uint OverLayDateTimeStyleMask;
+	av_uint FontSizeMask;
+	av_uint MaxTextExt;
+}C_OverLayCaps;
+typedef struct {
+	OverLayType		Index;
+	av_bool			bOpen;
+	
+	av_uint			BgRgba;
+	av_uint			FgRgba;
+
+	FontSize		Fontsize;
+	OverLayDateTimeSplit Split;
+	OverLayDateTimeStyle Style;
+	C_RECT			Rect;
+
+	char			TextChannel[128];
+	char			TextExt1[128];
+	char			TextExt2[128];
+	char			TextExt3[128];
+}C_OverLayProfile;
+
+typedef struct {
+	unsigned int AlarmEventMask;
+	int MaxAlmIn;
+	int MaxAlmOut;
+}C_AlarmCaps;
+
 #endif
 

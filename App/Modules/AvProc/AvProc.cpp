@@ -18,6 +18,10 @@ CAvProc::~CAvProc()
 av_bool CAvProc::Initialize()
 {
 #if defined(WIN32)
+
+#if defined(_DEBUG)
+
+#else
 	m_ProcHandle = open("avWare.log", _O_WRONLY | _O_CREAT );
 	if (m_ProcHandle <= 0){
 		av_error("open %s error\n", logAvWarePath);
@@ -26,6 +30,8 @@ av_bool CAvProc::Initialize()
 		dup2(m_ProcHandle, 1);
 		dup2(m_ProcHandle, 2);
 	}
+#endif
+
 #else
 	m_ProcHandle = open(logAvWarePath, O_WRONLY);
 	if (m_ProcHandle <= 0){

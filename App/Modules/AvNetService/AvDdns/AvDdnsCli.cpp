@@ -65,7 +65,7 @@ av_bool CAvDdnsCli::DdnsUpdateConfig()
 	ConfigNetDdns ddns_config;
 	ddns_config = m_AvConfigsDdns.GetConfig();
 
-	if (AvDdns.SetConf(ddns_config.Server, ddns_config.UsrName,ddns_config.Passwd) != av_true)
+	if (AvDdns.SetConf(ddns_config.ServerAddress, ddns_config.UserName,ddns_config.PassWord) != av_true)
 	{
 		av_error("avddns setconf error...\n");
 		return av_false;

@@ -118,7 +118,7 @@ int CFtp::AVFtpQuit()
         FTP_close(m_Ctrlsocket);//关闭控制通道
         m_Ctrlsocket = -1;
     }
-    if(m_Datasocket > 0)
+    if(m_Datasocket >= 0)
     {
         FTP_close(m_Datasocket);//关闭数据通道
         m_Datasocket = -1;
@@ -149,7 +149,7 @@ int CFtp::AVFtpCloseData()
     int state;
     char recv_buf[1500];
 
-    if( m_Datasocket <= 0)
+    if( m_Datasocket < 0)
     {
         printf("CFtpProtocol: ftp data channel is not open\n");
         return FTP_ERROR;
@@ -170,13 +170,13 @@ int CFtp::AVFtpCloseData()
 
 int CFtp::AVFtpSendData(const char * buf, int& buflen)
 {
+	//printf("[%s][%d] AVFtpSendData buflen[%d]\n", __FILE__, __LINE__, buflen);
 	struct timeval timetmp;
     int ret;
     char *pSend = (char*)buf;
     int sendlen = 0;
     int errCount = 0;
-	//printf("buf");
-	if( m_Datasocket <= 0)
+	if( m_Datasocket < 0)
     {
         return FTP_CONNECT_FAILED;
     }
@@ -189,7 +189,7 @@ int CFtp::AVFtpSendData(const char * buf, int& buflen)
         fd_set writefd;
 
         FD_ZERO(&writefd);
-        if(m_Datasocket <= 0)
+        if(m_Datasocket < 0)
         {
             return FTP_ERROR;
         }
@@ -361,17 +361,16 @@ int CFtp::AVFtpRecv(char * buf, int &buflen, int timeout)
 		        FTP_close(m_Ctrlsocket);//关闭控制通道
 		        m_Ctrlsocket = -1;
 		    }
-		    if(m_Datasocket > 0)
+		    if(m_Datasocket >= 0)
 		    {
 		        FTP_close(m_Datasocket);//关闭数据通道
 		        m_Datasocket = -1;
 		    }
 		}
         buf[ret] = 0;
-		//printf("bbbbbbbbbbbb ret = %d\n",ret);
         FTP_ASSERT_RETURN( (ret > 0), FTP_ERROR);
         buflen = ret;
-        printf("ftp>:recv: %s\n", buf);
+        //printf("[%s][%d]ftp>:recv: %s\n", __FILE__, __LINE__, buf);
         return FTP_OK;
     }
     else if(ret == 0)
@@ -422,11 +421,11 @@ int CFtp::AVFtpSendAndGet( const char * strCommand, const char * param, char * R
 	int ret;
 	int buflen = 0;
     char send_buf[1500];
-	printf("strCommand %s\n",strCommand);
     if(ReponseState != -1)
     {
         char send_buf[1500];
         sprintf(send_buf, "%s%s\r\n", strCommand, param);
+		//printf("[%s][%d]Command:[%s]\n", __FILE__, __LINE__, send_buf);
         ret = AVFtpSend( (char*)send_buf, (int)strlen(send_buf) );
         if(ret < 0)
         {

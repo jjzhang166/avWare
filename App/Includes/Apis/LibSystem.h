@@ -61,7 +61,6 @@ av_int	 AvGpioTriggerLevel(E_AvGpio eGpio);
 
 
 //´®¿Ú ²Ù×÷
-
 typedef enum {
 	SerialParity_NOPARITY,	///< No parity
 	SerialParity_ODDPARITY,	///< Odd parity
@@ -98,6 +97,8 @@ av_bool  AvSerialSetNonBlock(av_uchar index, av_bool iFlag);
 av_bool  AvSerialRead(av_uchar index, av_buf *buf);
 av_bool  AvSerialWrite(av_uchar index, av_buf *buf);
 
+av_bool	 AvPtzAdvancedCameraLensCaps(C_PtzAdvancedCameraLensCaps *PtzAdvancedCameraLensCaps);
+av_bool  AvPtzAdvancedCameraLensProfile(C_PtzAdvancedCameraLensProfile *PtzAdvancedCameraLensProfile);
 
 //watch dog
 av_bool AvWatchDogInit(const int FeedSec);
@@ -217,22 +218,6 @@ typedef struct {
 }C_DeviceFactoryInfo;
 
 
-typedef struct {
-	av_uint		Totoal;
-	av_uint		TotoalUse;
-}C_MemoryLoadInfo;
-
-typedef struct{
-	av_uint NetType;
-	av_uint Totoal;
-	av_uint TotoalUse;
-}C_NetLoadInfo;
-
-typedef struct {
-	av_uint mainHZ;
-	av_uint Totoal;
-	av_uint TotoalUse;
-}C_CpuLoadInfo;
 
 av_bool AvReboot();
 av_bool AvGetDeviceInfo(C_DeviceFactoryInfo *FactoryInfo);
@@ -248,9 +233,9 @@ typedef struct{
 
 av_bool AvSystemUpgradeFile(const av_char * UpgradeFilePath, C_UpgradeProgress *Progress);
 av_bool AvSystemUpgradeMemory(av_uchar *ptr, av_uint length, C_UpgradeProgress *Progress);
-av_bool AvGetMemLoadInfo(C_MemoryLoadInfo *MemLoadInfo);
-av_bool AvGetNetLoadInfo(C_NetLoadInfo *NetLoadInfo);
-av_bool AvGetCpuLoadInfo(C_CpuLoadInfo *CpuLoadInfo);
+
+av_bool avGetCpuMemStatusInfo(C_CpuMemStatusInfo *CpuMemStatusInfo);
+av_bool	avGetNetStatusInfo(C_NetStatusInfo *NetStatusInfo);
 
 #ifdef __cplusplus
 }

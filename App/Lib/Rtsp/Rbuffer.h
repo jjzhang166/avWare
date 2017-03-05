@@ -16,7 +16,7 @@
 #define _RBUFFER_H_
 
 
-#define DEFAULT_RBUFFER_LEN 6*1024
+#define DEFAULT_RBUFFER_LEN 32*1024
 
 class CRBuffer
 {

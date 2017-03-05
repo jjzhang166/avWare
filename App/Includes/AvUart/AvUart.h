@@ -19,9 +19,9 @@
 #include "AvConfigs/AvConfigDevice.h"
 #include "CAvObject.h"
 #include "Apis/AvWareStruct.h"
+#include "Apis/AvSystemStruct.h"
 
-
-class CAvUart
+class CAvUart:public CAvObject
 {
 public:
 	SINGLETON_DECLARE(CAvUart)
@@ -34,6 +34,16 @@ public:
 	av_bool PtzGetProfile(C_PtzProfile &PtzProfile);
 	av_bool PtzSetProfile(C_PtzProfile &PtzProfile);
 	av_bool PtzSetCommand(C_PtzCmd &PtzCmd);
+public:
+	av_bool PtzGetAdvancedCaps(C_AdvancedSystemCaps &PtzAdvancedCaps);
+	av_bool PtzGetAdvancedProfile(C_AdvancedSystemProfile &AdvancedSystemProfile);
+	av_bool PtzSetAdvancedProfile(C_AdvancedSystemProfile &AdvancedSystemProfile);
+
+private:
+	av_void OnConfigPtzCameralensModify(CAvConfigPtzCameraLensProfile *Config, int &result);
+	CAvConfigPtzCameraLensProfile m_ConfigPtzCameraLensProfile;
+	
+
 
 
 private:

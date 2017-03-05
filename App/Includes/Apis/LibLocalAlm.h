@@ -19,33 +19,17 @@
 extern "C" {
 #endif
 #include "AvWareType.h"
+#include "AvSystemStruct.h"
 
-	typedef struct {
-		av_uchar MaxAlmOutNum;
-		av_uchar MaxAlmInNum;
-	}C_AlmIoCaps;
 
-	typedef struct{
-		av_u32 AlmIoCount;
-		av_u32 AlmIoStatusMask;
-	}C_AlmIoResult;
 
-	av_bool AvGetIoAlmCaps(C_AlmIoCaps *Caps);
-	av_bool AvGetIoAlmStatus(av_u32 AlmInNoMask, C_AlmIoResult *result);
+	av_bool AvAlarmCaps(C_AlarmCaps *AlarmCaps);
+	av_bool AvGetIoAlmStatus(av_u32 *result);
 	av_bool avSetIoAlmOut(av_uchar AlmOutNo, av_bool bOpen);
-
-	typedef struct{
-		av_uchar MaxRow;//最大16
-		av_uchar MaxLine;//最大16
-		av_uchar Maxlevel;
-	}C_AlmMdCaps;
-
-	typedef struct{
-		av_u16 AlmAreaCount;
-		av_u16 result[16];
-	}C_AlmMdResult;
-	av_bool avGetMdAlmCaps(C_AlmMdCaps *AlmMdCaps);
-	av_bool avGetMdAlmStatus(C_AlmMdResult *result);
+	av_bool avGetMdAlmStatus(av_u32 result[]);
+	av_bool avSetMdProfile(av_u32 Area[], av_32 level);
+	av_bool avAlarmCreate();
+	av_bool avAlarmDestory();
 
 #ifdef __cplusplus
 }

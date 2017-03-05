@@ -33,6 +33,13 @@ template<> void ProcessValue<ConfigEncodeProfile>(CAvConfigBase &ConfBase, AvCon
 		ImageSizeMax = CaptureSize_LAST;
 		ImageSizeMin = CaptureSize_Self;
 		AvConfigValue &VideoTable = StreamTable[i]["Video"];
+		/*
+		//print for test
+		av_warning("i[%d] Enable[%d] ImageSize[%d] FrameRate[%d]\n", i,
+			StreamTable[i]["Enable"].asInt(),
+			VideoTable["ImageSize"].asInt(),
+			VideoTable["FrameRate"].asInt());
+		*/
 		if (i == CHL_MAIN_T){
 			av_findMaxMask(ImageSizeMax, EncodeCaps.ImageSizeMask, CaptureSize);
 			av_findMinMask(ImageSizeMin, EncodeCaps.ImageSizeMask, CaptureSize);
@@ -52,17 +59,23 @@ template<> void ProcessValue<ConfigEncodeProfile>(CAvConfigBase &ConfBase, AvCon
 			//assert(ImageSizeMin < ImageSizeMax || ImageSizeMax == 0 || ImageSizeMin == 0);
 			ConfBase.Process("Enable", StreamTable[i], (int &)EncodeProfile.CHLProfile[i].Enable, (int)av_true, (int)av_false, (int)av_true);
 			ConfBase.Process("ImageSize", VideoTable, (int &)EncodeProfile.CHLProfile[i].Profile.ImageSize, (int)ImageSizeMax, (int)ImageSizeMin, (int)ImageSizeMax);
-
-			if (i == CHL_JPEG_T){
+			if (av_true == EncodeProfile.CHLProfile[i].Enable) {
+				if (i == CHL_JPEG_T){
 				ConfBase.Process("Comp", VideoTable, (int &)EncodeProfile.CHLProfile[i].Profile.Comp, (int)AvComp_JPEG, (int)AvComp_JPEG, (int)AvComp_JPEG);
 				ConfBase.Process("BitRateValue", VideoTable, EncodeProfile.CHLProfile[i].Profile.BitRateValue, 512, 512, 4096);
 				ConfBase.Process("FrameRate", VideoTable, EncodeProfile.CHLProfile[i].Profile.FrameRate, 3, 1, 8);
+				}
+				else{
+					ConfBase.Process("Comp", VideoTable, (int &)EncodeProfile.CHLProfile[i].Profile.Comp, (int)CompMax, (int)CompMin, (int)CompMax);
+					ConfBase.Process("BitRateValue", VideoTable, EncodeProfile.CHLProfile[i].Profile.BitRateValue, 768, 64, 2048);
+					ConfBase.Process("FrameRate", VideoTable, EncodeProfile.CHLProfile[i].Profile.FrameRate, 25, 1, 120);
+				}
+			} else {
+					ConfBase.Process("Comp", VideoTable, (int &)EncodeProfile.CHLProfile[i].Profile.Comp, (int)AvComp_LAST, (int)AvComp_LAST, (int)AvComp_LAST);
+					ConfBase.Process("BitRateValue", VideoTable, EncodeProfile.CHLProfile[i].Profile.BitRateValue, 0, 0, 2048);
+					ConfBase.Process("FrameRate", VideoTable, EncodeProfile.CHLProfile[i].Profile.FrameRate, 0, 0, 120);
 			}
-			else{
-				ConfBase.Process("Comp", VideoTable, (int &)EncodeProfile.CHLProfile[i].Profile.Comp, (int)CompMax, (int)CompMin, (int)CompMax);
-				ConfBase.Process("BitRateValue", VideoTable, EncodeProfile.CHLProfile[i].Profile.BitRateValue, 768, 64, 2048);
-				ConfBase.Process("FrameRate", VideoTable, EncodeProfile.CHLProfile[i].Profile.FrameRate, 25, 1, 120);
-			}
+			
 		}
 		else{
 			ConfBase.Process("Enable", StreamTable[i], (int &)EncodeProfile.CHLProfile[i].Enable, (int)av_false, (int)av_false, (int)av_false);
@@ -80,51 +93,56 @@ template<> void ProcessValue<ConfigEncodeProfile>(CAvConfigBase &ConfBase, AvCon
 	}
 
 }
-template<> void ProcessValue<ConfigCoverFormats>(CAvConfigBase &ConfBase, AvConfigValue &ConfValue, ConfigCoverFormats &CoverFormats, int index, int diff)
+template<> void ProcessValue<ConfigCoverProfile>(CAvConfigBase &ConfBase, AvConfigValue &ConfValue, ConfigCoverProfile &CoverFormats, int index, int diff)
 {
 	AvConfigValue &CoverTable = ConfValue["Formats"];
-	
-	C_EncodeCaps EncodeCaps;
-	CAvDevice::GetEncodeCaps(index, EncodeCaps);
-	for (int i = 0; i < ConfMaxCover; i++){
-		ConfBase.Process("Index", CoverTable[i], CoverFormats.CHLFormats[i].Index, i, i, i);
-		ConfBase.Process("Enable", CoverTable[i], (int &)CoverFormats.CHLFormats[i].Enable, (int)av_false, (int)av_false, (int)av_true);
-		ConfBase.Process("Color", CoverTable[i], CoverFormats.CHLFormats[i].Color.U_RGBA, 0xff, 0x00, 0xffffffff);
 
-		AvConfigValue &Rect = CoverTable[i]["Rect"];
-		ConfBase.Process("Sx", Rect, CoverFormats.CHLFormats[i].Rect.Sx, 0, 0, 10000);
-		ConfBase.Process("Sy", Rect, CoverFormats.CHLFormats[i].Rect.Sy, 0, 0, 10000);
-		ConfBase.Process("Width", Rect, CoverFormats.CHLFormats[i].Rect.Width, 0, 0, 10000);
-		ConfBase.Process("Heigh", Rect, CoverFormats.CHLFormats[i].Rect.Heigh, 0, 0, 10000);
+
+	ConfBase.Process("CoverBgRGB", ConfValue, CoverFormats.CoverBgRGB, 0, 0, 0xffffffff);
+	ConfBase.Process("CoverbEnMask", ConfValue, CoverFormats.CoverbEnMask, 0, 0, AvMask(ConfMaxCover + 1) - 1);
+
+	for (int i = 0; i < ConfMaxCover; i++){
+		AvConfigValue &RectTable = CoverTable[i]["Rect"];
+		ConfBase.Process("Sx", RectTable, CoverFormats.CoverZone[i].Sx, 0, 0, AV_WARE_COVER_RECT_WIDTH);
+		ConfBase.Process("Sy", RectTable, CoverFormats.CoverZone[i].Sy, 0, 0, AV_WARE_COVER_RECT_HEITH);
+		ConfBase.Process("Width", RectTable, CoverFormats.CoverZone[i].Width, 0, 0, AV_WARE_COVER_RECT_WIDTH);
+		ConfBase.Process("Heigh", RectTable, CoverFormats.CoverZone[i].Heigh, 0, 0, AV_WARE_COVER_RECT_HEITH);
 	}
+
+
+
 }
 
-template<> void ProcessValue<ConfigWaterMarkingFormats>(CAvConfigBase &ConfBase, AvConfigValue &ConfValue, ConfigWaterMarkingFormats &WaterMarkingFormats, int index, int diff)
+template<> void ProcessValue<ConfigOverLayProfile>(CAvConfigBase &ConfBase, AvConfigValue &ConfValue, ConfigOverLayProfile &OverLayProfile, int index, int diff)
 {
-	AvConfigValue &WaterMarkingTable = ConfValue["Formats"];
-	C_EncodeCaps EncodeCaps;
-	CAvDevice::GetEncodeCaps(index, EncodeCaps);
-	assert(EncodeCaps.MaxWaterMaring <= ConfMaxWaterMarking);
+	AvConfigValue &OverLayTable = ConfValue["Formats"];
 
-	for (int i = 0; i < ConfMaxWaterMarking; i++)
+	for (int i = 0; i < OverLayType_Last; i++)
 	{
-		if (i == 0){
-			ConfBase.Process("Type", WaterMarkingTable[i], (int &)WaterMarkingFormats.CHLFormats[i].Type, (int)WM_DATE_TIME, (int)WM_DATE_TIME, (int)WM_DATE_TIME);
-			ConfBase.Process("Style", WaterMarkingTable[i], (int &)WaterMarkingFormats.CHLFormats[i].Style, (int)WM_YMD_HMS, (int)WM_YMD_HMS, (int)WM_HMS_YMD);
-		}else{
-			ConfBase.Process("Type", WaterMarkingTable[i], (int &)WaterMarkingFormats.CHLFormats[i].Type, (int)WM_CHANNEL_NAME, (int)WM_CHANNEL_NAME, (int)WM_CHANNEL_NAME);
-			ConfBase.Process("Style", WaterMarkingTable[i], (int &)WaterMarkingFormats.CHLFormats[i].Style, (int)VM_STYLE_NR, (int)VM_STYLE_NR, (int)VM_STYLE_NR);
 
+		ConfBase.Process("Index", OverLayTable[i], (int &)OverLayProfile.OverlayProfile[i].Index, i, i, i);
+		ConfBase.Process("Size", OverLayTable[i], (int &)OverLayProfile.OverlayProfile[i].Fontsize, FontSize__24, FontSize_None/*for title*/, FontSize__128);
+		ConfBase.Process("BgRgba", OverLayTable[i], OverLayProfile.OverlayProfile[i].BgRgba, 0, 0, 0xffffffff);
+		ConfBase.Process("FgRgba", OverLayTable[i], OverLayProfile.OverlayProfile[i].FgRgba, 0, 0, 0xffffffff);
+		ConfBase.Process("Split", OverLayTable[i], (int &)OverLayProfile.OverlayProfile[i].Split, OverLayDateTimeSplit_Split_Symbol, OverLayDateTimeSplit_None/*for title*/, OverLayDateTimeSplit_Last);
+		ConfBase.Process("Style", OverLayTable[i], (int &)OverLayProfile.OverlayProfile[i].Style, OverLayDateTimeStyle_Y_M_D_H_M_S, OverLayDateTimeStyle_None/*for title*/, OverLayDateTimeStyle_Last);
+		ConfBase.Process("TextChannel", OverLayTable[i], OverLayProfile.OverlayProfile[i].TextChannel, "avWare");
+		ConfBase.Process("TextExt1", OverLayTable[i], OverLayProfile.OverlayProfile[i].TextExt1, "");
+		ConfBase.Process("TextExt2", OverLayTable[i], OverLayProfile.OverlayProfile[i].TextExt2, "");
+		ConfBase.Process("TextExt3", OverLayTable[i], OverLayProfile.OverlayProfile[i].TextExt3, "");
+
+		if (i == OverLayType_Title || i == OverLayType_Time){
+			ConfBase.Process("bOpen", OverLayTable[i], (int &)OverLayProfile.OverlayProfile[i].bOpen, av_true, av_false, av_true);
 		}
-		ConfBase.Process("Enable", WaterMarkingTable[i], (int &)WaterMarkingFormats.CHLFormats[i].Enable, (int)av_true, (int)av_false, (int)av_true);
-		ConfBase.Process("Color", WaterMarkingTable[i], WaterMarkingFormats.CHLFormats[i].Color.U_RGBA, 0xff, 0x00, 0xffffffff);
-		ConfBase.Process("String", WaterMarkingTable[i], WaterMarkingFormats.CHLFormats[i].WaterMarkString, "avWare");
+		else{
+			ConfBase.Process("bOpen", OverLayTable[i], (int &)OverLayProfile.OverlayProfile[i].bOpen, av_false, av_false, av_true);
+		}
 
-		AvConfigValue &Rect = WaterMarkingTable[i]["Rect"];
-		ConfBase.Process("Sx", Rect, WaterMarkingFormats.CHLFormats[i].Rect.Sx, 0, 0, 10000);
-		ConfBase.Process("Sy", Rect, WaterMarkingFormats.CHLFormats[i].Rect.Sy, 0, 0, 10000);
-		ConfBase.Process("Width", Rect, WaterMarkingFormats.CHLFormats[i].Rect.Width, 0, 0, 10000);
-		ConfBase.Process("Heigh", Rect, WaterMarkingFormats.CHLFormats[i].Rect.Heigh, 0, 0, 10000);
+		AvConfigValue &OverLayRect = OverLayTable[i]["Rect"];
+		ConfBase.Process("Sx", OverLayRect, OverLayProfile.OverlayProfile[i].Rect.Sx, 0, 0, AV_WARE_COVER_RECT_WIDTH);
+		ConfBase.Process("Sy", OverLayRect, OverLayProfile.OverlayProfile[i].Rect.Sy, 0, 0, AV_WARE_COVER_RECT_HEITH);
+		ConfBase.Process("Width", OverLayRect, OverLayProfile.OverlayProfile[i].Rect.Width, 0, 0, AV_WARE_COVER_RECT_WIDTH);
+		ConfBase.Process("Heigh", OverLayRect, OverLayProfile.OverlayProfile[i].Rect.Heigh, 0, 0, AV_WARE_COVER_RECT_HEITH);
 	}
 
 }
@@ -192,8 +210,8 @@ template<> void ProcessValue<ConfigProtoFormats>(CAvConfigBase &ConfBase, AvConf
 {
 	AvConfigValue &ProtoTable = ConfValue["Formats"];
 	ConfBase.Process("IsEnable", ProtoTable, (int&)ProtocolFormats.IsEnable, (int)av_false, (int)av_false, (int)av_true);
-	ConfBase.Process("DigitalChannel", ProtoTable, ProtocolFormats.DigitalChannel, index, index, index);
-	ConfBase.Process("ShowWindowsId", ProtoTable, ProtocolFormats.ShowWindowsId, index, 0);
+//	ConfBase.Process("DigitalChannel", ProtoTable, ProtocolFormats.DigitalChannel, index, index, index);
+//	ConfBase.Process("ShowWindowsId", ProtoTable, ProtocolFormats.ShowWindowsId, index, 0);
 	ConfBase.Process("ProtoMode", ProtoTable, (int &)ProtocolFormats.ProtoMode, (int)ProtocolMoon, (int)ProtocolOnvif, (int)ProtocolMoon);
 	ConfBase.Process("UsrName", ProtoTable, ProtocolFormats.UsrName, "");
 	ConfBase.Process("Passwd", ProtoTable, ProtocolFormats.Passwd, "");

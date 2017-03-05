@@ -14,9 +14,15 @@ class DlgHandAddDevice : public QDialog
 public:
     explicit DlgHandAddDevice(QWidget *parent = 0);
     ~DlgHandAddDevice();
-
+	void FixUi();
 private slots:
     void on_BtnClose_clicked();
+
+    void on_BtnSubmit_clicked();
+
+    void on_CBoxProtocol_currentIndexChanged(const QString &arg1);
+
+    void on_BtnCannel_clicked();
 
 private:
     Ui::DlgHandAddDevice *ui;

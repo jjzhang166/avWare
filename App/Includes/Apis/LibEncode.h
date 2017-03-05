@@ -80,58 +80,6 @@ typedef enum {
 
 
 
-
-#define AV_WARE_STREAM_RECT_WIDTH 10000
-#define AV_WARE_STREAM_RECT_HEITH 10000
-
-
-
-
-typedef struct {
-	union
-	{
-		struct {
-			av_uchar R;
-			av_uchar G;
-			av_uchar B;
-			av_uchar A;
-		}S_RGBA;
-
-		unsigned int U_RGBA;
-	};
-}C_Color;
-typedef enum {
-	WM_DATE_TIME,
-	WM_CHANNEL_NAME,
-	WM_TYPE_Nr,
-}E_WaterMarkingType;
-
-typedef enum {
-	WM_YMD_HMS,
-	WM_YMD_W_HMS,
-	WM_HMS_YMD,
-	VM_STYLE_NR,
-}E_WaterMarkingStyle;
-
-typedef struct {
-	av_bool  Enable;
-	C_RECT   Rect;
-	C_Color  Color;
-	E_WaterMarkingType   Type;
-	E_WaterMarkingStyle  Style;
-	/*utf-8编码，*/
-	av_uchar Size;//the same of sdl_ttl
-	av_char  WaterMarkString[128];
-}C_WaterMarkingFormats;
-
-
-typedef struct {
-	av_uchar Index;
-	av_bool  Enable;
-	C_RECT   Rect;
-	C_Color	 Color;//argb
-}C_CoverFormats;
-
 typedef enum {
 	E_Capture_VideoNONE,
 	E_Capture_VideoStart,
@@ -166,17 +114,14 @@ E_CaptureSynchronizeStat AvCaptureSynchronize(av_uchar Channel);
 //视频遮盖
 av_bool AvCoverCreate(av_uchar Channel);
 av_bool AvCoverDestroy(av_uchar Channel);
-av_bool AvCoverStart(av_uchar Channel);
-av_bool AvCoverStop(av_uchar Channel);
-av_bool AvCoverSetFormat(av_uchar Channel, C_CoverFormats *CoverFormats);
+av_bool AvCoverSetProfile(av_uchar Channel, C_CoverProfile *CoverFormats);
+
+av_bool AvOverLayGetCaps(av_uchar Channel, C_OverLayCaps *OverLayCaps);
+av_bool AvOverLayCreate(av_uchar Channel);
+av_bool AvOverLayDestory(av_uchar Channel);
+av_bool AvOverLaySetProfile(av_uchar Channel, C_OverLayProfile *OverLayProfile);
 
 
-//osd
-av_bool AvWaterMarkingCreate(av_uchar Channel);
-av_bool AvWaterMarkingDestory(av_uchar Channel);
-av_bool AvWaterMarkingStart(av_uchar Channel);
-av_bool AvWaterMarkingStop(av_uchar channel);
-av_bool AvWaterMarkingSetFormat(av_uchar Channel, C_WaterMarkingFormats *VmFormats);
 
 //image
 av_bool AvImageCaps(av_uchar Channel, C_ImageCaps *ImageCaps);

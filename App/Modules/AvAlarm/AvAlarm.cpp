@@ -17,7 +17,7 @@
 #include "AvNetService/AvSmtp.h"
 #include "AvNetService/AvFtp.h"
 #include "AvDevice/AvDevice.h"
-
+#include "Apis/AvEnuminline.h"
 
 SINGLETON_IMPLEMENT(CAvAlarm)
 
@@ -101,38 +101,37 @@ av_void CAvAlmTask::TaskJob()
 {
 	(*m_AlarmSignal)(m_AlmMsg);
 	
-	av_msg("Get Alarm Type [%s]\n", CAvAlarm::GetCAvAlarmAlarmTypeString(m_AlmMsg.AlmType).c_str());
+	av_msg("Get Alarm Type [%s]\n", EnumNameAlarmEvent(m_AlmMsg.AlmType));
 	switch (m_AlmMsg.AlmType)
 	{
-	case CAvAlarm::AvAlmT_DISK_ERROR:		
-		break;
-	case CAvAlarm::AvAlmT_DISK_LOST:
-		break;
-	case CAvAlarm::AvAlmT_LAST:
-		break;
-	case CAvAlarm::AvAlmT_NONE:
-		break;
-	case CAvAlarm::AvAlmT_PORT_In:
-		break;
-	case CAvAlarm::AvAlmT_PORT_Out:
-		break;
-	case CAvAlarm::AvAlmT_VIDEO_Blind:
-		break;
-	case CAvAlarm::AvAlmT_VIDEO_DevOffline:
-		break;
-	case CAvAlarm::AvAlmT_VIDEO_FaceDetection:
-		break;
-	case CAvAlarm::AvAlmT_VIDEO_FaceRecognition:
-		break;
-	case CAvAlarm::AvAlmT_VIDEO_Lost:
-		break;
-	case CAvAlarm::AvAlmT_VIDEO_MotionDetection:
-		//获取报警配置 若发送邮件使能 则发送邮件
+
+	case AlarmEvent_PORT_In:
 		OnSendEmail();
 		break;
-	case CAvAlarm::AvAlmT_VIDEO_MotionFollow:
+	case AlarmEvent_PORT_Out:
 		break;
-	case CAvAlarm::AvAlmT_VIDEO_PlatenumberRecognition:
+	case AlarmEvent_VIDEO_FaceRecognition:
+		break;
+	case AlarmEvent_VIDEO_FaceDetection:
+		break;
+	case AlarmEvent_VIDEO_MotionDetection:
+		OnSendEmail();
+		break;
+	case AlarmEvent_VIDEO_MotionFollow:
+		break;
+	case AlarmEvent_VIDEO_PlatenumberRecognition:
+		break;
+	case AlarmEvent_VIDEO_DevOffline:
+		break;
+	case AlarmEvent_VIDEO_Lost:
+		break;
+	case AlarmEvent_VIDEO_Blind:
+		break;
+	case AlarmEvent_VIDEO_SomethingLoss:
+		break;
+	case AlarmEvent_DISK_ERROR:
+		break;
+	case AlarmEvent_DISK_LOST:
 		break;
 	default:
 		break;
@@ -149,7 +148,7 @@ av_bool CAvAlmTask::SetalmSignal(TSignal1<CAvAlarm::AlmMsg &> *signal)
 	m_AlarmSignal = signal;
 	return av_true;
 }
-
+#if 0
 av_bool CAvAlmTask::CheckTimeSection(C_WeekSpan *pWeekSpan)
 {
 	if (NULL == pWeekSpan)
@@ -193,22 +192,19 @@ av_bool CAvAlmTask::CheckTimeSection(C_WeekSpan *pWeekSpan)
 	
 	return av_true;
 }
+#endif
 
 av_bool CAvAlmTask::CheckEmailStartUp()
 {
 	switch (m_AlmMsg.AlmType)
 	{
-		case CAvAlarm::AvAlmT_VIDEO_MotionDetection:
+		case AlarmEvent_VIDEO_MotionDetection:
 		{
-			CAvConfigAlarmMd AvConfigAlarmMd;
-			AvConfigAlarmMd.Update();
-			ConfigMdAlarmFormats MdAlarmConfig = AvConfigAlarmMd.GetConfig();
-			if (MdAlarmConfig.SendEmail == av_false)
-			{
-				return av_false;
-			}
+			CAvConfigAlarm AvConfigAlarm;
+			AvConfigAlarm.Update();
+			ConfigAlarmProfile AlarmConfig = AvConfigAlarm.GetConfig();
 
-			if (CheckTimeSection(&MdAlarmConfig.WeekSpan) != av_true)
+			if (AlarmConfig.AlarmbLinkageEmail == av_false)
 			{
 				return av_false;
 			}
@@ -234,12 +230,12 @@ av_void CAvAlmTask::OnSendEmail()
 // 
 // 	Smtp.Start();
 	int i = 0;
-	CAvConfigNetSerSmtp AvConfigNetSmtp;
+	CAvConfigNetSmtp AvConfigNetSmtp;
 	AvConfigNetSmtp.Update();
-	ConfigNetSerSmtp smtp_config;
+	ConfigNetSmtp smtp_config;
 	smtp_config = AvConfigNetSmtp.GetConfig();
 
-	if (smtp_config.enable == av_true)
+	if (smtp_config.bEnable == av_true)
 	{
 		CAvSmtp Smtp;
 		std::string port;
@@ -250,17 +246,35 @@ av_void CAvAlmTask::OnSendEmail()
 			av_msg("CheckEmail fail...\n");
 			return;
 		}
-		
-		sprintf((char *)port.c_str(), "%d", smtp_config.port);
-		Smtp.SetServer(smtp_config.smtp_server, port, (CAvSmtp::E_SMTP_EN_MODE)smtp_config.save_mode);
-		Smtp.SetSender(smtp_config.sender);
-		for (i = 0; i < MAX_EMAIL_RECEIVER; i++)
+		CAvSmtp::E_SMTP_EN_MODE EnMode;
+		switch (smtp_config.EncodeType)
 		{
-			Smtp.SetAddRecver(smtp_config.receiver[i]);
+		case	EmailEncodeType_TLS:
+			EnMode = CAvSmtp::MAIL_ENTLS;
+			break;
+			
+		case 	EmailEncodeType_SSL:
+			EnMode = CAvSmtp::MAIL_ENSSL;
+				break;
+			
+		case EmailEncodeType_NULL:
+			EnMode = CAvSmtp::MAIL_ENNULL;
+				break;
+		default:
+			break;
 		}
-		Smtp.SetAuthorization(smtp_config.account, smtp_config.password);
-		Smtp.SetTitle(smtp_config.title);
-		Content = CAvAlarm::GetCAvAlarmAlarmTypeString(m_AlmMsg.AlmType);
+		sprintf((char *)port.c_str(), "%d", smtp_config.ServicePort);
+		Smtp.SetServer(smtp_config.ServerAddress, port, EnMode);
+		Smtp.SetSender(smtp_config.Sender);
+		if (0 != strlen(smtp_config.Receiver1)){
+			Smtp.SetAddRecver(smtp_config.Receiver1);
+		}
+		if (0 != strlen(smtp_config.Receiver2)){
+			Smtp.SetAddRecver(smtp_config.Receiver2);
+		}
+		Smtp.SetAuthorization(smtp_config.UserName, smtp_config.PassWord);
+		Smtp.SetTitle(smtp_config.Title);
+		Content = EnumNameAlarmEvent(m_AlmMsg.AlmType);
 		Smtp.SetContent(Content);
 		Smtp.Start();
 	}

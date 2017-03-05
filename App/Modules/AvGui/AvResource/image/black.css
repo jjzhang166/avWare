@@ -1,17 +1,21 @@
 .QWidget{
+	color: #F0F0F0;
 	border:1px solid #4D4D4D;
 	border-radius:0px;
-background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #4D4D4D, stop:1 #292929);	
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #4D4D4D, stop:1 #292929);	
 }
 .QFrame{
+	color: #F0F0F0;
 	border:1px solid #636363;
 	border-radius:5px;
 }
 
-QDialog#FrmDevice, QDialog#DlgNetSet, QDialog#DlgUpgrade, 
-QDialog#DlgFactorySet,QDialog#DlgHandAddDevice, QDialog#DlgDeviceSet,QDialog#DlgPtzWindows
+QDialog#FrmDevice, QDialog#DlgNetSet, QDialog#DlgUpgrade, QDialog#DlgAreaSelect,QDialog#DlgOverLay,QDialog#QColorDialog,
+QDialog#DlgFactorySet,QDialog#DlgHandAddDevice, QDialog#DlgDeviceSet,QDialog#DlgPtzWindows,QDialog#DlgAbout,
+QWidget#FormPtzAdvanced, QWidget#FrmMainMenu, QDialog#DlgTimeSelect
 {
 	border:1px solid #4D4D4D;
+	color: #F0F0F0;
 	border-radius:0px;
 	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #4D4D4D, stop:1 #292929);
 }
@@ -19,8 +23,12 @@ QDialog#DlgFactorySet,QDialog#DlgHandAddDevice, QDialog#DlgDeviceSet,QDialog#Dlg
 QTableView#TviewChnDevice,QTableView#TviewSearchDevice, QTableView#TviewDeviceList,QTableView#TviewPacket{
 */
 .QTableView{
+	color: #F0F0F0;
 	border: 1px solid #636363; 
 	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #4D4D4D, stop:1 #292929);
+}
+.QLabel{
+	color: #F0F0F0;
 }
 QLabel#LabIco,QLabel#LabTitle{
 	border-radius:0px;
@@ -30,23 +38,34 @@ QLabel#LabIco,QLabel#LabTitle{
 }
 
 .QLineEdit{
+	color: #F0F0F0;
 	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #4D4D4D, stop:1 #292929);
 }
-
+.IpPartLineEdit{
+	color: #F0F0F0;
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #4D4D4D, stop:1 #292929);
+}
+QTextEdit{
+	color: #F0F0F0;
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #4D4D4D, stop:1 #292929);
+}
 
 QLineEdit {
 	border: 1px solid #636363;
 	border-radius: 5px;
 	padding: 2px;
 	background: none;
+	color: #F0F0F0;
 	selection-background-color: #4D4D4D;
 }
 
 QLineEdit[echoMode="2"] { 
+	color: #F0F0F0;
 	lineedit-password-character: 9679; 
 }
 
 .QGroupBox{
+	color: #F0F0F0;
 	border: 1px solid #636363;
 	border-radius: 5px;
 }
@@ -86,6 +105,7 @@ QLineEdit[echoMode="2"] {
 .QToolBox::tab { 
    min-height:20px;
    max-height:80px;
+   color: #F0F0F0;
    border:none;outline:none;text-align:center;
          background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #4D4D4D, stop:1 #292929); 
      }
@@ -131,6 +151,7 @@ QPushButton#BtnSpeakListen:pressed{
 
 
 QCheckBox {
+	color: #F0F0F0;
 	spacing: 2px; 
 }
 
@@ -148,6 +169,7 @@ QCheckBox::indicator:checked {
 }
 
 QRadioButton {
+	color: #F0F0F0;
 	spacing: 2px;
 }
 
@@ -178,31 +200,45 @@ QComboBox,QDateEdit,QTimeEdit{
 	border-radius: 3px;
 	padding: 1px 10px 1px 5px;
 	border: 1px solid #636363;
+	color: #F0F0F0;
 }
 
 
 QComboBox::drop-down,QDateEdit::drop-down,QTimeEdit::drop-down {
 	subcontrol-origin: padding;
 	subcontrol-position: top right;
+	color: #F0F0F0;
 	width: 15px; 
 	border-left-width: 1px;
 	border-left-style: solid;
 	border-top-right-radius: 3px;
 	border-bottom-right-radius: 3px;
 	border-left-color: #636363;
-	background-color:#4D4D4D;
+	background-color:#636363;
 	selection-background-color:#4D4D4D;
-	selection-color: #575757;
+	selection-color:#575757;
+
 	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #4D4D4D, stop:1 #292929);
+
 }
+QComboBox QAbstractItemView {
+    border: 2px solid darkgray;
+    selection-background-color:green;
+	selection-color:blue;
+	color: #F0F0F0;
+	background:#4D4D4D;
+}
+
 QComboBox::item {
     height: 25px;
 	background-color:#4D4D4D;
 }
 
+/*控制下拉按键*/
 QComboBox::down-arrow,QDateEdit::down-arrow,QTimeEdit::down-arrow {
 	image: url(:/image/array_down.png); 
 }
+
 
 QMenu {
 	background-color:#4D4D4D;
@@ -235,11 +271,7 @@ QProgressBar {
 }
 
 QProgressBar::chunk {
-	/*width: 5px; 
-	margin: 0.5px;*/
-	/*background-color: #4D4D4D;*/
 	background-color:rgb(0,255,0);;
-	/*color:rgb(255,255,0);*/
 }
 
 QSlider::groove:horizontal,QSlider::add-page:horizontal { 

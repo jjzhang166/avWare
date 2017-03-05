@@ -37,12 +37,28 @@ private:
 
 private:
 	av_void OnConfigRtmpModify(CAvConfigRtmp *configRtmp, int &result);
+	av_void OnConfigRtspModify(CAvConfigNetRtsp *Config, int &Result);
+	av_void OnConfigP2pModify(CAvConfigNetP2p *Config, int &Result);
+	av_void OnConfigUpnpModify(CAvConfigNetUpnp *Config, int &Result);
+	av_void OnConfigNtpModify(CAvConfigNetNtp *Config, int &Result);
+	av_void OnConfigDdnsModify(CAvConfigNetDdns *Config, int &Result);
+	av_void OnConfigEmailModify(CAvConfigNetSmtp *Config, int &Result);
+	av_void OnConfigFtpModify(CAvConfigNetFtp *Config, int &Result);
+private:
+	CAvConfigRtmp				m_ConfigRtmp;
+	CAvConfigNetRtsp			m_ConfigRtsp;
+	CAvConfigNetP2p				m_ConfigP2p;
+	CAvConfigNetUpnp			m_ConfigUpnp;
+	CAvConfigNetNtp				m_ConfigNtp;
+	CAvConfigNetDdns			m_ConfigDdns;
+	CAvConfigNetSmtp			m_ConfigSmtp;
+	CAvConfigNetFtp				m_ConfigFtp;
 
 private:
 	void ThreadProc();
 
 private:
-	CAvConfigRtmp				m_ConfigRtmp;
+	
 	std::map<av_u32, AvRtmp*>	m_AvRtmpMap;
 };
 #define g_AvNetService (*CAvNetService::instance())

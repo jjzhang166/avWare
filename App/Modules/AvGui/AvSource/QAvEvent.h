@@ -3,13 +3,23 @@
 
 #include <QEvent>
 
-
 class QAvEvent:public QEvent
 {
 public:
 	typedef enum{
 		QAvEvent_Start = QEvent::User,
 		QAvEvent_SearchDevice,
+		QAvEvent_MaxWindows,
+		QAvEvent_MaxVideoAreaWindows,
+
+		QAvEvent_ShowMainMenum = QEvent::User + 100,
+		QAvEvent_MainMenuDevices_Click,
+		QAvEvent_MainMenuSystemSet_Click,
+		QAvEvent_MainMenuAlarm_Click,
+		QAvEvent_MainMenuSysTools_Click,
+		QAvEvent_MainMenuRecord_Click,
+		QAvEvent_MainMenuIntelligenceAlgorthm_Click,
+		QAvEvent_MainMenuSystemInfo_Click,
 	}QAvEventType;
 
 public:

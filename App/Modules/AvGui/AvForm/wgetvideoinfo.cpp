@@ -1,6 +1,7 @@
 #include "wgetvideoinfo.h"
 #include "ui_wgetvideoinfo.h"
 #include "AvUiComm/IconComm.h"
+#include "AvUiComm/AvUiComm.h"
 
 WgetVideoInfo::WgetVideoInfo(QWidget *parent) :
     QWidget(parent),
@@ -32,7 +33,14 @@ WgetVideoInfo::WgetVideoInfo(QWidget *parent) :
 	m_bBtnSpeakListenCliecked = false;
 	ResetOSDVideoInfo();
 	ResizeIconSize(12);
+
+	startTimer(800);
 	
+	m_bLabListenStatus = true;
+	m_bLabAlarmtatus = true;
+	m_bLabSpeakStatus = true;
+	m_bLabRecordStatus = true;
+
 }
 
 WgetVideoInfo::~WgetVideoInfo()
@@ -120,17 +128,86 @@ void WgetVideoInfo::resizeEvent(QResizeEvent* size)
 		ResizeIconSize(IconSize);
 	}
 }
+void	WgetVideoInfo::timerEvent(QTimerEvent *event)
+{
+	if (m_bBtnRecordClicked == true){
+		if (m_bLabRecordStatus == true){
+			ui->LabRecord->setPalette(*m_PaletteTrigger);
+		}
+		else{
+			ui->LabRecord->setPalette(*m_Palette);
+		}
+		m_bLabRecordStatus = !m_bLabRecordStatus;
+	}
+	else{
+		if (m_bLabRecordStatus == false){
+			m_bLabRecordStatus = true;
+			ui->LabRecord->setPalette(*m_Palette);
+		}
+	}
 
+	if (m_bBtnListenClicked == true){
+		if (m_bLabListenStatus == true){
+			ui->LabListen->setPalette(*m_PaletteTrigger);
+		}
+		else{
+			ui->LabListen->setPalette(*m_Palette);
+		}
+		m_bLabListenStatus = !m_bLabListenStatus;
+	}
+	else{
+		if (m_bLabListenStatus == false && m_bBtnSpeakListenCliecked == false){
+			m_bLabListenStatus = true;
+			ui->LabListen->setPalette(*m_Palette);
+		}
+	}
+	if (m_bBtnSpeakListenCliecked == true){
+		if (m_bLabSpeakStatus == true){
+			ui->LabSpeak->setPalette(*m_PaletteTrigger);
+		}
+		else{
+			ui->LabSpeak->setPalette(*m_Palette);
+		}
+		m_bLabSpeakStatus = !m_bLabSpeakStatus;
+
+		if (m_bLabListenStatus == true){
+			ui->LabListen->setPalette(*m_PaletteTrigger);
+		}
+		else{
+			ui->LabListen->setPalette(*m_Palette);
+		}
+		m_bLabListenStatus = !m_bLabListenStatus;
+	}
+	else {
+		if (m_bLabSpeakStatus == false){
+			ui->LabSpeak->setPalette(*m_Palette);
+			m_bLabSpeakStatus = true;
+		}
+
+		if (m_bBtnListenClicked == false && m_bLabListenStatus == false){
+			m_bLabListenStatus = true;
+			ui->LabListen->setPalette(*m_Palette);
+		}
+	}
+
+
+}
+
+void	WgetVideoInfo::moveEvent(QMoveEvent *event)
+{
+	m_bBtnEnableVideoClicked = false;
+	m_bBtnListenClicked = false;
+	m_bBtnRecordClicked = false;
+	m_bBtnSnapClicked = false;
+	m_bBtnSpeakListenCliecked = false;
+}
 void WgetVideoInfo::on_BtnRecord_clicked()
 {
 	if (m_bBtnRecordClicked == false){
-		ui->LabRecord->setPalette(*m_PaletteTrigger);
-		//ui->LabRecord->show();
-		
+		emit SignalsUiButtonMessage(UIMSG_START_RECORD);
 	}
 	else{
-		ui->LabRecord->setPalette(*m_Palette);
-		//ui->LabRecord->hide();
+		emit SignalsUiButtonMessage(UIMSG_STOP_RECORD);
 	}
 
 	m_bBtnRecordClicked = !m_bBtnRecordClicked;
@@ -139,21 +216,18 @@ void WgetVideoInfo::on_BtnRecord_clicked()
 void WgetVideoInfo::on_BtnSnap_clicked()
 {
 	m_bBtnSnapClicked = !m_bBtnSnapClicked;
+	emit SignalsUiButtonMessage(UIMSG_REQUEST_SNAP);
 }
 
 void WgetVideoInfo::on_BtnSpeakListen_clicked()
 {
 	if (m_bBtnSpeakListenCliecked == false){
-		//ui->LabSpeak->show();
-		//ui->LabListen->show();
-		ui->LabSpeak->setPalette(*m_PaletteTrigger);
-		ui->LabListen->setPalette(*m_PaletteTrigger);
+		emit SignalsUiButtonMessage(UIMSG_START_SPEAKLISTEN);
+		
+		
 	}
 	else{
-		//ui->LabSpeak->hide();
-		//ui->LabListen->hide();
-		ui->LabSpeak->setPalette(*m_Palette);
-		ui->LabListen->setPalette(*m_Palette);
+		emit SignalsUiButtonMessage(UIMSG_STOP_SPEAKLISTEN);
 	}
 	m_bBtnSpeakListenCliecked = !m_bBtnSpeakListenCliecked;
 }
@@ -162,11 +236,12 @@ void WgetVideoInfo::on_BtnListen_clicked()
 {
 	if (m_bBtnListenClicked == false){
 		//ui->LabListen->show();
-		ui->LabListen->setPalette(*m_PaletteTrigger);
+		emit SignalsUiButtonMessage(UIMSG_START_LISTEN);
 	}
 	else{
+		emit SignalsUiButtonMessage(UIMSG_STOP_LISTEN);
 		//ui->LabListen->hide();
-		ui->LabListen->setPalette(*m_Palette);
+		
 	}
 	m_bBtnListenClicked = !m_bBtnListenClicked;
 }
@@ -174,9 +249,11 @@ void WgetVideoInfo::on_BtnListen_clicked()
 void WgetVideoInfo::on_BtnEnableVideo_clicked()
 {
 	if (m_bBtnEnableVideoClicked == false){
+		emit SignalsUiButtonMessage(UIMSG_START_VIDEO);
 		IconComm::Instance()->SetIcon(ui->BtnEnableVideo, QChar(0xf0c8), m_IconSize);
 	}
 	else{
+		emit SignalsUiButtonMessage(UIMSG_STOP_VIDEO);
 		IconComm::Instance()->SetIcon(ui->BtnEnableVideo, QChar(0xf04b), m_IconSize);
 	}
 	m_bBtnEnableVideoClicked = !m_bBtnEnableVideoClicked;

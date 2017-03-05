@@ -42,6 +42,7 @@ char* usr_strrstr_btweenpoint(char  *phead,char  *pend,char* str);
 int usr_strnum_btweenpoint(char  *pfont,char  *pbehind,char  *str);
 int usr_getvalue_btweenpoint(char  *phead,char  *pend, char  *out);
 int usr_printf_btweenpoint(char  *ps,char  *pe);
+float usr_getfloatvalue_instr(char  *ptr,char  *str);
 
 #define STR_BTPOINT(pfont,pbehind,str)		usr_str_btweenpoint(pfont,pbehind,str)
 #define STRNCASECMP(str1,str2,len)			usr_strncasecmp(str1,str2,len)
@@ -50,6 +51,7 @@ int usr_printf_btweenpoint(char  *ps,char  *pe);
 #define STRRSTR_BTPOINT(pfont,pbehind,str)	usr_strrstr_btweenpoint(pfont,pbehind,str)
 #define STRNUM_BTPOINT(pfont,pbehind,str)	usr_strnum_btweenpoint(pfont,pbehind,str)
 #define STR_GETVALUE_BTPOINT(pfont,pbehind,out) usr_getvalue_btweenpoint(pfont,pbehind,out)
+#define STR_GETFLOATVALUE_INSTR(ptr,str)		usr_getfloatvalue_instr(ptr,str)
 //#define DEBUG_BTPOINT(fileName,lineNum,ps,pe);	usr_printf_btweenpoint(fileName,lineNum,ps,pe);
 
 #ifdef	WIN32

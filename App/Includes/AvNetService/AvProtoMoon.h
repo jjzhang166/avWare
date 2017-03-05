@@ -43,8 +43,10 @@ public:
 	I_RET  LocalPtzSetProfile(int Channel, C_PtzProfile &PtzProfile);
 	I_RET  LocalPtzSetCommand(int Channel, C_PtzCmd &PtzCmd);
 
-	I_RET  LocalFactoryInfoGet(C_ManufacturerInfo &ManfacturerInfo);
-	I_RET  LocalFactoryInfoSet(C_ManufacturerInfo &ManfacturerInfo);
+	I_RET LocalAdvancedSystemGetCaps(int Channel, C_AdvancedSystemCaps &AdvancedSystemCaps);
+	I_RET LocalAdvancedSystemGetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile);
+	I_RET LocalAdvancedSystemSetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile);
+
 
 	I_RET  LocalNetCommGetCaps(C_NetCommCaps &NetCommCaps);
 	I_RET  LocalNetCommGetProfile(C_NetWorkProfile &NetWorkProfile);
@@ -56,6 +58,12 @@ public:
 	I_RET  LocalStreamStart(int Channel, int Slave);
 	I_RET  LocalStreamStop(int Channel, int Slave);
 	I_RET  LocalDeviceStatus(C_DevStatusInfo &DeviceStat);
+	CAvPacket * LocalSnapshot(int Channel = 0, av_bool bRealTime = av_false, av_uint SnapshotInterval = 0, av_uint ContinuousTimes = 0);
+	I_RET  LocalSyncSystemTime(int Channel, av_timeval &atv);
+	I_RET  LocalRequestIdrFrame(int Channel, int Slave);
+
+
+
 
 	I_RET  LocalCheckAuthorization(const char *usrname, const char *passwd, unsigned int &UsrAccess);
 private:

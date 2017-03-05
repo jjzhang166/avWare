@@ -35,9 +35,11 @@ typedef struct _NetCliInfo_S{
 	int		recvSocket;
 	int 	recvLen;
 	char	recvmsg[DF_NET_MSGBUFLEN];
+	void	*usrdef;
 }NetCliInfo_S;
 
 typedef int (*NetTcpSerReadCbFun)(NetCliInfo_S *cli);
+typedef int (*NetTcpSerCheckEndCbFun)(NetCliInfo_S *cli);
 
 typedef struct _NetWorkSerHandle_S{
 	char				mulicastip[16];//×é²¥µØÖ·
@@ -45,6 +47,7 @@ typedef struct _NetWorkSerHandle_S{
 	int 				serverport;
 	int					sockfd;
 	NetTcpSerReadCbFun 	readcb;
+	NetTcpSerCheckEndCbFun checkendcb;
 }NetWorkSerHandle_S;
 
 

@@ -32,12 +32,20 @@ av_bool CAvGui::Initialize()
 
 	av_msg("%s Started\n", __FUNCTION__);
 	g_AvGuiApp.Initialize();
+	av_msg("%s Started Over\n", __FUNCTION__);
 	return av_true;
 }
 
-
+av_bool CAvGui::LoadingMsg(LoadingMessage m, int progress)
+{
+	g_AvGuiApp.StartingMessage(m, progress);
+	return av_true;
+}
 av_bool CAvGui::exec()
 {
+
+	g_AvAlarm.Start(this, (CAvAlarm::OnAvAlarmSigNalFunc)&CAvGui::OnSystemAlarmMsg);
+
 	g_AvGuiApp.exec();
 	return av_true;
 }
@@ -111,3 +119,13 @@ Capture::EAvCaptureStatus CAvGui::CaptureStatus(int Channel)
  {
 	 return g_AvManCapture.NetCaptureProtoUpgradeOver();
  }
+
+ void CAvGui::OnSystemAlarmMsg(C_AlmMsg &Msg)
+ {
+	 //av_error("AvGui Recv Alarm Msg\n");
+	 QAvEvent Event(QAvEvent::QAvEvent_SysAlarmMsg);
+	 Event.FillInUsrData((const char *)&Msg, sizeof(C_AlmMsg));
+
+	 g_AvGuiApp.PostQAvEvent(Event);
+ }
+

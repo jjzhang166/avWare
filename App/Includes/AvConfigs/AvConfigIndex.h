@@ -20,6 +20,7 @@ typedef enum _AvConfigIndex{
 
 	CONF_INDEX					= 0,
 	CONF_DEVICE_UART			= 1,
+	CONF_DEVICE_INFO			= 2,
 
 	CONF_NET_SER				= 100,
 	CONF_NET_SER_EMAIL			= 101,
@@ -30,7 +31,7 @@ typedef enum _AvConfigIndex{
 	CONF_NET_COMM				= 106,
 	CONF_NET_P2P				= 107,
 	CONF_NET_RTSP				= 108,
-
+	
 	CONF_USER_MANAGER			= 200,
 	CONF_ENCODE_FORMATS			= 300,
 	CONF_ENCODE_COVER			= 301,
@@ -49,6 +50,8 @@ typedef enum _AvConfigIndex{
 	CONF_RECORDCTRL				= 702,
 
 	CONF_PTZADVANCEDCAMERSLENS  = 801,
+
+
 
 }AvConfigIndex;
 

@@ -1,0 +1,152 @@
+#!/bin/sh
+# Useage: ./load [ -r|-i|-a ][type]
+#         -r : rmmod all modules
+#         -i : insmod all modules
+#    default : rmmod all moules and then insmod them
+#
+
+report_error()
+{
+    echo "******* Error!! Shell exit for error *****"
+    exit 1
+}
+
+insert_audio()
+{
+    insmod extdrv/tlv_320aic31.ko > /dev/null
+    insmod acodec.ko
+    insmod hi3535_aio.ko
+    insmod hi3535_ai.ko
+    insmod hi3535_ao.ko
+    insmod hi3535_aenc.ko
+    insmod hi3535_adec.ko
+}
+
+remove_audio()
+{
+    rmmod hi3535_adec
+    rmmod hi3535_aenc
+    rmmod hi3535_ao
+    rmmod hi3535_ai
+    rmmod hi3535_aio
+    rmmod acodec
+    rmmod tlv_320aic31
+}
+
+insert_ko()
+{
+    sh ./clkcfg_hi3535.sh > /dev/null
+    sh ./sysctl_hi3535.sh > /dev/null
+    sh ./pinctrl_hi3535_aic31.sh > /dev/null
+
+    insmod mmz.ko mmz=anonymous,0,0x84000000,442M:jpeg,0,0x9fa00000,5M anony=1 || report_error
+    insmod hiuser.ko
+    insmod hi3535_base.ko
+    insmod hi3535_sys.ko
+    insmod hi3535_tde.ko
+    insmod hi3535_vgs.ko
+    insmod hi3535_venc.ko
+    insmod hi3535_chnl.ko
+    insmod hi3535_h264e.ko
+    insmod hi3535_rc.ko
+    insmod hi3535_jpege.ko
+    insmod hi3535_vou.ko
+    insmod hi3535_vpss.ko
+    insmod hi3535_ive.ko
+    insmod hi3535_vda.ko
+    insmod hi3535_region.ko
+    # hifb: G0:1080P-ARGB1555,G1:1080P-ARGB1555,G2:D1-ARGB1555,G3(HC):128x128-ARGB1555.
+    insmod hifb.ko video="hifb:vram0_size:8100,vram1_size:8100,vram2_size:1620,vram3_size:32" softcursor="off"
+    insmod hi3535_vdec.ko VBSource=0
+    insmod hi3535_vfmw.ko
+    insmod hi3535_hdmi.ko
+    insmod hi3535_jpegd.ko
+    insmod extdrv/gpioi2c.ko
+    
+    #insmod extdrv/sil9024.ko norm=5;  #720P60
+    #insmod extdrv/sil9024.ko norm=6;   #720P50
+    #insmod extdrv/sil9024.ko norm=7;  #1080I60
+    #insmod extdrv/sil9024.ko norm=8;  #1080I50
+    #insmod extdrv/sil9024.ko norm=9;  #1080P60
+    #insmod extdrv/sil9024.ko norm=10;  #1080P50
+    #insmod extdrv/sil9024.ko norm=11;  #1080P25
+#    insmod extdrv/sil9024.ko norm=12;  #1080P30
+    
+    insert_audio
+}
+
+remove_ko()
+{
+    remove_audio
+    rmmod sil9024
+    rmmod gpioi2c
+    rmmod hifb
+    rmmod hi3535_region
+    rmmod hi3535_ive
+    rmmod hi3535_vda
+    rmmod hi3535_vpss
+    rmmod hi3535_vou
+    rmmod hi3535_jpegd
+    rmmod hi3535_hdmi.ko
+    rmmod hi3535_vfmw.ko
+    rmmod hi3535_vdec.ko   
+    rmmod hi3535_jpege
+    rmmod hi3535_rc
+    rmmod hi3535_h264e
+    rmmod hi3535_chnl
+    rmmod hi3535_venc
+    rmmod hi3535_vgs
+    rmmod hi3535_tde
+    rmmod hi3535_sys
+    rmmod hi3535_base
+    rmmod mmz
+    rmmod hiuser
+}
+
+# If you want to use PCIe cascade, please compile PCIe related uboot, kernel, rootfs in directory: osdrv/.
+# Also, please compile PCIe related ko files in directory: osdrv/drv/pcie_mcc/. Then create a directory named pcie in current directory, 
+# and put theses ko files in the directory.  
+# For more details, please read the files in directory: osdrv/ and osdrv/drv/pcie_mcc/.
+
+insert_pci()
+{
+    insmod pcie/hi35xx_dev_host.ko
+    insmod pcie/pcit_dma_host.ko
+    insmod pcie/mcc_drv_host.ko
+    insmod pcie/mcc_usrdev_host.ko
+	
+    insmod hi3535_pciv_fmw.ko
+    insmod hi3535_pciv.ko
+}
+
+remove_pci()
+{
+    rmmod mcc_usrdev_host.ko
+    rmmod mcc_drv_host.ko
+    rmmod pcit_dma_host.ko
+    rmmod hi35xx_dev_host.ko
+
+    rmmod hi3535_pciv.ko
+    rmmod hi3535_pciv_fmw.ko
+}
+
+# load module.
+if [ "$1" = "-i" ]
+then
+    insert_ko
+    #insert_pci
+fi
+
+if [ "$1" = "-r" ]
+then
+    #remove_pci
+    remove_ko
+fi
+
+if [ $# -eq 0 ] || [ "$1" = "-a" ]
+then
+    #remove_pci
+    remove_ko
+    insert_ko
+    #insert_pci
+fi

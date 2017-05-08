@@ -51,12 +51,19 @@ int FTP_close(int fd)
 #endif
 }
 
-
-
+#if 1
+CFtp::CFtp():
+	m_Ctrlsocket(-1),
+	m_Datasocket(-1),
+	login_success(false)
+{
+}
+#else
 CFtp::CFtp()
 {
-
 }
+
+#endif
 
 CFtp::~CFtp()
 {
@@ -309,7 +316,7 @@ int CFtp::AVFtpSend(char * buf, int buflen)
 
         timetmp.tv_sec = FTP_SEND_TIME/1000;
         timetmp.tv_usec = 0;
-
+		//printf("[%s:%d]m_Ctrlsocket %d\n", __FILE__, __LINE__,m_Ctrlsocket);
         ret = select(m_Ctrlsocket+1, NULL, &writefd, NULL, &timetmp);
         if(ret > 0)
         {
@@ -456,7 +463,7 @@ int CFtp::AVFtpSendAndGet( const char * strCommand, const char * param, char * R
     memcpy(tmpbuf, Response, 4);
     tmpbuf[4]=0;
     ReponseState = atoi(tmpbuf);
-
+	
 	return FTP_OK;
 }
 
@@ -605,7 +612,7 @@ int CFtp::AVFtpPassive()
         FTP_close(m_Datasocket);
         return -1;
     }
-	
+
 	if (m_Ctrlsocket == -1)
     {
         printf("FTP:m_Ctrlsocket Fail\n");
@@ -648,7 +655,7 @@ int CFtp::AVFtpPassive()
 #endif
     set_nonblock(TRUE, m_Datasocket);
 
-    return FTP_OK;
+	return FTP_OK;
 }
 
 int CFtp::AVFtpList()
@@ -810,7 +817,7 @@ int CFtp::AVFtpType( const FTP_TRAN_TYPE_E type_in )
     {
         state = 0;
         ret = AVFtpSendAndGet("TYPE ", "I", recv_buf, state);
-        FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
+		FTP_ASSERT_RETURN( (ret >= FTP_OK), ret);
         FTP_ASSERT_RETURN( (state == 200), FTP_ERROR);    //—È÷§∑µªÿ¬Î
     }
     else
@@ -818,7 +825,7 @@ int CFtp::AVFtpType( const FTP_TRAN_TYPE_E type_in )
         printf("CFtpProtocol: no do type\n");
         return FTP_ERROR;
     }
-
+	
     return FTP_OK;
 }
 

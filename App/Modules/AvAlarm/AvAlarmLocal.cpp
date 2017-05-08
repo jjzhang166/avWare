@@ -15,6 +15,8 @@
 #include "AvAlarm/AvAlarmLocal.h"
 #include "Apis/LibEncode.h"
 #include "CAvObject.h"
+#include "AvDevice/AvDevice.h"
+#include "Apis/AvEnuminline.h"
 
 
 SINGLETON_IMPLEMENT(CAvAlmLocal)
@@ -35,10 +37,10 @@ av_bool CAvAlmLocal::CheckConfMd()
 	return av_true;
 }
 
-av_bool CAvAlmLocal::SendAlmMsg(CAvAlarm::AlmMsg  &msg)
+av_bool CAvAlmLocal::SendAlmMsg(C_AlmMsg  &msg)
 {
 	CAvQmsg AlarmMsgQueue(ALARM_QUEUE_MSG_NAME);
-	av_u32 msglen = sizeof(CAvAlarm::AlmMsg);
+	av_u32 msglen = sizeof(C_AlmMsg);
 	return AlarmMsgQueue.QmSnd((av_char *)&msg, msglen);
 }
 
@@ -46,26 +48,27 @@ av_bool CAvAlmLocal::PacketAlmIo(av_u32 Result, av_bool bOpen)
 {
 	//ÊÇ·ñ¿ªÆôÁËalmio in ÅäÖÃ
 
-	CAvAlarm::AlmMsg msg;
-	msg.AlmTmSec = (av_u32)time(NULL);
-	msg.AlmType = AlarmEvent_PORT_In;
+	C_AlmMsg msg;
+	msg.AlarmTime = (av_u32)time(NULL);
+	msg.AlarmEventName = AlarmEvent_PORT_In;
 	msg.Channel = -1;
 	msg.Slave = CHL_NR_T;
 
-	msg.AlmStatus = bOpen == av_false ? CAvAlarm::AvAlm_Stat_Close : CAvAlarm::AvAlm_Stat_Open;
+	msg.AlarmStatus = bOpen == av_false ? AlarmStat_Stop : AlarmStat_Start;
 	msg.IoResult = Result;
 
 	return SendAlmMsg(msg);
 }
+
 av_bool CAvAlmLocal::PacketAlmMd(av_u32 Result[], av_bool bOpen)
 {
-	CAvAlarm::AlmMsg msg;
-	msg.AlmTmSec = (av_u32)time(NULL);
-	msg.AlmType = AlarmEvent_VIDEO_MotionDetection;
+	C_AlmMsg msg;
+	msg.AlarmTime = (av_u32)time(NULL);
+	msg.AlarmEventName = AlarmEvent_VIDEO_MotionDetection;
 	msg.Channel = -1;
 	msg.Slave = CHL_NR_T;
 
-	msg.AlmStatus = bOpen == av_false ? CAvAlarm::AvAlm_Stat_Close : CAvAlarm::AvAlm_Stat_Open;
+	msg.AlarmStatus = bOpen == av_false ? AlarmStat_Stop : AlarmStat_Start;
 	memcpy(msg.MdResult, Result, sizeof(msg.MdResult));
 
 	return SendAlmMsg(msg);
@@ -82,8 +85,8 @@ void CAvAlmLocal::ThreadProc()
 	av_u32	AlmMdLastResult[ConfMotionDetectionLine] = {0};
 	av_u32	AlmMdZeroResult[ConfMotionDetectionLine] = {0};
 	av_bool	AlmMdlastbOpen = av_false;
-
-	avAlarmCreate();
+	time_t	LastAlmTime = 0;
+	
 
 	while (av_true == m_Loop){
 		if (0 != m_AlarmCaps.MaxAlmIn && av_true == CheckConfIo()){
@@ -94,22 +97,23 @@ void CAvAlmLocal::ThreadProc()
 			}
 		}
 
-		if (av_true == CheckConfMd() && (m_AlarmCaps.AlarmEventMask & AvMask(AlarmEvent_VIDEO_MotionDetection))){
+		if (av_true == CheckConfMd()  && time(NULL) - LastAlmTime  > 1 && (m_AlarmCaps.AlarmEventMask & AvMask(AlarmEvent_VIDEO_MotionDetection))){
 			bRet = avGetMdAlmStatus(AlmMdResult);
-			if (bRet == av_true && 0 != memcmp(AlmMdResult, AlmMdLastResult, sizeof(AlmMdLastResult))){
-				//alm md
+			if (bRet == av_true && AlmMdlastbOpen == av_false && 0 != memcmp(AlmMdResult, AlmMdLastResult, sizeof(AlmMdLastResult))){
 				PacketAlmMd(AlmMdResult, av_true);
 				memcpy(AlmMdLastResult, AlmMdResult, sizeof(AlmMdLastResult));
 				AlmMdlastbOpen = av_true;
+				LastAlmTime = time(NULL);
 			}
 			else if (bRet == av_true && AlmMdlastbOpen  == av_true && 0 == memcmp(AlmMdResult, AlmMdZeroResult, sizeof(AlmMdZeroResult))){
 				PacketAlmMd(AlmMdZeroResult, av_false);
 				memcpy(AlmMdLastResult, AlmMdZeroResult, sizeof(AlmMdZeroResult));
 				AlmMdlastbOpen = av_false;
+				LastAlmTime = time(NULL);
 			}
 		}
 
-		av_msleep(100);
+		av_msleep(40);
 	}
 
 	avAlarmDestory();
@@ -123,6 +127,40 @@ av_bool CAvAlmLocal::Initialize()
 	bRet = AvAlarmCaps(&m_AlarmCaps);
 
 	CThread::ThreadStart();
+
+	//md
+	CAvConfigAlarm ConfigAlarm;
+	ConfigAlarm.Update();
+
+	av_bool bVaildFactoryInfo = av_false;
+	std::string bVaild;
+
+	CAvDevice::GetEnv(std::string(EKey_BvalidFactoryInfo), bVaild);
+	if (bVaild == std::string(EnumNameav_bool(av_true))){
+		bVaildFactoryInfo = av_true;
+		avAlarmCreate();
+	}
+	else{
+		av_error("FactoryInfo is  Invalid CAvAlmLocal Task not Initialize\n");
+	}
+
+	av_msg("m_AlarmCaps.AlarmEventMask[0x%x]\n", m_AlarmCaps.AlarmEventMask);
+	if (bVaildFactoryInfo == av_true && (m_AlarmCaps.AlarmEventMask & AvMask(AlarmEvent_VIDEO_MotionDetection))){
+		ConfigAlarmProfile &Profile = ConfigAlarm.GetConfig();
+		av_msg("AlarmEventMask[0x%x]\n", Profile.AlarmEventMask);
+		if (Profile.AlarmEventMask & AvMask(AlarmEvent_VIDEO_MotionDetection)){
+			av_bool ret = av_false;
+			int i = 0;
+			for (; i < 18; ++i) {
+				av_msg("Profile.AlarmMotionArea[%d] = %d\n", i, Profile.AlarmMotionArea[i]);
+			}
+			
+			ret = avSetMdProfile(Profile.AlarmMotionArea, Profile.AlarmMotionLevel);
+			if (ret != av_true){
+				av_error("avSetMdProfile return error \n");
+			}
+		}
+	}
 
 #if 0 //For MD Test 
 	C_AlmMdParam param = {0};

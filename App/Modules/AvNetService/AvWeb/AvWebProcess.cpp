@@ -3,7 +3,11 @@
 #include "AvConfigs/AvConfigCapture.h"
 #include "AvDevice/AvDevice.h"
 #include "AvUart/AvUart.h"
+#include "Apis/AvWareStruct.h"
 #include "Apis/AvEnuminline.h"
+#include "AvAlarm/AvAlarm.h"
+#include "AvConfigs/AvConfigNetService.h"
+
 
 using std::string;
 namespace av_web{
@@ -58,84 +62,8 @@ inline void GetSupportEncBitContrul(CWebMsg &msg, av_uchar EncBitControl)
 	}
 }
 
-}// namespace av_web
 
-#if 0
-template<> 
-const char* av_web::EnumNameStr<AvComp>::List[] =
-{
-	"MJPEG",	//AvComp_MJPEG,
-	"H264",		//AvComp_H264,
-	"H265",		//AvComp_H265,
-	"JPEG",		//AvComp_JPEG,
-	"PCM",		//AvComp_PCM,
-	"G711A",	//AvComp_G711A,
-	"G711U",	//AvComp_G711U,
-	"AAC",		//AvComp_AAC,
-	"AMR_NB",	//AvComp_AMR_NB,
-	"AMR_WB",	//AvComp_AMR_WB,
-	"MP3",		//AvComp_MP3,
-	"NR",		//AvComp_NR,
-};
-
-template<> 
-const char* av_web::EnumNameStr<CaptureSize>::List[] =
-{
-	"Self",			//CaptureSize_Self,
-	"480*270",		//CaptureSize_QVGAEX,	//480*270
-	"320*240",		//CaptureSize_QVGA,		//480*360
-	"640*360",		//CaptureSize_VGAEX,	//640*360
-	"640*480",		//CaptureSize_VGA,		//640*480
-	"720*480",		//CaptureSize_D1,		//720*576
-	"1280*720",		//CaptureSize_720P,
-	"1280*960",		//CaptureSize_960P,
-	"1920*1080",	//CaptureSize_1080P,
-	"2048*1536",	//CaptureSize_300W,		//2048*1536
-	"2560*1440",	//CaptureSize_400W,		//2560*1440
-	"2592*1944",	//CaptureSize_500W,		//2592*1944
-	"3072*2048",	//CaptureSize_600W,		//3072*2048
-	"3840*2160",	//CaptureSize_800W,		//3840*2160
-	"4096*2160",	//CaptureSize_4K,		//4096*2160
-	"7680*4320",	//CaptureSize_8K,		//7680*4320
-	"NR",			//CaptureSize_NR,
-};
-
-template<> 
-const char* av_web::EnumNameStr<BitRateCtrl>::List[] =
-{
-	"CBR",		//AvBitRate_CBR
-	"VBR",		//AvBitRate_VBR
-};
-
-template<>
-const char* av_web::EnumNameStr<IrCutMode>::List[] =
-{
-	"Open",			//IRCUT_OPEN,
-	"Close",		//IRCUT_CLOSE,
-	"Auto",			//IRCUT_AUTO,
-	"Schelude",		//IRCUT_TIMER,
-};
-
-template<>
-const char* av_web::EnumNameStr<AntiFlckerMode>::List[] =
-{
-	"None",			//AvAntiFlckerMode_NONE = 0,
-	"InDoor50Hz",			//AvAntiFlckerMode_INDOOR_50HZ = 1,
-	"OutDoor50Hz",				//AvAntiFlckerMode_OUTDOOR_50HZ = 2,
-	"50Hz",				//AvAntiFlckerMode_AUTO_50HZ = 3,
-	"InDoor60Hz",				//AvAntiFlckerMode_INDOOR_60HZ = 4,
-	"OutDoor60Hz",				//AvAntiFlckerMode_OUTDOOR_60HZ = 5,
-	"60Hz",						//AvAntiFlckerMode_AUTO_60HZ = 6,
-	"Theater50Hz",				//AvAntiFlckerMode_THEATER_50HZ = 7,
-	"Fast50Hz",				//AvAntiFlckerMode_FAST_50HZ = 8,
-	"Theater60Hz",				//AvAntiFlckerMode_THEATER_60HZ = 9,
-	"Fast60Hz",					//AvAntiFlckerMode_FAST_60HZ = 10,
-	"Close",				//AvAntiFlckerMode_ANTI_FLICKER_CLOSED = 11,
-	"Nr",				//AvAntiFlckerMode_LAST = 12
-};
-#endif
-
-int av_web::AvWebLogIn(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebLogIn(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	av_msg("User: %s  PW: %s\n", web_req["Username"].asCString(), web_req["Password"].asCString());
 	have_resp_param = av_true;
@@ -144,13 +72,13 @@ int av_web::AvWebLogIn(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_p
 	return WEB_STATUS_OK;
 }
 
-int av_web::AvWebLogOut(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebLogOut(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	have_resp_param = av_false;
 	return WEB_STATUS_OK;
 }
 
-int av_web::AvWebGetDeviceCaps(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebGetDeviceCaps(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	av_msg("AvWebGetDeviceCaps\n");
 	C_DspCaps dspcap = { 0 };
@@ -168,7 +96,7 @@ int av_web::AvWebGetDeviceCaps(CWebMsg &web_req, CWebMsg &web_resp, av_bool &hav
 }
 
 
-int av_web::AvWebGetVideoEncodeCaps(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebGetVideoEncodeCaps(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	av_msg("AvWebGetVideoEncodeCaps\n");
 	have_resp_param = av_false;
@@ -218,7 +146,7 @@ int av_web::AvWebGetVideoEncodeCaps(CWebMsg &web_req, CWebMsg &web_resp, av_bool
 	return 0;
 }
 
-int av_web::AvWebGetVideoEncodeProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebGetVideoEncodeProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	have_resp_param = av_false;
 
@@ -268,7 +196,7 @@ int av_web::AvWebGetVideoEncodeProfile(CWebMsg &web_req, CWebMsg &web_resp, av_b
 	return WEB_STATUS_OK;
 }
 
-int av_web::AvWebSetVideoEncodeProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebSetVideoEncodeProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	have_resp_param = av_false;
 
@@ -310,7 +238,7 @@ int av_web::AvWebSetVideoEncodeProfile(CWebMsg &web_req, CWebMsg &web_resp, av_b
 	
 }
 
-int av_web::AvWebGetImageProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebGetImageProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	have_resp_param = av_false;
 	int channel = 0;
@@ -330,7 +258,7 @@ int av_web::AvWebGetImageProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &h
 	return WEB_STATUS_OK;
 }
 
-int av_web::AvWebSetImageProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebSetImageProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	have_resp_param = av_false;
 	int channel = 0;
@@ -348,7 +276,111 @@ int av_web::AvWebSetImageProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &h
 	return (0 == conf_image.SettingUp(channel)) ? WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
 }
 
-int av_web::AvWebCallPtz(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+//web ptz cmd define:
+enum{
+		PtzCommand_LEFT_START = 2,
+		PtzCommand_LEFT_STOP = 3,
+		PtzCommand_RIGHT_START = 4,
+		PtzCommand_RIGHT_STOP = 5,
+		PtzCommand_UP_START = 6,
+		PtzCommand_UP_STOP = 7,
+		PtzCommand_DOWN_START = 8,
+		PtzCommand_DOWN_STOP = 9,
+
+		PtzCommand_LEFT_UP_START = 10,
+		PtzCommand_LEFT_UP_STOP = 11,
+		PtzCommand_RIGHT_UP_START = 12,
+		PtzCommand_RIGHT_UP_STOP = 13,
+		PtzCommand_LEFT_DOWN_START = 14,
+		PtzCommand_LEFT_DOWN_STOP = 15,
+		PtzCommand_RIGHT_DOWN_START = 16,
+		PtzCommand_RIGHT_DOWN_STOP = 17,
+
+		
+		//// 图象变小开始
+		PtzCommand_ZOOM_WIDE_START = 108,
+		//// 图象变小停止
+		PtzCommand_ZOOM_WIDE_STOP = 109,
+		//// 图象变大开始
+		PtzCommand_ZOOM_TELE_START = 110,
+		//// 图象变大停止
+		PtzCommand_ZOOM_TELE_STOP = 111,
+
+		
+		//// 焦距近开始
+		PtzCommand_FOCUS_NEAR_START = 104,
+		//// 焦距近停止
+		PtzCommand_FOCUS_NEAR_STOP = 105,
+		//// 焦距远开始
+		PtzCommand_FOCUS_FAR_START = 106,
+		//// 焦距远停止
+		PtzCommand_FOCUS_FAR_STOP = 107,
+
+		
+		//// 开光圈开始
+		PtzCommand_IRIS_OPEN_START = 100,
+		//// 开光圈停止
+		PtzCommand_IRIS_OPEN_STOP = 101,
+		//// 关光圈开始
+		PtzCommand_IRIS_CLOSE_START = 102,
+		//// 关光圈停止
+		PtzCommand_IRIS_CLOSE_STOP = 103,
+};
+
+static inline PtzCommand WebMsgConversionToPtzCommand(int web_cmd)
+{
+	switch (web_cmd) {
+	case PtzCommand_LEFT_STOP:
+	case PtzCommand_RIGHT_STOP:
+	case PtzCommand_UP_STOP:
+	case PtzCommand_DOWN_STOP:
+	case PtzCommand_LEFT_UP_STOP:
+	case PtzCommand_RIGHT_UP_STOP:
+	case PtzCommand_LEFT_DOWN_STOP:
+	case PtzCommand_RIGHT_DOWN_STOP:
+	case PtzCommand_ZOOM_WIDE_STOP:
+	case PtzCommand_ZOOM_TELE_STOP:
+	case PtzCommand_FOCUS_NEAR_STOP:
+	case PtzCommand_FOCUS_FAR_STOP:
+	case PtzCommand_IRIS_OPEN_STOP:
+	case PtzCommand_IRIS_CLOSE_STOP:
+		return PtzCommand_STOP;
+		
+	case PtzCommand_LEFT_START:
+		return PtzCommand_LEFT;
+	case PtzCommand_RIGHT_START:
+		return PtzCommand_RIGHT;
+
+		
+	case PtzCommand_UP_START:
+		return PtzCommand_UP;
+	case PtzCommand_DOWN_START:
+		return PtzCommand_DOWN;
+
+
+	case PtzCommand_ZOOM_WIDE_START:
+		return PtzCommand_ZOOM_WIDE;
+	case PtzCommand_ZOOM_TELE_START:
+		return PtzCommand_ZOOM_TELE;
+
+
+	case PtzCommand_FOCUS_NEAR_START:
+		return PtzCommand_FOCUS_NEAR;
+	case PtzCommand_FOCUS_FAR_START:
+		return PtzCommand_FOCUS_FAR;
+
+
+	case PtzCommand_IRIS_OPEN_START:
+		return PtzCommand_IRIS_LARGE;
+	case PtzCommand_IRIS_CLOSE_START:
+		return PtzCommand_IRIS_SMALL;
+
+	default:
+		return PtzCommand_STOP;
+	}
+}
+
+int AvWebCallPt(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	have_resp_param = av_false;
 	int channel = 0;
@@ -359,15 +391,16 @@ int av_web::AvWebCallPtz(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp
 	if (!web_req["Cmd"].isInt()) {
 		return WEB_STATUS_PARAM_ERROR;
 	}
-// 	C_PtzCmd PtzCmd;
-// 
-// 	PtzCmd.PtzCmd = web_req["Cmd"].asInt();
-// 	PtzCmd.HSpeed = web_req["HSpeed"].isInt() ? web_req["HSpeed"].asInt() : 1;
-// 	PtzCmd.VSpeed = web_req["VSpeed"].isInt() ? web_req["VSpeed"].asInt() : 1;
-// 	return (av_true == g_AvUart.PtzStart(ptzcmd)) ? WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
+	
+ 	C_PtzCmd command;
+	memset(&command, 0, sizeof(command));
+ 	command.PtzCmd = WebMsgConversionToPtzCommand(web_req["Cmd"].asInt());
+	//cradle head speed area 1-63,web speed area 0-10
+	command.PtzSpeed = 6 * (web_req["HSpeed"].isInt() ? web_req["HSpeed"].asInt() : 5);
+ 	return (av_true == g_AvUart.PtzSetCommand(command)) ? WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
 }
 
-int av_web::AvWebCallPtzFocus(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebCallZoom_Focus_Iris(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	have_resp_param = av_false;
 	int channel = 0;
@@ -378,34 +411,18 @@ int av_web::AvWebCallPtzFocus(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have
 	if (!web_req["Cmd"].isInt()) {
 		return WEB_STATUS_PARAM_ERROR;
 	}
-// 	PtzCmd ptzcmd = { 0 };
-// 	ptzcmd.Cmd = web_req["Cmd"].asInt();
-// 	ptzcmd.HSpeed = web_req["HSpeed"].isInt() ? web_req["HSpeed"].asInt() : 1;
-// 	ptzcmd.VSpeed = web_req["VSpeed"].isInt() ? web_req["VSpeed"].asInt() : 1;
-// 	av_msg("TODO: Call Ptz Focus cmd %d HSpeed %d\n", ptzcmd.Cmd, ptzcmd.HSpeed);
-	return WEB_STATUS_OK;
+	
+ 	C_PtzCmd command;
+	memset(&command, 0, sizeof(command));
+ 	command.PtzCmd = WebMsgConversionToPtzCommand(web_req["Cmd"].asInt());
+	//zoom speed area 1-16, web speed area 0-10
+	command.PtzSpeed = web_req["HSpeed"].isInt() ? web_req["HSpeed"].asInt() : 5;
+
+ 	return (av_true == g_AvUart.PtzSetCommand(command)) ? WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
 }
 
-int av_web::AvWebCallPtzIris(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
-{
-	have_resp_param = av_false;
-	int channel = 0;
-	int slave = 0;
-	int ret = AvWebChannelSalveCheck(web_req, channel, slave);
-	if (WEB_STATUS_OK != ret) { return ret; }
 
-	if (!web_req["Cmd"].isInt()) {
-		return WEB_STATUS_PARAM_ERROR;
-	}
-// 	PtzCmd ptzcmd = { 0 };
-// 	ptzcmd.Cmd = web_req["Cmd"].asInt();
-// 	ptzcmd.HSpeed = web_req["HSpeed"].isInt() ? web_req["HSpeed"].asInt() : 1;
-// 	ptzcmd.VSpeed = web_req["VSpeed"].isInt() ? web_req["VSpeed"].asInt() : 1;
-// 	av_msg("TODO: Call Ptz Iris cmd %d HSpeed %d\n", ptzcmd.Cmd, ptzcmd.HSpeed);
-	return WEB_STATUS_OK;
-}
-
-int av_web::AvWebGetVideoCaptureCaps(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebGetVideoCaptureCaps(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	have_resp_param = av_false;
 	int channel = 0;
@@ -427,7 +444,7 @@ int av_web::AvWebGetVideoCaptureCaps(CWebMsg &web_req, CWebMsg &web_resp, av_boo
 	return WEB_STATUS_OK;
 }
 
-int av_web::AvWebGetVideoCaptureProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebGetVideoCaptureProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	have_resp_param = av_false;
 	int channel = 0;
@@ -447,7 +464,7 @@ int av_web::AvWebGetVideoCaptureProfile(CWebMsg &web_req, CWebMsg &web_resp, av_
 	return WEB_STATUS_OK;
 }
 
-int av_web::AvWebSetVideoCaptureProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebSetVideoCaptureProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	have_resp_param = av_false;
 	int channel = 0;
@@ -476,7 +493,7 @@ int av_web::AvWebSetVideoCaptureProfile(CWebMsg &web_req, CWebMsg &web_resp, av_
 	return (0 == conf_cap.SettingUp(channel)) ? WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
 }
 
-int av_web::AvWebGetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebGetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	have_resp_param = av_false;
 	int channel = 0;
@@ -499,7 +516,7 @@ int av_web::AvWebGetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &ha
 	return WEB_STATUS_OK;
 }
 
-int av_web::AvWebSetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+int AvWebSetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
 {
 	have_resp_param = av_false;
 	int channel = 0;
@@ -520,3 +537,181 @@ int av_web::AvWebSetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &ha
 
 	return (0 == rtmp.SettingUp(channel)) ? WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
 }
+
+int AvWebGetFtp(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+{
+	CAvConfigNetFtp ftp;
+	ftp.Update();
+	ConfigNetFtp &conf_ftp = ftp.GetConfig();
+
+	web_resp["FtpEnable"] = conf_ftp.bEnable == av_true ? 1 : 0;
+	web_resp["FtpSeverAddr"] = conf_ftp.ServerAddress;
+	web_resp["FtpServerPort"] = conf_ftp.ServicePort;
+	web_resp["UsrName"] = conf_ftp.UserName;
+	web_resp["PassWord"] = conf_ftp.PassWord;
+	web_resp["FtpDir"] = conf_ftp.RemotePath;
+
+	have_resp_param = av_true;
+	return WEB_STATUS_OK;
+}
+
+int AvWebSetFtp(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+{
+	have_resp_param = av_false;
+	CAvConfigNetFtp ftp;
+	ftp.Update();
+	ConfigNetFtp &conf_ftp = ftp.GetConfig();
+
+	conf_ftp.bEnable = 1 == web_req["FtpEnable"].asInt() ? av_true : av_false;
+	conf_ftp.ServicePort = web_req["FtpServerPort"].asInt();
+
+	strcpy(conf_ftp.ServerAddress, web_req["FtpSeverAddr"].asCString());
+	strcpy(conf_ftp.UserName, web_req["UsrName"].asCString());
+	strcpy(conf_ftp.PassWord, web_req["PassWord"].asCString());
+	strcpy(conf_ftp.RemotePath, web_req["FtpDir"].asCString());
+
+	return (0 == ftp.SettingUp()) ?WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
+}
+
+
+int AvWebTestFtp(CWebMsg &web_req, CWebMsg &web_resp, av_bool &hava_resp_param)
+{
+	hava_resp_param = av_false;
+	
+	int channel = web_req["Channel"].isInt() ? web_req["Channel"].asInt() : -1;
+	int slave = web_req["Slave"].isInt() ? web_req["Slave"].asInt() : -1;
+	if ((channel < 0) || (slave < 0) || (slave >= CHL_NR_T)) {
+		av_msg("Channel: %d Slave: %d\n", channel, slave);
+		return WEB_STATUS_PARAM_ERROR;
+	}
+
+	C_AlmMsg msg;
+	msg.AlarmTime = (av_u32)time(NULL);
+	msg.AlarmEventName = AlarmEvent_TestFtpUpload;
+	msg.Channel = -1;
+	msg.Slave = CHL_NR_T;
+	CAvQmsg AlarmMsgQueue(ALARM_QUEUE_MSG_NAME);
+	av_u32 msglen = sizeof(C_AlmMsg);
+	AlarmMsgQueue.QmSnd((av_char *)&msg, msglen);
+	return WEB_STATUS_OK;
+}
+
+#if 0
+int AvWebGetWifiConf(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+{
+	CAvConfigNetComm conf_wifi;
+	conf_wifi.Update(NetCommT_Wireless);
+	ConfigNetComm &wifi_fmt = conf_wifi.GetConfig(NetCommT_Wireless);
+
+	web_resp["SSID"] = wifi_fmt.WirelessAttr.RouterLinkInfo[0].SSID;
+	web_resp["Passwd"] = wifi_fmt.WirelessAttr.RouterLinkInfo[0].Passwd;
+	web_resp["WifiMode"] = "Station";
+	av_msg("AvWebGetWifiConf SSID:[%s] Passwd[%s] Mode[%s]",
+		wifi_fmt.WirelessAttr.RouterLinkInfo[0].SSID,
+		wifi_fmt.WirelessAttr.RouterLinkInfo[0].Passwd,
+		"Station");
+
+	have_resp_param = av_true;
+	return WEB_STATUS_OK;
+}
+
+int AvWebSetWifiConf(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+{
+	have_resp_param = av_false;
+	CAvConfigNetComm conf_wifi;
+	conf_wifi.Update(NetCommT_Wireless);
+	ConfigNetComm &wifi_fmt = conf_wifi.GetConfig(NetCommT_Wireless);
+	
+	av_msg("AvWebSetWifiConf SSID:[%s] Passwd[%s] Mode[%s]",
+		web_req["SSID"].asCString(),
+		web_req["Passwd"].asCString(),
+		web_req["WifiMode"].asCString());
+	
+	strcpy(wifi_fmt.WirelessAttr.RouterLinkInfo[0].SSID, web_req["SSID"].asCString());
+	strcpy(wifi_fmt.WirelessAttr.RouterLinkInfo[0].Passwd, web_req["Passwd"].asCString());
+	return (0 == conf_wifi.SettingUp(NetCommT_Wireless)) ?WEB_STATUS_OK : WEB_STATUS_PARAM_ERROR;
+}
+#endif
+
+
+#if 0
+{"Header":{"Action":"Request","Method":"SetWifiConfig","Session":""},
+"Param":{"WifiEnable":1,"WIFIState":"1","WIFISSID":"ssid123131",
+"WIFIPW":"32131dsa","WifiDhcp":false,"WifiIPAddr":"192.168.2.36",
+"WifiGetWay":"192.168.2.1","WifiMask":"255.255.255.255"}}
+
+#endif
+
+int AvWebGetWifiConf(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+{
+	CAvConfigNetComm ConfigWifi;
+	ConfigWifi.Update(NetCommT_Wireless);
+	ConfigNetComm &WifiConfig = ConfigWifi.GetConfig(NetCommT_Wireless);
+
+	int index = WifiConfig.WirelessAttr.WirelessPreferred;
+	index--;
+	if (index < 0) index = MAX_CONF_ROUTER_LINK - 1;
+
+	web_resp["WifiEnable"]	= WifiConfig.bEnable;
+	web_resp["WIFIState"]	= WifiConfig.WirelessAttr.Mode - 1;
+	web_resp["WIFISSID"]	= WifiConfig.WirelessAttr.WirelessInfo[index].SSID;
+	web_resp["WIFIPW"]		= WifiConfig.WirelessAttr.WirelessInfo[index].Passwd;
+	web_resp["WifiDhcp"]	= av_true;
+	web_resp["APSSID"]		= WifiConfig.WirelessAttr.WirelessApConf.SSID;
+	web_resp["APPW"]		= WifiConfig.WirelessAttr.WirelessApConf.Passwd;
+		
+	have_resp_param = av_true;
+	return WEB_STATUS_OK;
+}
+
+int AvWebSetWifiConf(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param)
+{
+	have_resp_param = av_false;
+	CAvConfigNetComm ConfigWifi;
+	ConfigWifi.Update();
+	ConfigNetComm &WifiProfile = ConfigWifi.GetConfig(NetCommT_Wireless);
+
+	av_msg("AvWebSetWifiConf WifiEnable[%d], WIFIState(0:AP, 1:station)[%s], SSID:[%s] Passwd[%s]\n",
+			web_req["WifiEnable"].asInt(),
+			web_req["WIFIState"].asCString(),
+			web_req["WIFISSID"].asCString(),
+			web_req["WIFIPW"].asCString());
+	
+	if (web_req["WifiEnable"].asInt()){
+	    /* 0:AP Mode   1:station Mode*/
+		if (0 == atoi(web_req["WIFIState"].asCString())){
+			sprintf(WifiProfile.WirelessAttr.WirelessApConf.SSID, "%s", web_req["APSSID"].asCString());
+			sprintf(WifiProfile.WirelessAttr.WirelessApConf.Passwd, "%s", web_req["APPW"].asCString());
+			WifiProfile.WirelessAttr.Mode = WirelessMode_AP;
+
+		}else if (1 == atoi(web_req["WIFIState"].asCString())){
+			int index = WifiProfile.WirelessAttr.WirelessPreferred;
+			sprintf(WifiProfile.WirelessAttr.WirelessInfo[index].SSID, web_req["WIFISSID"].asCString());
+			sprintf(WifiProfile.WirelessAttr.WirelessInfo[index].Passwd, web_req["WIFIPW"].asCString());
+			WifiProfile.WirelessAttr.Mode = WirelessMode_STATION;
+			WifiProfile.WirelessAttr.WirelessPreferred = ++WifiProfile.WirelessAttr.WirelessPreferred%MAX_CONF_ROUTER_LINK;
+			if (true == web_req["WifiDhcp"].asBool()){
+				WifiProfile.mGetMode = NetCommGetMode_AUTO;
+			}
+			else{
+				WifiProfile.mGetMode = NetCommGetMode_MANUAL;
+				sprintf(WifiProfile.WirelessAttr.WirelessConf.IpAddr, web_req["WifiIPAddr"].asCString());
+				sprintf(WifiProfile.WirelessAttr.WirelessConf.Gateway, web_req["WifiGateWay"].asCString());
+				sprintf(WifiProfile.WirelessAttr.WirelessConf.Submask, web_req["WifiMask"].asCString());
+				sprintf(WifiProfile.WirelessAttr.WirelessConf.Dns1, "8.8.8.8");
+				sprintf(WifiProfile.WirelessAttr.WirelessConf.Dns2, "8.8.4.4");
+
+				//sprintf(WifiProfile.WirelessAttr.WirelessConf.Dns1, web_req["WIFISSID"].asCString());
+				//sprintf(WifiProfile.WirelessAttr.WirelessConf.Dns2, web_req["WIFISSID"].asCString());
+			}
+		}
+	}else{
+		WifiProfile.bEnable = av_false;
+	}
+	ConfigWifi.SettingUp();
+
+	return WEB_STATUS_OK;
+}
+
+}// namespace av_web
+

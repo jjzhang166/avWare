@@ -20,6 +20,7 @@
 #include "CAvObject.h"
 #include "AvThread/AvThread.h"
 #include "AvCapture/AvManCapture.h"
+#include "config.h"
 
 #ifdef AVGUI_SHARE_LIB
 #define AVWARE_SHARE_EXPORT
@@ -30,7 +31,22 @@
 #include "Apis/AvWareLibDef.h"
 #include "Apis/AvWareCplusplus.h"
 #include "CAvObject.h"
-class CAvGui
+
+typedef enum {
+
+	LoadingConfig,
+	LoadingInitDevice,
+	LoadingLog,
+	LoadingCapture,
+	LoadingRecodService,
+	LoadingAlarmService,
+	LoadingNetService,
+	LoadingIntelligentService,
+	LoadingUiResource,
+	LoadingInitOver,
+}LoadingMessage;
+
+class CAvGui:public CAvObject
 {
 public:
 	SINGLETON_DECLARE(CAvGui);
@@ -54,7 +70,9 @@ public:
 	static av_bool NetCaptureProtoUpgrade(std::list <C_FirmWareUpgrade> *FirmWareUpgrade);
 	static av_bool NetCaptureProtoUpgradeProgress(std::list <C_FirmWareUpgrade> *FirmWareUpgrade);
 	static av_bool NetCaptureProtoUpgradeOver();
-
+	static av_bool LoadingMsg(LoadingMessage m, int progress);
+public:
+	void OnSystemAlarmMsg(C_AlmMsg &Msg);
 private:
 	~CAvGui();
 };
@@ -63,6 +81,25 @@ private:
 
 
 
+
+#if defined(_AV_WARE_M_HAVE_UI)
+
+#define _AVGUI_LOADING_MSG(msg, progress)\
+	g_AvGui.LoadingMsg(msg, progress)
+
+#define g_AvGui_Initialize()\
+	g_AvGui.Initialize()
+
+#define g_AvGui_exec()\
+	g_AvGui.exec();
+
+#else
+
+#define _AVGUI_LOADING_MSG(msg, progress)
+#define g_AvGui_Initialize()
+#define g_AvGui_exec()
+
+#endif
 
 
 

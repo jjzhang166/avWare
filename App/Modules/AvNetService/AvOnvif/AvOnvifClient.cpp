@@ -115,6 +115,19 @@ I_RET CAvOnvifClient::RemoteAdvancedSystemSetProfile(int Channel, C_AdvancedSyst
 {
 	return IRet_faild;
 }
+I_RET CAvOnvifClient::RemoteRecordFileSearch(int Channel, C_RecordFileSearch &RecordFileSearch)
+{
+	return IRet_faild;
+}
+I_RET CAvOnvifClient::RemoteRecordFileDownload(int Channel, C_RecordFileDownload &RecordFileDeownload)
+{
+	return IRet_faild;
+}
+I_RET CAvOnvifClient::RemoteRecordFileDownloadCtrl(int Channel, C_RecordFileDownloadCtrl &RecordFileDownloadCtrl)
+{
+	return IRet_faild;
+
+}
 
 
 I_RET CAvOnvifClient::RemoteFactoryInfoGet(C_ManufacturerInfo &ManfacturerInfo)
@@ -149,6 +162,14 @@ I_RET CAvOnvifClient::RemoteStreamStop(int Channel, int Slave)
 	return IRet_faild;
 }
 I_RET CAvOnvifClient::RemoteSendAvPacket(int Channel, int Slave, CAvPacket *pack)
+{
+	return IRet_faild;
+}
+I_RET CAvOnvifClient::RemoteSendAlarmMsg(C_AlmMsg &AlmMsg)
+{
+	return IRet_faild;
+}
+I_RET CAvOnvifClient::RemoteGetAlarmMsg(C_AlmMsg &AlmMsg)
 {
 	return IRet_faild;
 }

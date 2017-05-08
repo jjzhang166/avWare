@@ -19,8 +19,9 @@
 #include "AvNetService/AvWeb.h"
 #include "AvNetService/AvDdnsCli.h"
 #include "AvNetService/AvNtpCli.h"
-//#include "AvProtocol/Moon/AvMoon.h"
+#include "AvNetService/AvHttpSearch.h"
 #include "AvNetService/AvProtoMoon.h"
+#include "AvConfigs/AvConfigManagerNetWork.h"
 #include "Rtsp/LibRtspClient.h"
 
 
@@ -87,6 +88,8 @@ av_bool CAvNetService::Start()
 	ret = g_AvRtspServer.Start();
 	ret = g_AvWebSer.Start();
 
+	g_HttpSearchServer.Start();
+
 	{
 		AvRtmp *pRtmp = NULL;
 		std::string RtmpUrl;
@@ -113,6 +116,7 @@ av_bool CAvNetService::Stop()
 	ret = g_AvOnvifSer.Stop();
 	ret = g_AvRtspServer.Stop();
 	ret = g_AvWebSer.Stop();
+	g_HttpSearchServer.Stop();
 	return ret;
 }
 av_bool CAvNetService::Restart()

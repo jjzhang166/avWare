@@ -24,11 +24,6 @@
 #include "AvProtocol/AvNetProto.h"
 
 
-typedef enum{
-	ARGS_GET,
-	ARGS_SET,
-}ARGS_M;
-
 class Capture:public CThread
 {
 public:
@@ -55,39 +50,39 @@ public:
 
 	virtual EAvCaptureStatus GetCaptureStatus(av_int Slave = -1) = 0;
 
-
+	
 
 
 public:
-	virtual av_bool CaptureGetCaps		(C_CaptureCaps &CaptureCaps) = 0;
-	virtual av_bool CaptureGetProfile	(C_CaptureProfile &CaptureProfile) = 0;
-	virtual av_bool CaptureSetProfile	(C_CaptureProfile &CaptureProfile) = 0;
+	virtual av_bool CaptureGetCaps				(C_CaptureCaps &CaptureCaps) = 0;
+	virtual av_bool CaptureGetProfile			(C_CaptureProfile &CaptureProfile) = 0;
+	virtual av_bool CaptureSetProfile			(C_CaptureProfile &CaptureProfile) = 0;
 
-	virtual av_bool EncodeGetCaps		(C_EncodeCaps &EncodeCaps) = 0;
-	virtual av_bool EncodeGetProfile	(int Slave, C_EnCodeProfile &EnCodeProfile) = 0;
-	virtual av_bool EncodeSetProfile	(int Slave, C_EnCodeProfile &EnCodeProfile) = 0;
+	virtual av_bool EncodeGetCaps				(C_EncodeCaps &EncodeCaps) = 0;
+	virtual av_bool EncodeGetProfile			(int Slave, C_EnCodeProfile &EnCodeProfile) = 0;
+	virtual av_bool EncodeSetProfile			(int Slave, C_EnCodeProfile &EnCodeProfile) = 0;
 
-	virtual av_bool AudioGetCaps		(C_AudioCaps &AudioCaps) = 0;
-	virtual av_bool AudioGetProfile		(C_AudioProfile &AudioProfile) = 0;
-	virtual av_bool AudioSetProfile		(C_AudioProfile &AudioProfile) = 0;
+	virtual av_bool AudioGetCaps				(C_AudioCaps &AudioCaps) = 0;
+	virtual av_bool AudioGetProfile				(C_AudioProfile &AudioProfile) = 0;
+	virtual av_bool AudioSetProfile				(C_AudioProfile &AudioProfile) = 0;
 
-	virtual av_bool ImageGetCaps		(C_ImageCaps &ImageCaps) = 0;
-	virtual av_bool ImageGetProfile		(C_ImageProfile &ImageProfile) = 0;
-	virtual av_bool ImageSetProfile		(C_ImageProfile &ImageProfile) = 0;
+	virtual av_bool ImageGetCaps				(C_ImageCaps &ImageCaps) = 0;
+	virtual av_bool ImageGetProfile				(C_ImageProfile &ImageProfile) = 0;
+	virtual av_bool ImageSetProfile				(C_ImageProfile &ImageProfile) = 0;
 
-	virtual av_bool PtzGetCaps			(C_PtzCaps &PtzCaps) = 0;
-	virtual av_bool PtzGetProfile		(C_PtzProfile &PtzProfile) = 0;
-	virtual av_bool PtzSetProfile		(C_PtzProfile &PtzProfile) = 0;
-	virtual av_bool PtzSetCommand		(C_PtzCmd &PtzCmd) = 0;
+	virtual av_bool PtzGetCaps					(C_PtzCaps &PtzCaps) = 0;
+	virtual av_bool PtzGetProfile				(C_PtzProfile &PtzProfile) = 0;
+	virtual av_bool PtzSetProfile				(C_PtzProfile &PtzProfile) = 0;
+	virtual av_bool PtzSetCommand				(C_PtzCmd &PtzCmd) = 0;
 
 	virtual av_bool AdvancedSystemGetCaps		(C_AdvancedSystemCaps &AdvancedSystemCaps) = 0;
 	virtual av_bool AdvancedSystemGetProfile	(C_AdvancedSystemProfile &AdvancedSystemProfile) = 0;
 	virtual av_bool AdvancedSystemSetProfile	(C_AdvancedSystemProfile &AdvancedSystemProfile) = 0;
 
 
-	virtual av_bool StartNetCapture		(CAvNetProto *Handle);
-	virtual av_bool StopNetCapture		();
-	virtual CAvNetProto *AvNetProtoHandle();
+	virtual av_bool StartNetCapture				(CAvNetProto *Handle);
+	virtual av_bool StopNetCapture				();
+	virtual CAvNetProto *AvNetProtoHandle		();
 
 	virtual CAvPacket * Snapshot(av_bool bRealTime = av_false, av_uint SnapshotInterval = 0, av_uint ContinuousTimes = 0) = 0;
 protected:

@@ -38,7 +38,9 @@
 							{
 							 "id":"ID_BoxMainTag_NetSet","listId":"ID_SubNetInfo","selectype":false,
 										"SubTag":[	/*{"id":"ID_TagNetBaseInfo","selectype":false},*/
-													{"id":"ID_TagRtmp","selectype":false,"ContentId":"ID_ContentRtmp","Initfun":InitRtmpUi}
+													{"id":"ID_TagRtmp","selectype":false,"ContentId":"ID_ContentRtmp","Initfun":InitRtmpUi},
+													{"id":"ID_TagFTP","selectype":false,"ContentId":"ID_ContentFTP","Initfun":InitFTPUi},
+													{"id":"ID_TagWifi","selectype":false,"ContentId":"ID_ContentWifi","Initfun":InitWifiUi}
 												]
 							}
 						]};
@@ -171,6 +173,8 @@
 		SetVedioEncodeConfig(0,0);
 		SetVedioEncodeConfig(0,1);
 	}
+	
+	
 </script>
 <style type="text/css">
  /*页面*/
@@ -345,8 +349,10 @@
 					<div class="boxMainTag" id="ID_BoxMainTag_NetSet" onclick="SetObjdisplayBlock(this)" >网络设置</div>
 					<div id="ID_SubNetInfo" class="boxSubTable">
 					<!--	<div class="boxSubTag" id="ID_TagNetBaseInfo" onclick="OnclickEventSubTag(this)"  onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">基本信息</div> -->
-						<div class="boxSubTag" id="ID_TagRtmp" onclick="OnclickEventSubTag(this)"  onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">RTMP</div>
-					</div>
+						<div class="boxSubTag" id="ID_TagRtmp" onclick="OnclickEventSubTag(this)"  onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">RTMP</div>				
+						<div class="boxSubTag" id="ID_TagFTP" onclick="OnclickEventSubTag(this)"  onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">FTP</div>
+						<div class="boxSubTag" id="ID_TagWifi" onclick="OnclickEventSubTag(this)"  onmouseover="OnmouseOverEventSubTag(this)" onmouseout="OnmouseOutEventSubTag(this)">Wifi</div>
+					</div>					
 				</li>				
 			</ul>
 		</div>
@@ -463,6 +469,54 @@
 				</div>
 				<input  class="boxMidleUiSubmitButtonMidle" type="button" onclick="RtmpSubmit()" value="提交"/>
 			</div>
+			<div class = "boxMidleContent" id="ID_ContentFTP">
+				<div style="width:50%;height:170px;">
+					<div class="boxMidleUiHeadNbspLine"></div>
+					<div class="boxMidleFontDiv">使能:</div>
+					<input class="boxMidleUiCheckbox" id="ID_FTPEnable" type="checkbox"/>
+					<div class="boxMidleFontDiv" >服务地址:</div>
+					<input class="boxMidleUiDiv" id="ID_FTPServerAddr"/>
+					<div class="boxMidleFontDiv" >端口:</div>
+					<input class="boxMidleUiDiv" id="ID_FTPServerPort" style="margin-top:3px;" />
+					<div class="boxMidleFontDiv"  >上传路径:</div>
+					<input class="boxMidleUiDiv" id="ID_FTPDir" style="margin-top:3px;"/>
+					<div class="boxMidleFontDiv" >用户名:</div>
+					<input class="boxMidleUiDiv" id="ID_FTPUsrName" style="margin-top:3px;"/>	
+					<div class="boxMidleFontDiv" >密码:</div>
+					<input class="boxMidleUiDiv" id="ID_FTPPassWord" type="password" style="margin-top:3px;"/>	
+				</div>
+				<input  class="boxMidleUiSubmitButtonMidle" type="button" onclick="FTPSubmit()" value="提交"/>
+			</div>
+			<div class = "boxMidleContent" id="ID_ContentWifi">
+				<div style="width:50%;height:170px;">
+					<div class="boxMidleUiHeadNbspLine"></div>
+					<div class="boxMidleFontDiv">使能:</div>
+					<input class="boxMidleUiCheckbox" id="ID_WifiEnable" type="checkbox" />
+					<div class="boxMidleFontDiv" >模式:</div>
+					<select class="boxMidleUiDiv" id="ID_WIFIState" onchange="WifiModeOnchange(this)">
+						<option value="0" >AP</option>
+						<option value="1" selected>Station</option>
+					</select>
+					<div class="boxMidleFontDiv" >SSID:</div>
+					<input class="boxMidleUiDiv" id="ID_WIFISSID"/>
+					<input class="boxMidleUiDiv" id="ID_APSSID" style="display:none" />
+					<div class="boxMidleFontDiv" >密钥:</div>
+					<input class="boxMidleUiDiv" id="ID_WIFIPW" style="margin-top:3px;" type="password"/>
+					<input class="boxMidleUiDiv" id="ID_APPW" style="display:none" />
+					
+					<div style="display:none;" id="ID_WifiStationInput">
+					<div class="boxMidleFontDiv">DHCP:</div>
+					<input class="boxMidleUiCheckbox" id="ID_WifiDhcp" type="checkbox" onchange="WifiDhcpOnchange(this);"/>
+					<div class="boxMidleFontDiv">IP:</div>
+					<input class="boxMidleUiDiv" id="ID_WifiIPAddr"  disabled="disabled"/>
+					<div class="boxMidleFontDiv" >网关:</div>
+					<input class="boxMidleUiDiv" id="ID_WifiGetWay" disabled="disabled" />
+					<div class="boxMidleFontDiv" >子网掩码:</div>
+					<input class="boxMidleUiDiv" id="ID_WifiMask" disabled="disabled" />
+					</div>
+				</div>
+				<input  class="boxMidleUiSubmitButtonMidle" type="button" onclick="WifiSubmit()" value="提交"/>
+			</div>		
 		</div>
 		<div id="ID_BoxBottom"></div>
 	</div>

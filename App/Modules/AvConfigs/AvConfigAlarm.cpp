@@ -31,7 +31,7 @@ template<> void ProcessValue<ConfigAlarmProfile>(CAvConfigBase &ConfBase, AvConf
 
 	AvConfigValue &MotionDetectionConfTable = ConfValue["MotionDetectionConfTable"];
 	for (int i = 0; i < ConfMotionDetectionLine; i++){
-		ConfBase.Process("AlarmMotionArea", MotionDetectionConfTable[i], AlarmProfile.AlarmMotionArea[i], 0, 0, (0x01 << ConfMotionDetectionLine) -1);
+		ConfBase.Process("AlarmMotionArea", MotionDetectionConfTable[i], AlarmProfile.AlarmMotionArea[i], 0, 0, (0x01 << 22) -1);
 	}
 
 	AvConfigValue &DaySpanTable = ConfValue["DaySpanTable"];

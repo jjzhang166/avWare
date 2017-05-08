@@ -4,13 +4,13 @@
 |
 |  版本: 1.0
 |  作�? Knight [knight@graceport.cn]
-|  日期: 2016�?�?�
+|  日期: 2016�?�?�?
 |  说明:
 |
 |  版本: 1.1
 |  作�?
 |  日期:
-|  说明:此文件是用来表述AvWare 属性�
+|  说明:此文件是用来表述AvWare 属性�?
 ******************************************************************/--]]
 
 avWare_default_hostname = "avWare";
@@ -44,13 +44,13 @@ MapPlatformConfigs =
 	["H21"] 			= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
 	["H35"] 			= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
 	["H36"] 			= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
-	["HNVR_RES_1"] 		= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
+	["H3798MV100"] 		= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
 	["HNVR_RES_2"] 		= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
-	["A22M"] 			= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
-	["A33M"] 			= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
-	["A55M"] 			= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
-	["A65"] 			= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
-	["A66"] 			= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
+	["S2L22M"] 			= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
+	["S2L33M"] 			= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
+	["S2L55M"] 			= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
+	["S2L65"] 			= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
+	["S2L66"] 			= {"/mnt/AvRecord", "/appex/configs",  "/app/webroot", "login.html"},
 	["WINDOWS_32"] 		= {"D:\\AvRecord",  "./configs",  	   "./webroot",    "login.html"},
 	["WINDOWS_64"] 		= {"D:\\AvRecord",  "./configs",  	   "./webroot",    "login.html"},
 	["LINUX_32"] 		= {"/mnt/AvRecord", "./configs", 	   "./webroot",    "login.html"},

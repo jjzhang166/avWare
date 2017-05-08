@@ -15,7 +15,7 @@ DlgNetSet::DlgNetSet(QWidget *parent) :
 
 
 	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
-	this->setAttribute(Qt::WA_DeleteOnClose);
+	//this->setAttribute(Qt::WA_DeleteOnClose);
 
 	IconComm::Instance()->SetIcon(ui->BtnClose, QChar(0xf00d), 10);
 	IconComm::Instance()->SetIcon(ui->BtnMax, QChar(0xf096), 10);
@@ -44,7 +44,7 @@ void DlgNetSet::SetModifyDeviceList(std::list<C_DevSearch> &ModifyList)
 		m_TviewDeviceTableModel->setItem(i, 1, new QStandardItem(QString(ilist->DevStatusInfo.DeviceName)));
 		m_TviewDeviceTableModel->setItem(i, 2, new QStandardItem(QString(ilist->NetWorkProfile.Mac)));
 		QIcon icon(":/image/info.png");
-		m_TviewDeviceTableModel->setItem(i, 3, new QStandardItem(icon, QString("Wait")));
+		m_TviewDeviceTableModel->setItem(i, 3, new QStandardItem(icon, QString(tr("Wait For Modify"))));
 		i++;
 	}
 
@@ -90,10 +90,10 @@ void DlgNetSet::FixDlgUi()
 	}
 	m_TviewDeviceTableModel = new QStandardItemModel;
 	m_TviewDeviceTableModel->setColumnCount(4);
-	m_TviewDeviceTableModel->setHeaderData(0, Qt::Horizontal, "Nu");
-	m_TviewDeviceTableModel->setHeaderData(1, Qt::Horizontal, "DevName");
-	m_TviewDeviceTableModel->setHeaderData(2, Qt::Horizontal, "StrMac");
-	m_TviewDeviceTableModel->setHeaderData(3, Qt::Horizontal, "status");
+	m_TviewDeviceTableModel->setHeaderData(0, Qt::Horizontal, tr("Nu"));
+	m_TviewDeviceTableModel->setHeaderData(1, Qt::Horizontal, tr("DevName"));
+	m_TviewDeviceTableModel->setHeaderData(2, Qt::Horizontal, tr("StrMac"));
+	m_TviewDeviceTableModel->setHeaderData(3, Qt::Horizontal, tr("status"));
 
 
 	ui->TviewDeviceList->setModel(m_TviewDeviceTableModel);

@@ -1,13 +1,8 @@
 #include "AvConfigs/AvConfigManagerGeneral.h"
 #include "AvConfigs/AvConfigIndex.h"
 #include "AvDevice/AvDevice.h"
-#ifdef WIN32
-#define  AvConfigFileName "avWare1.json"
-#define  AvConfigFileNameBak "avWare2.json"
-#else
-#define  AvConfigFileName "avWare1.conf"
-#define  AvConfigFileNameBak "avWare2.conf"
-#endif
+#include "AvConfigs/AvConfigManagerNetWork.h"
+#include "AvConfigs/AvConfigManagerNetCapture.h"
 
 SINGLETON_IMPLEMENT(CAvConfigManagerGeneral);
 
@@ -42,28 +37,13 @@ void CAvConfigManagerGeneral::Initialize()
 	SetUpConfig("Image", m_ConfigImage, CONF_IMAGE_FORMATS);
 
 	SetUpConfig("Enocde", m_ConfigEncode, CONF_ENCODE_FORMATS);
-	/*
-	//for test zh 20170301
-	m_ConfigEncode.Update();
-	ConfigEncodeProfile &Formats = m_ConfigEncode.GetConfig(0);
-	for (int i = CHL_MAIN_T; i < CHL_NR_T; i++) {
-		av_warning("Enable[%d], FrameRate[%d], Gop[%d] ImageSize[%d] BitRateValue[%d]\n",
-			Formats.CHLProfile[i].Enable,
-			Formats.CHLProfile[i].Profile.FrameRate,
-			Formats.CHLProfile[i].Profile.Gop,
-			Formats.CHLProfile[i].Profile.ImageSize,
-			Formats.CHLProfile[i].Profile.BitRateValue);
-	}
-	*/
-	
+
 	SetUpConfig("Cover", m_ConfigCover, CONF_ENCODE_COVER);
 	SetUpConfig("OverLay", m_ConfigOverLay, CONF_ENCODE_OverLay);
 
 	SetUpConfig("Alarm", m_ConfigAlarm, CONF_ALARM);
 
 
-	SetUpConfig("NetComm", m_ConfigNetComm, CONF_NET_COMM);
-	SetUpConfig("NetProtocol", m_ConfigNetProtocol, CONF_NETPROTOCOL);
 
 	SetUpConfig("Audio", m_ConfigAudio, CONF_AUDIO);
 	
@@ -80,6 +60,11 @@ void CAvConfigManagerGeneral::Initialize()
 	SetUpConfig("RecordCtrl", m_config_recordctrl, CONF_RECORDCTRL);
 	SetUpConfig("PtzAdvancedCameraLens", m_config_ptzCameraLens, CONF_PTZADVANCEDCAMERSLENS);
 
+	{
+		CAvConfigManagerNetWork::instance()->Initialize();
+		CAvConfigManagerNetCapture::instance()->Initialize();
+	}
+	
 	if (bLoadConfigFlag == false){
 		av_msg("bLoadConfigFlag == false, save file\n");
 		WriteFile();

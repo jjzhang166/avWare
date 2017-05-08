@@ -7,6 +7,12 @@
 #include "AvForm/dlgdeviceset.h"
 #include "AvGuiSystem.h"
 #include "AvQStandardItem.h"
+#include "AvForm/dlgnetset.h"
+#include "AvForm/dlgupgrade.h"
+#if defined(_AV_WARE_CODE_OPENSOURCE)
+#else
+#include "AvForm/dlgfactoryset.h"
+#endif
 
 namespace Ui {
 class FrmDevice;
@@ -19,21 +25,27 @@ class FrmDevice : public QDialog
 public:
     explicit FrmDevice(QWidget *parent = 0);
     ~FrmDevice();
+
+public:
+	void DlgDeviceSetShow(int ModifyChannel);
 private:
+	void FixViewItem();
 	void resizeEvent(QResizeEvent * event);
+	void showEvent(QShowEvent *e);
 	void DrawItemForSearchView();
 	void DrawItemForLinkView();
 	void DrawItemLinkView();
 
+
+
 	void GetSelectForModiyDevies();
 	void FixDlgUi();
-
 signals:
 	void SignalPreviewStart(int Channel, int Slave, bool bOpen);
 
 private slots:
 	void SlotsSearchTimer();
-	void SlotsInitTimer();
+
 	void SlotsSearchViewRightMenuSelect();
 	void SlotsSearchViewRightMenuSelectAll();
 	void SlotsSearchViewRightMenuSelectOther();
@@ -83,6 +95,12 @@ private slots:
 
 private:
 	DlgDeviceSet *	m_DeviceSet;
+#if defined(_AV_WARE_CODE_OPENSOURCE)
+#else
+	DlgFactorySet * m_FactorySet;
+#endif
+	DlgUpgrade	* m_Upgrade;
+	DlgNetSet	* m_NetSet;
 
 	std::list<C_DevSearch> m_DeviceList;
 	std::list<C_DevSearch> m_ForModifyDeviceList;
@@ -105,6 +123,7 @@ private:
     bool						m_WidowsMax;
 	QRect						m_localRect;
 	int							m_SearchTimerCnt;
+	bool						m_bSearching;
 
 };
 

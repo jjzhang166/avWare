@@ -12,8 +12,7 @@
 #define _AVCONFIG_MANAGER_GENERAL_H_
 
 #include "AvConfigs/AvConfigManagerBase.h"
-
-#include "AvConfigs/AvConfigUserManager.h"
+#include "AvConfigs/AvConfigManagerUser.h"
 #include "AvConfigs/AvConfigDevice.h"
 #include "AvConfigs/AvConfigNetService.h"
 #include "AvConfigs/AvConfigCapture.h"
@@ -35,12 +34,12 @@ private:
 	CAvConfigCover					m_ConfigCover;
 	CAvConfigOverLay				m_ConfigOverLay;
 	CAvConfigAlarm					m_ConfigAlarm;
-	CAvConfigNetComm				m_ConfigNetComm;
-	CAvConfigProtocol				m_ConfigNetProtocol;
+	CAvConfigCapture				m_ConfigCapture;
+	
 	CAvConfigImage					m_ConfigImage;
 	CAvConfigAudio					m_ConfigAudio;
 
-	CAvConfigCapture				m_ConfigCapture;
+
 
 	CAvConfigUart					m_config_device_uart;
 	CAvConfigUserManager			m_config_user_manager;

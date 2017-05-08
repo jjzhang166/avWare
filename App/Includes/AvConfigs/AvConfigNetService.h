@@ -24,14 +24,8 @@
 #include "Apis/LibSystem.h"
 #include "AvConfigs/AvConfigTable.h"
 
-#define MAX_CONF_ROUTER_LINK 10
 
 
-
-
-typedef C_LanAttribute ConfigLanAttribute;
-typedef C_BlueToothAttribute ConfigBlueTooth;
-typedef C_SimAttribute	ConfigSimAttribute;
 typedef C_SmtpProfile			ConfigNetSmtp;
 typedef C_FtpProfile			ConfigNetFtp;
 typedef C_DdnsProfile			ConfigNetDdns;
@@ -41,26 +35,6 @@ typedef C_NtpProfile			ConfigNetNtp;
 typedef C_RtspProfile			ConfigNetRtsp;
 typedef C_P2pProfile			ConfigNetP2p;
 
-typedef struct {
-	C_WirelessAttribute RouterLinkInfo[MAX_CONF_ROUTER_LINK];
-}ConfigWirelessAttribute;
-
-
-
-typedef struct {
-	av_bool Enable;//打开或者关闭
-	av_bool Support;//硬件上是否支持
-	NetCommT	type;
-	NetCommGetMode GetMode;
-	char Ifrname[32];
-	union 
-	{
-		ConfigLanAttribute		LanAttr;
-		ConfigBlueTooth			BlueToothAttr;
-		ConfigWirelessAttribute	WirelessAttr;
-		ConfigSimAttribute		SimAttr;
-	};
-}ConfigNetComm;
 
 
 
@@ -73,7 +47,12 @@ typedef TAvConfig<ConfigNetUpnp>	CAvConfigNetUpnp;
 typedef TAvConfig<ConfigNetNtp>		CAvConfigNetNtp;
 typedef TAvConfig<ConfigNetP2p>		CAvConfigNetP2p;
 typedef TAvConfig<ConfigNetRtsp>	CAvConfigNetRtsp;
-typedef TAvConfig<ConfigNetComm, 0, ConfMaxNetComm> CAvConfigNetComm;
-typedef TAvConfig<ConfigRtmp, 0, SYS_CHN_NUM>		CAvConfigRtmp;
+
+typedef TAvConfig<ConfigRtmp,		0, SYS_CHN_NUM>		CAvConfigRtmp;
+
+
+
+
+
 
 #endif

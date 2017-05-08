@@ -8,7 +8,7 @@
 #include "AvForm/dlgoverlay.h"
 //#include "AvForm/ctimearea.h"
 #include "AvForm/dlgtimeselect.h"
-
+#include "AvUiComm/AvUiConfigIni.h"
 typedef enum {
 	TabWidgetDeviceSet_Capture,
 	TabWidgetDeviceSet_Encode,
@@ -48,13 +48,8 @@ DlgDeviceSet::DlgDeviceSet(QWidget *parent) :
 	IconComm::Instance()->SetIcon(ui->BtnMenu, QChar(0xf0c9), 10);
 	IconComm::Instance()->SetIcon(ui->LabIco, QChar(0xf015), 12);
 
-	this->setWindowFlags(Qt::FramelessWindowHint|Qt::Tool | Qt::WindowStaysOnTopHint);
-	this->setAttribute(Qt::WA_DeleteOnClose);
+	this->setWindowFlags(Qt::FramelessWindowHint|Qt::Tool);
 
-
-
-
-	m_TviewRtmpListTableModel = new TableModel;
 	FixDlgUi();
 	ui->StWidgetNetWork->setCurrentIndex(0);
 	ui->TBoxNetWork->setCurrentIndex(0);
@@ -63,11 +58,24 @@ DlgDeviceSet::DlgDeviceSet(QWidget *parent) :
 	FillInVersion();
 
 	m_UiInitedOver = true;
+
+	m_mouseRtmpRightMenu = NULL;
+	m_RtmpItemModelcolumn = -1;
+	m_RtmpItemModelrow = -1;
+	m_RtmpListStandardItemModel = NULL;
+
 	memset(&m_CurrentAudioCaps, 0x00, sizeof(m_CurrentAudioCaps));
 	memset(&m_CurrentAudioProfile, 0x00, sizeof(m_CurrentAudioProfile));
+	memset(&m_AlarmTimeArea, 0x00, sizeof(m_AlarmTimeArea));
+	memset(&m_AlarmMotionArea, 0x00, sizeof(m_AlarmMotionArea));
 }
 
-
+void DlgDeviceSet::SelectModifyChannel(int Channel)
+{
+	QString String;
+	String = String.sprintf("CHN%02d", Channel);
+	ui->CBoxSettingChannel->setCurrentText(String);
+}
 void DlgDeviceSet::FixDlgUi()
 {
 	IconComm::Instance()->SetIcon(ui->BtnNetWorkRTMPAdd, QChar(0xf067), 10);
@@ -87,8 +95,8 @@ void DlgDeviceSet::FixDlgUi()
 	FixDlgUiEncode();
 	FixDlgUiNetWork();
 	FixDlgUiAudio();
-
-	QApplication::sendEvent(this, new QEvent(QEvent::Resize));
+	FixDlgUiRecord();
+	//QApplication::sendEvent(this, new QEvent(QEvent::Resize));
 }
 
 void DlgDeviceSet::FixDlgUiCapture()
@@ -128,26 +136,94 @@ void DlgDeviceSet::FixDlgUiVersion()
 }
 void DlgDeviceSet::FixDlgUiRecord()
 {
+// 	QStringList headers;
+// 	headers.push_back(QString(tr("No")));
+// 	headers.push_back(QString(tr("FileName")));
+// 	headers.push_back(QString(tr("Chn")));
+// 	headers.push_back(QString(tr("Slave")));
+// 	headers.push_back(QString(tr("Length")));
+// 	TableModel *ListTableModel = new TableModel;
+// 	ListTableModel->setHorizontalHeader(headers);
+// 
+// 	ui->TViewRecordFileList->setModel(ListTableModel);
+// 	ui->TViewRecordFileList->setSelectionBehavior(QAbstractItemView::SelectRows);
+// 	ui->TViewRecordFileList->setEditTriggers(QAbstractItemView::NoEditTriggers);
+// 	ui->TViewRecordFileList->setContextMenuPolicy(Qt::CustomContextMenu);
+// 	ui->TViewRecordFileList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
+
+//	QObject::connect((const QObject *)ui->TViewRecordFileList, SIGNAL(resize(int, int)), this, SLOT(SlotsTviewRtmpLinkInfoHorizontalScrollBarRangChanged(int, int)));
+	
+	//emit ListTableModel->layoutChanged();
 }
+
+#define D_RTMPITEMMODEL_HEADSECTION_NO			0
+#define D_RTMPITEMMODEL_HEADSECTION_RTMPURL		1
+#define D_RTMPITEMMODEL_HEADSECTION_CHN			2
+#define D_RTMPITEMMODEL_HEADSECTION_SLAVE		3
+#define D_RTMPITEMMODEL_HEADSECTION_AUDIO		4
+#define D_RTMPITEMMODEL_HEADSECTION_STATUS		5
+#define D_RTMPITEMMODEL_HEADSECTION_TOTAL		6	
+
+
+#define D_RTMP_INI_SECTION			"RTMP"
+#define D_RTMP_INI_KEY_ADDR			"Addr"
+#define D_RTMP_INI_KEY_STRING		"Strings"
+#define D_RTMP_INI_KEY_WITH_AUDIO	"Audio"
+
+
 void DlgDeviceSet::FixDlgUiNetWork()
 {
+	m_RtmpListStandardItemModel = new QStandardItemModel;
+	m_RtmpListStandardItemModel->setColumnCount(D_RTMPITEMMODEL_HEADSECTION_TOTAL);
+	m_RtmpListStandardItemModel->setHeaderData(D_RTMPITEMMODEL_HEADSECTION_NO, Qt::Horizontal, tr("No"));
+	m_RtmpListStandardItemModel->setHeaderData(D_RTMPITEMMODEL_HEADSECTION_RTMPURL, Qt::Horizontal, tr("RtmpUrl"));
+	m_RtmpListStandardItemModel->setHeaderData(D_RTMPITEMMODEL_HEADSECTION_CHN, Qt::Horizontal, tr("Chn"));
+	m_RtmpListStandardItemModel->setHeaderData(D_RTMPITEMMODEL_HEADSECTION_SLAVE, Qt::Horizontal, tr("Slave"));
+	m_RtmpListStandardItemModel->setHeaderData(D_RTMPITEMMODEL_HEADSECTION_AUDIO, Qt::Horizontal, tr("Audio"));
+	m_RtmpListStandardItemModel->setHeaderData(D_RTMPITEMMODEL_HEADSECTION_STATUS, Qt::Horizontal, tr("Status"));
 
-	QStringList headers;
-	headers.push_back(QString(tr("No")));
-	headers.push_back(QString(tr("RtmpUrl")));
-	headers.push_back(QString(tr("Chn")));
-	headers.push_back(QString(tr("Slave")));
-	headers.push_back(QString(tr("Audio")));
-	headers.push_back(QString(tr("Status")));
-	m_TviewRtmpListTableModel->setHorizontalHeader(headers);
-	ui->TviewRtmpLinkInfo->setModel(m_TviewRtmpListTableModel);
+	ui->TviewRtmpLinkInfo->setModel(m_RtmpListStandardItemModel);
 	ui->TviewRtmpLinkInfo->setSelectionBehavior(QAbstractItemView::SelectRows);
 	ui->TviewRtmpLinkInfo->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	ui->TviewRtmpLinkInfo->setContextMenuPolicy(Qt::CustomContextMenu);
-	emit m_TviewRtmpListTableModel->layoutChanged();
+	ui->TviewRtmpLinkInfo->verticalHeader()->hide();
+
 
 	QObject::connect((const QObject *)ui->TviewRtmpLinkInfo->horizontalScrollBar(), SIGNAL(rangeChanged(int, int)), this, SLOT(SlotsTviewRtmpLinkInfoHorizontalScrollBarRangChanged(int, int)));
+	{
+		QVariant Var = CAvUiConfigIni::Instance()->InigetValue(QString(D_RTMP_INI_SECTION), QString(D_RTMP_INI_KEY_ADDR));
+		if (Var.toString().size() != 0){
+			ui->LiEditNetWorkRTMPAddr->setText(Var.toString());
+		}
+		else{
+			ui->LiEditNetWorkRTMPAddr->setText(QString("rtmp://rtmp.pushserver.com/live"));
+		}
+		
+
+		 Var = CAvUiConfigIni::Instance()->InigetValue(QString(D_RTMP_INI_SECTION), QString(D_RTMP_INI_KEY_STRING));
+		 if (Var.toString().size() != 0){
+			 ui->LiEditNetWorkRTMPString->setText(Var.toString());
+		 }
+		 else{
+			 ui->LiEditNetWorkRTMPString->setText(QString("sample"));
+		 }
+
+
+		 Var = CAvUiConfigIni::Instance()->InigetValue(QString(D_RTMP_INI_SECTION), QString(D_RTMP_INI_KEY_WITH_AUDIO));
+		 if (Var.toBool() == true){
+			 ui->CBoxNetWorkRTMPAudio->setChecked(true);
+		 }
+		 else{
+			 ui->CBoxNetWorkRTMPAudio->setChecked(false);
+		 }
+
+		 ui->CBoxNetWorkRTMPStream->clear();
+
+		 ui->CBoxNetWorkRTMPStream->addItem(AvUiLangsCHL(CHL_MAIN_T));
+		 ui->CBoxNetWorkRTMPStream->addItem(AvUiLangsCHL(CHL_SUB1_T));
+	}
+
 
 }
 void DlgDeviceSet::FixDlgUiAlarm()
@@ -165,6 +241,32 @@ void DlgDeviceSet::FixDlgUiLog()
 void DlgDeviceSet::FixDlgPtz()
 {
 
+}
+
+void DlgDeviceSet::ResizeRecord()
+{
+// 
+// 	QSize viewSize = ui->TViewRecordFileList->size();
+// 	int TviewWidth = viewSize.width();
+// 	TviewWidth = 550;
+// 	AvQDebug("Size [%d, %d]\n", viewSize.width(), viewSize.height());
+// 	ui->TViewRecordFileList->setColumnWidth(0, 0.1*TviewWidth);
+// 	ui->TViewRecordFileList->setColumnWidth(1, 0.55*TviewWidth);
+// 	ui->TViewRecordFileList->setColumnWidth(2, 0.075*TviewWidth);
+// 	ui->TViewRecordFileList->setColumnWidth(3, 0.075*TviewWidth);
+// 	ui->TViewRecordFileList->setColumnWidth(4, 0.2*TviewWidth);
+}
+
+void DlgDeviceSet::ResizeNetWorkRtmp()
+{
+	QSize viewSize = ui->TviewRtmpLinkInfo->viewport()->size();
+	int TviewWidth = viewSize.width() + 3;
+	ui->TviewRtmpLinkInfo->setColumnWidth(D_RTMPITEMMODEL_HEADSECTION_NO,		0.08*TviewWidth);
+	ui->TviewRtmpLinkInfo->setColumnWidth(D_RTMPITEMMODEL_HEADSECTION_RTMPURL,	0.55*TviewWidth);
+	ui->TviewRtmpLinkInfo->setColumnWidth(D_RTMPITEMMODEL_HEADSECTION_CHN,		0.07*TviewWidth);
+	ui->TviewRtmpLinkInfo->setColumnWidth(D_RTMPITEMMODEL_HEADSECTION_SLAVE,	0.10*TviewWidth);
+	ui->TviewRtmpLinkInfo->setColumnWidth(D_RTMPITEMMODEL_HEADSECTION_AUDIO,	0.10*TviewWidth);
+	ui->TviewRtmpLinkInfo->setColumnWidth(D_RTMPITEMMODEL_HEADSECTION_STATUS,	0.10*TviewWidth);
 }
 
 void DlgDeviceSet::FillInCapture()
@@ -187,6 +289,53 @@ void DlgDeviceSet::FillInCapture()
 	ui->CBoxAnitFlicker->clear();
 	ui->CBoxExposureMode->clear();
 	ui->CBoxWhitBalance->clear();
+	
+	
+	{
+		//wdr
+		ui->CBoxWdr->clear();
+		if (CaptureCaps.WdrModeMask == 0){
+			ui->CBoxWdr->hide();
+			ui->LabWdr->hide();
+			ui->LabWdrValueRegion->hide();
+			ui->LiEditWdrValue->hide();
+		}
+		else{
+			ui->CBoxWdr->show();
+			ui->LabWdr->show();
+			ui->LabWdrValueRegion->show();
+			ui->LiEditWdrValue->show();
+		}
+		for (int i = WdrMode_None; i < WdrMode_Last; i++){
+			if (CaptureCaps.WdrModeMask & AvMask(i)){
+				ui->CBoxWdr->addItem(AvUiLangsWdrMode((WdrMode)i));
+			}
+		}
+	}
+
+	{
+		ui->CBoxShutter->clear();
+		if (CaptureCaps.ShutterModeMask == 0){
+			ui->CBoxShutter->hide();
+			ui->LabShutter->hide();
+			ui->LabShutterValueRegion->hide();
+			ui->LiEditShutter->hide();
+		}
+		else{
+			ui->CBoxShutter->show();
+			ui->LabShutter->show();
+			ui->LabShutterValueRegion->show();
+			ui->LiEditShutter->show();
+		}
+
+		if (CaptureCaps.ShutterModeMask & AvMask(ShutterMode_MaxShutter)){
+
+		}
+		else{
+			ui->LabShutterValueRegion->hide();
+			ui->LiEditShutter->hide();
+		}
+	}
 	for (int i = IrCutMode_NONE; i < IrCutMode_LAST; i++){
 		if (CaptureCaps.IrCutMask & AvMask(i)){
 			ui->CBoxIrCut->addItem(AvUiLangsIrCutMode((IrCutMode)i));
@@ -269,6 +418,12 @@ void DlgDeviceSet::FillInCapture()
 
 	ui->CBoxWhitBalance->setCurrentText(AvUiLangsWhiteBalanceMode(CaptureProfile.WhiteBalance));
 	ui->LiEditWhitBalanceCustom->setText(QString::number(CaptureProfile.WhiteBalanceValue));
+
+	ui->CBoxWdr->setCurrentText(AvUiLangsWdrMode(CaptureProfile.Wdr));
+	ui->LiEditWdrValue->setText(QString::number(CaptureProfile.WdrValue));
+
+	ui->CBoxShutter->setCurrentText(AvUiLangsShutterMode(CaptureProfile.Shutter));
+	ui->LiEditShutter->setText(QString::number(CaptureProfile.ShutterMax));
 
 	if (CaptureProfile.MirrorMaskValue & AvMask(MirrorMode_HOR)){
 		ui->CBoxHorizontal->setChecked(true);
@@ -924,7 +1079,14 @@ void DlgDeviceSet::FillInNetWorkNetSet()
 		ui->CBoxNetWorkGetMode->clear();
 		ui->CBoxNetWorkGetMode->addItem(AvUiLangsNetCommGetMode(NetWorkProfile.NetGetType));
 		ui->LiEditNetWorkIpV4Addr->setText(QString(NetWorkProfile.Ipv4));
-		ui->LiEditNetWorkIpV6Addr->setText(QString(NetWorkProfile.Ipv6));
+		
+		if (strlen(NetWorkProfile.Ipv6) == 0){
+			ui->LiEditNetWorkIpV6Addr->hide();
+			ui->LabNetWorkIpV6Addr->hide();
+		}
+		else{
+			ui->LiEditNetWorkIpV6Addr->setText(QString(NetWorkProfile.Ipv6));
+		}
 		ui->LiEditNetWorkGateWay->setText(QString(NetWorkProfile.GateWay));
 		ui->LiEditNetWorkSubMask->setText(QString(NetWorkProfile.SubMask));
 		ui->LiEditNetWorkDns1->setText(QString(NetWorkProfile.DnsI));
@@ -1207,15 +1369,70 @@ void DlgDeviceSet::FillInNetWorkP2P()
 
 void DlgDeviceSet::FillInNetWorkRTMP()
 {
+
 	Capture *pCapture = GetChannelHandle();
 	if (pCapture == NULL){
 		return;
 	}
 
 	C_AdvancedSystemProfile AdvancedSystemProfile;
-	C_NetWorkProfile &NetWorkProfile = AdvancedSystemProfile.NetWorkProfile;
+	C_RtmpProfile &RtmpProfile = AdvancedSystemProfile.RtmpProfile;
+	C_AdvancedSystemCaps AdvancedSystemCaps;
+	C_DeviceCaps  &DeviceCaps = AdvancedSystemCaps.DspCaps;
+	AdvancedSystemCaps._msg = __MsgDspCaps;
+	pCapture->AdvancedSystemGetCaps(AdvancedSystemCaps);
+	m_DeviceMaxChannels = DeviceCaps.nMaxDecodeChannel + DeviceCaps.nMaxEncodeChannel;
+	ui->CBoxNetWorkRTMPChannel->clear();
+	QString  String;
+
+	for (int i = 0; i < m_DeviceMaxChannels; i++){
+		String.clear();
+		String += tr("CHN");
+		String += QString::number(i + 1);
+		ui->CBoxNetWorkRTMPChannel->addItem(String);
+	}
+
 	AdvancedSystemProfile._msg = __MsgRtmpProfile;
 	pCapture->AdvancedSystemGetProfile(AdvancedSystemProfile);
+
+	m_RtmpNodeProfileList = RtmpProfile.RtmpNodeProfileList;
+	DrawRtmpConfigTableView();
+
+}
+
+void DlgDeviceSet::DrawRtmpConfigTableView()
+{
+
+	std::list<C_RtmpNodeProfile>::iterator iList;
+	int i = 0;
+	QString Strings;
+	m_RtmpListStandardItemModel->removeRows(0, m_RtmpListStandardItemModel->rowCount());
+	for (iList = m_RtmpNodeProfileList.begin(); iList != m_RtmpNodeProfileList.end(); iList++, i++){
+		m_RtmpListStandardItemModel->setItem(i, D_RTMPITEMMODEL_HEADSECTION_NO, new QStandardItem(QString::number(i + 1)));
+		m_RtmpListStandardItemModel->item(i, D_RTMPITEMMODEL_HEADSECTION_NO)->setCheckable(true);
+		Strings.clear();
+		Strings = Strings.sprintf("%s/%s", iList->PushServer, iList->PushStrings);
+		m_RtmpListStandardItemModel->setItem(i, D_RTMPITEMMODEL_HEADSECTION_RTMPURL, new QStandardItem(Strings));
+		m_RtmpListStandardItemModel->setItem(i, D_RTMPITEMMODEL_HEADSECTION_CHN, new QStandardItem(QString::number(iList->PushChannel)));
+		Strings.clear();
+		if (iList->PushStream == CHL_MAIN_T){
+			Strings = QString(tr("Main"));
+		}
+		else{
+			Strings = QString(tr("Sub"));
+		}
+		m_RtmpListStandardItemModel->setItem(i, D_RTMPITEMMODEL_HEADSECTION_SLAVE, new QStandardItem(Strings));
+		Strings.clear();
+		if (av_true == iList->bEnableAudio){
+			Strings = QString(tr("WithAudio"));
+		}
+		else{
+			Strings = QString(tr("WithoutAudio"));
+		}
+		m_RtmpListStandardItemModel->setItem(i, D_RTMPITEMMODEL_HEADSECTION_AUDIO, new QStandardItem(Strings));
+		QIcon icon(":/image/info.png");
+		m_RtmpListStandardItemModel->setItem(i, D_RTMPITEMMODEL_HEADSECTION_STATUS, new QStandardItem(icon, QString("")));
+	}
 }
 void DlgDeviceSet::FillInNetWorkNTP()
 {
@@ -1336,6 +1553,19 @@ void DlgDeviceSet::SubmitCapture()
 		CaptureProfile.bOpenCvbs = av_false;
 	}
 
+	for (int i = WdrMode_None; i < WdrMode_Last; i++){
+		if (ui->CBoxWdr->currentText() == AvUiLangsWdrMode((WdrMode)i)){
+			CaptureProfile.Wdr = (WdrMode)i;
+		}
+	}
+	CaptureProfile.WdrValue = ui->LiEditWdrValue->text().toInt();
+
+	for (int i = ShutterMode_None; i < ShutterMode_Last; i++){
+		if (ui->CBoxShutter->currentText() == AvUiLangsShutterMode((ShutterMode)i)){
+			CaptureProfile.Shutter = (ShutterMode)i;
+		}
+	}
+	CaptureProfile.ShutterMax = ui->LiEditShutter->text().toInt();
 
 	av_bool bRet = av_false;
 	bRet = pCapture->CaptureSetProfile(CaptureProfile);
@@ -1577,7 +1807,7 @@ void DlgDeviceSet::SubmitAlarm()
 	}
 
 	C_AdvancedSystemProfile AdvancedSystemProfile;
-	memset(&AdvancedSystemProfile, 0x00, sizeof(C_AdvancedSystemProfile));
+	//memset(&AdvancedSystemProfile, 0x00, sizeof(C_AdvancedSystemProfile));
 	AdvancedSystemProfile._msg = __MsgAlarmProfile;
 	C_AlarmProfile &AlarmProfile = AdvancedSystemProfile.AlarmProfile;
 	if (true == ui->CBoxAlmEnable->isChecked()){
@@ -1769,7 +1999,23 @@ void DlgDeviceSet::SubmitNetWorkP2P()
 }
 void DlgDeviceSet::SubmitNetWorkRTMP()
 {
+	Capture *pCapture = GetChannelHandle();
+	if (pCapture == NULL){
+		return;
+	}
 
+	C_AdvancedSystemProfile AdvancedSystemProfile;
+	C_RtmpProfile &RtmpProfile = AdvancedSystemProfile.RtmpProfile;
+	AdvancedSystemProfile._msg = __MsgRtmpProfile;
+	RtmpProfile.RtmpNodeProfileList = m_RtmpNodeProfileList;
+	av_bool bRet = pCapture->AdvancedSystemSetProfile(AdvancedSystemProfile);
+	if (bRet == av_true){
+
+		CAvUiComm::ShowNotificationBox(QString(tr("Set Rtmp OK")));
+	}
+	else{
+		AvQDebug("AdvancedSystemSetProfile rtmp error\n");
+	}
 }
 void DlgDeviceSet::SubmitNetWorkNTP()
 {
@@ -1778,19 +2024,23 @@ void DlgDeviceSet::SubmitNetWorkNTP()
 
 void DlgDeviceSet::ShowErrorConnectMesageBox()
 {
-	CAvUiComm::ShowMessageBoxError(QString(tr("This Channel does't Connect!")));
+	//CAvUiComm::ShowMessageBoxError(QString(tr("This Channel does't Connect!")));
+	CAvUiComm::ShowNotificationBox(QString(tr("This Channel does't Connect!")));
 }
 void DlgDeviceSet::ShowErrorGetArgs()
 {
-	CAvUiComm::ShowMessageBoxError(QString(tr("Failed to get parameters!")));
+	//CAvUiComm::ShowMessageBoxError(QString(tr("Failed to get parameters!")));
+	CAvUiComm::ShowNotificationBox(QString(tr("Failed to get parameters!")));
 }
 void DlgDeviceSet::ShowSucceedSetArgs()
 {
-	CAvUiComm::ShowMessageBoxInfo(QString(tr("set parameters succeed!")));
+	//CAvUiComm::ShowMessageBoxInfo(QString(tr("set parameters succeed!")));
+	CAvUiComm::ShowNotificationBox(QString(tr("set parameters succeed!")));
 }
 void DlgDeviceSet::ShowErrorSetArgs()
 {
-	CAvUiComm::ShowMessageBoxError(QString(tr("Failed to set parameters!")));
+	//CAvUiComm::ShowMessageBoxError(QString(tr("Failed to set parameters!")));
+	CAvUiComm::ShowNotificationBox(QString(tr("Failed to set parameters!")));
 }
 
 DlgDeviceSet::~DlgDeviceSet()
@@ -1820,7 +2070,8 @@ void DlgDeviceSet::SlotsTviewRtmpLinkInfoHorizontalScrollBarRangChanged(int min,
 
 void DlgDeviceSet::resizeEvent(QResizeEvent * event)
 {
-
+	ResizeRecord();
+	ResizeNetWorkRtmp();
 	AvQDebug("DlgDeviceSet::resizeEvent\n");
 }
 
@@ -1884,12 +2135,44 @@ void DlgDeviceSet::on_TBoxNetWork_currentChanged(int index)
 
 void DlgDeviceSet::on_BtnNetWorkRTMPAdd_clicked()
 {
+	QString RtmpAddr = ui->LiEditNetWorkRTMPAddr->text();
+	QString RtmpString = ui->LiEditNetWorkRTMPString->text();
+	bool bWithAudio = ui->CBoxNetWorkRTMPAudio->isChecked();
+	int  Channel = ui->CBoxNetWorkRTMPChannel->currentIndex();
+	int	 Stream = ui->CBoxNetWorkRTMPStream->currentIndex();
+	{//
+		CAvUiConfigIni::Instance()->InisetValue(QString(D_RTMP_INI_SECTION), QString(D_RTMP_INI_KEY_ADDR), RtmpAddr);
+		CAvUiConfigIni::Instance()->InisetValue(QString(D_RTMP_INI_SECTION), QString(D_RTMP_INI_KEY_STRING), RtmpString);
+		CAvUiConfigIni::Instance()->InisetValue(QString(D_RTMP_INI_SECTION), QString(D_RTMP_INI_KEY_WITH_AUDIO), bWithAudio);
+	}
 
+	
+	C_RtmpNodeProfile NodeProfile;
+	NodeProfile.bEnable = av_true;
+	NodeProfile.bEnableAudio = bWithAudio == true ? av_true : av_false;
+	NodeProfile.PushChannel = Channel;
+	NodeProfile.PushStream = Stream;
+	sprintf(NodeProfile.PushServer, "%s", RtmpAddr.toStdString().c_str());
+	sprintf(NodeProfile.PushStrings, "%s", RtmpString.toStdString().c_str());
+	NodeProfile.RtmpbPushStreamAdaptiveNetSpeed = av_true;
+
+	m_RtmpNodeProfileList.push_back(NodeProfile);
+	DrawRtmpConfigTableView();
 }
 
 void DlgDeviceSet::on_BtnNetWorkRTMPDel_clicked()
 {
+	std::list<C_RtmpNodeProfile>::iterator iList;
+	int i = 0;
+	for (iList = m_RtmpNodeProfileList.begin(); iList != m_RtmpNodeProfileList.end(); i++){
+		if (m_RtmpListStandardItemModel->item(i, D_RTMPITEMMODEL_HEADSECTION_NO)->checkState() == Qt::Checked){
+			iList = m_RtmpNodeProfileList.erase(iList);
+			continue;
+		}
+		iList++;
+	}
 
+	DrawRtmpConfigTableView();
 }
 
 void DlgDeviceSet::on_GBoxNetWork_RTMP_objectNameChanged(const QString &objectName)
@@ -2545,4 +2828,96 @@ void DlgDeviceSet::on_CBoxAlmEnable_clicked(bool checked)
 	ui->CBoxAlmLinkageSnapshort->setCheckable(enable);
 	ui->CBoxalmPreRcordSecond->setEnabled(enable);
 
+}
+
+void DlgDeviceSet::on_BtnCRecordSetRecordTypeTimeSelect_clicked()
+{
+
+}
+
+
+
+
+
+void DlgDeviceSet::on_CBoxWdr_currentIndexChanged(const QString &arg1)
+{
+	if (arg1 == AvUiLangsWdrMode(WdrMode_Open)){
+		ui->LabWdrValueRegion->show();
+		ui->LiEditWdrValue->show();
+	}
+	else{
+		ui->LabWdrValueRegion->hide();
+		ui->LiEditWdrValue->hide();
+	}
+}
+
+void DlgDeviceSet::on_CBoxShutter_currentIndexChanged(const QString &arg1)
+{
+	if (arg1 == AvUiLangsShutterMode(ShutterMode_MaxShutter)){
+		ui->LabShutterValueRegion->show();
+		ui->LiEditShutter->show();
+	}
+	else{
+		ui->LabShutterValueRegion->hide();
+		ui->LiEditShutter->hide();
+	}
+}
+
+void DlgDeviceSet::on_TviewRtmpLinkInfo_customContextMenuRequested(const QPoint &pos)
+{
+	AvQDebug("this is costom menu\n");
+	if (NULL == m_mouseRtmpRightMenu){
+		m_mouseRtmpRightMenu = new QMenu(ui->TviewRtmpLinkInfo->horizontalHeader());
+		m_mouseRtmpRightMenu->addAction(QString(tr("Select")), this, SLOT(SlotsRtmpViewRightMenuSelect()));
+		m_mouseRtmpRightMenu->addSeparator();
+		m_mouseRtmpRightMenu->addAction(QString(tr("SelectAll")), this, SLOT(SlotsRtmpViewRightMenuSelectAll()));
+		m_mouseRtmpRightMenu->addAction(QString(tr("SelectOther")), this, SLOT(SlotsRtmpViewRightMenuSelectOther()));
+	}
+	if (m_RtmpItemModelrow != -1 && m_RtmpListStandardItemModel->rowCount() > 0){
+		m_mouseRtmpRightMenu->exec(QCursor::pos());
+	}
+}
+
+void DlgDeviceSet::on_TviewRtmpLinkInfo_doubleClicked(const QModelIndex &index)
+{
+	m_RtmpItemModelIndex	= index;
+	m_RtmpItemModelrow		= index.row();
+	m_RtmpItemModelcolumn	= index.column();
+
+	if (m_RtmpListStandardItemModel->item(m_RtmpItemModelrow, 0)->checkState() == Qt::Checked){
+		m_RtmpListStandardItemModel->item(m_RtmpItemModelrow, 0)->setCheckState(Qt::Unchecked);
+	}
+	else{
+		m_RtmpListStandardItemModel->item(m_RtmpItemModelrow, 0)->setCheckState(Qt::Checked);
+	}
+}
+
+void DlgDeviceSet::SlotsRtmpViewRightMenuSelect()
+{
+	m_RtmpListStandardItemModel->item(m_RtmpItemModelrow, 0)->setCheckState(Qt::Checked);
+}
+void DlgDeviceSet::SlotsRtmpViewRightMenuSelectAll()
+{
+	for (int i = 0; i < m_RtmpListStandardItemModel->rowCount(); i++){
+		m_RtmpListStandardItemModel->item(i, 0)->setCheckState(Qt::Checked);
+	}
+}
+void DlgDeviceSet::SlotsRtmpViewRightMenuSelectOther()
+{
+	for (int i = 0; i < m_RtmpListStandardItemModel->rowCount(); i++){
+		if (m_RtmpListStandardItemModel->item(i, 0)->checkState() == Qt::Checked){
+			m_RtmpListStandardItemModel->item(i, 0)->setCheckState(Qt::Unchecked);
+		}
+		else{
+			m_RtmpListStandardItemModel->item(i, 0)->setCheckState(Qt::Checked);
+		}
+	}
+}
+
+
+void DlgDeviceSet::on_TviewRtmpLinkInfo_pressed(const QModelIndex &index)
+{
+	m_RtmpItemModelIndex = index;
+	m_RtmpItemModelrow = index.row();
+	m_RtmpItemModelcolumn = index.column();
 }

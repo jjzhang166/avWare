@@ -2,7 +2,7 @@
 #include "AvDevice/AvDevice.h"
 #include "AvConfigs/AvConfigCapture.h"
 #include "Apis/AvWareCplusplus.h"
-
+#include "Apis/AvEnuminline.h"
 #include "AvNetService/AvProtoMoon.h"
 #include "AvNetService/AvOnvifClient.h"
 
@@ -10,6 +10,9 @@
 SINGLETON_IMPLEMENT(CManCapture)
 CManCapture::CManCapture()
 {
+	m_MaxCaptureChannels = 0;
+	m_ManCaptureMap.clear();
+	m_ManCaptureMap.clear();
 
 }
 CManCapture::~CManCapture()
@@ -22,24 +25,40 @@ av_bool CManCapture::Initialize()
 	CAvDevice::GetDspCaps(DspCaps);
 	int i = 0;
 	Capture *pCapture = NULL;
-	//assert(SYS_LOCALCAPTURE_CHN + SYS_REMOTECAPTURE_CHN == SYS_CHN_NUM);
 #if defined(_AV_WARE_M_HAVE_UI_CLOSE_CAPUTRE)
 	DspCaps.nMaxEncodeChannel = 0;
 #endif
-	for (i = 0; i < DspCaps.nMaxEncodeChannel; i++){
+
+	av_bool bVaildFactoryInfo = av_false;
+	std::string bVaild;
+
+	CAvDevice::GetEnv(std::string(EKey_BvalidFactoryInfo), bVaild);
+	if (bVaild == std::string(EnumNameav_bool(av_true))){
+		bVaildFactoryInfo = av_true;
+	}
+	else{
+		av_error("FactoryInfo is  Invalid Capture Task not Initialize\n");
+	}
+
+	for (i = 0; i < (int)DspCaps.nMaxEncodeChannel; i++){
 		pCapture = new CAvDevCapture;
-		pCapture->Initialize((av_int)i);
+		if (av_true == bVaildFactoryInfo){
+			pCapture->Initialize((av_int)i);
+		}
+		m_ManCaptureMap.insert(std::pair<av_int, Capture*>(i, pCapture));
+	}
+	for (; i < SYS_CHN_NUM; i++){
+		pCapture = new CAvNetCapture;
+		if (av_true == bVaildFactoryInfo){
+			pCapture->Initialize((av_int)i);
+		}
 		m_ManCaptureMap.insert(std::pair<av_int, Capture*>(i, pCapture));
 	}
 
-	for (; i < SYS_CHN_NUM; i++){
-		pCapture = new CAvNetCapture;
-		pCapture->Initialize((av_int)i);
-		m_ManCaptureMap.insert(std::pair<av_int, Capture*>(i, pCapture));
-	}
 	m_MaxCaptureChannels = i;
 	return av_true;
 }
+
 Capture *CManCapture::GetAvCaptureInstance(av_int iChannel)
 {
 	assert(iChannel >= 0);
@@ -99,33 +118,22 @@ av_bool CManCapture::NetCaptureSearchResult(LinkProtocol ProType, std::list<C_De
 
 av_bool CManCapture::NetCaptureAddDevice(int Channel, C_ProtoFormats &ProtoFormats)
 {
-	Capture *pCapture = m_ManCaptureMap[Channel];
-	CAvNetProto *pNetProto = NULL;
-	switch (ProtoFormats.ProtoMode)
-	{
-	case	ProtocolOnvif:
-	{
-		pNetProto = new CAvOnvifClient;
-	}
-		break;
-	case 	ProtocolRtmp:
-		break;
-	case 	ProtocolRtsp:
-		break;
-	case 	ProtocolMoon:
-		pNetProto = new CAvProtoMoon(ProtoFormats);
-		break;
-	default:
-		break;
-	}
-	return pCapture->StartNetCapture(pNetProto);
-	
+	CAvConfigProtocol AvConfigProtocol;
+	AvConfigProtocol.Update();
+	ConfigProtoFormats &ConfigProtocol = AvConfigProtocol.GetConfig(Channel);
+	ConfigProtocol = ProtoFormats;
+	AvConfigProtocol.SettingUp(Channel);
+	return av_true;
 }
 
 av_bool CManCapture::NetCaptureDelDevice(int Channel)
 {
-	Capture *pCapture = m_ManCaptureMap[Channel];
-	return pCapture->StopNetCapture();
+	CAvConfigProtocol AvConfigProtocol;
+	AvConfigProtocol.Update();
+	ConfigProtoFormats &ConfigProtocol = AvConfigProtocol.GetConfig(Channel);
+	ConfigProtocol.IsEnable = av_false;
+	AvConfigProtocol.SettingUp(Channel);
+	return av_true;
 }
 
 av_bool CManCapture::MoonDeviceSetNetProfile(C_NetWorkProfile &NetWorkProfile)
@@ -148,7 +156,7 @@ av_bool CManCapture::NetCaptureProtocolsMask(av_u32 &ProtocolMask)
 }
 int		 CManCapture::NetCaptureGetEmptyChannel()
 {
-	for (int i = 0; i < m_ManCaptureMap.size(); i++){
+	for (int i = 0; i < (int)m_ManCaptureMap.size(); i++){
 		if (m_ManCaptureMap[i]->GetCaptureStatus() == Capture::EAvCapture_STOP){
 			return i;
 		}
@@ -174,6 +182,9 @@ av_bool CManCapture::NetCaptureProtoUpgrade(std::list <C_FirmWareUpgrade> *FirmW
 	C_FirmWareUpgrade LocalFrimWareUpgrade;
 	std::list<C_FirmWareUpgrade>::iterator ilist;
 	for (ilist = FirmWareUpgrade->begin(); ilist != FirmWareUpgrade->end(); ilist++){
+		if (ilist->_status == ProgressStatus_HaveNoRightResource){
+			continue;
+		}
 		sprintf(ProtoFormats.UsrName, ilist->Usrname);
 		sprintf(ProtoFormats.Passwd, ilist->Passwd);
 		sprintf(ProtoFormats.MoonFormats.Url, ilist->IpAddr);
@@ -200,11 +211,17 @@ av_bool CManCapture::NetCaptureProtoUpgradeProgress(std::list <C_FirmWareUpgrade
 	std::list <CAvProtoMoon *>::iterator iProtoList;
 	int Progress;
 	for (ilist = FirmWareUpgrade->begin(), iProtoList = g_CAvProtoMoonUpgrade.begin();
-		ilist != FirmWareUpgrade->end(); ilist++, iProtoList++){
+		ilist != FirmWareUpgrade->end(); ilist++){
 
+		if (ilist->_status == ProgressStatus_HaveNoRightResource){
+			continue;
+		}
+		
 		(*iProtoList)->RemoteFirmWareUpgradeGetProgress(Progress);
 		ilist->_status = (ProgressStatus)((Progress >> 16) & 0xffff);
 		ilist->_value = Progress & 0xff;
+
+		iProtoList++;
 	}
 
 	return av_true;
@@ -213,14 +230,19 @@ av_bool CManCapture::NetCaptureProtoUpgradeProgress(std::list <C_FirmWareUpgrade
 av_bool CManCapture::NetCaptureProtoUpgradeOver()
 {
 	std::list <CAvProtoMoon *>::iterator iProtoList;
-	int Progress;
+//	int Progress;
 	CAvProtoMoon *pAvPrtoMoon;
 	for (iProtoList = g_CAvProtoMoonUpgrade.begin();iProtoList != g_CAvProtoMoonUpgrade.end();){
 		pAvPrtoMoon = *iProtoList;
 		
 		iProtoList = g_CAvProtoMoonUpgrade.erase(iProtoList);
-		delete pAvPrtoMoon;
+		av_error("relase over\n");
+		pAvPrtoMoon->Disconnect();
+//		delete pAvPrtoMoon;
+		//why delete error
+		
 	}
 
 	return av_true;
 }
+

@@ -15,6 +15,24 @@
 #include <string>
 #include "AvConfigs/AvConfigTable.h"
 
+#ifdef WIN32
+#define  AvConfigFileName					"avWare1.json"
+#define  AvConfigFileNameBak				"avWare2.json"
+#define  AvConfigFileNameNetCapture			"avWareNetCapture.json"
+#define  AvConfigFileNameNetCaptureBak		"avWareNetCaptureBk.json"
+#define  AvConfigFileNameNetWork			"avWareNetWork.json"
+#define  AvConfigFileNameNetWorkBak			"avWareNetWorkBk.json"
+#else
+#define  AvConfigFileName					"avWare1.conf"
+#define  AvConfigFileNameBak				"avWare2.conf"
+#define  AvConfigFileNameNetCapture			"avWareNetCapture.conf"
+#define  AvConfigFileNameNetCaptureBak		"avWareNetCaptureBk.conf"
+#define  AvConfigFileNameNetWork			"avWareNetWork.conf"
+#define  AvConfigFileNameNetWorkBak			"avWareNetWorkBk.conf"
+#endif
+
+
+
 class CAvConfigBase;
 class CAvConfigManagerBase:public CAvObject
 {

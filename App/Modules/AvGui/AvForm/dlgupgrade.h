@@ -33,6 +33,7 @@ public:
 private:
 	void FixDlgUpgradeUi();
 	void resizeEvent(QResizeEvent * event);
+	void showEvent(QShowEvent *e);
 Q_SIGNALS:
 	void SignalsDlgClose();
 
@@ -57,18 +58,18 @@ private slots:
 
 	void SlotsTimeout();
 private:
-    Ui::DlgUpgrade *ui;
-	TableModel			* m_TviewDeviceTableModel;
-	ProgressBarDelegate * m_ProgressBar;
-	std::list<C_DevSearch> *m_ModifyList;
+    Ui::DlgUpgrade		*				ui;
+	TableModel			*				m_TviewDeviceTableModel;
+	ProgressBarDelegate *				m_ProgressBar;
+	std::list<C_DevSearch> *			m_ModifyList;
 
-	std::list <C_FirmWareUpgrade>   m_FirmWareUpgradeDevices;
-	std::list <C_FirmwarePacketInfo> m_FirmwareList;
-	QModelIndex         m_FirmwareModelIndex;
-	QStandardItemModel *m_FirmwareStandardItem;
-	QTimer				*m_Timer;
-	unsigned	int		m_TimerCnt;
-
+	std::list <C_FirmWareUpgrade>		m_FirmWareUpgradeDevices;
+	std::list <C_FirmwarePacketInfo>	m_FirmwareList;
+	QModelIndex							m_FirmwareModelIndex;
+	QStandardItemModel *				m_FirmwareStandardItem;
+	QTimer				*				m_Timer;
+	unsigned	int						m_TimerCnt;
+	QString								m_WindowTitle;
 };
 
 #endif // DLGUPGRADE_H

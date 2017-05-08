@@ -41,6 +41,7 @@ public:
 
 public:
 	av_bool DbOpen(const char *DbPath);
+	av_bool DbOpen(av_u32 OpenDaySecond);
 	av_bool DbClose();
 	av_bool DbInsert(RecordFileInfo &FileInfo);
 	av_bool DbUpdate(RecordFileInfo &FileInfo);

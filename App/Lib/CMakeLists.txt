@@ -167,19 +167,6 @@ set(UpnpINC_LIST
 add_library(Upnp STATIC ${UpnpSRC_LIST} ${UpnpINC_LIST})	
 set_property(TARGET Upnp PROPERTY FOLDER "AvLibs")
 
-if (WIN32)
-
-elseif(UNIX)
-include_directories(Dhcp)
-set(DhcpSRC_LIST
-		Dhcp/dhcp.c
-	)
-set(DhcpINC_LIST
-		Dhcp/dhcp.h
-	)
-add_library(Dhcp STATIC ${DhcpSRC_LIST} ${DhcpINC_LIST})
-endif()
-
 include_directories(Ddns)
 set(DdnsSRC_LIST
 		Ddns/Ddns_Enable.c

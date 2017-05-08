@@ -54,9 +54,7 @@ private:
 	av_bool m_login;
 };
 
-
-
-
+av_bool AvFtpSetRemotePath(CAvFtp *pftp, std::string remotePath);
 
 
 #endif

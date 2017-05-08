@@ -12,28 +12,20 @@ include("CMakeConfig.cmake")
 set(SYS_CHN_NUM "64" CACHE STRING "define system Channels")
 option (CMAKE_WITH_UI "Build avWare With Ui On Qt5" OFF)
 option (HAVE_MemPool "use memory pool for stream buffer " OFF)
-option (UI_CLOSE_CAPUTRE "Close Caputre" OFF)
+option (UI_CLOSE_CAPUTRE "Close Caputre" ON)
 
-#人脸检测算??
-option (FaceDetect_LMX "Face Detect" OFF)
 
-#ZhongHao FaceDetect
-
-if (FaceDetect_LMX STREQUAL "ON")
-add_definitions("-DFACE_DETECT")
-endif()
+############################################
+#option (_AV_WARE_M_HAVE_FACE_DETECT "Face Detect" OFF)
+#option (_AV_WARE_M_HAVE_PLATERECOGNITION "Plate Recognition" OFF)
+option (_AV_WARE_CODE_OPENSOURCE "Open Source" ON)
+option (_AV_WARE_CODE_LITE "Lite Version" OFF)
+############################################
 
 
 if (WIN32)
-	#set (COMPILER PC_WIN32)
-	#set (COMPILER PC_LINUX)
-	#set (COMPILER AMBA)
-	#set (COMPILER HISI_16C_18ACE_V100)
-	#set (COMPILER HISI_16C_18E_V200)
-	#set (COMPILER HISI_16AD)
-	#set (COMPILER HISI_3535)
-	
 	option (_AV_WARE_M_HAVE_PROC "use proc" OFF)
+	#option (_AV_WARE_RENDER_BY_POSWINEOWS "Render Windows By Pos" ON)
 	if (COMPILER MATCHES "PC_WIN32")
 		set (CMAKE_QT_PATH ${QT_WIN32_PATH})
 	elseif (COMPILER MATCHES "PC_WIN64")
@@ -43,13 +35,7 @@ if (WIN32)
 	
 elseif (UNIX)
 	option (_AV_WARE_M_HAVE_PROC "use proc" ON)
-	#COMPILER
-	#set (COMPILER PC_LINUX)
-	#set (COMPILER AMBA)
-	#set (COMPILER HISI_16C_18ACE_V100)
-	#set (COMPILER HISI_16C_18E_V200)
-	#set (COMPILER HISI_16AD)
-	#set (COMPILER HISI_3535)
+	
 	
 	set(CMAKE_SYSTEM_NAME Linux)
 	if (COMPILER MATCHES "HISI_16C_18ACE_V100")
@@ -61,31 +47,43 @@ elseif (UNIX)
 		set(SYS_CHN_NUM "1")
 		set (CMAKE_C_COMPILER "arm-hisiv300-linux-gcc")
 		set (CMAKE_CXX_COMPILER "arm-hisiv300-linux-g++")
+		#set (CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4")
+		#set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4")
 	elseif (COMPILER MATCHES "HISI_16C_18E_V200")
 		set(SYS_CHN_NUM "1")
 		set (CMAKE_C_COMPILER "arm-hisiv300-linux-gcc")
 		set (CMAKE_CXX_COMPILER "arm-hisiv300-linux-g++")
 		add_definitions("-DCHIP_ID=0x3518E200")
 	elseif (COMPILER MATCHES "HISI_3535")
-		set(SYS_CHN_NUM "32")
+		set (CMAKE_QT_PATH ${QT_NVR35_PATH})
+		option (_AV_WARE_RENDER_BY_RECT "Render Windows By Rect" ON)
 		set (CMAKE_C_COMPILER "arm-hisiv300-linux-gcc")
 		set (CMAKE_CXX_COMPILER "arm-hisiv300-linux-g++")
 	elseif (COMPILER MATCHES "HISI_3536")
-		set(SYS_CHN_NUM "32")
 		set (CMAKE_QT_PATH ${QT_NVR36_PATH})
-		set (CMAKE_C_COMPILER "arm-hisiv300-linux-gcc")
-		set (CMAKE_CXX_COMPILER "arm-hisiv300-linux-g++")
-		#set (CMAKE_C_COMPILER "arm-hisiv400-linux-gcc")
-		#set (CMAKE_CXX_COMPILER "arm-hisiv400-linux-g++")
+		option (_AV_WARE_RENDER_BY_RECT "Render Windows By Rect" ON)
+		set (CMAKE_C_COMPILER "arm-hisiv400-linux-gcc")
+		set (CMAKE_CXX_COMPILER "arm-hisiv400-linux-g++")
+		#set (CMAKE_C_COMPILER "arm-hisiv300-linux-gcc")
+		#set (CMAKE_CXX_COMPILER "arm-hisiv300-linux-g++")
+
+	elseif (COMPILER MATCHES "HISI_3798M")
+		set (CMAKE_QT_PATH ${QT_NVR3798M_PATH})
+		option (_AV_WARE_RENDER_BY_RECT "Render Windows By Rect" ON)
+		set (CMAKE_C_COMPILER "arm-hisiv400-linux-gcc")
+		set (CMAKE_CXX_COMPILER "arm-hisiv400-linux-g++")
 	elseif (COMPILER MATCHES "AMBA")
 		set(SYS_CHN_NUM "1")
 		set (CMAKE_C_COMPILER "arm-linux-gnueabihf-gcc")
 		set (CMAKE_CXX_COMPILER "arm-linux-gnueabihf-g++")
+		
 	elseif (COMPILER MATCHES "ALLWINNER_A33")
 		set(SYS_CHN_NUM "4")
 		set (CMAKE_C_COMPILER "arm-linux-gnueabi-gcc")
 		set (CMAKE_CXX_COMPILER "arm-linux-gnueabi-g++")
-	elseif (COMPILER MATCHES "LINUX")
+	elseif (COMPILER MATCHES "PC_LIN32")
+
+	elseif (COMPILER MATCHES "PC_LIN64")
 
 	endif()
 endif()
@@ -99,9 +97,14 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(PROJDIR ${CMAKE_CURRENT_SOURCE_DIR})
 set (AVWARE_HOME_DIR ${PROJDIR})
 set (CMAKE_CONFIGURATION_TYPES Debug Release)
-
-
 project (avWare)
+
+
+
+message(STATUS "")
+message(STATUS "-------------------------")
+
+set(CMAKE_BUILD_TYPE ${BUILD_TYPE})
 
 if (WIN32)
 	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
@@ -124,22 +127,32 @@ elseif (UNIX)
 	
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-	if (CMAKE_BUILD_TYPE MATCHES "Release")
-		message("*****Use Build Type ${CMAKE_BUILD_TYPE}")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s -O2 -pipe -fPIC -Wall -MMD -fno-strict-aliasing -fmessage-length=0")
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s -O2 -pipe -fPIC -Wall -MMD -fno-strict-aliasing -fmessage-length=0")
-	elseif (CMAKE_BUILD_TYPE MATCHES "Debug")
-		message("*****Use Build Type ${CMAKE_BUILD_TYPE}")
+	
+	if (${BUILD_TYPE} MATCHES "Release")
+		message("[Top CMakeLists] Use Build Type ${CMAKE_BUILD_TYPE}")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s -O2 -pipe -fPIC -Wall -MMD -fno-strict-aliasing -fmessage-length=0 -Wl,-gc-sections")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s -O2 -pipe -fPIC -Wall -MMD -fno-strict-aliasing -fmessage-length=0 -Wl,-gc-sections")
+	elseif (${BUILD_TYPE} MATCHES "Debug")
+		message("[Top CMakeLists] Use Build Type ${CMAKE_BUILD_TYPE}")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -ggdb -pipe -fPIC -Wall -MMD -fno-strict-aliasing")
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -ggdb -pipe -fPIC -Wall -MMD -fno-strict-aliasing")
 	
-		if (COMPILER MATCHES LINUX)  
+		if (COMPILER MATCHES "PC_LIN32" OR COMPILER MATCHES "PC_LIN64")
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
 			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
 		endif()
 	else()
-		message(FATAL_ERROR "Please use cmake -DCMAKE_BUILD_TYPE=Debug(Release) dir current Type[${CMAKE_BUILD_TYPE}]")
+		message(FATAL_ERROR "Please use cmake -DCMAKE_BUILD_TYPE=Debug(Release) dir current Type[${BUILD_TYPE}]")
 	endif()
+	
+	if (COMPILER MATCHES "PC_LIN32")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+	elseif (COMPILER MATCHES "PC_LIN64")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
+	endif()
+	
 endif()
 	
 add_definitions("-D_AV_WARE_")
@@ -163,17 +176,14 @@ configure_file (
   )
 
 include_directories(${PROJECT_BINARY_DIR})
-message("*****COMPILER USE [${COMPILER}]")
-if (COMPILER MATCHES "PC_LIN32" OR COMPILER MATCHES "PC_LIN64" OR COMPILER MATCHES "PC_WIN32" OR COMPILER MATCHES "PC_WIN64")
-    #add_subdirectory(BspPlatform/PC)
-elseif (COMPILER MATCHES "ALLWINNER_A33")
-    #add_subdirectory(BspPlatform/PlatformBase)
-else()
-    #add_subdirectory(BspPlatform/${COMPILER})
-endif()
+message("[Top CMakeLists]COMPILER USE [${COMPILER}]")
+
 
 add_subdirectory(App)
 
+	message(STATUS "-------------------------")
+	message(STATUS "")
+	
 
 
 ###record for knight

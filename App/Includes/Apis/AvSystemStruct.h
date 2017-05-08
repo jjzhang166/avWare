@@ -11,7 +11,7 @@ typedef struct {
 	av_u32 t_mon;		//实际的月 1-12
 	av_u32 t_day;		//实际的日 1-31
 
-	av_uchar t_week;		//rang 1-7
+	av_uchar t_week;	//rang 1-7
 	av_uchar t_hour;
 	av_uchar t_min;
 	av_uchar t_sec;
@@ -124,15 +124,19 @@ typedef struct {
 typedef C_DspCaps C_DeviceCaps;
 
 typedef struct {
-	av_u32 IrCutMask;
-	av_u32 MirrorMask;
-	av_u32 ExposureMask;
-	C_Region ExposureValueRegion;
-	av_u32 WhiteBalanceMask;
-	C_Region WhiteBalanceValueRegion;
-	av_u32 AntiFlckerMask;
-	C_Region AntiFlckerValueRegion;
-	av_u32 CvbsMask;
+	av_u32      IrCutMask;
+	av_u32      MirrorMask;
+	av_u32      ExposureMask;
+	C_Region    ExposureValueRegion;
+	av_u32      WhiteBalanceMask;
+	C_Region    WhiteBalanceValueRegion;
+	av_u32      AntiFlckerMask;
+	C_Region    AntiFlckerValueRegion;
+	av_u32      CvbsMask;
+	av_u32		WdrModeMask;
+	C_Region	WdrValueRegion;
+	av_u32		ShutterModeMask;
+	C_Region	ShutterMaxRegion;
 }C_CaptureCaps;
 
 typedef struct {
@@ -146,6 +150,11 @@ typedef struct {
 	AntiFlckerMode 		AntiFlcker;
 	av_int 				AntiFlckerValue;
 	av_bool 			bOpenCvbs;
+	WdrMode				Wdr;
+	av_uint				WdrValue;
+	ShutterMode			Shutter;
+	av_uint				ShutterMax;
+
 }C_CaptureProfile;
 
 
@@ -210,6 +219,13 @@ typedef struct {
 	int MaxAlmIn;
 	int MaxAlmOut;
 }C_AlarmCaps;
+
+
+typedef struct{
+	av_u32 Mask;
+}C_IntelligentCaps;
+
+
 
 #endif
 

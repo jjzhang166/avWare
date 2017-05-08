@@ -69,3 +69,16 @@ function PtzDriction(cmd)
 		return ;
 	}
 }
+
+function Snap()
+{
+	var	msg={
+		Channel:0,
+		Slave:0,
+		};
+	var resp = $.sendMsg("SnapSignal",msg);
+	if(false == resp.success){
+		alert("抓拍失败");
+		return ;
+	}
+}

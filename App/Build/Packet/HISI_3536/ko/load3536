@@ -1,0 +1,215 @@
+#!/bin/sh
+# Useage: ./load3536 [ -r|-i|-a ] [ sensor ]
+#         -r : rmmod all modules
+#         -i : insmod all modules
+#    default : rmmod all moules and then insmod them
+
+####################Variables Definition##########################
+
+mem_total=1024;        # 1024M, total mem
+mem_start=0x40000000;  # phy mem start
+
+os_mem_size=512;       # 128M, os mem
+mmz_start=0x60000000;  # mmz start addr
+mmz_size=512M;         # 896M, mmz size
+
+##################################################################
+
+report_error()
+{
+    echo "******* Error: There's something wrong, please check! *****"
+    exit 1
+}
+
+insert_audio()
+{
+    insmod acodec.ko
+    insmod hi3536_aio.ko
+    insmod hi3536_ai.ko
+    insmod hi3536_ao.ko
+    insmod hi3536_aenc.ko
+    insmod hi3536_adec.ko
+#    insmod extdrv/tlv_320aic31.ko 
+    echo "insert audio"
+}
+
+remove_audio()
+{
+ #   rmmod tlv_320aic31.ko
+    rmmod hi3536_adec
+    rmmod hi3536_aenc
+    rmmod hi3536_ao
+    rmmod hi3536_ai
+    rmmod hi3536_aio
+    rmmod acodec
+    echo "remove audio"
+}
+
+
+insert_ko()
+{
+    # pinmux configuration
+    source ./pinmux.sh aic31 > /dev/null
+    #source ./pinmux.sh bt1120_16bit_i2s2 > /dev/null
+    #source ./pinmux.sh bt1120_20bit > /dev/null
+
+    # clock configuration
+    source ./crgctrl.sh > /dev/null
+    
+    # system configuration
+    source ./sysctrl.sh > /dev/null
+
+    # driver load
+    insmod mmz.ko mmz=anonymous,0,$mmz_start,$mmz_size anony=1 || report_error
+    insmod hi_media.ko
+    insmod hiuser.ko
+    insmod hi3536_base.ko
+    insmod hi3536_sys.ko
+    insmod hi3536_vdec.ko
+    insmod hi3536_vfmw.ko 
+    insmod hi3536_jpegd.ko
+    insmod hi3536_tde.ko
+    insmod hi3536_region.ko
+    insmod hi3536_vgs.ko
+    insmod hi3536_viu.ko
+    insmod hi3536_vpss.ko
+    insmod hi3536_vou.ko
+    insmod hifb.ko video="hifb:vram0_size:32400,vram1_size:8100,vram2_size:2160,vram3_size:128,vram4_size:128" softcursor="off"
+    insmod hi3536_hdmi.ko
+
+    insmod hi3536_rc.ko   
+#    insmod hi3536_venc.ko
+    insmod hi3536_chnl.ko 
+    insmod hi3536_h264e.ko
+    insmod hi3536_jpege.ko
+    insmod hi3536_vda.ko  
+    insmod hi3536_ive.ko
+
+    #insmod extdrv/gpioi2c.ko
+    #insmod extdrv/sil9024.ko norm=7   #720P@60fps
+    #insmod extdrv/sil9024.ko norm=9   #1080P@30fps
+  #  insmod extdrv/sil9024.ko norm=12    #1080P@30fps
+    #./i2c_write 0x72 0x64 0x43        
+    #./i2c_write 0x72 0x19 0x00
+    #./i2c_write 0x72 0x63 0x40
+
+    insert_audio
+}
+
+remove_ko()
+{
+    remove_audio
+ #   rmmod sil9024 &> /dev/null
+
+    rmmod hi3536_ive
+    rmmod hi3536_vda
+    rmmod hi3536_jpege
+    rmmod hi3536_h264e
+    rmmod hi3536_chnl
+#  rmmod hi3536_venc
+    rmmod hi3536_rc
+    rmmod hi3536_hdmi
+    rmmod hifb
+    rmmod hi3536_vou
+    rmmod hi3536_vpss
+    rmmod hi3536_viu
+    rmmod hi3536_vgs
+    rmmod hi3536_region
+    rmmod hi3536_tde
+    rmmod gpioi2c.ko &> /dev/null
+    rmmod hi3536_jpegd
+    rmmod hi3536_vfmw
+    rmmod hi3536_vdec
+    rmmod hi3536_sys
+    rmmod hi3536_base
+    rmmod hiuser.ko
+    rmmod hi_media
+    rmmod mmz
+}
+
+load_usage()
+{
+    echo "Usage:  ./load3536 [-option]"
+    echo "options:"
+    echo "    -i                       insert modules"
+    echo "    -r                       remove modules"
+    echo "    -a                       remove modules first, then insert modules"
+    echo "    -osmem os_mem_size       config os mem size [unit: M, default: 64]"
+    echo "    -h                       help information"
+    echo -e "notes: osmem option can't be used when mmz zone partition is enable\n\n"
+    echo -e "for example: ./load3536 -a -osmem 96\n"
+}
+
+calc_mmz_info()
+{
+    mmz_start=`echo "$mem_start $os_mem_size" | 
+    awk 'BEGIN { temp = 0; }
+    {
+        temp = $1/1024/1024 + $2;
+    } 
+    END { printf("0x%x00000\n", temp); }'`
+
+    mmz_size=`echo "$mem_total $os_mem_size" | 
+    awk 'BEGIN { temp = 0; }
+    {
+        temp = $1 - $2;
+    } 
+    END { printf("%dM\n", temp); }'`
+    echo "mmz_start: $mmz_start, mmz_size: $mmz_size"
+}
+
+
+######################parse arg###################################
+b_arg_os_mem=0
+b_arg_insmod=0
+b_arg_remove=0
+
+for arg in $@
+do
+    if [ $b_arg_os_mem -eq 1 ] ; then
+        b_arg_os_mem=0;
+        os_mem_size=$arg;
+
+        if [ -z $os_mem_size ]; then
+            echo "[error] os_mem_size is null"
+            exit;
+        fi
+
+        if [ $os_mem_size -ge $mem_total ] ; then
+            echo "[err] os_mem[$os_mem_size], over total_mem[$mem_total]"
+            exit;
+        fi
+
+        calc_mmz_info;
+    fi
+
+    case $arg in
+        "-i")
+            b_arg_insmod=1;
+            ;;
+        "-r")
+            b_arg_remove=1;
+            ;;
+        "-a") 
+            b_arg_insmod=1;
+            b_arg_remove=1;
+            ;;
+        "-h")
+            load_usage;
+            ;;
+        "-osmem")
+            b_arg_os_mem=1;
+            ;;
+    esac
+done
+#######################parse arg end########################
+
+
+#######################Action###############################
+if [ $b_arg_remove -eq 1 ]; then
+    remove_ko;
+fi
+if [ $b_arg_insmod -eq 1 ]; then
+    insert_ko;
+fi
+

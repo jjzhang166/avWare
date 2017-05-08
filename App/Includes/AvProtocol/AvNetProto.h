@@ -1,7 +1,7 @@
 #ifndef _AVNETPROTO_H_
 #define _AVNETPROTO_H_
 #include "CAvObject.h"
-#include "Signals.h"
+
 #include "Apis/AvWareCplusplus.h"
 #include "AvPacket/AvPacket.h"
 #include "Apis/AvWareStruct.h"
@@ -39,7 +39,7 @@ typedef struct{
 	av_char Passwd[64];
 	av_char CheckAliveAddress[64];//程序自动使用ping 其是否在线
 	E_ProtoMode ProtoMode;
-	union{
+	struct{
 		C_ProtoOnvifFormats OnvifFormats;
 		C_ProtoMoonFormats  MoonFormats;
 		C_ProtoRtmpFormats  RtmpFormats;
@@ -47,7 +47,7 @@ typedef struct{
 	};
 }C_ProtoFormats;
 
-class AVWARE_API CAvNetProto: public CAvObject
+class CAvNetProto: public CAvObject
 {
 public:
 	CAvNetProto(){}
@@ -55,7 +55,7 @@ public:
 		m_ProtoFromats = ProtoFormats;
 	}
 
-	virtual ~CAvNetProto(){};
+	virtual ~CAvNetProto(){ av_error("relase CAvNetProto\n"); };
 public:
 	C_ProtoFormats & ProtoFromats(){
 		return m_ProtoFromats;
@@ -64,7 +64,6 @@ public:
 	virtual I_RET Connect(C_ProtoFormats *Formats = NULL) = 0;
 	virtual I_RET Disconnect() = 0;
 
-	virtual I_RET RemoteDspGetCaps(C_DspCaps &DspCaps) = 0;
 	virtual I_RET RemoteCaptureGetCaps(int Channel, C_CaptureCaps &CaptureCaps) = 0;
 	virtual I_RET RemoteCaptureGetProfile(int Channel, C_CaptureProfile &CaptureProfile) = 0;
 	virtual I_RET RemoteCaptureSetProfile(int Channel, C_CaptureProfile &CaptureProfile) = 0;
@@ -90,6 +89,11 @@ public:
 	virtual I_RET RemoteAdvancedSystemGetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile) = 0;
 	virtual I_RET RemoteAdvancedSystemSetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile) = 0;
 
+	virtual I_RET RemoteRecordFileSearch(int Channel, C_RecordFileSearch &RecordFileSearch) = 0;
+	virtual I_RET RemoteRecordFileDownload(int Channel, C_RecordFileDownload &RecordFileDeownload) = 0;
+	virtual I_RET RemoteRecordFileDownloadCtrl(int Channel, C_RecordFileDownloadCtrl &RecordFileDownloadCtrl) = 0;
+
+
 
 	virtual I_RET RemoteFactoryInfoGet(C_ManufacturerInfo &ManfacturerInfo) = 0;
 
@@ -102,6 +106,8 @@ public:
 	virtual I_RET RemoteStreamStart(int Channel, int Slave) = 0;
 	virtual I_RET RemoteStreamStop(int Channel, int Slave) = 0;
 	virtual I_RET RemoteSendAvPacket(int Channel, int Slave, CAvPacket *pack) = 0;
+	virtual I_RET RemoteSendAlarmMsg(C_AlmMsg &AlmMsg) = 0;
+	virtual I_RET RemoteGetAlarmMsg(C_AlmMsg &AlmMsg) = 0;
 	virtual I_RET RemoteOnAvPacket(int Channel, int Slave, CAvPacket *pack) = 0;
 	virtual CAvPacket * RemoteStreamGet(int Channel, int Slave) = 0;
 

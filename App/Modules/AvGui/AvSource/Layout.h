@@ -38,8 +38,6 @@ typedef struct
  	int right;
  	int top;
  	int bottom;
-
- 	QString filePath;
 } LayoutZone;
 
 typedef QList<LayoutZone> LayoutZoneList;

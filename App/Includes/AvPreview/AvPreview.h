@@ -10,16 +10,19 @@
 
 class CAvPreview:public CAvObject
 {
-
-
-
 public:
 	CAvPreview();
 	~CAvPreview();
 
+
+
 	av_bool Set(unsigned int hWid, int ScreenID);
 	av_bool Start(int Channel, int Slave);
 	av_bool GetChannleSlave(int &Channel, int &Slave);
+	av_uint GetWindowsID();
+	av_int  GetScreenID();
+	C_RECT  &GetWindowsRect();
+
 	av_bool Stop();
 	av_bool Pause(av_bool bPause = av_false);
 	av_bool RenderResize(C_RECT &RenderRect);
@@ -32,7 +35,12 @@ public:
 
 
 public:
-	static  av_void SetSpiltScreen(int SpiltScreenNum);
+	static  E_EncodeCHL					GetShowCHL(av_int Channel);
+	static  av_void						SetSpiltScreen(int SpiltScreenNum);
+	static	av_void						SplitScreenClear(int ScreenID = -1);
+	static  av_uint						m_SpiltScreenNum;
+	static  C_DecodeCaps				m_DecodeCaps;
+
 
 private:
 	av_bool			m_bStatistics;

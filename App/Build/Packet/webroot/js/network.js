@@ -8,7 +8,7 @@
 			var str;
 			message += "\r\n\r\n";
 			//alert(message);
-			//console.log(message);
+			console.log(message);
 			$.ajax({
 				url: "Login.cgi",
 				async: false,
@@ -24,7 +24,7 @@
 				//alert("fail");
 				resp = {success:false,data:""};
 			})		
-			//console.log(resp.data);
+			console.log(resp.data);
 			return resp;
 		},
 		buildMessage: function(cmd, bodyMsg) {

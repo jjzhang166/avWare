@@ -2,30 +2,13 @@
 #include "Apis/LibDecode.h"
 
 #define PreviewStatisticsMs 3000
-// CAvPreview::CAvPreview(unsigned int hWid, int WinId)
-// {
-// 	m_hWid = hWid;
-// 	m_Channel = -1;
-// 	m_Slave = -1;
-// 	m_isStarted = av_false;
-// 	m_Capture = NULL;
-// 	m_ScreenID = WinId;
-// 	m_bAudioOpen = av_false;
-// 
-// 	m_bStatistics = av_true;
-// 	m_StatisticsBitRate = 0;
-// 	m_StatisticsFrameRate = 0;
-// 	m_StatisticsGop = 0;
-// 
-// 	m_Gop = 0;
-// 	m_ImageWidth = 0;
-// 	m_ImageHeigh = 0;
-// 	m_FrameRate = 0;
-// 	m_BitRate = 0;
-// 
-// 	m_bStartDecode = av_false;
-// 
-// }
+
+av_uint							CAvPreview::m_SpiltScreenNum								= 0;
+C_DecodeCaps					CAvPreview::m_DecodeCaps									= {0};
+
+av_bool							m_gPause													= av_false;
+std::map <int, CAvPreview*>		m_gPreviewManager;
+
 CAvPreview::CAvPreview()
 {
 	m_hWid = 0;
@@ -50,6 +33,10 @@ CAvPreview::CAvPreview()
 	m_BitRate = 0;
 	m_bPause = av_false;
 	m_bStartDecode = av_false;
+	m_RenderRect.Sx = 0;
+	m_RenderRect.Sy = 0;
+	m_RenderRect.Width = 0;
+	m_RenderRect.Heigh = 0;
 
 	m_Timer.SetContinual(av_true);
 	m_Timer.SetInterlvalMsec(PreviewStatisticsMs);
@@ -68,6 +55,7 @@ av_bool CAvPreview::Set(unsigned int hWid, int ScreenID)
 {
 	m_ScreenID = ScreenID;
 	m_hWid = hWid;
+	m_gPreviewManager[ScreenID] = this;
 	return av_true;
 }
 av_bool CAvPreview::Start(int Channel, int Slave)
@@ -78,15 +66,25 @@ av_bool CAvPreview::Start(int Channel, int Slave)
 	m_Channel = Channel;
 	m_Slave = Slave;
 	m_Capture = g_AvManCapture.GetAvCaptureInstance(Channel);
-
-	AvDecodeStartByWid(m_ScreenID, m_hWid);
-
+	AvDecodeStart(m_ScreenID);
 
 	m_Capture->Start(m_Slave, this, (Capture::SIG_PROC_ONDATA)&CAvPreview::OnStream);
 	m_isStarted = av_true;
 
 	CAvTimer::StartTimer(m_Timer);
 	return av_true;
+}
+av_uint CAvPreview::GetWindowsID()
+{
+	return m_hWid;
+}
+av_int  CAvPreview::GetScreenID()
+{
+	return m_ScreenID;
+}
+C_RECT  &CAvPreview::GetWindowsRect()
+{
+	return m_RenderRect;
 }
 av_bool CAvPreview::GetChannleSlave(int &Channel, int &Slave)
 {
@@ -150,10 +148,14 @@ av_bool CAvPreview::GetStatistics(std::string &ImageSize, std::string &Comp, std
 }
 av_bool CAvPreview::Stop()
 {
+	if (m_isStarted == false){
+		return av_true;
+	}
 	m_bStartDecode = av_false;
 	m_Capture->Stop(m_Slave, this, (Capture::SIG_PROC_ONDATA)&CAvPreview::OnStream);
-	AvDecodeStopByPos(m_ScreenID);
-	AvDecodeStopByWid(m_ScreenID);
+
+	AvDecodeClears(m_ScreenID);
+
 	m_Slave = -1;
 	m_Channel = -1;
 	m_Capture = NULL;
@@ -168,19 +170,15 @@ av_bool CAvPreview::Pause(av_bool bPause)
 }
 av_bool  CAvPreview::RenderResize(C_RECT &RenderRect)
 {
-
-	Pause(av_true);
 	m_RenderRect = RenderRect;
-	AvDecodeStopByPos(m_ScreenID);
-
-	AvDecodeStartByPos(m_ScreenID, &m_RenderRect);
-	Pause(av_false);
-
 	return av_true;
 }
 av_void CAvPreview::OnStream(int Channel, int Slave, CAvPacket *Pack)
 {
-	
+	if (m_gPause == av_true){
+		return;
+	}
+
 	if (m_bAudioOpen == av_false && Pack->StreamCont() == StreamContent_AUDIO){
 		return;
 	}
@@ -203,9 +201,6 @@ av_void CAvPreview::OnStream(int Channel, int Slave, CAvPacket *Pack)
 		return;
 	}
 	AvDecodeRenderBuffer(m_ScreenID, (unsigned char *)Pack->GetBuffer(), Pack->GetLength());
-	if (m_bStartDecode == av_false){
-		av_warning("Start Decode Can't find First I Frame\n");
-	}
 	m_bStartDecode = av_true;
 }
 
@@ -221,5 +216,55 @@ av_void CAvPreview::OnTimer(CAvTimer &Timer)
 
 av_void CAvPreview::SetSpiltScreen(int SpiltScreenNum)
 {
+	m_SpiltScreenNum = SpiltScreenNum;
 	AvDecodeSplit(SpiltScreenNum);
+	m_gPause = av_false;
+}
+av_void	CAvPreview::SplitScreenClear(int ScreenID)
+{
+	if (ScreenID == -1){
+		m_gPause = av_true;
+	}
+	else{
+		m_gPreviewManager[ScreenID]->Pause(av_true);
+	}
+	AvDecodeClears(ScreenID);
+}
+
+E_EncodeCHL		CAvPreview::GetShowCHL(av_int Channel)
+{
+	if (m_DecodeCaps.MaxChannels == 0){
+		AvDecodeGetCaps(&m_DecodeCaps);
+	}
+	
+	if (Channel > 31){
+		return CHL_SUB1_T;
+	}
+
+	if (m_DecodeCaps.MainStreamMode[m_SpiltScreenNum] & AvMask(Channel)){
+		return CHL_MAIN_T;
+	}
+	else{
+		return CHL_SUB1_T;
+	}
+}
+
+
+av_u32		 avWareGetWindowsIdByScreenID(int SrceenID)
+{
+	if (NULL == m_gPreviewManager[SrceenID]){
+		return 0;
+	}
+	else{
+		return m_gPreviewManager[SrceenID]->GetWindowsID();
+	}
+}
+C_RECT		*avWareGetWindowsRectByScreenID(int SrceenID)
+{
+	if (NULL == m_gPreviewManager[SrceenID]){
+		return NULL;
+	}
+	else{
+		return &m_gPreviewManager[SrceenID]->GetWindowsRect();
+	}
 }

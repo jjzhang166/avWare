@@ -37,6 +37,7 @@ typedef struct {
 	char FacManufacturer[64];
 	char HardWareVersion[32];
 	char ProtocolUniqueCode[128];
+	unsigned int HardWareInterfaceMask;
 } C_ManufacturerInfo;
 
 
@@ -152,13 +153,26 @@ typedef struct {
 }C_TimeArea;
 
 
+typedef struct {
+	AlarmEvent				AlarmEventName;
+	AlarmStat				AlarmStatus;
+	av_u32					AlarmTime;
+	av_u32					Channel;
+	av_u32					Slave;
+	union
+	{
+		av_u32	MdResult[ConfMotionDetectionLine];
+		av_u32	IoResult;
+	};
+
+}C_AlmMsg;
 
 typedef struct {
 	av_bool RegisterStatus;
 	unsigned int AlarmEventMask;
 }C_AlarmRegister;
 
-typedef struct {
+typedef struct{
 	av_u32		AlarmEventMask;
 	av_bool		AlarmbEnable;
 	C_TimeArea  AlarmTimeArea[AvMaxWeeks][AvMaxTimeArea];
@@ -174,14 +188,14 @@ typedef struct {
 	av_bool		AlarmbLinkageRecord;
 }C_AlarmProfile;
 
-
-typedef struct {
-	AlarmEvent	AlarmEventName;
-	av_bool		AlarmbStat;
-	av_u32		AlarmTime;
-	av_u32		AlarmPortInNuMask;
-	av_u32		AlarmMotionArea[ConfMotionDetectionLine];
-}C_Alarm;
+// 
+// typedef struct {
+// 	AlarmEvent	AlarmEventName;
+// 	av_bool		AlarmbStat;
+// 	av_u32		AlarmTime;
+// 	av_u32		AlarmPortInNuMask;
+// 	av_u32		AlarmMotionArea[ConfMotionDetectionLine];
+// }C_Alarm;
 
 
 typedef struct {
@@ -231,7 +245,7 @@ typedef struct {
 	char Title[64];
 }C_SmtpProfile;
 
-typedef struct {
+typedef struct{
 	av_bool bEnable;
 	int		ServicePort;
 	char	ServerAddress[64];
@@ -240,7 +254,7 @@ typedef struct {
 	char	RemotePath[64];
 }C_FtpProfile;
 
-typedef struct {
+typedef struct{
 	av_bool bEnable;
 	DdnsType Type;
 	char ServerAddress[64];
@@ -297,15 +311,15 @@ typedef struct {
 }C_RtmpNodeProfile;
 
 typedef struct {
-	C_RtmpNodeProfile RtmpNodeProfile[SYS_CHN_NUM];
+	std::list <C_RtmpNodeProfile> RtmpNodeProfileList;
 }C_RtmpProfile;
 
 typedef struct {
 	unsigned int PtzProtocolMask;	//支持协议的掩码
 	unsigned int PtzBaudrateMask;	//支持波特率掩码
 	unsigned int PtzAddressMax;		//地址范围
-	unsigned int PtzDataBitMask;		//数据位范围
-	unsigned int PtzStopBitMask;		//停止位范围
+	unsigned int PtzDataBitMask;	//数据位范围
+	unsigned int PtzStopBitMask;	//停止位范围
 	unsigned int PtzVerifyMask;		//检验位掩码
 }C_PtzCaps;
 
@@ -368,27 +382,31 @@ typedef struct {
 	av_bool bRealTime;
 }C_Snapshot;
 
+typedef struct{
+	av_uint Second;
+}C_SyncSystemTime;
+
 typedef struct {
 	unsigned int		_msg;
 	unsigned int		_stat;
 	union
 	{
-		C_DspCaps			DspCaps;
-		C_CaptureCaps		CaptureCaps;
-		C_CaptureProfile	CaptureProfile;
-		C_EncodeCaps		EncodeCaps;
-		C_EnCodeProfile		EnCodeProfile;
-		C_ImageCaps			ImageCaps;
-		C_ImageProfile		ImageProfile;
-		C_PtzCaps			PtzCaps;
-		C_PtzProfile		PtzProfile;
-		C_PtzCmd			PtzCmd;
-		C_ManufacturerInfo	ManfacturerInfo;
-		C_NetCommCaps		NetCommCaps;
-		C_NetWorkProfile	NetWorkProfile;
-		C_FirmwareInfo		FirmwareInfo;
-		C_AudioCaps			AudioCaps;
-		C_AudioProfile		AudioProfile;
+		C_DspCaps						DspCaps;
+		C_CaptureCaps					CaptureCaps;
+		C_CaptureProfile				CaptureProfile;
+		C_EncodeCaps					EncodeCaps;
+		C_EnCodeProfile					EnCodeProfile;
+		C_ImageCaps						ImageCaps;
+		C_ImageProfile					ImageProfile;
+		C_PtzCaps						PtzCaps;
+		C_PtzProfile					PtzProfile;
+		C_PtzCmd						PtzCmd;
+		C_ManufacturerInfo				ManfacturerInfo;
+		C_NetCommCaps					NetCommCaps;
+		C_NetWorkProfile				NetWorkProfile;
+		C_FirmwareInfo					FirmwareInfo;
+		C_AudioCaps						AudioCaps;
+		C_AudioProfile					AudioProfile;
 		C_PtzAdvancedCameraLensCaps		PtzCameralensCaps;
 		C_PtzAdvancedCameraLensProfile	PtzAdvancedCameraLensProfile;
 
@@ -404,7 +422,10 @@ typedef struct {
 		C_DdnsProfile					DdnsProfile;
 		C_AlarmCaps						AlarmCaps;
 		C_AlarmProfile					AlarmProfile;
+		C_SyncSystemTime				SyncSystemTime;
 	};
+	C_RecordFileSearch					RecordFileSearch;
+	C_RtmpProfile						RtmpProfile;
 }NetProtocolParam;
 
 
@@ -416,6 +437,7 @@ typedef struct {
 		C_PtzAdvancedCameraLensCaps			PtzCameralensCaps;
 		C_OverLayCaps						OverLayCaps;
 		C_AlarmCaps							AlarmCaps;
+		C_DspCaps							DspCaps;
 	};
 }C_AdvancedSystemCaps;
 
@@ -427,7 +449,6 @@ typedef struct {
 		C_SmtpProfile						SmtpProfile;
 		C_FtpProfile						FtpProfile;
 		C_UpnpProfile						UpnpProfile;
-		C_RtmpProfile						RtmpProfile;
 		C_RtspProfile						RtspProfile;
 		C_LogProfile						LogProfile;
 		C_FirmwareInfo						FirmwareInfo;
@@ -440,7 +461,9 @@ typedef struct {
 		C_NetWorkProfile					NetWorkProfile;
 		C_P2pProfile						P2pProfile;
 		C_AlarmProfile						AlarmProfile;
+		C_SyncSystemTime					SyncSystemTime;
 	};
+	C_RtmpProfile							RtmpProfile;
 }C_AdvancedSystemProfile;
 
 #endif

@@ -4,7 +4,7 @@
 #include "AvUiComm/IconComm.h"
 #include "AvForm/dlgnetset.h"
 #include "AvForm/dlgupgrade.h"
-#include "AvForm/dlgfactoryset.h"
+
 #include "AvForm/dlghandadddevice.h"
 #include "AvForm/dlgdeviceset.h"
 #include "AvGuiSystem.h"
@@ -12,6 +12,12 @@
 #include "AvUiComm/StdListDevicesSort.h"
 #include "AvGui/AvGui.h"
 #include "AvSource/AvQStringsLanguage.h"
+
+#if defined(_AV_WARE_CODE_OPENSOURCE)
+#else
+#include "AvForm/dlgfactoryset.h"
+#endif
+
 FrmDevice::FrmDevice(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::FrmDevice)
@@ -25,13 +31,20 @@ FrmDevice::FrmDevice(QWidget *parent) :
 	IconComm::Instance()->SetIcon(ui->LabIco, QChar(0xf015), 12);
 
 	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
-	this->setAttribute(Qt::WA_DeleteOnClose);
+
 
 
 	
 	m_DeviceSet = NULL;
+	m_DeviceSet = new DlgDeviceSet(this);
+	m_DeviceSet->hide();
+#if defined(_AV_WARE_CODE_OPENSOURCE)
+#else
+	m_FactorySet = NULL;
+#endif
 	
-	QTimer::singleShot(100, this, SLOT(SlotsInitTimer()));
+	m_Upgrade = NULL;
+	m_NetSet = NULL;
 
 	FixDlgUi();
 	m_DeviceList.clear();
@@ -44,12 +57,27 @@ FrmDevice::FrmDevice(QWidget *parent) :
 	m_mouseDevicesRightMenu = NULL;
 	m_DevicesItemModelcolumn = -1;
 	m_DevicesItemModelrow  = -1;
+	m_bSearching = false;
+
+	
+#if defined(_AV_WARE_CODE_OPENSOURCE)
+	ui->BtnFacInfo->hide();
+#endif
+
 }
 
 FrmDevice::~FrmDevice()
 {
 	AvQDebug("clear up\n");
     delete ui;
+}
+
+void FrmDevice::DlgDeviceSetShow(int ModifyChannel)
+{
+
+	CAvUiComm::FormInCenter(m_DeviceSet);
+	m_DeviceSet->SelectModifyChannel(ModifyChannel);
+	m_DeviceSet->exec();
 }
 
 void FrmDevice::GetSelectForModiyDevies()
@@ -119,57 +147,61 @@ void FrmDevice::FixDlgUi()
 	ui->TviewChnDevice->setContextMenuPolicy(Qt::CustomContextMenu);
 	ui->TviewChnDevice->verticalHeader()->hide();
 
-
-
 	QObject::connect((const QObject *)ui->TviewSearchDevice->horizontalScrollBar(),
 		SIGNAL(rangeChanged(int, int)), this, SLOT(SlotsHorizontalScrollBarRangChanged(int, int)));
 	QObject::connect((const QObject *)ui->TviewChnDevice->horizontalScrollBar(),
 		SIGNAL(rangeChanged(int, int)), this, SLOT(SlotsHorizontalScrollBarRangChanged(int, int)));
 
-	
 	ui->ProgressSearch->setValue(0);
 
 
 	av_u32 protolMask = 0;
 	CAvGui::NetCaptureProtocolsMask(protolMask);
 	ui->CBoxProtoType->clear();
-	//ui->CBoxProtoType->setStyleSheet("color:black");
 
 	for (int i = 0; i < sizeof(protolMask); i++){
 		if (!(AvMask(i) & protolMask)) continue;
 		ui->CBoxProtoType->addItem(AvUiLangsLinkProtocol((LinkProtocol)i));
 	}
 
-	DrawItemLinkView();
+	
 
 	QApplication::sendEvent(this, new QEvent(QEvent::Resize));
+}
+
+void FrmDevice::FixViewItem()
+{
+
+	QSize viewSize = ui->TviewSearchDevice->viewport()->size();
+	int TviewWidth = viewSize.width() + 3;
+	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_NO, 0.08*TviewWidth);
+	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_DEVNAME, 0.13*TviewWidth);
+	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_IPADDR, 0.15*TviewWidth);
+	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_GATEWAY, 0.15*TviewWidth);
+	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_MACADDR, 0.15*TviewWidth);
+	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_CHANNELS, 0.07*TviewWidth);
+	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_PORTS, 0.10*TviewWidth);
+	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_STARTUP, 0.17*TviewWidth);
+
+
+	viewSize = ui->TviewChnDevice->viewport()->size();
+	TviewWidth = viewSize.width();
+	ui->TviewChnDevice->setColumnWidth(D_DEVICES_HEADSECTION_CHNO, 0.10*TviewWidth);
+	ui->TviewChnDevice->setColumnWidth(D_DEVICES_HEADSECTION_IPADDR, 0.30*TviewWidth);
+	ui->TviewChnDevice->setColumnWidth(D_DEVICES_HEADSECTION_PORT, 0.25*TviewWidth);
+	ui->TviewChnDevice->setColumnWidth(D_DEVICES_HEADSECTION_PROTOCOL, 0.25*TviewWidth);
+	ui->TviewChnDevice->setColumnWidth(D_DEVICES_HEADSECTION_STAT, 0.10*TviewWidth);
 }
 void FrmDevice::resizeEvent(QResizeEvent * event)
 {
 
-	
-	QSize viewSize = ui->TviewSearchDevice->viewport()->size();
-	int TviewWidth = viewSize.width() + 3;
-	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_NO,			0.08*TviewWidth);
-	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_DEVNAME,		0.13*TviewWidth);
-	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_IPADDR,		0.15*TviewWidth);
-	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_GATEWAY,		0.15*TviewWidth);
-	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_MACADDR,		0.15*TviewWidth);
-	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_CHANNELS,	0.07*TviewWidth);
-	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_PORTS,		0.10*TviewWidth);
-	ui->TviewSearchDevice->setColumnWidth(D_SEARCHITEM_HEADSECTION_STARTUP,		0.17*TviewWidth);
-	
-	
-	viewSize = ui->TviewChnDevice->viewport()->size();
-	TviewWidth = viewSize.width();
-	ui->TviewChnDevice->setColumnWidth(D_DEVICES_HEADSECTION_CHNO,				0.10*TviewWidth);
-	ui->TviewChnDevice->setColumnWidth(D_DEVICES_HEADSECTION_IPADDR,			0.30*TviewWidth);
-	ui->TviewChnDevice->setColumnWidth(D_DEVICES_HEADSECTION_PORT,				0.25*TviewWidth);
-	ui->TviewChnDevice->setColumnWidth(D_DEVICES_HEADSECTION_PROTOCOL,			0.25*TviewWidth);
-	ui->TviewChnDevice->setColumnWidth(D_DEVICES_HEADSECTION_STAT,				0.10*TviewWidth);
-	
-	AvQDebug("resizeEvent\n");
+	FixViewItem();
 
+}
+void FrmDevice::showEvent(QShowEvent *e)
+{
+	FixViewItem();
+	DrawItemLinkView();
 }
 
 void FrmDevice::DrawItemForLinkView()
@@ -190,12 +222,16 @@ void FrmDevice::DrawItemForLinkView()
 void FrmDevice::DrawItemLinkView()
 {
 	int TotalChns = CAvGui::NetCaptureGetTotalNm();
-	m_DevicesItemModel->clear();
+//	m_DevicesItemModel->clear();
+	m_DevicesItemModel->removeRows(0, m_DevicesItemModel->rowCount());
 	for (int i = 0, j = 0; i < TotalChns; i++){
-		Capture::EAvCaptureStatus stat = CAvGui::CaptureStatus(i);
-		if (stat != Capture::EAvCapture_STOP){
+// 		Capture::EAvCaptureStatus stat = CAvGui::CaptureStatus(i);
+// 		if (stat != Capture::EAvCapture_STOP){
 			Capture *pCapture = CAvGui::CaptureInstance(i);
 			CAvNetProto *pNetProto = pCapture->AvNetProtoHandle();
+			if (pNetProto == NULL){
+				continue;
+			}
 			C_ProtoFormats &ProtoFormats = pNetProto->ProtoFromats();
 			QString Address;
 			QString ProtoString;
@@ -233,7 +269,7 @@ void FrmDevice::DrawItemLinkView()
 			m_DevicesItemModel->setItem(j, D_DEVICES_HEADSECTION_STAT, new QStandardItem(icon, QString("")));
 			//m_DevicesItemModel->setItem(j, D_DEVICES_HEADSECTION_STAT, new QStandardItem::);
 			j++;
-		}
+//		}
 	}
 
 
@@ -387,41 +423,43 @@ void FrmDevice::SlotsDevicesViewRightMenuSelectOther()
 		}
 	}
 }
-void FrmDevice::SlotsInitTimer()
-{
-	m_DeviceSet = new DlgDeviceSet(this);
-	m_DeviceSet->hide();
-	AvQDebug("Init over\n");
-}
+
 void FrmDevice::SlotsSearchTimer()
 {
 	int SearchSecond = 3;
 	m_SearchTimerCnt++;
 
+	LinkProtocol PtoType = LinkProtocol_None;
+	QString Comcurrtext = ui->CBoxProtoType->currentText();
+	if (Comcurrtext == QString("Moon")){
+		PtoType = LinkProtocol_Moon;
+	}
+	else if (Comcurrtext == QString("Onvif")){
+		PtoType = LinkProtocol_Onvif;
+	}
+	else if (Comcurrtext == QString("Rtsp")){
+		PtoType = LinkProtocol_RTSP;
+	}
+	else{
+		assert(0);
+	}
+
 	if (m_SearchTimerCnt == SearchSecond * 2 + 1){
 		ui->ProgressSearch->setValue(0);
+		m_bSearching = false;
 		return;
 	}
 	if (m_SearchTimerCnt == SearchSecond * 2){
-		LinkProtocol PtoType = LinkProtocol_None;
-		QString Comcurrtext = ui->CBoxProtoType->currentText();
-		if (Comcurrtext == QString("Moon")){
-			PtoType = LinkProtocol_Moon;
-		}
-		else if (Comcurrtext == QString("Onvif")){
-			PtoType = LinkProtocol_Onvif;
-		}
-		else if (Comcurrtext == QString("Rtsp")){
-			PtoType = LinkProtocol_RTSP;
-		}
-		else{
-			assert(0);
-		}
+
 		ui->ProgressSearch->setValue(100);
 		CAvGui::NetCaptureSearchResult(PtoType, m_DeviceList);
 		DrawItemForSearchView();
 		QTimer::singleShot(1500, this, SLOT(SlotsSearchTimer()));
+
 		return;
+	}
+	if (m_SearchTimerCnt % 3 == 0){
+		CAvGui::NetCaptureSearch(PtoType, av_false);
 	}
 	ui->ProgressSearch->setValue(m_SearchTimerCnt*(100 / (SearchSecond * 2)));
 	QTimer::singleShot(500, this, SLOT(SlotsSearchTimer()));
@@ -441,7 +479,10 @@ void FrmDevice::on_CBoxProtoType_activated(const QString &arg1)
 
 void FrmDevice::on_BtnSearch_clicked()
 {
-
+	if (m_bSearching == true){
+		return;
+	}
+	m_bSearching = true;
 	LinkProtocol PtoType = LinkProtocol_None;
 	QString Comcurrtext = ui->CBoxProtoType->currentText();
 	if (Comcurrtext == QString("Moon")){
@@ -476,33 +517,42 @@ void FrmDevice::on_BtnAddByHand_clicked()
 void FrmDevice::on_BtnModifNet_clicked()
 {
 	GetSelectForModiyDevies();
-	DlgNetSet *DlgnetSet = new DlgNetSet;
+	//DlgNetSet *DlgnetSet = new DlgNetSet;
+	if (m_NetSet == NULL)m_NetSet = new DlgNetSet;
 
-	DlgnetSet->SetModifyDeviceList(m_ForModifyDeviceList);
-	DlgnetSet->move(pos());
-	DlgnetSet->resize(size());
-	DlgnetSet->exec();
+	m_NetSet->SetModifyDeviceList(m_ForModifyDeviceList);
+	m_NetSet->move(pos());
+	m_NetSet->resize(size());
+	m_NetSet->exec();
 }
 
 void FrmDevice::on_BtnUpgrade_clicked()
 {
 	GetSelectForModiyDevies();
-	DlgUpgrade *Dlgupgrade = new DlgUpgrade;
-	Dlgupgrade->SetModifyDeviceList(m_ForModifyDeviceList);
-	Dlgupgrade->move(pos());
-	Dlgupgrade->resize(size());
-	Dlgupgrade->exec();
+	//DlgUpgrade *Dlgupgrade = new DlgUpgrade;
+	if (m_Upgrade == NULL) m_Upgrade = new DlgUpgrade;
+
+	m_Upgrade->SetModifyDeviceList(m_ForModifyDeviceList);
+	m_Upgrade->move(pos());
+	m_Upgrade->resize(size());
+	m_Upgrade->exec();
 }
 
 void FrmDevice::on_BtnFacInfo_clicked()
 {
+#if defined(_AV_WARE_CODE_OPENSOURCE)
+#else
 	GetSelectForModiyDevies();
-	DlgFactorySet *Factory = new DlgFactorySet;
-	
-	Factory->SetModifyDeviceList(m_ForModifyDeviceList);
-	Factory->move(pos());
-	Factory->resize(size());
-	Factory->exec();
+	//DlgFactorySet *Factory = new DlgFactorySet;
+	if (NULL == m_FactorySet) m_FactorySet = new DlgFactorySet;
+
+	m_FactorySet->SetModifyDeviceList(m_ForModifyDeviceList);
+	m_FactorySet->move(pos());
+	m_FactorySet->resize(size());
+	m_FactorySet->exec();
+#endif
+
+
 }
 
 void FrmDevice::on_BtnChnDeleteDevice_clicked()
@@ -511,7 +561,7 @@ void FrmDevice::on_BtnChnDeleteDevice_clicked()
 		if (m_DevicesItemModel->item(i, 0)->checkState() == Qt::Checked){
 			int DelChn = m_DevicesItemModel->item(i, 0)->text().toInt();
 			emit SignalPreviewStart(DelChn, 0, false);
-			CAvGui::NetCaptureDelDevice(i);
+			CAvGui::NetCaptureDelDevice(DelChn);
 		}
 	}
 
@@ -523,19 +573,8 @@ void FrmDevice::on_BtnChnDeleteDevice_clicked()
 
 void FrmDevice::on_BtnChnModifDevice_clicked()
 {
-// 
-// 	this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint |
-// 		Qt::WindowMinMaxButtonsHint | Qt::Tool | Qt::WindowStaysOnTopHint);
-
-	
-	m_DeviceSet->move(this->pos());
-	hide();
 	m_DeviceSet->move(pos());
-	//m_DeviceSet->resize(size());
-	m_DeviceSet->show();
-
 	m_DeviceSet->exec();
-	av_msg("DEVICESET OVER\n");
 }
 
 
@@ -568,22 +607,27 @@ void FrmDevice::on_BtnAddDevice_clicked()
 	int j = 0;
 	C_ProtoFormats ProtoFormats;
 	for (iList = m_LinkDeviceList.begin(); iList != m_LinkDeviceList.end(); iList++){
+		memset(&ProtoFormats, 0x00, sizeof(C_ProtoFormats));
 		ProtoFormats.MoonFormats.Port = iList->NetWorkProfile.ServicePort == 0 ? 5000 : iList->NetWorkProfile.ServicePort;
 		sprintf(ProtoFormats.MoonFormats.Url, iList->NetWorkProfile.Ipv4);
 		sprintf(ProtoFormats.CheckAliveAddress, iList->NetWorkProfile.Ipv4);
 		sprintf(ProtoFormats.UsrName, "admin");
 		sprintf(ProtoFormats.Passwd, "admin");
 		ProtoFormats.ProtoMode = ProtocolMoon;
-		
+		ProtoFormats.IsEnable = av_true;
 		int emptyChn = CAvGui::NetCaptureGetEmptyChannel();
-		
+		AvQDebug("Get Empty Channel [%d]\n", emptyChn);
 		if (emptyChn == -1){
 			CAvUiComm::ShowMessageBoxError(QString(tr("Have not Empty Channel!")));
+			for (; iList != m_LinkDeviceList.end();){
+				iList = m_LinkDeviceList.erase(iList);
+			}
+			break;
 		}
 		else{
 			iList->ManufacturerInfo.FacTime = emptyChn;
-			CAvGui::NetCaptureAddDevice(emptyChn, ProtoFormats);
 			emit SignalPreviewStart(emptyChn, 0, true);
+			CAvGui::NetCaptureAddDevice(emptyChn, ProtoFormats);
 		}
 	}
 	DrawItemForLinkView();

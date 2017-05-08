@@ -20,6 +20,7 @@ public:
 	void FixUi();
 	void PtzStop();
 	void PtzStart(PtzCommand Command, C_PtzCmd *Cmd = NULL);
+	void SetModiyChannel(int Channel);
 public:
 	void mouseMoveEvent(QMouseEvent *e);
 	void mousePressEvent(QMouseEvent *e);

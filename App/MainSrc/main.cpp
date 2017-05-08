@@ -27,11 +27,8 @@
 #include "AvNetService/AvNetService.h"
 #include "AvPacket/AvPacket.h"
 #include "AvDevice/AvDevice.h"
-#include "AvWatchDog/AvWatchDog.h"
-#ifdef _AV_WARE_M_HAVE_UI
 #include "AvGui/AvGui.h"
 #include "AvPreview/AvPreview.h"
-#endif
 #include "AvCapture/AvManCapture.h"
 #include "AvUart/AvUart.h"
 #include "AvLog/AvLog.h"
@@ -44,10 +41,8 @@
 #include "AvLua/AvLua.h"
 #include "AvProc/AvProc.h"
 #include "Common/gtkutf8.h"
-
-#ifdef FACE_DETECT
-#include "AvIntelligentAnalysis/AvFaceDetectManager.h"
-#endif //FACE_DETECT
+#include "AvIntelligentAnalysis/AvIntelligentAnalysis.h"
+#include "AvF/AvF.h"
 
 int main(int argc, char *argv[])
 {
@@ -66,42 +61,58 @@ int main(int argc, char *argv[])
 		以下函数运行序列，不得自行调整。
 	*/
 	av_msg("AvWare Runing Start\n");
+	av_warning("Version [%s]\n", CAvDevice::GetSoftVersionString().c_str());
 	str_normalize_init();
+
 	AvProcInit();
+
+
 	g_AvDevice.Initialize();
+	g_AvGui_Initialize();
+	_AVGUI_LOADING_MSG(LoadingInitDevice, 5);
+
 	g_AvThreadPool.Initialize(SYS_CHN_NUM + 10, av_true);
+
 	g_AvTimer.Initialize();
 
+	_AVGUI_LOADING_MSG(LoadingConfig, 10);
 	g_AvConfigMagagerGeneral.Initialize();
+
 	g_AvDevice.InitializeConfigs();
+
 //	g_AvMemoryPool.Initialize();
 	
 	g_AvPacketManager.Initialize();
 
-#ifdef _AV_WARE_M_HAVE_UI
-	g_AvGui.Initialize();
-#endif
-	g_AvLog.Initialize();
-	g_AvUart.Initialize();
-	
-	g_AvAlarm.Initialize();
 
+	_AVGUI_LOADING_MSG(LoadingLog, 15);
+	g_AvLog.Initialize();
+	
+
+	g_AvUart.Initialize();
+
+	_AVGUI_LOADING_MSG(LoadingCapture, 20);
 	g_AvManCapture.Initialize();
+	
+	_AVGUI_LOADING_MSG(LoadingRecodService, 25);
 	//g_AvRecordMan.Initialize();
 	
+	_AVGUI_LOADING_MSG(LoadingAlarmService, 50);
+	g_AvAlarm.Initialize();
+	
+	_AVGUI_LOADING_MSG(LoadingNetService, 55);
 	g_AvNetService.Initialize();
-	av_msg("AvWare Service Start Succeed\n");
+
+	_AVGUI_LOADING_MSG(LoadingIntelligentService, 60);
+	g_AvIntelligentanalysis.Initialize();
 
 	g_AvThreadPool.Dump();
 
-#ifdef FACE_DETECT
-	g_AvIS_FaceDetect.Start();
-#endif //FACE_DETECT
+	av_msg("AvWare Service Start Succeed\n");
 
+	_AVGUI_LOADING_MSG(LoadingUiResource, 80);
+	g_AvGui_exec();
 
-#ifdef _AV_WARE_M_HAVE_UI
-	g_AvGui.exec();
-#endif
 
 	while (1) av_msleep(1000);
 

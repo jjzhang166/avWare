@@ -4,7 +4,7 @@ project (AvModules)
 set (project_headers_pach ${PROJECT_SOURCE_DIR}/../Includes)
 
 include_directories(${project_headers_pach})
-
+include_directories(AvIntelligentAnalysis)
 
 
 macro(source_group_by_dir source_files)
@@ -93,18 +93,19 @@ source_group_by_dir(AvNetServiceALL_LIST)
 add_library(AvNetService STATIC ${AvNetServiceALL_LIST})
 set_property(TARGET AvNetService PROPERTY FOLDER "AvNetService")
 
+file(GLOB_RECURSE FaceDetectSource_LIST AvIntelligentAnalysis/AvFaceDetect/*.h AvIntelligentAnalysis/AvFaceDetect/*.hpp)
+file(GLOB_RECURSE FaceDetectHeader_LIST AvIntelligentAnalysis/AvFaceDetect/*.c AvIntelligentAnalysis/AvFaceDetect/*.cpp)
+set (AvIntelligentAnalysisALL_LIST ${FaceDetectSource_LIST} ${FaceDetectHeader_LIST})
 
-
-
-#AvWatchDog
-set(AvWatchDogSRC_LIST 
-		AvWatchDog/AvWatchDog.cpp
+set (AvIntelligentAnalysisALL_LIST
+		${AvIntelligentAnalysisALL_LIST}
+		AvIntelligentAnalysis/AvIntelligentAnalysis.cpp
+		${project_headers_pach}/AvIntelligentAnalysis/AvIntelligentAnalysis.h
 	)
-set(AvWatchDogHeader_LIST 
-		${project_headers_pach}/AvWatchDog/AvWatchDog.h
-	)
-add_library(AvWatchDog STATIC ${AvWatchDogSRC_LIST} ${AvWatchDogHeader_LIST})
-set_property(TARGET AvWatchDog PROPERTY FOLDER "AvModules")
+source_group_by_dir(AvIntelligentAnalysisALL_LIST)
+add_library(AvIntelligentAnalysis STATIC ${AvIntelligentAnalysisALL_LIST})
+set_property(TARGET AvIntelligentAnalysis PROPERTY FOLDER "AvIntelligentAnalysis")
+
 
 #AvThread
 set(AvThreadSRC_LIST 
@@ -251,7 +252,9 @@ set(AvConfigExSRC_LIST
 		AvConfigs/AvConfigManagerGeneral.cpp
 		AvConfigs/AvConfigNetService.cpp
 		AvConfigs/AvConfigCapture.cpp
-		AvConfigs/AvConfigUserManager.cpp
+		AvConfigs/AvConfigManagerUser.cpp
+		AvConfigs/AvConfigManagerNetCapture.cpp
+		AvConfigs/AvConfigManagerNetWork.cpp
 		AvConfigs/AvConfigDevice.cpp
 		AvConfigs/AvConfigAlarm.cpp
 		AvConfigs/AvConfigRecord.cpp
@@ -263,7 +266,9 @@ set(AvConfigExHeader_LIST
 		${project_headers_pach}/AvConfigs/AvConfigIndex.h
 		${project_headers_pach}/AvConfigs/AvConfigNetService.h
 		${project_headers_pach}/AvConfigs/AvConfigCapture.h
-		${project_headers_pach}/AvConfigs/AvConfigUserManager.h
+		${project_headers_pach}/AvConfigs/AvConfigManagerUser.h
+		${project_headers_pach}/AvConfigs/AvConfigManagerNetCapture.h
+		${project_headers_pach}/AvConfigs/AvConfigManagerNetWork.h
 		${project_headers_pach}/AvConfigs/AvConfigDevice.h
 		${project_headers_pach}/AvConfigs/AvConfigAlarm.h
 		${project_headers_pach}/AvConfigs/AvConfigRecord.h

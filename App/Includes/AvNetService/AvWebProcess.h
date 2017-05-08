@@ -2,8 +2,7 @@
 #define AVWARE_AVNETSERVICE_AVWEBPROCESS_H_
 
 #include "jsoncpp/json.h"
-#include "Apis/AvWareCplusplus.h"
-
+#include "Apis/AvWareType.h"
 typedef Json::Value CWebMsg;
 typedef Json::Reader CWebMsgReader;
 
@@ -80,9 +79,8 @@ int AvWebGetImageProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp
 int AvWebSetImageProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
 
 //CallPtzPt  CallPtzZoom  CallPtzFocus  CallPtzIris
-int AvWebCallPtz(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
-int AvWebCallPtzFocus(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
-int AvWebCallPtzIris(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
+int AvWebCallPt(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
+int AvWebCallZoom_Focus_Iris(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
 
 //GetVideoCaptureCaps  
 int AvWebGetVideoCaptureCaps(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
@@ -93,6 +91,14 @@ int AvWebSetVideoCaptureProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &ha
 
 int AvWebGetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
 int AvWebSetRtmpProfile(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
+
+
+int AvWebGetFtp(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
+int AvWebSetFtp(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
+int AvWebTestFtp(CWebMsg &web_req, CWebMsg &web_resp, av_bool &hava_resp_param);
+
+int AvWebGetWifiConf(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
+int AvWebSetWifiConf(CWebMsg &web_req, CWebMsg &web_resp, av_bool &have_resp_param);
 }
 
 #endif //AVWARE_AVNETSERVICE_AVWEBPROCESS_H_

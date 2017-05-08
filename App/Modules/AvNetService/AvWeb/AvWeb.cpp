@@ -64,10 +64,10 @@ void CAvWebSer::RegisterMsgProc()
 	map_webmsgproc_["GetImageProfile"] = &av_web::AvWebGetImageProfile;
 	map_webmsgproc_["SetImageProfile"] = &av_web::AvWebSetImageProfile;
 
-	map_webmsgproc_["CallPtzPt"] = &av_web::AvWebCallPtz;
-	map_webmsgproc_["CallPtzZoom"] = &av_web::AvWebCallPtz;
-	map_webmsgproc_["CallPtzFocus"] = &av_web::AvWebCallPtzFocus;
-	map_webmsgproc_["CallPtzIris"] = &av_web::AvWebCallPtzIris;
+	map_webmsgproc_["CallPtzPt"] = &av_web::AvWebCallPt;
+	map_webmsgproc_["CallPtzZoom"] = &av_web::AvWebCallZoom_Focus_Iris;
+	map_webmsgproc_["CallPtzFocus"] = &av_web::AvWebCallZoom_Focus_Iris;
+	map_webmsgproc_["CallPtzIris"] = &av_web::AvWebCallZoom_Focus_Iris;
 
 	map_webmsgproc_["GetVideoCaptureCaps"] = &av_web::AvWebGetVideoCaptureCaps;
 	map_webmsgproc_["GetVideoCaptureProfile"] = &av_web::AvWebGetVideoCaptureProfile;
@@ -75,6 +75,13 @@ void CAvWebSer::RegisterMsgProc()
 
 	map_webmsgproc_["GetRtmpProfile"] = &av_web::AvWebGetRtmpProfile;
 	map_webmsgproc_["SetRtmpProfile"] = &av_web::AvWebSetRtmpProfile;
+
+	map_webmsgproc_["GetFtpConfig"] = &av_web::AvWebGetFtp;
+	map_webmsgproc_["SetFtpConfig"] = &av_web::AvWebSetFtp;
+	map_webmsgproc_["SnapSignal"] = &av_web::AvWebTestFtp;
+
+	map_webmsgproc_["GetWifiConfig"] = &av_web::AvWebGetWifiConf;
+	map_webmsgproc_["SetWifiConfig"] = &av_web::AvWebSetWifiConf;
 }
 
 

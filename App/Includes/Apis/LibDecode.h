@@ -25,25 +25,29 @@ typedef struct{
 	unsigned int ImageSizeMask;// CHL_MAIN_T
 	unsigned int MaxOutFrameRate;
 	unsigned int MaxChannels;
+	unsigned int MainStreamMode[64];
 }C_DecodeCaps;
+
+
+av_bool AvDecodeSplit(int SplitNum);
+av_bool AvDecodeClears(int ScreenID);
 
 
 av_bool AvAudioDecodeBuffer(unsigned  char *buffer, int bufferlen);
 
-av_bool AvDecodeSplit(int SplitNo);
+
 av_bool AvDecodeGetCaps(C_DecodeCaps *DecodeCaps);
 
-//以下4套接口，可能会成对调用。即AvDecodeStartByWid AvDecodeStopByWid,结合硬件平台，只实现一套即可。
-//以下两个接口中给PC上显示时使用的，因为PC 多数是以wind 存在。
-av_bool AvDecodeStartByWid(int ScreenID, unsigned int hWid);
-av_bool AvDecodeStopByWid(int ScreenID);
 
-//以下两个接口中给NVR 上 显示使用的，因为NVR多数是以坐标来计算的。
-av_bool AvDecodeStartByPos(int ScreenID, C_RECT *pRenderRect);
-av_bool AvDecodeStopByPos(int ScreenID);
+av_bool AvDecodeStart(int ScreenID);
+
 
 //此接口，平台自行处理 分辨率 及 编码类型，结合自身平台，是否需要重置解码器。
 av_bool AvDecodeRenderBuffer(int ScreenID, unsigned  char  *buffer, int bufferlen);
+
+
+av_u32		 avWareGetWindowsIdByScreenID(int SrceenID);
+C_RECT		*avWareGetWindowsRectByScreenID(int SrceenID);
 
 
 #ifdef __cplusplus

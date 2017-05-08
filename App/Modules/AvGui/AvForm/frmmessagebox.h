@@ -25,6 +25,8 @@ protected:
 private slots:
     void on_btnOk_clicked();
 
+    void on_btnMenu_Close_clicked();
+
 private:
     Ui::frmMessageBox *ui;
 

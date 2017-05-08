@@ -19,9 +19,10 @@
 #include "CAvObject.h"
 #include "Apis/LibSystem.h"
 #include "Apis/LibEncode.h"
-#include "AvConfigs/AvConfigNetService.h"
+#include "AvConfigs/AvConfigManagerNetWork.h"
 #include "Signals.h"
 #include "config.h"
+#include "AvThread/AvTask.h"
 
 
 #ifndef _AV_WARE_VERSION_MAJOR
@@ -67,10 +68,19 @@
 
 #define EKey_Call2avWarePlatformConfigs		"avWarePlatformConfigs"
 
+#define EKey_BvalidFactoryInfo				"avWare_bValid_FactoryInfo"
+
+
+
+#define _D_AVDEVICE_REBOOT_DELAY			3
 class CAvDevice:public CAvObject
 {
 public:
 	SINGLETON_DECLARE(CAvDevice);
+	CAvDevice();
+	virtual ~CAvDevice();
+
+public:
 	av_bool Initialize();//这个函数一定要在加载配置表之前运行；
 	av_bool InitializeLua();
 	av_bool InitializeConfigs();//这个函数一定要放在加载完配置表之后 
@@ -91,8 +101,9 @@ private:
 
 
 public:
-	static std::string GetSoftVersionString();
-	static av_u32      GetSoftVersionU32();
+	static av_bool		IsEmbeddedSystem();
+	static std::string	GetSoftVersionString();
+	static av_u32		GetSoftVersionU32();
 
 public:
 	static av_bool GetEnv(std::string key, std::string &value);
@@ -107,7 +118,6 @@ public:
 	static av_bool GetEncodeCaps	(av_ushort Channel, C_EncodeCaps &EncodeCaps);
 	static av_bool GetDecodeCaps	(av_ushort Channel);
 	static av_bool GetSerialCaps	(C_SerialCaps &SerialCaps);
-//	static av_bool GetPtzCameraLensCaps(C_PtzAdvancedCaps &PtzCameraLensCaps);
 	static av_bool GetNetCommCaps	(C_NetCommCaps &NetCommCaps);
 	static av_bool SetNetCommAttribute(NetCommT comt, C_NetCommAttribute &NetCommAttribute);
 	static av_bool GetNetCommAttribute(NetCommT comt, C_NetCommAttribute &NetCommAttribute);
@@ -117,13 +127,27 @@ public:
 	static av_bool GetACaptureCaps	(E_AUDIO_CHL Chl,C_AudioCaps &AudioCaps);
 
 private:
+	av_void		OnTimer(CAvTimer &Timer);
+	av_u32		m_TimerDeviceCount;
+	av_u32		m_TimerDeviceRebootTime;
+
+private:
+	CAvTask		m_PlatformTimerTask;
+	av_void		PlatformTimerTask();
+
+private:
 	av_void OnConfigsNetComm(CAvConfigNetComm *NetComm, int &result);
 	static CAvConfigNetComm m_ConfigNetComm;
 
 public:
 	static av_bool Reboot();
+
 	static av_bool GetSysTime(av_timeval &tv);
 	static av_bool SetSysTime(av_timeval &tv);
+	
+	static av_bool TimeUtc2Local(av_u32 &utcSec, av_u32 &localSec);
+	static av_bool TimeLocal2Utc(av_u32 &utcSec, av_u32 &localSec);
+
 	static av_bool GetDeviceInfo(C_DeviceFactoryInfo &FactoryInfo);
 	static av_bool SetDeviceInfo(C_DeviceFactoryInfo &FactoryInfo);
 	
@@ -137,15 +161,11 @@ private:
 	static C_UpgradeProgress m_SystemUpgradeProgress;
 	
 public:
-// 	static av_bool GetMemLoadInfo(C_MemoryLoadInfo &MemLoadInfo);
-// 	static av_bool GetNetLoadInfo(C_NetLoadInfo &NetLoadInfo);
-// 	static av_bool GetCpuLoadInfo(C_CpuLoadInfo &CpuLoadInfo);
 	static av_bool GetNetStatusInfo(C_NetStatusInfo &NetStatusInfo);
 	static av_bool GetCpuMemStatusInfo(C_CpuMemStatusInfo &CpuMemStatusInfo);
 	static av_bool GetStartUpGuid(std::string &guid);
+
 private:
-	CAvDevice();
-	~CAvDevice();
 	av_bool Start();
 	av_bool Stop();
 

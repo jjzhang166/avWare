@@ -224,11 +224,11 @@ enum AvChip {
 	AvChip_H36 = 17,
 	AvChip_H3798MV100 = 18,
 	AvChip_HNVR_RES_2 = 19,
-	AvChip_A22M = 20,
-	AvChip_A33M = 21,
-	AvChip_A55M = 22,
-	AvChip_A65 = 23,
-	AvChip_A66 = 24,
+	AvChip_S2L22M = 20,
+	AvChip_S2L33M = 21,
+	AvChip_S2L55M = 22,
+	AvChip_S2L65 = 23,
+	AvChip_S2L66 = 24,
 	AvChip_WINDOWS_32 = 25,
 	AvChip_WINDOWS_64 = 26,
 	AvChip_LINUX_32 = 27,
@@ -237,6 +237,18 @@ enum AvChip {
 	AvChip_MAC_64 = 30,
 	AvChip_LAST = 31
 };
+
+typedef enum  {
+	HardInterface_NONE = 0,
+	HardInterface_SD = 1,
+	HardInterface_WIFI = 2,
+	HardInterface_PTZ = 3,
+	HardInterface_IO = 4,
+	HardInterface_AUDIO_PLAY = 5,
+	HardInterface_AUDIO_CAPTURE = 6,
+	HardInterface_SIM_4G = 7,
+	HardInterface_LAST = 8
+}HardInterface;
 
 typedef enum  {
   TimeFMT_NONE = 0,
@@ -326,6 +338,20 @@ typedef enum  {
 
 
 typedef enum  {
+	WdrMode_None = 0,
+	WdrMode_Open = 1,
+	WdrMode_Close = 2,
+	WdrMode_Last = 3
+}WdrMode;
+
+typedef enum  {
+	ShutterMode_None = 0,
+	ShutterMode_Auto = 1,
+	ShutterMode_MaxShutter = 2,
+	ShutterMode_Last = 3,
+}ShutterMode;
+
+typedef enum  {
   NetCommGetMode_NONE = 0,
   NetCommGetMode_MANUAL = 1,
   NetCommGetMode_AUTO = 2,
@@ -333,15 +359,31 @@ typedef enum  {
   NetCommGetMode_LAST = 4
 }NetCommGetMode;
 
+typedef enum {
+	WirelessMode_NONE = 0,
+	WirelessMode_AP = 1,
+	WirelessMode_STATION = 2,
+	WirelessMode_LAST = 3
+}WirelessMode;
+
 
 typedef enum  {
-  NetCommT_LAN0 = 0,
-  NetCommT_LAN1 = 1,
-  NetCommT_Wireless = 2,
-  NetCommT_SIM = 3,
-  NetCommT_BlueTooth = 4,
-  NetCommT_LAST = 5
+  NetCommT_LAN0			= 0,
+  NetCommT_LAN1			= 1,
+  NetCommT_Wireless		= 2,
+  NetCommT_SIM			= 3,
+  NetCommT_BlueTooth	= 4,
+  NetCommT_Wireless1	= 5,
+  NetCommT_SIM1			= 6,
+  NetCommT_LAST			= 7
 }NetCommT;
+
+typedef enum  {
+  NetCommWirelessMode_NONE = 0,
+  NetCommWirelessMode_AP = 1,
+  NetCommWirelessMode_Station = 2,
+  NetCommWirelessMode_LAST,
+}NetCommWirelessModeT;
 
 
 typedef enum  {
@@ -354,6 +396,27 @@ typedef enum  {
   UserCategory_NORMALUSER = 3,
   UserCategory_LAST = 4
 }UserCategory;
+
+typedef enum {
+	EncryptionAlgorithm_NONE = 0,
+	EncryptionAlgorithm_AUTO = 1,
+	EncryptionAlgorithm_ASCII = 2,
+	EncryptionAlgorithm_HEXADECIMAL = 3,
+	EncryptionAlgorithm_AES = 4,
+	EncryptionAlgorithm_TKIP = 5,
+	EncryptionAlgorithm_LAST = 6
+}EncryptionAlgorithm;
+
+typedef enum {
+	CertificationType_NONE = 0,
+	CertificationType_AUTO = 1,
+	CertificationType_WPA_PSK = 2,
+	CertificationType_WPA2_PSK = 3,
+	CertificationType_WPA = 4,
+	CertificationType_WPA2 = 5,
+	CertificationType_WEP = 6,
+	CertificationType_LAST = 7
+}CertificationType;
 
 
 typedef enum  {
@@ -379,6 +442,16 @@ typedef enum  {
   UserAccess_VISIT_PROFILE = 7,
   UserAccess_LAST = 8
 }UserAccess;
+
+typedef enum {
+	AlarmStat_None = 0,
+	AlarmStat_Start = 1,
+	AlarmStat_Stop = 2,
+	AlarmStat_Ongoing = 3,
+	AlarmStat_Nr = 4
+}AlarmStat;
+
+
 
 
 typedef enum  {
@@ -406,7 +479,9 @@ typedef enum  {
   ///硬盘
   AlarmEvent_DISK_ERROR = 12,
   AlarmEvent_DISK_LOST = 13,
-  AlarmEvent_LAST = 14
+  //ftp上传图片,测试ftp能否成功
+  AlarmEvent_TestFtpUpload = 14,
+  AlarmEvent_LAST
 }AlarmEvent;
 
 
@@ -435,7 +510,8 @@ typedef enum  {
   RecordFileType_ALARM_MOTIONTRACE = 6,
   RecordFileType_TIMER = 7,
   RecordFileType_REALTIME = 8,
-  RecordFileType_LAST = 9
+  RecordFileType_ALARM = 9,
+  RecordFileType_LAST = 10
 }RecordFileType;
 
 
@@ -581,7 +657,7 @@ typedef enum  {
 	AudioVoiceQualityEnhancement_LAST = 9
 }AudioVoiceQualityEnhancement;
 
-typedef enum  {
+ typedef enum{
 	OverLayType_Title = 0,
 	OverLayType_Time = 1,
 	OverLayType_Last = 2
@@ -710,7 +786,8 @@ typedef enum  {
 		PtzCommand_LIGHTCONTROLLER = 51
 }PtzCommand;
 
-enum ProgressStatus {
+
+typedef enum  {
 	ProgressStatus_None = 0,
 	ProgressStatus_UpgradeStart = 1,
 	ProgressStatus_UpgradeRecvData = 2,
@@ -725,8 +802,14 @@ enum ProgressStatus {
 	ProgressStatus_HaveNoDiskResource = 11,
 	ProgressStatus_HaveNoRightResource = 12,
 	ProgressStatus_LinkFailed = 13,
-	ProgressStatus_Last = 14
-};
+	ProgressStatus_UpgradeFirmwareCheckout = 14,
+	ProgressStatus_UpgradeFirmwareCheckoutSucceed = 15,
+	ProgressStatus_UpgradeFirmwareCheckoutFailed = 16,
+	ProgressStatus_Last = 17
+}ProgressStatus;
+
+
+
 
 
 typedef enum  {
@@ -769,15 +852,15 @@ typedef enum  {
 }PtzCameraLensIrisCtrlMode;
 
 
-typedef enum EmailEncodeType{
+typedef enum {
 	EmailEncodeType_None = 0,
 	EmailEncodeType_TLS = 1,
 	EmailEncodeType_SSL = 2,
 	EmailEncodeType_NULL = 3,
 	EmailEncodeType_Last = 4
-};
+}EmailEncodeType;
 
-typedef enum DdnsType{
+typedef enum {
 	DdnsType_None = 0,
 	DdnsType_DynDns = 1,
 	DdnsType_Ddns3322 = 2,
@@ -785,7 +868,7 @@ typedef enum DdnsType{
 	DdnsType_DdnsExt1 = 4,
 	DdnsType_DdnsExt2 = 5,
 	DdnsType_Last = 6
-};
+}DdnsType;
 typedef enum  {
 	RenewalInterval_None = 0,
 	RenewalInterval_HalfHour = 1,
@@ -800,11 +883,11 @@ typedef enum  {
 }RenewalInterval;
 
 typedef enum  {
-  LinkProtocol_None = 0,
-  LinkProtocol_Moon = 1,
-  LinkProtocol_Onvif = 2,
-  LinkProtocol_GBT28181 = 3,
-  LinkProtocol_RTSP = 4,
+	LinkProtocol_None = 0,
+	LinkProtocol_Moon = 1,
+	LinkProtocol_Onvif = 2,
+	LinkProtocol_GBT28181 = 3,
+	LinkProtocol_RTSP = 4,
 	LinkProtocol_RTMP = 5,
 	LinkProtocol_Last = 6
 }LinkProtocol;
@@ -851,6 +934,35 @@ typedef enum  {
 	TimeZone_UTC_E14 = 37,
 	TimeZone_UTC_Last = 38
 }TimeZone;
+
+
+
+typedef enum  {
+	FirmWareFileFormat_NULL = 0,
+	FirmWareFileFormat_Jffs2 = 1,
+	FirmWareFileFormat_CramFs = 2,
+	FirmWareFileFormat_SquashFs = 3,
+	FirmWareFileFormat_Bin = 4,
+	FirmWareFileFormat_Yaffs2 = 5,
+	FirmWareFileFormat_Tar = 6,
+	FirmWareFileFormat_Ubi = 7,
+	FirmWareFileFormat_Last = 8
+}FirmWareFileFormat;
+
+
+typedef enum  {
+	FirmWarePayload_NULL = 0,
+	FirmWarePayload_Uboot = 1,
+	FirmWarePayload_UbootConfig = 2,
+	FirmWarePayload_Kernel = 3,
+	FirmWarePayload_FileSystem = 4,
+	FirmWarePayload_App = 5,
+	FirmWarePayload_BoardArgs1 = 6,
+	FirmWarePayload_BoardArgs2 = 7,
+	FirmWarePayload_BoardArgs3 = 8,
+	FirmWarePayload_BoardArgs4 = 9,
+	FirmWarePayload_Last,
+}FirmWarePayload;
 
 typedef enum _ {
   __NONE = 0,
@@ -918,6 +1030,19 @@ typedef enum _ {
   __MsgSnapshot = 62,
   __MsgOverLayCaps = 63,
 }__Msg;
+
+typedef enum {
+	Intelligent_None = 0,
+	Intelligent_FaceDetect = 1,
+	Intelligent_PlateRecognition = 2,
+	Intelligent_Last
+}IntelligentCap;
+
+typedef enum {
+	IntelligentHandle_None = 0,
+	IntelligentHandle_FaceDetectResultQueue = 1,
+	IntelligentHandle_Last
+}IntelligentHandle;
 
 
 #endif

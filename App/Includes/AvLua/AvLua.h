@@ -136,7 +136,7 @@ public:
 		}
 		lua_call(m_LuaState, sizeargs, 1);
 
-		int n = luaL_len(m_LuaState, -1);
+		int n = (int)luaL_len(m_LuaState, -1);
 		std::string mem;
 
 		for (int i = 1; i <= n; i++){

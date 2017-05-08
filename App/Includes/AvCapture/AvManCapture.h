@@ -30,6 +30,7 @@ private:
 	~CManCapture();
 public:
 	av_bool Initialize();
+	av_bool LoadConfig();
 	Capture *GetAvCaptureInstance(av_int iChannel);
 	av_u32   GetAvCaptureTotal();
 public:
@@ -49,10 +50,6 @@ public:
 	av_bool NetCaptureProtoUpgrade(std::list <C_FirmWareUpgrade> *FirmWareUpgrade);
 	av_bool NetCaptureProtoUpgradeProgress(std::list <C_FirmWareUpgrade> *FirmWareUpgrade);
 	av_bool NetCaptureProtoUpgradeOver();
-
-
-public:
-	av_void OnProtoSlots(LinkProtocol ProType, NetProtocolParam &_data);
 
 private:
 	std::map <av_int, Capture *>  m_ManCaptureMap;

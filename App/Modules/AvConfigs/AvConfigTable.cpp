@@ -400,6 +400,7 @@ int CAvConfigBase::SettingUp(int index, int require)
 				}
 			}
 			if (i == m_max_index) {
+				//当index 为 -1 时， 默认比对函数未找到不同的情总，直接返回即可。
 				return req;
 			}
 		} else {
@@ -437,6 +438,7 @@ int CAvConfigBase::SettingUp(int index, int require)
 		m_mutex.Enter();
 
 	} else {
+		av_warning("config CONF_REQ_CHECK_INVALID\n");
 		req |= CONF_REQ_CHECK_INVALID;
 	}
 	return req;

@@ -3,11 +3,11 @@
 if (!CMAKE_QT_PATH)
 	message(FATAL_ERROR ${CMAKE_QT_PATH})
 endif()
-message(STATUS ${CMAKE_QT_PATH})
+message(STATUS "CMakeLists AvGui Dir ${CMAKE_QT_PATH} ")
 SET(CMAKE_PREFIX_PATH ${CMAKE_QT_PATH})
 find_package(Qt5Core)
 find_package(Qt5Widgets)
-find_package(Qt5Quick)
+#find_package(Qt5Quick)
 find_package(Qt5LinguistTools)
 ADD_DEFINITIONS (${QT_DEFINITIONS})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -22,11 +22,10 @@ set(AvGuiSRC_LIST
 		AvGui.cpp
 		AvForm/frmmessagebox.cpp
 		AvForm/frmmainwindows.cpp
-#		AvForm/frmdevices.cpp
 		AvForm/frmdevice.cpp
 		AvForm/dlgnetset.cpp
 		AvForm/dlgupgrade.cpp
-		AvForm/dlgfactoryset.cpp
+		
 		AvForm/dlghandadddevice.cpp
 		AvForm/dlgdeviceset.cpp
 		AvForm/dlgptzwindows.cpp
@@ -34,7 +33,13 @@ set(AvGuiSRC_LIST
 		AvForm/formptzadvanced.cpp
 		AvForm/dlgareaselect.cpp
 		AvForm/dlgoverlay.cpp
-		#AvForm/ctimearea.cpp
+		AvForm/dlgrecordset.cpp
+		AvForm/dlgalarmmessage.cpp
+		AvForm/wgtrecordshow.cpp
+		AvForm/frmrecordsearch.cpp
+		AvForm/frmmainmenu.cpp
+		AvForm/frmnotificationbox.cpp
+		AvForm/dlgsnapshot.cpp
 		AvForm/dlgtimeselect.cpp
 		AvForm/dlgabout.cpp
 		AvUiComm/IconComm.cpp
@@ -44,22 +49,22 @@ set(AvGuiSRC_LIST
 		AvUiComm/progressbardelegate.cpp
 		AvUiComm/tablemodel.cpp
 		AvUiComm/AvUiConfigIni.cpp
+		AvUiComm/StartupWindow.cpp
 		AvSource/videowidget.cpp
 		AvSource/VideoWidgetManager.cpp
 		AvSource/umslider.cpp
 		AvSource/QAvEvent.cpp
 		AvSource/AvGuiApplication.cpp
-#		AvSource/AvQStringsLanguage.cpp
+		AvSource/AvGuiStatusMachine.cpp
 	)
+		
 set(AvGuiHeader_LIST 
 		${project_headers_pach}/AvGui/AvGui.h
 		AvForm/frmmessagebox.h
 		AvForm/frmmainwindows.h
-#		AvForm/frmdevices.h
 		AvForm/frmdevice.h
 		AvForm/dlgnetset.h
 		AvForm/dlgupgrade.h
-		AvForm/dlgfactoryset.h
 		AvForm/dlghandadddevice.h
 		AvForm/dlgdeviceset.h
 		AvForm/dlgptzwindows.h
@@ -67,9 +72,15 @@ set(AvGuiHeader_LIST
 		AvForm/formptzadvanced.h
 		AvForm/dlgareaselect.h
 		AvForm/dlgoverlay.h
-		#AvForm/ctimearea.h
+		AvForm/dlgrecordset.h
+		AvForm/dlgalarmmessage.h
+		AvForm/wgtrecordshow.h
+		AvForm/frmrecordsearch.h
+		AvForm/frmmainmenu.h
+		AvForm/frmnotificationbox.h
 		AvForm/dlgtimeselect.h
 		AvForm/dlgabout.h
+		AvForm/dlgsnapshot.h
 		AvUiComm/IconComm.h
 		AvUiComm/AvUiComm.h
 		AvUiComm/IpAddrEdit.h
@@ -79,24 +90,25 @@ set(AvGuiHeader_LIST
 		AvUiComm/tablemodel.h
 		AvUiComm/StdListDevicesSort.h
 		AvUiComm/AvUiConfigIni.h
+		AvUiComm/StartupWindow.h
 		AvSource/videowidget.h
 		AvSource/VideoWidgetManager.h
 		AvSource/umslider.h
 		AvSource/QAvEvent.h
 		AvSource/AvGuiApplication.h
 		AvSource/AvQStringsLanguage.h
-		
+		AvSource/AvGuiStatusMachine.h
 		AvGuiSystem.h
-		
 	)
+	
+
+
 set (SOURCE_UI
 	AvForm/frmmessagebox.ui
 	AvForm/frmmainwindows.ui
-#	AvForm/frmdevices.ui
 	AvForm/frmdevice.ui
 	AvForm/dlgnetset.ui
 	AvForm/dlgupgrade.ui
-	AvForm/dlgfactoryset.ui
 	AvForm/dlghandadddevice.ui
 	AvForm/dlgdeviceset.ui
 	AvForm/dlgptzwindows.ui
@@ -107,18 +119,30 @@ set (SOURCE_UI
 	#AvForm/ctimearea.ui
 	AvForm/dlgtimeselect.ui
 	AvForm/dlgabout.ui
+	AvForm/dlgrecordset.ui
+	AvForm/dlgalarmmessage.ui
+	AvForm/wgtrecordshow.ui
+	AvForm/frmrecordsearch.ui
+	AvForm/frmmainmenu.ui
+	AvForm/frmnotificationbox.ui
+	AvForm/dlgsnapshot.ui
 )
-if (COMPILER MATCHES "HISI_3536" OR COMPILER MATCHES "PC_WIN32" )
+
+if (_AV_WARE_CODE_OPENSOURCE STREQUAL "OFF")
 	set(AvGuiSRC_LIST ${AvGuiSRC_LIST}
-		AvForm/frmmainmenu.cpp
+			AvForm/dlgmkfirmware.cpp
+			AvForm/dlgfactoryset.cpp
 	)
 	
 	set(AvGuiHeader_LIST ${AvGuiHeader_LIST}
-		AvForm/frmmainmenu.h
+			AvForm/dlgmkfirmware.h
+			AvForm/dlgfactoryset.h
 	)
 	
+	
 	set (SOURCE_UI ${SOURCE_UI}
-		AvForm/frmmainmenu.ui
+			AvForm/dlgmkfirmware.ui
+			AvForm/dlgfactoryset.ui
 	)
 endif()
 

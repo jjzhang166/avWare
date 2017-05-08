@@ -16,7 +16,7 @@ frmMessageBox::frmMessageBox(QWidget *parent) :
     this->setAttribute(Qt::WA_DeleteOnClose);
     //设置图形字体
     IconComm::Instance()->SetIcon(ui->LabIco, QChar(0xf015), 12);
-	IconComm::Instance()->SetIcon(ui->btnMenu_Close, QChar(0xf00d), 10);
+    IconComm::Instance()->SetIcon(ui->btnMenu_Close, QChar(0xf00d), 10);
     //关联关闭按钮
     connect(ui->btnMenu_Close, SIGNAL(clicked()), this, SLOT(close()));
     connect(ui->btnCancel, SIGNAL(clicked()), this, SLOT(close()));
@@ -74,4 +74,9 @@ void frmMessageBox::mousePressEvent(QMouseEvent *e)
 void frmMessageBox::mouseReleaseEvent(QMouseEvent *)
 {
     mousePressed = false;
+}
+
+void frmMessageBox::on_btnMenu_Close_clicked()
+{
+   // close();
 }

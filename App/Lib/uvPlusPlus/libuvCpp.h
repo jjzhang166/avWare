@@ -58,9 +58,11 @@ typedef void (*WorkerFuncAfter_t)(void *args);
 class AVWARE_API CNetUv{
 public:
 	CNetUv();
-	~CNetUv();
+	virtual ~CNetUv();
+
 public:
 	bool				Start(const char *address, const int port, int attr);
+	bool				Stop();
 	int					WriteAsync(buf_t *bufbase, int nbufs);
 	int					WorkerTask(WorkerFunc_t worker, WorkerFuncAfter_t workerafter, void *args);
 	virtual int			OnRead(const buf_t *bufbase, int nbufs, struct sockaddr_in *addr = NULL);
@@ -120,6 +122,7 @@ public:
 	static void *		 mp_CloseSock_sem;
 	static void *		 mp_CloseSock_mutex;
 	static void *		 mp_timerList;
+	static void *		 mp_timerList_mutex;
 };
 
 

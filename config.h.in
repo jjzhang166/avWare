@@ -13,6 +13,15 @@
 /*Use Have Proc*/
 #cmakedefine _AV_WARE_M_HAVE_PROC
 
+/*Open Source */
+#cmakedefine _AV_WARE_CODE_OPENSOURCE
+
+/*Lite Version */
+#cmakedefine _AV_WARE_CODE_LITE
+
+
+/*use _AV_WARE_RENDER_BY_RECT*/
+#cmakedefine _AV_WARE_RENDER_BY_RECT
 
 #define _AV_WARE_VERSION_MAJOR 		@_AV_WARE_VERSION_MAJOR@
 #define _AV_WARE_VERSION_MINOR 		@_AV_WARE_VERSION_MINOR@

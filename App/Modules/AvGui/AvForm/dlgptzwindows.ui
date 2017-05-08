@@ -952,7 +952,7 @@
        </widget>
       </item>
       <item row="0" column="0" colspan="4">
-       <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,0,2,2,0">
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,2,2,0">
         <property name="sizeConstraint">
          <enum>QLayout::SetMinAndMaxSize</enum>
         </property>
@@ -968,26 +968,6 @@
         <property name="bottomMargin">
          <number>6</number>
         </property>
-        <item>
-         <widget class="QComboBox" name="CBoxChannels">
-          <property name="minimumSize">
-           <size>
-            <width>32</width>
-            <height>24</height>
-           </size>
-          </property>
-          <item>
-           <property name="text">
-            <string>Chn0</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Chn1</string>
-           </property>
-          </item>
-         </widget>
-        </item>
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">

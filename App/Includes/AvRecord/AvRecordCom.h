@@ -36,14 +36,17 @@ public:
 	virtual ~CAvRecFCom(){};
 	
 public:	
-	virtual av_bool AvRecFOpen(av_char *FilePatch, AvRecFOpenMode _mode) 		= 0;
-	virtual av_bool AvRecFReadPacket(CAvPacket &Packet) 						= 0;
-	virtual av_bool AvRecFWritePacket(CAvPacket &Packet) 						= 0;
-	virtual av_bool AvRecFSeek(AvRecFSeekPlace seek, AvRecFSeekContext c, av_32 offset) 		= 0;
-	virtual av_bool AvRecFRename(av_char *newName) 								= 0;
-	virtual av_bool AvRecFRemove() 												= 0;
-	virtual av_bool AvRecFClose() = 0;
-	
+	virtual av_64			AvRecFOpen(av_char *FilePatch, AvRecFOpenMode _mode) = 0;
+	virtual av_int			AvRecFNextFrameLength() = 0;
+	virtual av_bool			AvRecFReadPacket(CAvPacket &Packet) = 0;
+	virtual CAvPacket *		AvRecFReadPacket() = 0;
+	virtual av_bool			AvRecFWritePacket(CAvPacket &Packet) = 0;
+	virtual av_bool			AvRecFSeek(AvRecFSeekPlace seek, AvRecFSeekContext c, av_32 offset) = 0;
+	virtual av_bool			AvRecFSeek(av_u32 AbsoluteSecond) = 0;
+	virtual av_bool			AvRecFRename(av_char *newName) = 0;
+	virtual av_bool			AvRecFRemove() = 0;
+	virtual av_bool			AvRecFClose() = 0;
+	virtual av_bool			AvRecRepair(av_u32 &FileLen, av_u32 &EndTmSec, av_u32 &FileMask) = 0;
 
 };
 

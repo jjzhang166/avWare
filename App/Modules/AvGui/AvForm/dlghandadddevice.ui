@@ -389,7 +389,7 @@
   <customwidget>
    <class>IpAddrEdit</class>
    <extends>QFrame</extends>
-   <header location="global">ipaddredit.h</header>
+   <header location="global">IpAddrEdit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

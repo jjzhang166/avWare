@@ -1,6 +1,3 @@
-target_link_libraries(${target} mtd)
-
-
 target_link_libraries(${target} mpi)
 target_link_libraries(${target} hdmi)
 target_link_libraries(${target} ive)

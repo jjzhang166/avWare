@@ -188,7 +188,7 @@ static int	GetNetWorkInfo(NetWorkInfo_S *info)
 	snprintf(info->ip,sizeof(info->ip),"%s",ConfigNet.LanAttr.IpAddr);
 	snprintf(info->dns,sizeof(info->dns),"%s",ConfigNet.LanAttr.Dns1);
 	snprintf(info->gateway,sizeof(info->gateway),"%s",ConfigNet.LanAttr.Gateway);
-	snprintf(info->hostName,sizeof(info->hostName),"%s",ConfigNet.LanAttr.Host);
+	snprintf(info->hostName,sizeof(info->hostName),"eth0");
 	snprintf(info->mac,sizeof(info->mac),"%s",FactoryInfo.ProductMacAddr);
 	strcat(info->ethernetName,"eth0");
 	info->DhcpEnable = ENUM_ENABLED_FALSE;	
@@ -276,7 +276,6 @@ static int	SetVideoEncode(int chn, int streamId, VedioEncode_S *info)
 static int	GetVideoEncodeCab(int chn, int streamId, VedioEncodeCab_S *info)
 {
 	C_DspCaps DspCaps;
-	
 	CAvDevice::GetDspCaps(DspCaps);
 	if (DspCaps.nMaxDecodeChannel <= chn && DspCaps.nMaxEncodeChannel <= chn){
 		av_error("This Device Have no %d Channel \n", chn);

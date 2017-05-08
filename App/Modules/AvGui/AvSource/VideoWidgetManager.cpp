@@ -1,21 +1,31 @@
 ﻿#include "AvGui/AvGui.h"
 #include "AvUiComm/AvUiComm.h"
 #include "VideoWidgetManager.h"
+#include "AvGuiStatusMachine.h"
 #include <QPainter>
 #include <QEvent>
-
+#include "AvUiComm/AvUiConfigIni.h"
 
 #define GRID_LINE_WIDTH     1
 //#define GRID_LINE_COLOR     QColor(255, 255, 128)
 #define GRID_LINE_COLOR     QColor(192, 192, 192)
 
 
+#define D_VIDEOWIDGETMANAGER_INI_SECTION						"VideoWidgetsManager"
+#define D_VIDEOWIDGETMANAGER_INI_KEY_WIDGETSNUM					"WidgetNum"
+#define D_VIDEOWIDGETMANAGER_INI_KEY_START_CHANNEL				"StartChn"
+#define D_VIDEOWIDGETMANAGER_INI_KEY_END_CHANNEL				"EndChn"
+
 VideoWidgetManager::VideoWidgetManager(QWidget *parent)
 : QWidget(parent)
 {
 	m_WidgetLayoutNum = 0;
-    initVideoWidgetManager();
-    this->setMouseTracking(true);
+	QVariant VarNum = CAvUiConfigIni::Instance()->InigetValue(QString(D_VIDEOWIDGETMANAGER_INI_SECTION), QString(D_VIDEOWIDGETMANAGER_INI_KEY_WIDGETSNUM));
+
+	this->setMouseTracking(true);
+
+	m_Dlgsnapshot = new DlgSnapshot(this);
+
 
 	m_WgetVideoInfo = new WgetVideoInfo(this);
 	m_WgetVideoInfo->setMouseTracking(true);
@@ -25,22 +35,56 @@ VideoWidgetManager::VideoWidgetManager(QWidget *parent)
 	m_bOpenVideoInfoWindows = false;
 	
 	connect(m_WgetVideoInfo, SIGNAL(SignalsUiButtonMessage(WGET_VIDEOINFO_UIMSG)), this, SLOT(SlotVideoInfoOnUiMsg(WGET_VIDEOINFO_UIMSG)));
+	int Screens = 0;
+	if (VarNum.toInt() != 0 ){
+		Screens = VarNum.toInt();
+		setLayoutMode(VarNum.toInt());
+	}
+	else{
+		Screens = SYS_CHN_NUM;
+		setLayoutMode(SYS_CHN_NUM);
+	}
+	setLayoutMode(Screens);
+#if defined(_AV_WARE_RENDER_BY_RECT)
+
+#else
+	//for CAvPreview::m_SpiltScreenNum;
+	CAvPreview::SetSpiltScreen(Screens);
+#endif
 
 
 	startTimer(1000);
 
+	connect(&m_TimerInitStream, SIGNAL(timeout()), this, SLOT(SlotinitVideoWidgetStreamTimeOut()));
+
+	m_TimerInitStream.start(1200);
+
 }
 
 
+void VideoWidgetManager::SlotinitVideoWidgetStreamTimeOut()
+{
+	m_TimerInitStream.stop();
+	QVariant VarSChn = CAvUiConfigIni::Instance()->InigetValue(QString(D_VIDEOWIDGETMANAGER_INI_SECTION), QString(D_VIDEOWIDGETMANAGER_INI_KEY_START_CHANNEL));
+	QVariant VarEChn = CAvUiConfigIni::Instance()->InigetValue(QString(D_VIDEOWIDGETMANAGER_INI_SECTION), QString(D_VIDEOWIDGETMANAGER_INI_KEY_END_CHANNEL));
+
+	int StartChannel, EndChannel, NumWidgets;
+	if (VarSChn.toInt() == 0 || VarEChn.toInt() == 0){
+		StartChannel = 1;
+		EndChannel = SYS_CHN_NUM;
+	}
+	else{
+		StartChannel = VarSChn.toInt();
+		EndChannel = VarEChn.toInt();
+	}
+
+	NumWidgets = CAvGuiStatus::instance()->SplitGetNum();
+	SlotSpiltScreen(NumWidgets, StartChannel, EndChannel);
+	
+}
 VideoWidgetManager::~VideoWidgetManager()
 {
 	
-}
-
-void VideoWidgetManager::initVideoWidgetManager()
-{    
-	setLayoutMode(LAYOUT_MODE_FOUR);
-	//setLayoutMode(LAYOUT_MODE_SIZTYFOUR);
 }
 
 void VideoWidgetManager::paintEvent(QPaintEvent * event)
@@ -54,6 +98,7 @@ void VideoWidgetManager::paintEvent(QPaintEvent * event)
 
 void VideoWidgetManager::resizeEvent(QResizeEvent * event)
 {
+	AvQDebug("VideoWidgetManager::resizeEvent\n");
     resizeVideoWidgets(event->size().width(), event->size().height());
 	VideoWidget * pSelectedWidget = GetSelectedWidget();
 	if (pSelectedWidget != NULL){
@@ -90,14 +135,23 @@ void	VideoWidgetManager::moveEvent(QMoveEvent *event)
 void VideoWidgetManager::resizeVideoWidgets(int w, int h)
 {
     QRect rect;
+#if defined(_AV_WARE_RENDER_BY_RECT)
+	AvQDebug("VideoWidgetManager::resizeVideoWidgets start\n");
+	CAvPreview::SplitScreenClear();
+#endif
     for (int i = 0; i < m_WidgetLayout.zones.size(); ++i)
     {
         WidgetZone & widgetZone = m_WidgetLayout.zones[i];
-        
         rect = getZoneRect(w, h, widgetZone.zone);
-		
 		widgetZone.widget->setGeometry(rect);
+		widgetZone.widget->SyncWidgetSize(rect);
     }
+#if defined(_AV_WARE_RENDER_BY_RECT)
+	CAvPreview::SetSpiltScreen(m_WidgetLayoutNum);
+	AvQDebug("VideoWidgetManager::resizeVideoWidgets over\n");
+#endif
+
+
 }
 
 void VideoWidgetManager::drawGrid(QPainter & painter, int rows, int cols)
@@ -136,8 +190,10 @@ void VideoWidgetManager::drawGrid(QPainter & painter, int rows, int cols)
 
 void VideoWidgetManager::setLayoutMode(int layoutMode)
 {
-	CAvPreview::SetSpiltScreen(layoutMode);
 	m_WidgetLayoutNum = layoutMode;
+	
+	CAvGuiStatus::instance()->SplitSetNum(layoutMode);
+
     LayoutZoneList zones;
     switch (layoutMode)
     {
@@ -368,6 +424,10 @@ void VideoWidgetManager::setLayoutMode(int layoutMode)
 
         setLayout(8, 8, zones);
         break;
+	default:
+		AvQDebug("have no this mode = %d\n", layoutMode);
+		assert(0);
+		break;
     }
 	
 }
@@ -385,13 +445,17 @@ void VideoWidgetManager::addZone(LayoutZoneList & zones, int l, int r, int t, in
 }
 void	VideoWidgetManager::setVideoInfoWindows()
 {
+	if (GetSelectedWidget() == NULL){
+		return;
+	}
 	if (m_bOpenVideoInfoWindows == true){
-		m_WgetVideoInfo->hide();
 		m_bOpenVideoInfoWindows = false;
+		SlotOnShowInfoWidget(GetSelectedWidget(), false);
 	}
 	else{
 		m_bOpenVideoInfoWindows = true;
-		m_WgetVideoInfo->show();
+		SlotOnShowInfoWidget(GetSelectedWidget(), true);
+
 	}
 }
 void VideoWidgetManager::setLayout(int rows, int cols, LayoutZoneList & zones, bool syncFlag)
@@ -402,21 +466,17 @@ void VideoWidgetManager::setLayout(int rows, int cols, LayoutZoneList & zones, b
     int i, j, index = 0;
 	WidgetZone widgetZone = {0};
     VideoWidget * widget = 0;
-        
+	int Start_SysChannel = 0;
+	int End_SysChannel = 0;
+	CAvGuiStatus::instance()->SplitGetStartChannel(Start_SysChannel, End_SysChannel);
+	Start_SysChannel -= 1;
+	End_SysChannel -= 1;
     for (i = 0; i < m_WidgetLayout.zones.size(); ++i)
     {
         widgetZone = m_WidgetLayout.zones[i];
-            
-        if (widgetZone.widget->m_filePath.isEmpty())
-        {
-            delete widgetZone.widget;
-        }
-        else
-        {
-            widgetZone.widget->hide();
+        widgetZone.widget->hide();
+        m_VideoWidgets.insert(i, widgetZone.widget);
 
-            m_VideoWidgets.insert(index++, widgetZone.widget);
-        }
     }
 
     m_WidgetLayout.zones.clear();
@@ -424,66 +484,48 @@ void VideoWidgetManager::setLayout(int rows, int cols, LayoutZoneList & zones, b
     for (i = 0; i < zones.size(); ++i)
     {
         widget = 0;
-        
+		if (m_VideoWidgets.size() != 0){
+			widget = m_VideoWidgets.takeAt(0);
+		}
         widgetZone.zone.left = zones[i].left;
         widgetZone.zone.right = zones[i].right;
         widgetZone.zone.top = zones[i].top;
         widgetZone.zone.bottom = zones[i].bottom;
-        widgetZone.zone.filePath = zones[i].filePath;
-
-        if (!zones[i].filePath.isEmpty())
-        {
-            for (j = 0; j < m_VideoWidgets.size(); ++j)
-            {
-                if (m_VideoWidgets[j]->m_filePath == zones[i].filePath)
-                {
-                    widget = m_VideoWidgets.takeAt(j);
-                    break;
-                }
-            }
-        }
-
-        if (!syncFlag && !widget && !m_VideoWidgets.isEmpty())
-        {
-            widget = m_VideoWidgets.takeAt(0);
-        }
-        
-        initVideoWidget(widget, widgetZone, i);
+		initVideoWidget(widget, widgetZone, i, Start_SysChannel + i);
         
         m_WidgetLayout.zones.push_back(widgetZone);
     }
 
+	for (int i = 0; i < m_VideoWidgets.size(); i++){
+		widget = m_VideoWidgets[i];
+		widget->VideoWidgetDeInit();
+	}
     if (syncFlag)
-    {
+	{
         for (i = 0; i < m_VideoWidgets.size(); ++i)
         {
             widget = m_VideoWidgets[i];
             delete widget;
         }
-
         m_VideoWidgets.clear();
     }
 	
     update();
 }
 
-void VideoWidgetManager::initVideoWidget(VideoWidget * widget, WidgetZone & widgetZone, int ScreenID)
+void VideoWidgetManager::initVideoWidget(VideoWidget * widget, WidgetZone & widgetZone, int ScreenID, int SysChannel)
 {
-    if (widget)
-    {
+    if (widget) {
         widgetZone.widget = widget;
-		widgetZone.widget->SetTotalWindows(m_WidgetLayoutNum);
-    }
-    else
-    {
+		widgetZone.widget->VideoWidgetInit(m_WidgetLayoutNum, ScreenID, SysChannel);
+    } else {
 		widgetZone.widget = new VideoWidget(this);
-		widgetZone.widget->BindWidgetScreenID(ScreenID);
-        widgetZone.widget->m_filePath = widgetZone.zone.filePath;
+		widgetZone.widget->VideoWidgetInit(m_WidgetLayoutNum, ScreenID, SysChannel);
         QObject::connect(widgetZone.widget, SIGNAL(videoWidgetResize()), this, SLOT(SlotVideoWidgetReSize()));
 		QObject::connect(widgetZone.widget, SIGNAL(widgetSelecting(QWidget*)), this, SLOT(SlotWidgetSelecting(QWidget*)));
-		QObject::connect(widgetZone.widget, SIGNAL(SignalsSpiltScreen(int)), this, SLOT(SlotSpiltScreen(int)), Qt::QueuedConnection);
+		QObject::connect(widgetZone.widget, SIGNAL(SignalsSpiltScreen(int, int , int)), this, SLOT(SlotSpiltScreen(int,int, int)), Qt::QueuedConnection);
 		QObject::connect(widgetZone.widget, SIGNAL(SignalsMaxWindows(QWidget*, bool)), this, SLOT(SlotMaxWindows(QWidget *, bool)));
-		widgetZone.widget->SetTotalWindows(m_WidgetLayoutNum);
+
     }
 
     setVideoWidgetRect(widgetZone);
@@ -565,7 +607,6 @@ VideoWidget * VideoWidgetManager::GetIdleWidget()
 
 void VideoWidgetManager::SlotOnPreviewStart(int Channel, int Slave, bool bOpen)
 {
-	av_warning("mark \n");
 	if (Channel >= m_WidgetLayout.zones.size()){
 		AvQDebug("channel = %d  zones.size = %d\n", Channel, m_WidgetLayout.zones.size());
 		return;
@@ -573,41 +614,48 @@ void VideoWidgetManager::SlotOnPreviewStart(int Channel, int Slave, bool bOpen)
 	WidgetZone & widgetZone = m_WidgetLayout.zones[Channel];
 	widgetZone.widget->m_filePath.append(QString::number(Channel * 10 + Slave));
 
-	if (m_WidgetLayoutNum <= 4 || (m_WidgetLayoutNum < 9 && Channel == 0)){
-		Slave = CHL_MAIN_T;
-	}
-	else {
-		Slave = CHL_SUB1_T;
-	}
-	av_warning("mark \n");
-	widgetZone.widget->PreviewStart(Channel, Slave, bOpen);
-	av_warning("mark \n");
+	Slave = CAvPreview::GetShowCHL(Channel);
 
+	widgetZone.widget->PreviewStart(Slave, bOpen);
 }
 void	VideoWidgetManager::SlotOnShowInfoWidget(QWidget *pWidget, bool bShow)
 {
+	AvQDebug("pWidget = %p\n", pWidget);
+	if (pWidget == NULL){
+		return;
+	}
 	QPoint tmpPos = pWidget->mapToGlobal(pWidget->mapFromParent(pWidget->pos()));
 	m_WgetVideoInfo->resize(pWidget->size());
 	m_WgetVideoInfo->update();
 	m_WgetVideoInfo->move(tmpPos);
 	if (m_bOpenVideoInfoWindows == true){
 		m_WgetVideoInfo->show();
+		m_WgetVideoInfo->raise();
+	}
+	else if (m_bOpenVideoInfoWindows == false){
+		m_WgetVideoInfo->hide();
 	}
 	
-	m_WgetVideoInfo->raise();
+	
 }
 void VideoWidgetManager::SlotWidgetSelecting(QWidget * pWidget)
 {
 	
     VideoWidget * pSelectedWidget = GetSelectedWidget();
 	AvQDebug("VideoWidgetManager::SlotWidgetSelecting = %p\n", pSelectedWidget);
+
+
 	SlotOnShowInfoWidget(pWidget);
 	if (pSelectedWidget != pWidget)
     {
-        if (pSelectedWidget)
-        {
-            pSelectedWidget->m_bSelected = false;
-        }
+//         if (pSelectedWidget != NULL){
+//             pSelectedWidget->m_bSelected = false;
+//         }
+		for (int i = 0; i < m_WidgetLayout.zones.size(); ++i)
+		{
+			WidgetZone & widgetZone = m_WidgetLayout.zones[i];
+			widgetZone.widget->m_bSelected = false;
+		}
 
         pSelectedWidget = (VideoWidget *) pWidget;
         pSelectedWidget->m_bSelected = true;
@@ -627,6 +675,18 @@ void    VideoWidgetManager::SlotMaxWindows(QWidget *pWidget, bool bMax)
 }
 void	VideoWidgetManager::SlotVideoInfoOnUiMsg(WGET_VIDEOINFO_UIMSG eUiMsg)
 {
+	VideoWidget *pSlectWidget = NULL;
+	pSlectWidget = GetSelectedWidget();
+	if (NULL == pSlectWidget){
+		return;
+	}
+	av_msg("Channel = %d\n",pSlectWidget->m_Channel);
+	Capture *pCapture = g_AvManCapture.GetAvCaptureInstance(pSlectWidget->m_Channel);
+	if (pCapture == NULL){
+		return;
+	}
+
+	CAvPacket *pPacket = NULL;
 	switch (eUiMsg)
 	{
 	case UIMSG_START_LISTEN:
@@ -654,17 +714,98 @@ void	VideoWidgetManager::SlotVideoInfoOnUiMsg(WGET_VIDEOINFO_UIMSG eUiMsg)
 		av_msg("UIMSG_STOP_VIDEO\n");
 		break;
 	case UIMSG_REQUEST_SNAP:
+	{
 		av_msg("UIMSG_REQUEST_SNAP\n");
+		pPacket = pCapture->Snapshot();
+		if (NULL == pPacket){
+			QString Message = QString("Snaphot Failed");
+			CAvUiComm::ShowNotificationBox(Message);
+		}
+		else{
+			m_Dlgsnapshot->FillInSnapshot((unsigned char *)pPacket->GetRawBuffer(), pPacket->GetRawLength());
+			m_Dlgsnapshot->exec();
+		}
+	}
 		break;
 	default:
 		break;
 	}
 }
 
-void	VideoWidgetManager::SlotSpiltScreen(int Screens)
+void	VideoWidgetManager::SlotSpiltScreen(int Screens, int StartChanel, int EndChannel)
 {
+	int OldScreens = CAvGuiStatus::instance()->SplitGetNum();
 
-	setLayoutMode(Screens);
-	m_WgetVideoInfo->hide();
+	if (Screens != OldScreens){
+		setLayoutMode(Screens);
+#if defined(_AV_WARE_RENDER_BY_RECT)
+
+#else
+		//for CAvPreview::m_SpiltScreenNum;
+		CAvPreview::SetSpiltScreen(Screens);
+#endif
+	}
+#if defined(_AV_WARE_RENDER_BY_RECT)
+	AvQDebug("VideoWidgetManager::SlotSpiltScreen = %d Start\n", Screens);
+	CAvPreview::SplitScreenClear();
+#endif
+
+	if (Screens != 1){
+		CAvUiConfigIni::Instance()->InisetValue(QString(D_VIDEOWIDGETMANAGER_INI_SECTION), QString(D_VIDEOWIDGETMANAGER_INI_KEY_WIDGETSNUM), Screens);
+		CAvUiConfigIni::Instance()->InisetValue(QString(D_VIDEOWIDGETMANAGER_INI_SECTION), QString(D_VIDEOWIDGETMANAGER_INI_KEY_START_CHANNEL), StartChanel);
+		CAvUiConfigIni::Instance()->InisetValue(QString(D_VIDEOWIDGETMANAGER_INI_SECTION), QString(D_VIDEOWIDGETMANAGER_INI_KEY_END_CHANNEL), EndChannel);
+	}
+
+	int Status_StartChannel, Status_EndChannel, TotalWins;
+	CAvGuiStatus::instance()->SplitGetStartChannel(Status_StartChannel, Status_EndChannel);
+	TotalWins = CAvGuiStatus::instance()->SplitGetNum();
+	if (StartChanel != Status_StartChannel || EndChannel != Status_EndChannel){
+
+		int NowChannel, NowSlave;
+		int NowStartChannel, NowEndChannel;
+		CAvGuiStatus::instance()->SplitGetStartChannel(NowStartChannel, NowEndChannel);
+		NowStartChannel -= 1;
+
+		for (int i = 0; i < m_WidgetLayout.zones.size(); i++){
+			WidgetZone & widgetZone = m_WidgetLayout.zones[i];
+			
+#if defined(_AV_WARE_RENDER_BY_RECT)
+			QRect rect = getZoneRect(size().width(), size().height(), widgetZone.zone);
+			widgetZone.widget->SyncWidgetSize(rect);
+#else
+			E_EncodeCHL Slave = CAvPreview::GetShowCHL(i);
+			if (true == widgetZone.widget->PreviewGetCHLSlave(NowChannel, NowSlave)){
+				if (NowChannel == i + StartChanel - 1 && Slave == NowSlave){
+					AvQDebug("OLD[%d, %d] NEW[%d %d]\n", NowChannel, NowSlave, i + StartChanel - 1, Slave);
+					continue;
+				}
+			}
+			widgetZone.widget->VideoWidgetDeInit();
+			widgetZone.widget->VideoWidgetInit(TotalWins, i, i + StartChanel - 1);
+			widgetZone.widget->PreviewStart(Slave, true);
+#endif		
+		}
+		CAvGuiStatus::instance()->SplitSetStartChannel(StartChanel, EndChannel);
+
+#if defined(_AV_WARE_RENDER_BY_RECT)
+		CAvPreview::SetSpiltScreen(Screens);
+		AvQDebug("VideoWidgetManager::SlotSpiltScreen = %d End\n", Screens);
+		for (int i = 0; i < m_WidgetLayout.zones.size(); i++){
+			WidgetZone & widgetZone = m_WidgetLayout.zones[i];
+			widgetZone.widget->VideoWidgetDeInit();
+			widgetZone.widget->VideoWidgetInit(TotalWins, i, i + StartChanel - 1);
+			E_EncodeCHL Slave = CAvPreview::GetShowCHL(i);
+			widgetZone.widget->PreviewStart(Slave, true);
+		}
+#endif
+
+
+	}
+	if (NULL != m_WgetVideoInfo){
+		m_WgetVideoInfo->hide();
+	}
+
+
+
 	m_bOpenVideoInfoWindows = false;
 }

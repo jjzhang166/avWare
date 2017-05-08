@@ -248,7 +248,26 @@ inline QString AvUiLangsIrCutMode(IrCutMode e) {
 	};
 	return names[e];
 }
+inline QString AvUiLangsWdrMode(WdrMode e){
+	static QString names[] = {
+		QObject::tr("None"),
+		QObject::tr("Open"),
+		QObject::tr("Close"),
+		QObject::tr("Last"),
+	};
+	return names[e];
+}
 
+inline QString AvUiLangsShutterMode(ShutterMode e)
+{
+	static QString names[] = {
+		QObject::tr("None"),
+		QObject::tr("Auto"),
+		QObject::tr("MaxShutter"),
+		QObject::tr("Last"),
+	};
+	return names[e];
+}
 
 inline QString AvUiLangsMirrorMode(MirrorMode e) {
 	static QString names[] = {
@@ -332,6 +351,8 @@ inline QString AvUiLangsNetCommT(NetCommT e) {
 		QObject::tr("Wireless"),
 		QObject::tr("SIM"),
 		QObject::tr("BlueTooth"),
+		QObject::tr("Wireless1"),
+		QObject::tr("SIM1"),
 		QObject::tr("LAST"),
 	};
 	return names[e];
@@ -399,7 +420,17 @@ inline QString AvUiLangsAlarmEvent(AlarmEvent e) {
 	return names[e];
 }
 
-
+inline QString AvUiLangsAlarmStat(AlarmStat e)
+{
+	static QString names[] = {
+		QObject::tr("None"),
+		QObject::tr("Start"),
+		QObject::tr("Stop"),
+		QObject::tr("Ongoing"),
+		QObject::tr("Nr"),
+	};
+	return names[e];
+}
 
 inline QString AvUiLangsDiskStatus(DiskStatus e) {
 	static QString names[] = {
@@ -635,6 +666,9 @@ inline QString AvUiLangsProgressStatus(ProgressStatus e) {
 		QObject::tr("HaveNoDiskResource"),
 		QObject::tr("HaveNoRightResource"),
 		QObject::tr("LinkFailed"),
+		QObject::tr("UpgradeFirmwareCheckout"),
+		QObject::tr("UpgradeFirmwareCheckoutSucceed"),
+		QObject::tr("UpgradeFirmwareCheckoutFailed"),
 		QObject::tr("Last"),
 	};
 	return names[e];

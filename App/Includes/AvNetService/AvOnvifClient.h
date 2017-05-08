@@ -45,6 +45,9 @@ public:
 	I_RET RemoteAdvancedSystemGetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile);
 	I_RET RemoteAdvancedSystemSetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile);
 
+	I_RET RemoteRecordFileSearch(int Channel, C_RecordFileSearch &RecordFileSearch);
+	I_RET RemoteRecordFileDownload(int Channel, C_RecordFileDownload &RecordFileDeownload);
+	I_RET RemoteRecordFileDownloadCtrl(int Channel, C_RecordFileDownloadCtrl &RecordFileDownloadCtrl);
 
 	I_RET RemoteFactoryInfoGet(C_ManufacturerInfo &ManfacturerInfo);
 
@@ -57,6 +60,8 @@ public:
 	I_RET RemoteStreamStart(int Channel, int Slave);
 	I_RET RemoteStreamStop(int Channel, int Slave);
 	I_RET RemoteSendAvPacket(int Channel, int Slave, CAvPacket *pack);
+	I_RET RemoteSendAlarmMsg(C_AlmMsg &AlmMsg);
+	I_RET RemoteGetAlarmMsg(C_AlmMsg &AlmMsg);
 	I_RET RemoteOnAvPacket(int Channel, int Slave, CAvPacket *pack);
 	CAvPacket * RemoteStreamGet(int Channel, int Slave);
 

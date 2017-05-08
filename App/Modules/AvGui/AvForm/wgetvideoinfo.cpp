@@ -3,15 +3,13 @@
 #include "AvUiComm/IconComm.h"
 #include "AvUiComm/AvUiComm.h"
 
+
 WgetVideoInfo::WgetVideoInfo(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WgetVideoInfo)
 {
     ui->setupUi(this);
-// 	setMouseTracking(true);
-// 	setWindowFlags(Qt::FramelessWindowHint);
-//     setAttribute(Qt::WA_TranslucentBackground, true);
-	//setWindowOpacity(0.1);
+
 	raise();
 	m_Palette = new QPalette;
 	m_Palette->setColor(QPalette::WindowText, Qt::green);
@@ -20,12 +18,13 @@ WgetVideoInfo::WgetVideoInfo(QWidget *parent) :
 	m_PaletteTrigger = new QPalette;
 	m_PaletteTrigger->setColor(QPalette::WindowText, QColor(0x00, 0xff, 0x00, 0x00));
 	m_PaletteTrigger->setColor(QPalette::Background, QColor(0x00, 0xff, 0x00, 0x00));
-	ui->LabAlarm->setPalette(*m_Palette);
-	ui->LabStreamInfo->setPalette(*m_Palette);
-	ui->LabListen->setPalette(*m_Palette);
-	ui->LabRecord->setPalette(*m_Palette);
-	ui->LabSpeak->setPalette(*m_Palette);
 	
+	ui->LabAlarm->setStyleSheet(QString("color:rgba(0, 255, 0, 255)"));
+	ui->LabStreamInfo->setStyleSheet(QString("color:rgba(0, 255, 0, 255)"));
+	ui->LabListen->setStyleSheet(QString("color:rgba(0, 255, 0, 255)"));
+	ui->LabRecord->setStyleSheet(QString("color:rgba(0, 255, 0, 255)"));
+	ui->LabSpeak->setStyleSheet(QString("color:rgba(0, 255, 0, 255)"));
+
 	m_bBtnEnableVideoClicked = false;
 	m_bBtnListenClicked = false;
 	m_bBtnRecordClicked = false;
@@ -130,63 +129,66 @@ void WgetVideoInfo::resizeEvent(QResizeEvent* size)
 }
 void	WgetVideoInfo::timerEvent(QTimerEvent *event)
 {
+
 	if (m_bBtnRecordClicked == true){
 		if (m_bLabRecordStatus == true){
-			ui->LabRecord->setPalette(*m_PaletteTrigger);
+			ui->LabRecord->setStyleSheet(QString("color:rgba(0, 255, 0, 0)"));
 		}
 		else{
-			ui->LabRecord->setPalette(*m_Palette);
+			ui->LabRecord->setStyleSheet(QString("color:rgba(0, 255, 0, 255)"));
 		}
 		m_bLabRecordStatus = !m_bLabRecordStatus;
 	}
 	else{
 		if (m_bLabRecordStatus == false){
 			m_bLabRecordStatus = true;
-			ui->LabRecord->setPalette(*m_Palette);
+			ui->LabRecord->setStyleSheet(QString("color:rgba(0, 255, 0, 255)"));
 		}
 	}
 
 	if (m_bBtnListenClicked == true){
 		if (m_bLabListenStatus == true){
-			ui->LabListen->setPalette(*m_PaletteTrigger);
+			
+			ui->LabListen->setStyleSheet(QString("color:rgba(0, 255, 0, 0)"));
 		}
 		else{
-			ui->LabListen->setPalette(*m_Palette);
+			
+			ui->LabListen->setStyleSheet(QString("color:rgba(0, 255, 0, 255)"));
 		}
 		m_bLabListenStatus = !m_bLabListenStatus;
 	}
 	else{
 		if (m_bLabListenStatus == false && m_bBtnSpeakListenCliecked == false){
 			m_bLabListenStatus = true;
-			ui->LabListen->setPalette(*m_Palette);
+			ui->LabListen->setStyleSheet(QString("color:rgba(0, 255, 0, 255)"));
 		}
 	}
 	if (m_bBtnSpeakListenCliecked == true){
 		if (m_bLabSpeakStatus == true){
-			ui->LabSpeak->setPalette(*m_PaletteTrigger);
+			ui->LabSpeak->setStyleSheet(QString("color:rgba(0, 255, 0, 0)"));
 		}
 		else{
-			ui->LabSpeak->setPalette(*m_Palette);
+			ui->LabSpeak->setStyleSheet(QString("color:rgba(0, 255, 0, 255)"));
 		}
 		m_bLabSpeakStatus = !m_bLabSpeakStatus;
 
 		if (m_bLabListenStatus == true){
-			ui->LabListen->setPalette(*m_PaletteTrigger);
+			ui->LabListen->setStyleSheet(QString("color:rgba(0, 255, 0, 0)"));
 		}
 		else{
-			ui->LabListen->setPalette(*m_Palette);
+			ui->LabListen->setStyleSheet(QString("color:rgba(0, 255, 0, 255)"));
 		}
 		m_bLabListenStatus = !m_bLabListenStatus;
 	}
 	else {
 		if (m_bLabSpeakStatus == false){
-			ui->LabSpeak->setPalette(*m_Palette);
+			ui->LabSpeak->setStyleSheet(QString("color:rgba(0, 255, 0, 255)"));
 			m_bLabSpeakStatus = true;
 		}
 
 		if (m_bBtnListenClicked == false && m_bLabListenStatus == false){
 			m_bLabListenStatus = true;
-			ui->LabListen->setPalette(*m_Palette);
+			ui->LabSpeak->setStyleSheet(QString("color:rgba(0, 255, 0, 255)"));
 		}
 	}
 

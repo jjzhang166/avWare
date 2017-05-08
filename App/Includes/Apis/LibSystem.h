@@ -58,8 +58,8 @@ av_bool  AvGpioSet0(av_int GpioNo);
 av_bool  AvGpioSet(av_int GpioNo, av_int level);
 av_int	 AvGpioConvert(E_AvGpio eGpio);
 av_int	 AvGpioTriggerLevel(E_AvGpio eGpio);
-
-
+av_bool  AvGpioChangeIONum(E_AvGpio eGpio, av_int GpioNum);
+av_bool  avGpioLedSet(av_bool bOpen, int mode);
 //串口 操作
 typedef enum {
 	SerialParity_NOPARITY,	///< No parity
@@ -106,9 +106,6 @@ av_bool AvWatchDogDeInit();
 av_bool AvWatchDogFeed();
 
 //rtc 操作
-
-
-
 av_u32  AvGetUpTime();
 av_bool AvRtcInit();
 av_bool AvRtcDeInit();
@@ -161,16 +158,32 @@ typedef struct{
 	char Submask[NetCommMaxStringLen];
 	char Dns1[NetCommMaxStringLen];
 	char Dns2[NetCommMaxStringLen];
-	char Host[NetCommMaxStringLen];
 }C_LanAttribute;
 
 typedef struct {
 	char MarkCode[NetCommMaxStringLen];
+	char SearchName[NetCommMaxStringLen];
 }C_BlueToothAttribute;
 
+#define MAX_CONF_ROUTER_LINK 10
+typedef struct{
+	char SSID[128];
+	char Passwd[128];
+}C_WirelessInfo;
+
+typedef struct{
+	char SSID[128];
+	char Passwd[128];
+}C_WirelessApAttribute;
+
+
+
 typedef struct {
-	char SSID[NetCommMaxStringLen];
-	char Passwd[NetCommMaxStringLen];
+	WirelessMode			Mode;
+	av_int					WirelessPreferred;
+	C_WirelessInfo			WirelessInfo[MAX_CONF_ROUTER_LINK];
+	C_LanAttribute			WirelessConf;
+	C_WirelessApAttribute	WirelessApConf;
 }C_WirelessAttribute;
 
 typedef struct  {
@@ -179,7 +192,11 @@ typedef struct  {
 
 typedef struct 
 {
-	av_bool Enable;
+	av_bool			bEnable;	//打开或者关闭
+	av_bool			bSupport;	//硬件上是否支持/*仅供上层配置表使用，BSP 可不必理会*/
+	NetCommT		iFrNameType;
+	NetCommGetMode	mGetMode;
+
 	union
 	{
 		C_LanAttribute			LanAttr;
@@ -192,12 +209,12 @@ typedef struct
 
 
 
-av_bool avNetCommCaps(C_NetCommCaps *NetCommCaps);
 
-av_bool avNetCommSet(NetCommT type, C_NetCommAttribute *Attr);
+av_bool avNetCommCaps(C_NetCommCaps *NetCommCaps);
+av_bool avNetCommSet(C_NetCommAttribute *Attr);
 av_bool avNetCommGet(NetCommT type, C_NetCommAttribute *Attr);
 
-
+av_void avSystemOnTime1s();
 
 unsigned int  /*av_capture_size*/NmSize2AvCaptureSize(int higth, int width);
 
@@ -214,7 +231,7 @@ typedef struct {
 	av_uint		SensorType;
 	av_uint		FActoryTime;
 	av_uint		MaxChannel;
-	av_uint		Res;
+	av_uint		HardInterfaceMask;
 }C_DeviceFactoryInfo;
 
 
@@ -236,6 +253,12 @@ av_bool AvSystemUpgradeMemory(av_uchar *ptr, av_uint length, C_UpgradeProgress *
 
 av_bool avGetCpuMemStatusInfo(C_CpuMemStatusInfo *CpuMemStatusInfo);
 av_bool	avGetNetStatusInfo(C_NetStatusInfo *NetStatusInfo);
+
+
+av_bool avPlatformInit();
+av_bool avPlatformDeInit();
+
+
 
 #ifdef __cplusplus
 }

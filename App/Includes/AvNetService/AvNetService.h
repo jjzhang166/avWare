@@ -14,6 +14,7 @@
 ******************************************************************/
 #ifndef _AVNETSERVICE_H_
 #define _AVNETSERVICE_H_
+#include <string.h>
 #include "Apis/AvWareCplusplus.h"
 #include "AvConfigs/AvConfigNetService.h"
 #include "AvThread/AvThread.h"
@@ -62,5 +63,6 @@ private:
 	std::map<av_u32, AvRtmp*>	m_AvRtmpMap;
 };
 #define g_AvNetService (*CAvNetService::instance())
+
 
 #endif

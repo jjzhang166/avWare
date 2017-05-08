@@ -1,5 +1,5 @@
 #include "AvRecord/AvRecordDB.h"
-
+#include "AvDevice/AvDevice.h"
 
 #define RecordDbColumnFilePath		"FilePath"
 #define RecordDbColumnFileSize		"FileSize"
@@ -25,7 +25,17 @@ CAvRecordDB::~CAvRecordDB()
 {
 	DbClose();
 }
+av_bool CAvRecordDB::DbOpen(av_u32 OpenDaySecond)
+{
+	char path[256] = { 0 };
+	std::string RecordHomeDir;
+	CAvDevice::GetEnv(std::string(EKey_DefaultRecordHomeDir), RecordHomeDir);
+	struct tm *Tv = localtime((time_t *)&OpenDaySecond);
+	sprintf(path, "%s/%d_%02d/%02d/Record.db", RecordHomeDir.c_str(), Tv->tm_year + 1900, Tv->tm_mon + 1, Tv->tm_mday);
 
+	return DbOpen(path);
+
+}
 av_bool CAvRecordDB::DbOpen(const char *DbPath)
 {
 	av_bool isDbHave = av_false;
@@ -120,12 +130,23 @@ av_bool CAvRecordDB::DbDelete(RecordFileInfo &FileInfo)
 av_bool CAvRecordDB::DbSearch(RecordFileSearch &Search, std::list<RecordFileInfo> &result)
 {
 	av_char SearchFmt[256] = { 0 };
+
 	strcat(SearchFmt, "select * from RecordDb where ");
 	{
 		av_bool HasFirst = av_false;
 		if (Search.FileSize != -1){
 			sprintf(&SearchFmt[strlen(SearchFmt)], RecordDbColumnFileSize" <= %d ", Search.FileSize);
 			HasFirst = av_true;
+		}
+		else{
+			if (HasFirst == av_false){
+				sprintf(&SearchFmt[strlen(SearchFmt)], RecordDbColumnFileSize" != 0 ");
+				HasFirst = av_true;
+			}
+			else{
+				sprintf(&SearchFmt[strlen(SearchFmt)], " and "RecordDbColumnFileSize" != 0 ");
+				HasFirst = av_true;
+			}
 		}
 		
 		if (Search.FileRecTmS != -1 && Search.FileRecTmE != -1){
@@ -138,10 +159,8 @@ av_bool CAvRecordDB::DbSearch(RecordFileSearch &Search, std::list<RecordFileInfo
 
 			sprintf(&SearchFmt[strlen(SearchFmt)], " and "RecordDbColumnFileRecTmE" <= %d ", Search.FileRecTmE);
 		}
-	}
-	
-	
 
+	}
 
 	sqlite3_stmt* stmt = NULL;
 	RecordFileInfo FileInfo;
@@ -151,6 +170,7 @@ av_bool CAvRecordDB::DbSearch(RecordFileSearch &Search, std::list<RecordFileInfo
 
 	int rc = sqlite3_prepare_v2(m_Db, SearchFmt, -1, &stmt, 0);
 	if (rc != SQLITE_OK){
+		av_error("SQLite [%s] Search Error command [%s]\n", DbTableName, SearchFmt);
 		return av_false;
 	}
 

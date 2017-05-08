@@ -204,38 +204,62 @@ template<> void ProcessValue<ConfigCaptureProfile>(CAvConfigBase &ConfBase, AvCo
 			- CaptureCaps.ExposureValueRegion.Start) / 2, CaptureCaps.ExposureValueRegion.Start, CaptureCaps.ExposureValueRegion.End);
 
 	}
+
+	{
+		AvConfigValue &WdrTable = ConfValue["Wdr"];
+		ConfBase.Process("mode", WdrTable, (int &)CaptureProfile.Wdr, (int)WdrMode_Open, (int)WdrMode_None, (int)WdrMode_Last);
+		ConfBase.Process("Value", WdrTable, CaptureProfile.WdrValue, 0/*0 is not suport valude only open close*/, CaptureCaps.WdrValueRegion.End);
+
+	}
+
+	{
+		AvConfigValue &ShutterTable = ConfValue["Shutter"];
+		ConfBase.Process("mode", ShutterTable, (int &)CaptureProfile.Shutter, (int)ShutterMode_Auto, (int)ShutterMode_None, (int)ShutterMode_Last);
+		ConfBase.Process("Value", ShutterTable, (int &)CaptureProfile.ShutterMax, CaptureCaps.ShutterMaxRegion.Start, CaptureCaps.ShutterMaxRegion.End);
+	}
+
 }
+
 
 template<> void ProcessValue<ConfigProtoFormats>(CAvConfigBase &ConfBase, AvConfigValue &ConfValue, ConfigProtoFormats &ProtocolFormats, int index, int diff)
 {
 	AvConfigValue &ProtoTable = ConfValue["Formats"];
 	ConfBase.Process("IsEnable", ProtoTable, (int&)ProtocolFormats.IsEnable, (int)av_false, (int)av_false, (int)av_true);
-//	ConfBase.Process("DigitalChannel", ProtoTable, ProtocolFormats.DigitalChannel, index, index, index);
-//	ConfBase.Process("ShowWindowsId", ProtoTable, ProtocolFormats.ShowWindowsId, index, 0);
+	ConfBase.Process("CheckAliveAddress", ProtoTable, ProtocolFormats.CheckAliveAddress, "");
 	ConfBase.Process("ProtoMode", ProtoTable, (int &)ProtocolFormats.ProtoMode, (int)ProtocolMoon, (int)ProtocolOnvif, (int)ProtocolMoon);
 	ConfBase.Process("UsrName", ProtoTable, ProtocolFormats.UsrName, "");
 	ConfBase.Process("Passwd", ProtoTable, ProtocolFormats.Passwd, "");
 
-	switch (ProtocolFormats.ProtoMode)
 	{
-	case ProtocolOnvif:
-		ConfBase.Process("Url", ProtoTable, ProtocolFormats.OnvifFormats.Url, "");
-		break;
-	case ProtocolRtmp:
-		ConfBase.Process("MainUrl", ProtoTable, ProtocolFormats.RtmpFormats.MainUrl, "");
-		ConfBase.Process("SubUrl", ProtoTable, ProtocolFormats.RtmpFormats.SubUrl, "");
-		break;
-	case ProtocolRtsp:
-		ConfBase.Process("MainUrl", ProtoTable, ProtocolFormats.RtspFormats.MainUrl, "");
-		ConfBase.Process("SubUrl", ProtoTable, ProtocolFormats.RtspFormats.SubUrl, "");
-		break;
-	case ProtocolMoon:
-		ConfBase.Process("Url", ProtoTable, ProtocolFormats.MoonFormats.Url, "");
-		ConfBase.Process("Port", ProtoTable, ProtocolFormats.MoonFormats.Port, 0, 0);
-		break;
-	default:
-		break;
+
+		ConfBase.Process("OnvifUrl", ProtoTable, ProtocolFormats.OnvifFormats.Url, "");
+		ConfBase.Process("RtmpMainUrl", ProtoTable, ProtocolFormats.RtmpFormats.MainUrl, "");
+		ConfBase.Process("RtmpSubUrl", ProtoTable, ProtocolFormats.RtmpFormats.SubUrl, "");
+		ConfBase.Process("RtspMainUrl", ProtoTable, ProtocolFormats.RtspFormats.MainUrl, "");
+		ConfBase.Process("RtspSubUrl", ProtoTable, ProtocolFormats.RtspFormats.SubUrl, "");
+		ConfBase.Process("MoonUrl", ProtoTable, ProtocolFormats.MoonFormats.Url, "");
+		ConfBase.Process("MoonPort", ProtoTable, ProtocolFormats.MoonFormats.Port, 5000);
 	}
+// 	switch (ProtocolFormats.ProtoMode)
+// 	{
+// 	case ProtocolOnvif:
+// 		ConfBase.Process("Url", ProtoTable, ProtocolFormats.OnvifFormats.Url, "");
+// 		break;
+// 	case ProtocolRtmp:
+// 		ConfBase.Process("MainUrl", ProtoTable, ProtocolFormats.RtmpFormats.MainUrl, "");
+// 		ConfBase.Process("SubUrl", ProtoTable, ProtocolFormats.RtmpFormats.SubUrl, "");
+// 		break;
+// 	case ProtocolRtsp:
+// 		ConfBase.Process("MainUrl", ProtoTable, ProtocolFormats.RtspFormats.MainUrl, "");
+// 		ConfBase.Process("SubUrl", ProtoTable, ProtocolFormats.RtspFormats.SubUrl, "");
+// 		break;
+// 	case ProtocolMoon:
+// 		ConfBase.Process("Url", ProtoTable, ProtocolFormats.MoonFormats.Url, "");
+// 		ConfBase.Process("Port", ProtoTable, ProtocolFormats.MoonFormats.Port, 0, 0);
+// 		break;
+// 	default:
+// 		break;
+// 	}
 
 }
 template<> void ProcessValue<ConfigAudioFormats>(CAvConfigBase &ConfBase, AvConfigValue &ConfValue, ConfigAudioFormats &AudioFormats, int index, int diff)
@@ -248,19 +272,16 @@ template<> void ProcessValue<ConfigAudioFormats>(CAvConfigBase &ConfBase, AvConf
 	av_findMaxMask(CompMax, AudioCaps.CompMask, AvComp);
 	av_findMinMask(CompMin, AudioCaps.CompMask, AvComp);
 
-	AudioSampleRate	SampleRateMax = AudioSampleRate_LAST;
-	AudioSampleRate	SampleRateMin = AudioSampleRate_NONE;
-	av_findMaxMask(SampleRateMax, AudioCaps.SampleRateMask[CompMax], AudioSampleRate);
-	av_findMinMask(SampleRateMin, AudioCaps.SampleRateMask[CompMax], AudioSampleRate);
+	AvComp DefaultComp = CompMax;
+	AudioSampleBits DefaultSampleBits;
+	AudioSampleRate DefaultSampleRate;
 
-	AudioSampleBits	SampleBitsMax = AudioSampleBits_NONE;
-	AudioSampleBits	SampleBitsMin = AudioSampleBits_LAST;
-	av_findMaxMask(SampleBitsMax, AudioCaps.SampleBitsMask[CompMax], AudioSampleBits);
-	av_findMinMask(SampleBitsMin, AudioCaps.SampleBitsMask[CompMax], AudioSampleBits);
+	av_findMinMask(DefaultSampleBits, AudioCaps.SampleBitsMask[DefaultComp], AudioSampleBits);
+	av_findMinMask(DefaultSampleRate, AudioCaps.SampleRateMask[DefaultComp], AudioSampleRate);
 
 	ConfBase.Process("Comp", AudioTable, (int &)AudioFormats.Comp, (int)CompMax, (int)CompMin, (int)CompMax);
-	ConfBase.Process("Samplebits", AudioTable, (int &)AudioFormats.SampleBits, (int)SampleBitsMin, (int)SampleBitsMin, (int)SampleBitsMax);
-	ConfBase.Process("SampleRate", AudioTable, (int &)AudioFormats.SampleRate, (int)SampleRateMin, (int)SampleRateMin, (int)SampleRateMax);
+	ConfBase.Process("Samplebits", AudioTable, (int &)AudioFormats.SampleBits, (int)DefaultSampleBits, (int)AudioSampleBits_B8, (int)AudioSampleBits_B32);
+	ConfBase.Process("SampleRate", AudioTable, (int &)AudioFormats.SampleRate, (int)DefaultSampleRate, (int)AudioSampleRate_R8000, (int)AudioSampleRate_R192000);
 	ConfBase.Process("CaptureVolume", AudioTable, AudioFormats.VolumeCapture, AudioCaps.VolumeRang / 2, 0, AudioCaps.VolumeRang);
 	ConfBase.Process("PlayVolume", AudioTable, AudioFormats.VolumePlay, AudioCaps.VolumeRang / 2, 0, AudioCaps.VolumeRang);
 	ConfBase.Process("SoundMode", AudioTable, (int &)AudioFormats.SoundMode, (int)AudioSoundMode_MONO, (int)AudioSoundMode_MONO, (int)AudioSoundMode_STEREO);

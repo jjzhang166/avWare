@@ -5,7 +5,8 @@
 #include "AvUiComm/tablemodel.h"
 #include "Apis/AvWareStruct.h"
 #include "AvCapture/AvCapture.h"
-
+#include <QStandardItemModel>
+#include <QMenu>
 namespace Ui {
 class DlgDeviceSet;
 }
@@ -19,6 +20,11 @@ public:
     ~DlgDeviceSet();
 	Capture * GetChannelHandle();
 
+
+public:
+	void DrawRtmpConfigTableView();
+	void SelectModifyChannel(int Channel);
+public:
 	void FixDlgUi();
 	void FixDlgUiCapture();
 	void FixDlgUiEncode();
@@ -30,6 +36,10 @@ public:
 	void FixDlgUiUserManager();
 	void FixDlgUiLog();
 	void FixDlgPtz();
+	
+	void ResizeRecord();
+	void ResizeNetWorkRtmp();
+
 
 	void FillInCapture();
 	void FillInEncode();
@@ -54,6 +64,7 @@ public:
 	void SubmitLog();
 	void SubmitPtz();
 
+	
 
 public:
 	void FillInNetWorkNetSet();
@@ -153,8 +164,6 @@ private slots:
 
         void on_CBoxNetWorkEmailEnable_clicked(bool checked);
 
-       // void on_CBoxNetWorkUpnpEnable_clicked(bool checked);
-
         void on_CBoxNetWorkRtspEnable_clicked(bool checked);
 
         void on_CBoxNetWorkDdnsEnable_clicked(bool checked);
@@ -173,8 +182,32 @@ private slots:
 
         void on_CBoxAlmEnable_clicked(bool checked);
 
+        void on_BtnCRecordSetRecordTypeTimeSelect_clicked();
+
+        void on_CBoxWdr_currentIndexChanged(const QString &arg1);
+
+        void on_CBoxShutter_currentIndexChanged(const QString &arg1);
+
+        void on_TviewRtmpLinkInfo_customContextMenuRequested(const QPoint &pos);
+
+        void on_TviewRtmpLinkInfo_doubleClicked(const QModelIndex &index);
+
+		void SlotsRtmpViewRightMenuSelect();
+		void SlotsRtmpViewRightMenuSelectAll();
+		void SlotsRtmpViewRightMenuSelectOther();
+
+                void on_TviewRtmpLinkInfo_pressed(const QModelIndex &index);
+
 private:
-	TableModel			* m_TviewRtmpListTableModel;
+		QMenu		*		m_mouseRtmpRightMenu;
+		QModelIndex			m_RtmpItemModelIndex;
+		int					m_RtmpItemModelcolumn;
+		int					m_RtmpItemModelrow;
+		QStandardItemModel			*	m_RtmpListStandardItemModel;
+private:
+	
+	std::list <C_RtmpNodeProfile>	m_RtmpNodeProfileList;
+	int								m_DeviceMaxChannels;
 private:
     Ui::DlgDeviceSet *ui;
 	bool	m_UiInitedOver;

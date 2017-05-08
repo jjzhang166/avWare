@@ -8,7 +8,7 @@ target_link_libraries(${target} bz2)
 target_link_libraries(${target} z)
 target_link_libraries(${target} dome)
 target_link_libraries(${target} autofocus)
-target_link_libraries(${target} tklpn)
+target_link_libraries(${target} jpeg)
 
 # static library
 target_link_libraries(${target} img_algo_s2l)

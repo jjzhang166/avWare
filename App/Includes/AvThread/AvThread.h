@@ -25,7 +25,7 @@
 #endif
 
 #if 1
-class CMutex
+class AVWARE_API CMutex
 {
 public:
 	CMutex();
@@ -37,7 +37,7 @@ private:
 };
 
 
-class CGuard
+class AVWARE_API CGuard
 {
 public:
 	CGuard(CMutex& Mutex);
@@ -46,7 +46,7 @@ private:
 	CMutex &m_Mutex;
 };
 
-class CSemaphore
+class AVWARE_API CSemaphore
 {
 public:
 	CSemaphore(unsigned int dwInitialCount = 0);

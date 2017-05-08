@@ -12,7 +12,9 @@ public:
 		QAvEvent_MaxWindows,
 		QAvEvent_MaxVideoAreaWindows,
 
-		QAvEvent_ShowMainMenum = QEvent::User + 100,
+		QAvEvent_SubMsgNULL = QEvent::User + 100,
+		QAvEvent_ShowMainMenum ,
+		QAvEvent_MediaInfo,
 		QAvEvent_MainMenuDevices_Click,
 		QAvEvent_MainMenuSystemSet_Click,
 		QAvEvent_MainMenuAlarm_Click,
@@ -20,6 +22,17 @@ public:
 		QAvEvent_MainMenuRecord_Click,
 		QAvEvent_MainMenuIntelligenceAlgorthm_Click,
 		QAvEvent_MainMenuSystemInfo_Click,
+
+
+		QAvEvent_ShowDeviceSet = QEvent::User + 200,
+
+
+		QAvEvent_ShowRecordPlay = QEvent::User + 300,
+		QAvEvent_ShowRecordSet,
+		QAvEvent_RecordPlay_Close,
+
+		QAvEvent_SysAlarmMsg = QEvent::User + 400,
+
 	}QAvEventType;
 
 public:
@@ -28,7 +41,7 @@ public:
 	~QAvEvent();
 
 	QAvEvent &operator = (const QAvEvent &AvEvent);
-	bool			FillInUsrData(const char *usrdata, const int datalen, int subType);
+	bool			FillInUsrData(const char *usrdata, const int datalen, int subType = QAvEvent_SubMsgNULL);
 	char *			UsrData();
 	int				UsrDataLen();
 	bool			UsrData(char *usrdata, int &datalen, int &subType);

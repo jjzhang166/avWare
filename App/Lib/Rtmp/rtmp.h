@@ -82,7 +82,9 @@ extern "C"
 /* needs to fit largest number of bytes recv() may return */
 #define RTMP_BUFFER_CACHE_SIZE (16*1024)
 
-#define	RTMP_CHANNELS	65600
+//#define	RTMP_CHANNELS	65600
+//modify by jsk 2017-03-24 
+#define RTMP_CHANNELS 32
 
 	extern const char RTMPProtocolStringsLower[][7];
 	extern const AVal RTMP_DefaultFlashVer;

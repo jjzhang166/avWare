@@ -12,6 +12,14 @@ QAvEvent::QAvEvent(QAvEventType EType) : QEvent(Type(EType))
 }
 QAvEvent::QAvEvent(QAvEvent &AvEvent) : QEvent(Type(AvEvent.AvEventType()))
 {
+
+	m_usrdata = NULL;
+	m_usrdatalen = 0;
+	m_subType = 0;
+	m_AvEventType = QAvEvent_SubMsgNULL;
+	m_usrdatasize = 0;
+
+
 	m_usrdatalen = AvEvent.UsrDataLen();
 	m_subType = AvEvent.SubType();
 	m_AvEventType = AvEvent.AvEventType();

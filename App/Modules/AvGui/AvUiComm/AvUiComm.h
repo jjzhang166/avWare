@@ -8,6 +8,7 @@
 #include <QApplication>
 #include "frmmessagebox.h"
 #include <QTextCodec>  
+#include "frmnotificationbox.h"
 
 
 #define AvQDebug av_msg
@@ -31,7 +32,14 @@ public:
             reg->setValue(AppName, "");
         }
     }
-
+	//设置字体
+	static void SetFont()
+	{
+		QFont font;
+		font.setFamily("simhei");
+		font.setBold(false);
+		qApp->setFont(font);
+	}
     //设置编码为UTF8
 	static void SetUTF8Code()
     {
@@ -47,26 +55,28 @@ public:
     static void SetStyle(const QString &styleName)
     {
 		//
-       QFile file(QString(":/image/%1.css").arg(styleName));
+       QFile file(QString(":/style/%1.css").arg(styleName));
        bool ret = file.open(QFile::ReadOnly);
 
        QString qss = QLatin1String(file.readAll());
        qApp->setStyleSheet(qss);
        qApp->setPalette(QPalette(QColor("#F0F0F0")));
+	   //qApp->setPalette(QPalette(QColor("#000000")));
     }
 
     //加载中文字符
     static void SetChinese()
     {
         QTranslator *translator = new QTranslator(qApp);
-        //translator->load(":/image/qt_zh_CN.qm");
-		bool ret = translator->load("Zh_Cn.qm");
-		
-		//bool ret = translator->load("en_US.qm");
+		//bool ret = translator->load("zh_CN.qm", "./");
+		bool ret = translator->load(":/languages/zh_CN.qm");
 		if (ret != true){
-			printf("load Zh_cn.qm Error\n");
+			AvQDebug("load zh_CN.qm Error\n");
 		}
-        qApp->installTranslator(translator);
+        ret = qApp->installTranslator(translator);
+		if (ret != true){
+			AvQDebug("installTranslator zh_CN.qm Error\n");
+		}
     }
 
     //判断是否是IP地址
@@ -100,6 +110,16 @@ public:
         return msg->exec();
     }
 
+	static int ShowNotificationBox(QString Message, QString Title=QString(tr("Notification")), int TimeOut = 3000)
+	{
+		static FrmNotificationBox *_msg = NULL; 
+		if (NULL == _msg){
+			_msg = new FrmNotificationBox;
+		}
+		_msg->SetShowInfo(Title, Message, TimeOut);
+		_msg->show();
+		return 0;
+	}
     //延时
     static void Sleep(int sec)
     {
@@ -124,6 +144,21 @@ public:
         QPoint movePoint(frmx, frmy);
         frm->move(movePoint);
     }
+
+	static void FormInLeftDwon(QWidget *frm)
+	{
+		int frmX = frm->width();
+		int frmY = frm->height();
+		QDesktopWidget w;
+		QRect deskRect = GetWindowsOnScreen();
+		int deskWidth = deskRect.width();
+		int deskHeight = deskRect.height();
+
+		int frmx = deskWidth - frmX  + deskRect.x();
+		int frmy = deskHeight - frmY + deskRect.y();
+		QPoint movePoint(frmx, frmy);
+		frm->move(movePoint);
+	}
 
 	static std::list<QRect> GetScreenInfo()
 	{

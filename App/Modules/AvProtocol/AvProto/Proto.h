@@ -40,12 +40,13 @@
 #include "AvPacket/AvPacket.h"
 
 
+
 class AVWARE_API AvProtoSDK :public CAvNetProto, public CNetUv
 {
 public:
 	AvProtoSDK();
 	AvProtoSDK(C_ProtoFormats &ProtoFormats);
-	~AvProtoSDK();
+	virtual ~AvProtoSDK();
 	static I_RET StartAvProtoService(AvProtoSDK *LinkService, AvProtoSDK *SearchService);
 	static I_RET StopAvProtoService();
 	static I_RET SearchCmdStart(av_bool bClearCache = av_false);
@@ -59,7 +60,6 @@ public:
 	I_RET Disconnect();
 
 public:
-	I_RET RemoteDspGetCaps(C_DspCaps &DspCaps);
 	I_RET RemoteCaptureGetCaps(int Channel, C_CaptureCaps &CaptureCaps);
 	I_RET RemoteCaptureGetProfile(int Channel, C_CaptureProfile &CaptureProfile);
 	I_RET RemoteCaptureSetProfile(int Channel, C_CaptureProfile &CaptureProfile);
@@ -86,6 +86,9 @@ public:
 	I_RET RemoteAdvancedSystemGetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile);
 	I_RET RemoteAdvancedSystemSetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile);
 
+	I_RET RemoteRecordFileSearch(int Channel, C_RecordFileSearch &RecordFileSearch);
+	I_RET RemoteRecordFileDownload(int Channel, C_RecordFileDownload &RecordFileDownload);
+	I_RET RemoteRecordFileDownloadCtrl(int Channel, C_RecordFileDownloadCtrl &RecordFileDownloadCtrl);
 
 	I_RET RemoteFactoryInfoGet(C_ManufacturerInfo &ManfacturerInfo);
 	
@@ -100,7 +103,9 @@ public:
 	I_RET RemoteStreamStart(int Channel, int Slave);
 	I_RET RemoteStreamStop(int Channel, int Slave);
 	I_RET RemoteSendAvPacket(int Channel, int Slave, CAvPacket *pack);
-	
+	I_RET RemoteSendAlarmMsg(C_AlmMsg &AlmMsg);
+	I_RET RemoteGetAlarmMsg(C_AlmMsg &AlmMsg);
+
 	I_RET		RemoteSyncSystemTime(av_timeval &atv);
 	I_RET		RemoteRequestIdrFrame(av_int Slave = CHL_MAIN_T);
 	CAvPacket * RemoteSnapshot(int Channel, av_bool bRealTime = av_false, av_uint SnapshotInterval = 0, av_uint ContinuousTimes = 0);
@@ -110,7 +115,6 @@ public:
 	virtual CAvPacket * RemoteStreamGet(int Channel, int Slave) = 0;
 
 public:
-	virtual I_RET  LocalDspGetCaps(C_DspCaps &DspCaps) = 0;
 
 	virtual I_RET  LocalCaptureGetCaps(int Channel, C_CaptureCaps &CaptureCaps) = 0;
 	virtual I_RET  LocalCaptureGetProfile(int Channel, C_CaptureProfile &CaptureProfile) = 0;
@@ -136,6 +140,10 @@ public:
 	virtual I_RET  LocalAdvancedSystemGetCaps(int Channel, C_AdvancedSystemCaps &AdvancedSystemCaps) = 0;
 	virtual I_RET  LocalAdvancedSystemGetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile) = 0;
 	virtual I_RET  LocalAdvancedSystemSetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile) = 0;
+
+	virtual I_RET  LocalRecordFileSearch(int Channel, C_RecordFileSearch &RecordFileSearch) = 0;
+	virtual I_RET  LocalRecordFileDownload(int Channel, C_RecordFileDownload &RecordFileDownload) = 0;
+	virtual I_RET  LocalRecordFileDownloadCtrl(int Channel, C_RecordFileDownloadCtrl &RecordFileDownloadCtrl) = 0;
 
 	virtual I_RET  LocalNetCommGetCaps(C_NetCommCaps &NetCommCaps) = 0;
 	virtual I_RET  LocalNetCommGetProfile(C_NetWorkProfile &NetWorkProfile) = 0;

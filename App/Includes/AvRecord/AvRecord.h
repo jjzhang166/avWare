@@ -45,10 +45,10 @@ public:
 
 private:
 	CAvConfigRecord				m_ConfigRecord;
-	ConfigRecordFormats			m_ConfigRecordFormat;
+	ConfigRecordProfile			m_ConfigRecordFormat;
 
 	CAvConfigRecordCtrl			m_ConfigRecordCtrl;
-	ConfigRecordCtrlFormats		m_ConfigRecordCtrlFormat;
+	ConfigRecordCtrlProfile		m_ConfigRecordCtrlFormat;
 
 private:
 	av_u32						m_Channel;
@@ -73,13 +73,13 @@ public:
 	av_bool RecordDbDeInit();
 	av_bool RecordDbRepair();
 
-
 	av_bool RecordDbAddItem(RecordFileInfo &RecordFInfo);
 	av_bool RecordDbOverItem(RecordFileInfo &RecordFInfo);
+	av_bool RecordDbDelItem(av_char *Path);
+	av_bool RecordSearch(RecordFileSearch &Search, std::list<RecordFileInfo> &result);
+
 private:
 	CAvRecordDB m_RecordDb;
-
-
 private:
 	CAvRecordManager();
 	~CAvRecordManager();

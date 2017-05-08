@@ -32,6 +32,11 @@ public:
 	void SetOSDVideoInfo(QString kbps, QString ImageSize, QString FrameRate, QString EncodeType);
 	void ResizeIconSize(int size);
 
+public:
+	QString GetPaletteTriggerStly();
+	QString GetPaletteCommonStly();
+
+
 private slots:
 	void mousePressEvent(QMouseEvent *);
 	void mouseDoubleClickEvent(QMouseEvent *);

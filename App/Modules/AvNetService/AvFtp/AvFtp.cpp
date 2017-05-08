@@ -204,8 +204,8 @@ av_bool CAvFtp::Upload(std::string FileName, av_uchar *data, av_u32 datalen)
 		av_error("FtpStor error...\n");
 		//return av_false;
 	}
-
-	ret = m_Ftp.AVFtpSendData((const char *)data, (int &)datalen);
+	
+	ret = m_Ftp.AVFtpSendData((const char*)data, (int&)datalen);
 	if (ret < FTP_OK)
 	{
 		av_error("ftp send data error...\n");
@@ -213,7 +213,7 @@ av_bool CAvFtp::Upload(std::string FileName, av_uchar *data, av_u32 datalen)
 		return av_false;
 	}
 
-	m_Ftp.AVFtpCloseData();
+	m_Ftp.AVFtpCloseData();	
 	return av_true;
 }
 
@@ -285,4 +285,17 @@ av_bool CAvFtp::CdDir(std::string dirName)
 	}
 	
 	return av_true;
+}
+
+av_bool AvFtpSetRemotePath(CAvFtp *pftp, std::string remotePath)
+{
+	av_msg("Set Ftp RemotePath %s\n", remotePath.c_str());
+	av_bool ret = pftp->CdDir(remotePath);
+	if (av_false == ret) {
+		ret = pftp->Mkdir(remotePath);
+		if (ret) {
+			ret = pftp->CdDir(remotePath);	
+		}
+	}
+	return ret;
 }

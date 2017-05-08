@@ -77,16 +77,15 @@ av_bool CAvRecord::GetStatus(av_int Slave, CAvRecStatus &RecStatus)
 }
 av_bool CAvRecord::CheckConfig(av_timeval &aTv)
 {
-	if (m_ConfigRecordFormat.RecordChlMask != 0
+	if (m_ConfigRecordFormat.RecordCHLMask != 0
 		&& m_ConfigRecordFormat.RecordTypeMask != 0){
-		if (m_ConfigRecordFormat.RecordTypeMask == EAvRecord_Manul){
+		if (m_ConfigRecordFormat.RecordTypeMask & AvMask(RecordFileType_REALTIME)){
 			return av_true;
 		}
 		av_bool bTIn = av_false;
-		for (int i = 0; i < RECORD_MAX_TIME_RANGE; i++){
-			if (aTv.t_todaysec >= m_ConfigRecordFormat.RecordTm[i].tStart
-				&& aTv.t_todaysec <= m_ConfigRecordFormat.RecordTm[i].tEnd
-				&& m_ConfigRecordFormat.RecordTm[i].bEnable == av_true){
+		for (int i = 0; i < AvMaxTimeArea; i++){
+			if (aTv.t_todaysec >= m_ConfigRecordFormat.RecordTm[aTv.t_week][i].StartSec
+				&& aTv.t_todaysec <= m_ConfigRecordFormat.RecordTm[aTv.t_week][i].StopSec){
 				bTIn = av_true;
 				break;
 			}
@@ -106,7 +105,7 @@ av_void CAvRecord::CheckOut()
 
 	bStartRec = CheckConfig(AvTv);
 	for (int i = CHL_MAIN_T; i < CHL_NR_T; i++){
-		if (!(m_ConfigRecordFormat.RecordChlMask & AvMask(i))) {
+		if (!(m_ConfigRecordFormat.RecordCHLMask & AvMask(i))) {
 			if (NULL != m_RecF[i]){
 				RecordFileClose(i, AvTv);
 				m_RecStatus[i] = CAvRecStoped;
@@ -134,7 +133,7 @@ av_void CAvRecord::CheckOut()
 			if (m_RecStatus[i] != CAvRecRecording){
 				continue;
 			}
-			m_ConfigRecordCtrlFormat.LimitArgs = 6 * 1024 * 1024;
+			m_ConfigRecordCtrlFormat.LimitArgs = 200 * 1024 * 1024;
 			switch (m_ConfigRecordCtrlFormat.LimitType)
 			{
 				case EAvRecord_LimitTime:
@@ -199,13 +198,15 @@ av_void CAvRecord::OnConfigRecordCtrlModify(CAvConfigRecordCtrl *CofnigRecordCtr
 av_bool CAvRecord::RecordFileOpen(av_int Slave, av_timeval &AvTv)
 {
 	m_RecF[Slave] = new CAvF;
-	av_bool bRet = av_false;
+	//av_bool bRet = av_false;
+	av_u64 uRet = 0;
 	std::string RecordHomeDir;
 	CAvDevice::GetEnv(std::string(EKey_DefaultRecordHomeDir), RecordHomeDir);
 	sprintf(m_RecordFInfo[Slave].FilePath, "%s/%d_%02d/%02d/CHN%02d_%d_%02d_%02d_%02d.Avf",  RecordHomeDir.c_str(),AvTv.t_year, AvTv.t_mon, AvTv.t_day, m_Channel, Slave, AvTv.t_hour, AvTv.t_min, AvTv.t_sec);
+	av_msg("Create a avF File [%s]\n", m_RecordFInfo[Slave].FilePath);
 	CFile::MakeDeepDirectory(m_RecordFInfo[Slave].FilePath);
-	bRet = m_RecF[Slave]->AvRecFOpen(m_RecordFInfo[Slave].FilePath, CAvRecFCom::AvRecF_OW);
-	if (bRet != av_true){
+	uRet = m_RecF[Slave]->AvRecFOpen(m_RecordFInfo[Slave].FilePath, CAvRecFCom::AvRecF_OW);
+	if (uRet < 0){
 		av_error("AvRecFOpen return av_flase\n");
 		assert(0);
 	}
@@ -264,7 +265,6 @@ av_bool CAvRecordManager::Initialize()
 	}
 
 	RecordDbRepair();
-
 
 	for (int i = 0; i < SYS_CHN_NUM; i++){
 		m_AvRecord[i] = new CAvRecord(i);
@@ -334,8 +334,28 @@ av_bool CAvRecordManager::RecordDbRepair()
 
 	m_RecordDb.DbSearch(Search, result);
 	std::list<RecordFileInfo>::iterator i;
+	RecordFileInfo RepairFileInfo;
+	CAvF Avf;
+	av_64 i64Ret = 0;
+	//av_error("current = %d\n", time(NULL) % (24 * 3600));
 	for (i = result.begin(); i != result.end(); i++){
-
+		RepairFileInfo = *i;
+		i64Ret = Avf.AvRecFOpen(RepairFileInfo.FilePath, CAvRecFCom::AvRecF_OR);
+		if (i64Ret < 0){
+			av_error("Open Repair File [%s] Error \n", RepairFileInfo.FilePath);
+			RecordDbDelItem(RepairFileInfo.FilePath);
+		}
+		
+		if (av_true == Avf.AvRecRepair(RepairFileInfo.FileSize, RepairFileInfo.FileRecTmE, RepairFileInfo.FileTypeMask)){
+			RepairFileInfo.FileRecTmE %= (24 * 3600);
+			RecordDbOverItem(RepairFileInfo);
+			av_warning("Repair File [%s] Over\n", RepairFileInfo.FilePath);
+		}
+		else{
+			RecordDbDelItem(RepairFileInfo.FilePath);
+			av_warning("Repair File [%s] Error\n", RepairFileInfo.FilePath);
+		}
+		Avf.AvRecFClose();
 	}
 	return av_true;
 }
@@ -348,5 +368,12 @@ av_bool CAvRecordManager::RecordDbOverItem(RecordFileInfo &RecordFInfo)
 {
 	m_RecordDb.DbUpdate(RecordFInfo);
 	return av_true;
-
+}
+av_bool CAvRecordManager::RecordDbDelItem(av_char *Path)
+{
+	return av_true;
+}
+av_bool CAvRecordManager::RecordSearch(RecordFileSearch &Search, std::list<RecordFileInfo> &result)
+{
+	return av_true;
 }

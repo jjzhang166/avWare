@@ -100,7 +100,7 @@ inline const char **EnumNamesnal_unit_type_h264() {
 
 
 inline const char **EnumNamesAvChip() {
-  static const char *names[] = { "H18EV100", "H18EV200", "H18EV201", "H18C", "H18A", "H16CV100", "H16CV200", "H16CV300", "H16A", "H16D", "H19", "HIPC_RES_1", "HIPC_RES_2", "H20D", "H21", "H31", "H35", "H36", "H3798MV100", "HNVR_RES_2", "A22M", "A33M", "A55M", "A65", "A66", "WINDOWS_32", "WINDOWS_64", "LINUX_32", "LINUX_64", "MAC_32", "MAC_64", "LAST", nullptr };
+  static const char *names[] = { "H18EV100", "H18EV200", "H18EV201", "H18C", "H18A", "H16CV100", "H16CV200", "H16CV300", "H16A", "H16D", "H19", "HIPC_RES_1", "HIPC_RES_2", "H20D", "H21", "H31", "H35", "H36", "H3798MV100", "HNVR_RES_2", "S2L22M", "S2L33M", "S2L55M", "S2L65", "S2L66", "WINDOWS_32", "WINDOWS_64", "LINUX_32", "LINUX_64", "MAC_32", "MAC_64", "LAST", nullptr };
   return names;
 }
 
@@ -111,6 +111,13 @@ inline AvChip AvChipStr2EnumValue(const char *EName)
 {
 	return (AvChip)EnumName2EnumComm(EName, EnumNamesAvChip(), AvChip_H18EV100, AvChip_LAST);
 }
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesHardInterface() {
+	static const char *names[] = { "NONE", "SD", "WIFI", "PTZ", "IO", "AUDIO_PLAY", "AUDIO_CAPTURE", "SIM_4G", "LAST", nullptr };
+	return names;
+}
+
+inline const char *EnumNameHardInterface(HardInterface e) { return EnumNamesHardInterface()[e]; }
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -177,6 +184,36 @@ inline ExposureMode ExposureModeStr2EnumValue(const char *EName)
 	return (ExposureMode)EnumName2EnumComm(EName, EnumNamesExposureMode(), ExposureMode_NONE, ExposureMode_LAST);
 }
 //////////////////////////////////////////////////////////////////////////
+
+inline const char **EnumNamesWdrMode() {
+	static const char *names[] = { "None", "Open", "Close", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNameWdrMode(WdrMode e) { return EnumNamesWdrMode()[e]; }
+
+
+inline WdrMode WdrModeStr2EnumValue(const char *EName)
+{
+	return (WdrMode)EnumName2EnumComm(EName, EnumNamesWdrMode(), WdrMode_None, WdrMode_Last);
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+inline const char **EnumNamesShutterMode() {
+	static const char *names[] = { "None", "Auto", "MaxShutter", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNameShutterMode(ShutterMode e) { return EnumNamesShutterMode()[e]; }
+
+inline ShutterMode ShutterModeStr2EnumValue(const char *EName)
+{
+	return (ShutterMode)EnumName2EnumComm(EName, EnumNamesShutterMode(), ShutterMode_None, ShutterMode_Last);
+}
+
+
+//////////////////////////////////////////////////////////////////////////
 inline const char **EnumNamesWhiteBalanceMode() {
   static const char *names[] = { "NONE", "OFF", "", "AUTO", "DAYTIME", "EVENING", "CLOUDY", "OFFICE", "FLUORESCENT", "INCANDESCENT", "MANUAL", "LAST", nullptr };
   return names;
@@ -201,6 +238,33 @@ inline AntiFlckerMode AntiFlckerModeStr2EnumValue(const char *EName)
 	return (AntiFlckerMode)EnumName2EnumComm(EName, EnumNamesAntiFlckerMode(), AntiFlckerMode_NONE, AntiFlckerMode_LAST);
 }
 //////////////////////////////////////////////////////////////////////////
+
+inline const char **EnumNamesEncryptionAlgorithm() {
+	static const char *names[] = { "NONE", "AUTO", "ASCII", "HEXADECIMAL", "AES", "TKIP", "LAST", nullptr };
+	return names;
+}
+
+inline const char *EnumNameEncryptionAlgorithm(EncryptionAlgorithm e) { return EnumNamesEncryptionAlgorithm()[e]; }
+
+inline EncryptionAlgorithm EncryptionAlgorithmStr2EnumValue(const char *EName)
+{
+	return (EncryptionAlgorithm)EnumName2EnumComm(EName, EnumNamesEncryptionAlgorithm(), EncryptionAlgorithm_NONE, EncryptionAlgorithm_LAST);
+}
+
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesCertificationType() {
+	static const char *names[] = { "NONE", "AUTO", "WPA_PSK", "WPA2_PSK", "WPA", "WPA2", "WEP", "LAST", nullptr };
+	return names;
+}
+
+inline const char *EnumNameCertificationType(CertificationType e) { return EnumNamesCertificationType()[e]; }
+
+inline CertificationType CertificationTypeStr2EnumValue(const char *EName)
+{
+	return (CertificationType)EnumName2EnumComm(EName, EnumNamesCertificationType(), CertificationType_NONE, CertificationType_LAST);
+}
+
+//////////////////////////////////////////////////////////////////////////
 inline const char **EnumNamesNetCommGetMode() {
   static const char *names[] = { "NONE", "MANUAL", "AUTO", "PPPOE", "LAST", nullptr };
   return names;
@@ -213,10 +277,25 @@ inline NetCommGetMode NetCommGetModeStr2EnumValue(const char *EName)
 	return (NetCommGetMode)EnumName2EnumComm(EName, EnumNamesNetCommGetMode(), NetCommGetMode_NONE, NetCommGetMode_LAST);
 }
 //////////////////////////////////////////////////////////////////////////
-inline const char **EnumNamesNetCommT() {
-  static const char *names[] = { "LAN0", "LAN1", "Wireless", "SIM", "BlueTooth", "LAST", nullptr };
-  return names;
+
+inline const char **EnumNamesWirelessMode() {
+	static const char *names[] = { "NONE", "AP", "STATION", "LAST", nullptr };
+	return names;
 }
+
+inline const char *EnumNameWirelessMode(WirelessMode e) { return EnumNamesWirelessMode()[e]; }
+
+inline WirelessMode WirelessModeStr2EnumValue(const char *EName)
+{
+	return (WirelessMode)EnumName2EnumComm(EName, EnumNamesWirelessMode(), WirelessMode_NONE, WirelessMode_LAST);
+}
+//////////////////////////////////////////////////////////////////////////
+
+inline const char **EnumNamesNetCommT() {
+	static const char *names[] = { "LAN0", "LAN1", "Wireless", "SIM", "BlueTooth", "Wireless1", "SIM1", "LAST", nullptr };
+	return names;
+}
+
 inline const char *EnumNameNetCommT(NetCommT e) { return EnumNamesNetCommT()[e]; }
 inline NetCommT NetCommTStr2EnumValue(const char *EName)
 {
@@ -224,6 +303,20 @@ inline NetCommT NetCommTStr2EnumValue(const char *EName)
 }
 
 //////////////////////////////////////////////////////////////////////////
+
+inline const char **EnumNamesNetCommWirelessModeT() {
+  static const char *names[] = { "NONE", "AP", "Station", "LAST", nullptr };
+  return names;
+}
+inline const char *EnumNameNetCommWirelessModeT(NetCommWirelessModeT e) { return EnumNamesNetCommWirelessModeT()[e]; }
+inline NetCommWirelessModeT NetCommWirelessModeTStr2EnumValue(const char *EName)
+{
+	return (NetCommWirelessModeT)EnumName2EnumComm(EName, EnumNamesNetCommWirelessModeT(), NetCommWirelessMode_NONE, NetCommWirelessMode_LAST);
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+
 inline const char **EnumNamesUserCategory() {
   static const char *names[] = { "NONE", "SUPERADMIN", "ADMIN", "NORMALUSER", "LAST", nullptr };
   return names;
@@ -245,9 +338,16 @@ inline const char **EnumNamesUserAccess() {
 
 inline const char *EnumNameUserAccess(UserAccess e) { return EnumNamesUserAccess()[e]; }
 
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesAlarmStat() {
+	static const char *names[] = { "None", "Start", "Stop", "Ongoing", "Nr", nullptr };
+	return names;
+}
 
+inline const char *EnumNameAlarmStat(AlarmStat e) { return EnumNamesAlarmStat()[e]; }
+//////////////////////////////////////////////////////////////////////////
 inline const char **EnumNamesAlarmEvent() {
-  static const char *names[] = { "NONE", "PORT_In", "PORT_Out", "VIDEO_FaceRecognition", "VIDEO_FaceDetection", "VIDEO_MotionDetection", "VIDEO_MotionFollow", "VIDEO_PlatenumberRecognition", "VIDEO_DevOffline", "VIDEO_Lost", "VIDEO_Blind", "VIDEO_SomethingLoss", "DISK_ERROR", "DISK_LOST", "LAST", nullptr };
+  static const char *names[] = { "NONE", "PORT_In", "PORT_Out", "VIDEO_FaceRecognition", "VIDEO_FaceDetection", "VIDEO_MotionDetection", "VIDEO_MotionFollow", "VIDEO_PlatenumberRecognition", "VIDEO_DevOffline", "VIDEO_Lost", "VIDEO_Blind", "VIDEO_SomethingLoss", "DISK_ERROR", "DISK_LOST", "TestFtpConf","LAST", nullptr };
   return names;
 }
 
@@ -263,7 +363,7 @@ inline const char *EnumNameDiskStatus(DiskStatus e) { return EnumNamesDiskStatus
 
 
 inline const char **EnumNamesRecordFileType() {
-  static const char *names[] = { "NONE", "ALARM_PORTIN", "ALARM_FACERECOGNITION", "ALARM_FACEDETECTION", "ALARM_PLATENUMBERRECOGNITION", "ALARM_MOTIONDETECTION", "ALARM_MOTIONTRACE", "TIMER", "REALTIME", "LAST", nullptr };
+	static const char *names[] = { "NONE", "ALARM_PORTIN", "ALARM_FACERECOGNITION", "ALARM_FACEDETECTION", "ALARM_PLATENUMBERRECOGNITION", "ALARM_MOTIONDETECTION", "ALARM_MOTIONTRACE", "TIMER", "REALTIME", "ALARM", "LAST", nullptr };
   return names;
 }
 
@@ -485,9 +585,11 @@ inline const char *EnumNameAudioVoiceQualityEnhancement(AudioVoiceQualityEnhance
 //////////////////////////////////////////////////////////////////////////
 
 inline const char **EnumNamesProgressStatus() {
-  static const char *names[] = { "None", "UpgradeStart", "UpgradeRecvData", "UpgradeWipePartition", "UpgradeWriteData", "UpgradeOver", "UpgradeExtract", "UpgradeCopy", "UpgradeInstall", "Rebootting", "ModifyOver", "Last", nullptr };
-  return names;
+	static const char *names[] = { "None", "UpgradeStart", "UpgradeRecvData", "UpgradeWipePartition", "UpgradeWriteData", "UpgradeOver", "UpgradeExtract", "UpgradeCopy", "UpgradeInstall", "Rebootting", "ModifyOver", "HaveNoDiskResource", "HaveNoRightResource", "LinkFailed", "UpgradeFirmwareCheckout", "UpgradeFirmwareCheckoutSucceed", "UpgradeFirmwareCheckoutFailed", "Last", nullptr };
+	return names;
 }
+
+
 inline const char *EnumNameProgressStatus(ProgressStatus e) { return EnumNamesProgressStatus()[e]; }
 
 inline ProgressStatus ProgressStatusStr2EnumValue(const char *EName)
@@ -570,6 +672,32 @@ inline const char **EnumNamesPtzCommand() {
 inline const char *EnumNamePtzCommand(PtzCommand e) { return EnumNamesPtzCommand()[e]; }
 //////////////////////////////////////////////////////////////////////////
 
+
+inline const char **EnumNamesFirmWareFileFormat() {
+	static const char *names[] = { "NULL", "Jffs2", "CramFs", "SquashFs", "Bin", "Yaffs2", "Tar", "Ubi", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNameFirmWareFileFormat(FirmWareFileFormat e) { return EnumNamesFirmWareFileFormat()[e]; }
+
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesFirmWarePayload() {
+	static const char *names[] = { "NULL", "Uboot", "UbootConfig", "Kernel", "FileSystem", "App", "BoardArgs1", "BoardArgs2", "BoardArgs3", "BoardArgs4", nullptr };
+	return names;
+}
+inline const char *EnumNameFirmWarePayload(FirmWarePayload e) { return EnumNamesFirmWarePayload()[e]; }
+//////////////////////////////////////////////////////////////////////////
+inline const char **EnumNamesIntelligentCapType() {
+	static const char *names[] = { "None", "FaceDetect", "PlateRecognition", "Last", nullptr };
+	return names;
+}
+
+inline const char *EnumNameIntelligentCap(IntelligentCap e) { return EnumNamesIntelligentCapType()[e]; }
+
+inline IntelligentCap IntelligentCapTypeStr2EnumValue(const char *EName)
+{
+	return (IntelligentCap)EnumName2EnumComm(EName, EnumNamesIntelligentCapType(), Intelligent_None, Intelligent_Last);
+}
 
 #endif
 

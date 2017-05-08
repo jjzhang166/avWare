@@ -209,7 +209,9 @@ public:
 		for (it = m_observer.begin(); it != m_observer.end(); it++) {
 			if ((it->m_pObj == pObj)
 				&& (memcmp(&(it->m_cb), &cb, sizeof(AvConfigCallBack)) == 0)) {
-				break;
+				m_mutex.Leave();
+				//find same attach , return;
+				return;
 			}
 		}
 		AvConfigObserver node;

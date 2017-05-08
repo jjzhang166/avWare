@@ -87,7 +87,6 @@ CICMPPing::CICMPPing()
 	m_RawSocket = -1;
 	m_nID = 1;
 	m_nSeq = 1;
-
 	m_RawSocket = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 	if (m_RawSocket <= 0){
 		av_error("socket IPPROTO Error  ret = %d\n", m_RawSocket);

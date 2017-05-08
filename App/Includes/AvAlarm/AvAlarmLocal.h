@@ -42,7 +42,7 @@ private:
 
 
 private:
-	av_bool SendAlmMsg(CAvAlarm::AlmMsg  &msg);
+	av_bool SendAlmMsg(C_AlmMsg  &msg);
 	av_bool PacketAlmIo(av_u32 Result, av_bool bOpen = av_false);
 	av_bool PacketAlmMd(av_u32 Result[], av_bool bOpen = av_false);
 

@@ -23,18 +23,19 @@
 #include <time.h>
 #include <assert.h>
 #include <fcntl.h>
-
+#include <pthread.h>
+#include <semaphore.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdint.h>
+
 #if defined (WIN32)
-
 #include <io.h>
-
 #include <WS2tcpip.h>
-#include   <windows.h>
+#include <windows.h>
 #elif defined (__GNUC__)
 #include <sys/sysinfo.h>
-#include "sys/prctl.h"
+#include <sys/prctl.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/time.h>
@@ -50,12 +51,17 @@
 #include <netdb.h>
 #include <sys/ioctl.h>
 #include <errno.h>
+#include <mtd/mtd-user.h>
 #else
 
 #endif
+
+
 #ifdef _AV_WARE_
 #include "config.h"
 #endif
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -63,8 +69,39 @@ extern "C" {
 
 #if defined(WIN32)
 #define socklen_t int
+
+#ifndef F_OK
+#define F_OK 0
+#endif
+#ifndef R_OK
+#define R_OK 4
+#endif
+#ifndef W_OK
+#define W_OK 2
+#endif
+#ifndef X_OK
+#define X_OK 1
+#endif
+
+#define _filelength_byfd(fd, length) length = _filelength(fd)
+
 #else
 #define INVALID_SOCKET -1
+#define _open	open
+#define _read	read
+#define _write	write
+#define _close  close
+#define _lseek  lseek
+#define O_BINARY O_SYNC //为了与windws平台兼容 binary这个结构
+#define _filelength_byfd(fd, length)\
+	do {\
+		struct stat filestat;\
+		length = -1;\
+		if (0 == fstat(fd, &filestat)) length = filestat.st_size;\
+			else perror("why lstat error\n");\
+	} while (0)
+
+
 #endif
 
 
@@ -128,9 +165,6 @@ typedef unsigned long long int  av_u64, av_ulonglong;
 #define ConfMotionDetectionLine 18
 #endif
 
-#ifndef ConfMaxNetComm
-#define ConfMaxNetComm			5
-#endif
 
 #ifndef ConfMaxIoAlarmIn
 #define ConfMaxIoAlarmIn		1
@@ -158,8 +192,20 @@ typedef unsigned long long int  av_u64, av_ulonglong;
 //取最小的倍数
 #define MultipleMin(target,multiple) (target) = (((target)/(multiple))*(multiple))
 
+#if defined(WIN32)
+#define AppRunMSec(msec) msec = (long)(clock()*(1000.0/CLOCKS_PER_SEC))
 
-#define AppRunMSec() (long)(clock()*(1000.0/CLOCKS_PER_SEC))
+#else
+#define AppRunMSec(msec)\
+	do {\
+		struct timespec spec;\
+		clock_gettime(CLOCK_MONOTONIC, &spec);\
+		msec = spec.tv_sec*1000+spec.tv_nsec/1000000;\
+	} while (0)
+
+
+#endif
+
 
 #if defined(WIN32)
 
@@ -202,8 +248,6 @@ typedef void av_cond;
 
 
 #if defined(WIN32)
-#include <pthread.h>
-#include <semaphore.h>
 typedef pthread_t av_thread_t;
 #else
 typedef pthread_t av_thread_t;
@@ -271,6 +315,11 @@ extern av_void  AvMemoryPoolFree(av_void *ptr);
 #endif
 
 
+#define ENABLE_PRINTF
+
+
+#if defined(ENABLE_PRINTF)
+
 #if defined(WIN32)
 #ifndef PATH_HR
 #define PATH_HR '\\'
@@ -279,12 +328,32 @@ extern av_void  AvMemoryPoolFree(av_void *ptr);
 #define av_error(fmt,...) do {printf("[%s][%d]=>", NULL == strrchr(__FILE__, PATH_HR)? __FILE__:(char *)(strrchr(__FILE__, PATH_HR) + 1), __LINE__);SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);printf(fmt, ##__VA_ARGS__); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15); }while(0)
 #define av_msg(fmt,...) do {printf("[%s][%d]=>", NULL == strrchr(__FILE__, PATH_HR)? __FILE__:(char *)(strrchr(__FILE__, PATH_HR) + 1), __LINE__);SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); printf(fmt, ##__VA_ARGS__); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15); }while(0)
 
+
+
 #else
 #define PATH_HR '/'
 #define av_warning(fmt,...) printf("[%s][%d]=>\033[1;33m" fmt "\033[m", NULL == strrchr(__FILE__, PATH_HR)? __FILE__:(char *)(strrchr(__FILE__, PATH_HR) + 1), __LINE__,##__VA_ARGS__)
 #define av_error(fmt,...) printf("[%s][%d]=>\033[0;32;31m" fmt "\033[m", NULL == strrchr(__FILE__, PATH_HR)? __FILE__:(char *)(strrchr(__FILE__, PATH_HR) + 1), __LINE__,##__VA_ARGS__)
 #define av_msg(fmt,...) printf("[%s][%d]=>\033[1;32m" fmt "\033[m", NULL == strrchr(__FILE__, PATH_HR)? __FILE__:(char *)(strrchr(__FILE__, PATH_HR) + 1), __LINE__,##__VA_ARGS__)
 #endif
+
+
+#else
+#define av_warning(fmt,...)
+#define av_error(fmt,...)
+#define av_msg(fmt,...) 
+#endif
+
+
+
+
+
+
+
+
+
+
+
 
 #ifdef __cplusplus
 }

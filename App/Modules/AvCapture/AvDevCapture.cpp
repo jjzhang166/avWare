@@ -4,6 +4,7 @@
 #include "AvDevice/AvDevice.h"
 #include "Apis/LibEncode.h"
 #include "AvUart/AvUart.h"
+
 CAvDevCapture::CAvDevCapture()
 {
 	CThread::SetThreadName(__FUNCTION__);
@@ -353,11 +354,20 @@ av_bool CAvDevCapture::AlarmGetCaps(C_AlarmCaps &AlarmCaps)
 }
 av_bool CAvDevCapture::AlarmSetProfile(C_AlarmProfile &AlmProfile)
 {
-	av_msg("CAvDevCapture::AlarmSetProfile \n");
 	CAvConfigAlarm ConfigAlarm;
 	ConfigAlarm.Update();
 	ConfigAlarmProfile &NewAlarmPorfile = ConfigAlarm.GetConfig();
 
+/* for test	
+	av_warning("user AlarmbEnable[%d] AlarmMotionLevel[%d]\n", AlmProfile.AlarmbEnable, AlmProfile.AlarmMotionLevel);
+	const ConfigAlarmProfile &EnvAlarmPorfile = ConfigAlarm.GetEnvConfig();
+	av_warning("env AlarmbEnable[%d] AlarmMotionLevel[%d]\n", EnvAlarmPorfile.AlarmbEnable, EnvAlarmPorfile.AlarmMotionLevel);
+	if (0 == memcmp(&AlmProfile, &EnvAlarmPorfile, sizeof(EnvAlarmPorfile))) {
+		av_warning("AlmProfile == EnvAlarmPorfile sizeof(EnvAlarmPorfile) %d\n", sizeof(NewAlarmPorfile));
+	} else {
+		av_warning("AlmProfile != EnvAlarmPorfile sizeof(EnvAlarmPorfile) %d\n", sizeof(NewAlarmPorfile));
+	}
+*/
 	NewAlarmPorfile = AlmProfile;
 	ConfigAlarm.SettingUp();
 	return av_true;
@@ -391,6 +401,10 @@ av_bool CAvDevCapture::AdvancedSystemGetCaps(C_AdvancedSystemCaps &AdvancedSyste
 			return AlarmGetCaps(AdvancedSystemCaps.AlarmCaps);
 		}
 		break;
+		case __MsgDspCaps:
+		{
+			return CAvDevice::GetDspCaps(AdvancedSystemCaps.DspCaps);
+		}
 	default:
 		av_msg("AdvancedSystemGetCaps error _msg [%d]\n", AdvancedSystemCaps._msg);
 		break;
@@ -447,6 +461,7 @@ av_bool CAvDevCapture::AdvancedSystemGetProfile(C_AdvancedSystemProfile &Advance
 		sprintf(AdvancedSystemProfile.ManufacturerInfo.FacProductionSerialNo, "%s", DeviceFactoryInfo.SerialNumber);
 		sprintf(AdvancedSystemProfile.ManufacturerInfo.HardWareVersion, DeviceFactoryInfo.HardWareVersion);
 		AdvancedSystemProfile.ManufacturerInfo.FacTime = DeviceFactoryInfo.FActoryTime;
+		AdvancedSystemProfile.ManufacturerInfo.HardWareInterfaceMask = DeviceFactoryInfo.HardInterfaceMask;
 		std::string guid;
 		CAvDevice::GetStartUpGuid(guid);
 		sprintf(AdvancedSystemProfile.ManufacturerInfo.ProtocolUniqueCode, "%s", guid.c_str());
@@ -520,6 +535,15 @@ av_bool CAvDevCapture::AdvancedSystemGetProfile(C_AdvancedSystemProfile &Advance
 	}
 		break;
 	case __MsgRtmpProfile:
+	{
+		av_msg("__MsgRtmpProfile Get \n");
+		CAvConfigRtmp AvConfigRtmp;
+		AvConfigRtmp.Update();
+		for (int i = 0; i < SYS_CHN_NUM; i++){
+			ConfigRtmp &Config = AvConfigRtmp.GetConfig(i);
+			AdvancedSystemProfile.RtmpProfile.RtmpNodeProfileList.push_back(Config);
+		}
+	}
 		break;
 	case __MsgP2pProfile:
 	{
@@ -537,6 +561,18 @@ av_bool CAvDevCapture::AdvancedSystemGetProfile(C_AdvancedSystemProfile &Advance
 		AdvancedSystemProfile.AlarmProfile = Conf;
 	}
 	break;
+	case __MsgSyncSystemTime:
+	{
+		av_timeval atv;
+		CAvDevice::GetSysTime(atv);
+		av_u32 utcSecond;
+		CAvDevice::TimeLocal2Utc(utcSecond, atv.tv_sec);
+		AdvancedSystemProfile.SyncSystemTime.Second = utcSecond;
+	}
+	break;
+
+
+
 	default:
 		av_error("AdvancedSystemGetProfile _msg Error [%d]\n", AdvancedSystemProfile._msg);
 		break;
@@ -586,7 +622,7 @@ av_bool CAvDevCapture::AdvancedSystemSetProfile(C_AdvancedSystemProfile &Advance
 		sprintf(DeviceFacInfo.ProductModel, "%s", AdvancedSystemProfile.ManufacturerInfo.FacProductionModel);
 		char buffer[32];
 		int bufferlen = 0;
-		for (int i = 0; i < strlen(DeviceFacInfo.SerialNumber); i++){
+		for (int i = 0; i < (int)strlen(DeviceFacInfo.SerialNumber); i++){
 			if (bufferlen == 0 && DeviceFacInfo.SerialNumber[i] != '-') continue;
 			if (bufferlen != 0 && DeviceFacInfo.SerialNumber[i] == '-'){
 				break;
@@ -605,7 +641,7 @@ av_bool CAvDevCapture::AdvancedSystemSetProfile(C_AdvancedSystemProfile &Advance
 		DeviceFacInfo.SensorType = AdvancedSystemProfile.ManufacturerInfo.FacSenSor;
 		DeviceFacInfo.FActoryTime = AdvancedSystemProfile.ManufacturerInfo.FacTime;
 		DeviceFacInfo.MaxChannel = AdvancedSystemProfile.ManufacturerInfo.ChannelMax;
-		DeviceFacInfo.Res = 0x00;
+		DeviceFacInfo.HardInterfaceMask = AdvancedSystemProfile.ManufacturerInfo.HardWareInterfaceMask;
 
 		CAvDevice::SetDeviceInfo(DeviceFacInfo);
 	}
@@ -668,6 +704,24 @@ av_bool CAvDevCapture::AdvancedSystemSetProfile(C_AdvancedSystemProfile &Advance
 	}
 	break;
 	case __MsgRtmpProfile:
+	{
+		av_msg("__MsgRtmpProfile Set \n");
+		CAvConfigRtmp AvConfigRtmp;
+		AvConfigRtmp.Update();
+		for (int i = 0; i < SYS_CHN_NUM; i++){
+			ConfigRtmp &Config = AvConfigRtmp.GetConfig(i);
+			if (AdvancedSystemProfile.RtmpProfile.RtmpNodeProfileList.size() == 0){
+				Config.bEnable = av_false;
+			}
+			else{
+				Config = AdvancedSystemProfile.RtmpProfile.RtmpNodeProfileList.front();
+				AdvancedSystemProfile.RtmpProfile.RtmpNodeProfileList.pop_front();
+			}
+
+		}
+
+		AvConfigRtmp.SettingUp();
+	}
 		break;
 	case __MsgP2pProfile:
 	{
@@ -684,6 +738,15 @@ av_bool CAvDevCapture::AdvancedSystemSetProfile(C_AdvancedSystemProfile &Advance
 		AlarmSetProfile(AdvancedSystemProfile.AlarmProfile);
 	}
 		break;
+	case __MsgSyncSystemTime:
+	{
+		av_timeval timeval;
+		timeval.tv_usec = 0;
+		CAvDevice::TimeUtc2Local(AdvancedSystemProfile.SyncSystemTime.Second, timeval.tv_sec);
+		CAvDevice::SetSysTime(timeval);
+
+	}
+	break;
 	default:
 		av_msg("AdvancedSystemSetProfile default\n");
 		break;
@@ -814,28 +877,12 @@ av_bool CAvDevCapture::LoadConfigs()
 
 
 	ConfigOverLayProfile &OverLayProfile = m_ConfigOverLay.GetConfig(m_Channel);
-
 	for (int i = 0; i < OverLayType_Last; i++){
 		if (!(AvMask(i)&EncodeCaps.OverLayMask)) continue;
 		AvOverLaySetProfile(m_Channel, &OverLayProfile.OverlayProfile[i]);
 	}
 
-
-	//md
-	C_AlarmCaps AlarmCaps;
-	AvAlarmCaps(&AlarmCaps);
-	if (AlarmCaps.AlarmEventMask & AvMask(AlarmEvent_VIDEO_MotionDetection)){
-		ConfigAlarmProfile &Profile = m_ConfigAlarm.GetConfig();
-		if (Profile.AlarmEventMask & AvMask(AlarmEvent_VIDEO_MotionDetection)){
-			av_bool ret = av_false;
-			ret = avSetMdProfile(Profile.AlarmMotionArea, Profile.AlarmMotionLevel);
-			if (ret != av_true){
-				av_error("avSetMdProfile return error \n");
-			}
-		}
-	}
 	return av_true;
-
 }
 
 void CAvDevCapture::ThreadProc()
@@ -953,7 +1000,7 @@ void CAvDevCapture::ThreadProc()
 		//以下是为了动态输入
 		if (1 && (cnt++ % 100) == 0){
 			ViStatus = AvCaptureSynchronize(m_Channel);
-			CAvAlarm::AvAlarmStat MsgStatus = CAvAlarm::AvAlm_Stat_NONE;
+			AlarmStat  MsgStatus = AlarmStat_None;
 			switch (ViStatus){
 			case 	E_Capture_VideoNONE:
 				av_error("Why AvCaptureSynchronize return E_Capture_VideoNONE\n");
@@ -972,7 +1019,7 @@ void CAvDevCapture::ThreadProc()
 					}
 					AStart(CHL_ACAP_T);
 					AStart(CHL_APLY_T);
-					MsgStatus = CAvAlarm::AvAlm_Stat_Close;
+					MsgStatus = AlarmStat_Stop;
 					m_LastCaptureSyncStat = E_Capture_VideoStart;
 				}
 
@@ -993,7 +1040,7 @@ void CAvDevCapture::ThreadProc()
 						Stop(i);
 					}
 					CaptureDestroy();
-					MsgStatus = CAvAlarm::AvAlm_Stat_Open;
+					MsgStatus = AlarmStat_Start;
 					m_LastCaptureSyncStat = E_Capture_VideoStop;
 				}
 			}
@@ -1009,15 +1056,15 @@ void CAvDevCapture::ThreadProc()
 				break;
 			}
 
-			if (1 && MsgStatus != CAvAlarm::AvAlm_Stat_NONE){
+			if (1 && MsgStatus != AlarmStat_None){
 				CAvQmsg AlarmMsgQueue(ALARM_QUEUE_MSG_NAME);
-				CAvAlarm::AlmMsg MsgData;
-				MsgData.AlmStatus = MsgStatus;
-				MsgData.AlmTmSec = (av_u32)time(NULL);
+				C_AlmMsg MsgData;
+				MsgData.AlarmStatus = MsgStatus;
+				MsgData.AlarmTime = (av_u32)time(NULL);
 				MsgData.Channel = m_Channel;
 				MsgData.Slave = CHL_NR_T;
-				MsgData.AlmType = AlarmEvent_VIDEO_Lost;
-				av_u32 MsgDatalen = sizeof(CAvAlarm::AlmMsg);
+				MsgData.AlarmEventName = AlarmEvent_VIDEO_Lost;
+				av_u32 MsgDatalen = sizeof(C_AlmMsg);
 				AlarmMsgQueue.QmSnd((av_char *)&MsgData, MsgDatalen);
 			}
 		}
@@ -1149,7 +1196,6 @@ av_void CAvDevCapture::OnConfigAudioModify(CAvConfigAudio *ConfigAudio, int &res
 
 av_void CAvDevCapture::OnConfigAlarmModify(CAvConfigAlarm *Configalarm, int &result)
 {
-	av_warning("OnConfigAlarmModify Modify\n");
 	ConfigAlarmProfile &OldProfile = m_ConfigAlarm.GetConfig();
 	ConfigAlarmProfile &NewProfile = Configalarm->GetConfig();
 

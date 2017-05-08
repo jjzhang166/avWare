@@ -17,6 +17,9 @@
 #include "Common/icmp.h"
 #include "AvThread/AvTimer.h"
 
+#include "AvNetService/AvProtoMoon.h"
+#include "AvNetService/AvOnvifClient.h"
+
 CAvNetCapture::CAvNetCapture()
 {
 	CThread::SetThreadName(__FUNCTION__);
@@ -31,21 +34,28 @@ CAvNetCapture::CAvNetCapture()
 	}
 
  	m_Timer.SetContinual(av_true);
-	m_Timer.SetInterlvalMsec(10000);
+	m_Timer.SetInterlvalMsec(5000);
 	m_Timer.SetStartRunMSec(0);
 	m_Timer.SetOnTimerProc(this, (CAvTimer::ONTIMER_PROC)&CAvNetCapture::OnTimer);
+	m_bMainChnOffLine = av_false;
+	m_bSubChnOffLine = av_false;
+
+	m_ConfigNetCapture.Update();
+	m_ConfigNetCapture.Attach(this, (AvConfigCallBack)&CAvNetCapture::OnConfigNetCaptureModify);
+
 
 }
 CAvNetCapture::~CAvNetCapture()
 {
 	m_LinkStatus = IRet_uninitialized;
+	m_ConfigNetCapture.Detach(this, (AvConfigCallBack)&CAvNetCapture::OnConfigNetCaptureModify);
+
 }
 
 av_bool CAvNetCapture::Initialize(av_int Channel)
 {
 	m_Channel = Channel;
-
-	return av_true;
+	return LoadConfigs();
 }
 av_bool CAvNetCapture::Start(av_int Slave)
 {
@@ -88,15 +98,12 @@ CAvPacket * CAvNetCapture::Snapshot(av_bool bRealTime, av_uint SnapshotInterval,
 
 Capture::EAvCaptureStatus CAvNetCapture::GetCaptureStatus(av_int Slave)
 {
-	if (Slave == -1){
-		for (int i = CHL_MAIN_T; i < CHL_NR_T; i++){
-			if (m_RecvFrameNm[i] != 0){
-				return Capture::EAvCapture_ING;
-			}
-		}
+	if (m_LinkStatus == IRet_linking){
+		return Capture::EAvCapture_ING;
+	}
+	else{
 		return Capture::EAvCapture_STOP;
 	}
-	return Capture::EAvCapture_STOP;
 }
 
 
@@ -201,27 +208,36 @@ av_bool  CAvNetCapture::AdvancedSystemSetProfile(C_AdvancedSystemProfile &Advanc
 }
 av_bool CAvNetCapture::LoadConfigs()
 {
-	CAvConfigProtocol NetProtocol;
-	NetProtocol.Update();
-	ConfigProtoFormats &Formats = NetProtocol.GetConfig(m_Channel);
-	
+	m_ConfigNetCapture.Update();
+	ConfigProtoFormats &Formats = m_ConfigNetCapture.GetConfig(m_Channel);
+	if (Formats.IsEnable != av_true){
+		return av_true;
+	}
 
-	return av_true;
+
+	return StartNetCapture(GetNetCaptureHandle(Formats));
+}
+av_bool CAvNetCapture::SendAlmMsgToSystem(C_AlmMsg &msg)
+{
+	CAvQmsg AlarmMsgQueue(ALARM_QUEUE_MSG_NAME);
+	av_u32 msglen = sizeof(C_AlmMsg);
+	return AlarmMsgQueue.QmSnd((av_char *)&msg, msglen);
 }
 
 void CAvNetCapture::ThreadProc()
 {
-	CAvPacket *pAcket = NULL;
-	av_bool bSleep = av_true;
-	av_msg("Start NetCapture Channel %d\n", m_Channel);
+	CAvPacket	*pAcket = NULL;
+	av_bool		bSleep = av_true;
+	C_AlmMsg	AlarmMsg;
 	m_LinkStatus = IRet_linking;
+	av_msg("Start NetCapture Channel %d Remote IpAddr[%s]\n", m_Channel, m_NetProtoHandle->ProtoFromats().CheckAliveAddress);
+	
 	I_RET ret = m_NetProtoHandle->Connect();
 	if (ret != IRet_succeed){
 		av_error("Link Server Error exit NetCapture Thread\n");
 		m_LinkStatus = IRet_droplinked;
 		return;
 	}
-	m_LinkStatus = IRet_succeed;
 	Start(CHL_MAIN_T);
 	Start(CHL_SUB1_T);
 	//Start(CHL_JPEG_T);
@@ -239,15 +255,21 @@ void CAvNetCapture::ThreadProc()
 				pAcket->Release();
 			}
 		}
+		
+		while (IRet_succeed == m_NetProtoHandle->RemoteGetAlarmMsg(AlarmMsg))
+		{
+			AlarmMsg.Channel = m_Channel;
+			SendAlmMsgToSystem(AlarmMsg);
+		}
 
 		if (bSleep == av_true && m_Loop == av_true){
-			av_msleep(20);
+			av_msleep(10);
 		}
 	}
 
 	Stop(CHL_MAIN_T);
 	Stop(CHL_SUB1_T);
-	Stop(CHL_JPEG_T);
+	//Stop(CHL_JPEG_T);
 
 	m_NetProtoHandle->Disconnect();
 	m_LinkStatus = IRet_closeed;
@@ -258,6 +280,7 @@ void CAvNetCapture::ThreadProc()
 
 	for (int i = CHL_MAIN_T; i < CHL_NR_T; i++){
 		m_RecvFrameNm[i] = 0;
+		m_TimerLastRecFrameNm[i] = 0;
 	}
 
 }
@@ -266,32 +289,67 @@ void CAvNetCapture::OnTimer(CAvTimer &Timer)
 {
 	av_bool bMainStreamOff = av_false;
 	av_bool bSubStreamOff = av_false;
-	if (m_LinkStatus == IRet_succeed){
-		if (m_TimerLastRecFrameNm[CHL_MAIN_T] == m_RecvFrameNm[CHL_MAIN_T]){
+	if (m_LinkStatus == IRet_linking && NULL != m_NetProtoHandle){
+		if (m_TimerLastRecFrameNm[CHL_MAIN_T] == m_RecvFrameNm[CHL_MAIN_T] && m_RecvFrameNm[CHL_MAIN_T] != 0){
 			bMainStreamOff = av_true;
 		}
+		else if (m_bMainChnOffLine == av_true){
+			PushAlmMsgToSys(CHL_MAIN_T, AlarmStat_Stop);
+			m_bMainChnOffLine = av_false;
+		}
 
-		if (m_TimerLastRecFrameNm[CHL_SUB1_T] == m_RecvFrameNm[CHL_SUB1_T]){
+		if (m_TimerLastRecFrameNm[CHL_SUB1_T] == m_RecvFrameNm[CHL_SUB1_T] && m_RecvFrameNm[CHL_SUB1_T] != 0){
 			bSubStreamOff = av_true;
+		}
+		else if (m_bSubChnOffLine == av_true){
+			PushAlmMsgToSys(CHL_SUB1_T, AlarmStat_Stop);
+			m_bSubChnOffLine = av_false;
 		}
 
 		if (bMainStreamOff == av_true && bSubStreamOff == av_true){
+			if (m_bMainChnOffLine == av_false && m_bSubChnOffLine == av_false){
+				//设备掉线
+				m_bMainChnOffLine = av_true;
+				m_bSubChnOffLine = av_true;
+				PushAlmMsgToSys(CHL_MAIN_T);
+				PushAlmMsgToSys(CHL_SUB1_T);
+			}
+			av_error("CAvNetCapture::OnTimer Channle[%d] Lost Device Relink it\n", m_Channel);
 			CThread::ThreadStop(av_true, 2 * 1000);
 		}
 		else if (bMainStreamOff == av_true){
+			m_bMainChnOffLine = av_true;
+			PushAlmMsgToSys(CHL_MAIN_T);
+			av_error("CAvNetCapture::OnTimer Stream[CHL_MAIN_T] Lost Relink it\n");
 			Stop(CHL_MAIN_T);
 			Start(CHL_MAIN_T);
 		}
 		else if (bSubStreamOff == av_true){
+			m_bSubChnOffLine = av_true;
+			PushAlmMsgToSys(CHL_SUB1_T);
+			av_error("CAvNetCapture::OnTimer Stream[CHL_SUB1_T] Lost Relink it\n");
 			Stop(CHL_SUB1_T);
 			Start(CHL_SUB1_T);
 		}
+
+		m_TimerLastRecFrameNm[CHL_MAIN_T] = m_RecvFrameNm[CHL_MAIN_T];
+		m_TimerLastRecFrameNm[CHL_SUB1_T] = m_RecvFrameNm[CHL_SUB1_T];
+
 	}
 	else if (m_LinkStatus != IRet_linking && NULL != m_NetProtoHandle){
+		if (m_bMainChnOffLine == av_false && m_bSubChnOffLine == av_false){
+			//设备掉线
+			m_bMainChnOffLine = av_true;
+			m_bSubChnOffLine = av_true;
+			PushAlmMsgToSys(CHL_MAIN_T);
+			PushAlmMsgToSys(CHL_SUB1_T);
+		}
 		CICMPPing ICMPPing;
 		C_ProtoFormats &ProtoFormats = m_NetProtoHandle->ProtoFromats();
 		ICMPPing.SetRemoteHost(ProtoFormats.CheckAliveAddress);
 		ICMPPing.SetTimeOut(200 * 1000);
+		
+
 		if (1 == ICMPPing.Ping()){
 			av_warning("ping [%s] is ok relink server CThread::ThreadStart\n", ProtoFormats.CheckAliveAddress);
 			CThread::ThreadStart();
@@ -300,19 +358,34 @@ void CAvNetCapture::OnTimer(CAvTimer &Timer)
 	else{
 
 	}
-	m_TimerLastRecFrameNm[CHL_MAIN_T] = m_RecvFrameNm[CHL_MAIN_T];
-	m_TimerLastRecFrameNm[CHL_SUB1_T] = m_RecvFrameNm[CHL_SUB1_T];
+
 
 
 }
 
+void CAvNetCapture::PushAlmMsgToSys(av_uint Slave, AlarmStat AlmStat, AlarmEvent AlmE)
+{
+	CAvQmsg AlarmMsgQueue(ALARM_QUEUE_MSG_NAME);
+	C_AlmMsg MsgData;
+	MsgData.AlarmStatus = AlmStat;
+	MsgData.AlarmTime = (av_u32)time(NULL);
+	MsgData.Channel = m_Channel;
+	MsgData.Slave = Slave;
+	MsgData.AlarmEventName = AlmE;
+	av_u32 MsgDatalen = sizeof(C_AlmMsg);
+	AlarmMsgQueue.QmSnd((av_char *)&MsgData, MsgDatalen);
+}
+
+
+
 av_bool CAvNetCapture::StartNetCapture(CAvNetProto *Handle)
 {
-
-	m_NetProtoHandle = Handle;
-	for (int i = 0; i < CHL_NR_T; i++){
-		m_RecvFrameNm[i] = 1;
+	if (NULL == Handle){
+		av_error("Handle is NULL\n");
+		return av_false;
 	}
+	m_NetProtoHandle = Handle;
+
 	CThread::ThreadStart();
 	CAvTimer::StartTimer(m_Timer);
 	
@@ -320,14 +393,99 @@ av_bool CAvNetCapture::StartNetCapture(CAvNetProto *Handle)
 }
 av_bool CAvNetCapture::StopNetCapture()
 {
-	CThread::ThreadStop(av_true, 2000);
 	CAvTimer::StopTimer(m_Timer);
-
+	CThread::ThreadStop(av_true, 2000);
+	
 	if (m_NetProtoHandle != NULL){
+		m_NetProtoHandle->Disconnect();
 		av_msg("delete m_NetProtoHandle \n");
 		delete m_NetProtoHandle;
 	}
 	m_NetProtoHandle = NULL;
 
 	return av_true;
+}
+CAvNetProto *CAvNetCapture::GetNetCaptureHandle(C_ProtoFormats &ProtoFormats)
+{
+	CAvNetProto *ProtoHandle = NULL;
+	switch (ProtoFormats.ProtoMode)
+	{
+	case ProtocolMoon:
+	{
+		ProtoHandle = new CAvProtoMoon(ProtoFormats);
+	}
+	break;
+	case ProtocolOnvif:
+	{
+		ProtoHandle = new CAvOnvifClient();
+	}
+	break;
+	case ProtocolRtsp:
+		break;
+
+	default:
+		av_error("Unkown this Protocol [%d]\n", ProtoFormats.ProtoMode);
+		break;
+	}
+
+	return ProtoHandle;
+}
+
+av_void CAvNetCapture::OnConfigNetCaptureModify(CAvConfigProtocol *ConfigProtocol, int &result)
+{
+	ConfigProtoFormats &OldConfigProtoProfile = m_ConfigNetCapture.GetConfig(m_Channel);
+	ConfigProtoFormats &NewConfigProtoProfile = ConfigProtocol->GetConfig(m_Channel);
+	result = 0;
+
+	av_bool bChange = av_false;
+
+	{
+		if (OldConfigProtoProfile.IsEnable != NewConfigProtoProfile.IsEnable ||
+			0 != strcmp(OldConfigProtoProfile.UsrName, NewConfigProtoProfile.UsrName) ||
+			0 != strcmp(OldConfigProtoProfile.Passwd, NewConfigProtoProfile.Passwd) ||
+			0 != strcmp(OldConfigProtoProfile.CheckAliveAddress, NewConfigProtoProfile.CheckAliveAddress) ||
+			OldConfigProtoProfile.ProtoMode != NewConfigProtoProfile.ProtoMode){
+			bChange = av_true;
+		}
+		else{
+			switch (OldConfigProtoProfile.ProtoMode)
+			{
+			case ProtocolMoon:
+			{
+				if (OldConfigProtoProfile.MoonFormats.Port != NewConfigProtoProfile.MoonFormats.Port ||
+					0 != strcmp(OldConfigProtoProfile.MoonFormats.Url, NewConfigProtoProfile.MoonFormats.Url)){
+					bChange = av_true;
+				}
+			}
+				break;
+			case ProtocolOnvif:
+				break;
+			case ProtocolRtmp:
+				break;
+			case ProtocolRtsp:
+				break;
+
+			default:
+				return;
+				break;
+			}
+		}
+	}
+
+	//if (0 == memcmp(&OldConfigProtoProfile, &NewConfigProtoProfile, sizeof(ConfigProtoFormats))){
+	if (bChange == av_false){
+		return ;
+	}
+	else{
+		if (m_NetProtoHandle != NULL){
+			StopNetCapture();
+		}
+
+		if (NewConfigProtoProfile.IsEnable == av_true){
+			StartNetCapture(GetNetCaptureHandle(NewConfigProtoProfile));
+		}
+		OldConfigProtoProfile = NewConfigProtoProfile;
+		av_warning("NetCapture new Config\n");
+	}
+
 }

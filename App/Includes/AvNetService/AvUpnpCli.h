@@ -16,8 +16,7 @@
 #define __AV_UPNPCLI_H__
 
 #include "AvThread/AvTimer.h"
-#include "AvConfigs/AvConfigNetService.h"
-//#include "AvConfigs/AvConfigsNetWork.h"
+#include "AvConfigs/AvConfigManagerNetWork.h"
 
 
 class CAvUpnpCli : public CAvObject

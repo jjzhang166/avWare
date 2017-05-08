@@ -12,6 +12,7 @@
 	<script src="jquery/json2.js"></script>
 	<script src="js/network.js"></script>
 	<script src="js/index.js"></script>
+	<script src="js/plugin.js"></script>
 </head>
 <style type="text/css">
  /*页面*/
@@ -37,7 +38,7 @@
 				position:absolute;
 				left:212px;right:0px;
 				} 	
-  #ID_INDEX_LEFT{width:210px; background:#405c74;position:absolute;bottom:0px;top:52px; min-height: 560px;} 
+  #ID_INDEX_LEFT{width:210px; background:#405c74;position:absolute;bottom:0px;top:52px; min-height: 690px;} 
   #ID_INDEX_PTZTAG{width: 210px;
 				height: 25px;
 				background: #948B8B;
@@ -47,7 +48,7 @@
 				line-height: 25px;
 				text-align: center;
 		}		
-  #ID_INDEX_OCX{background:#000000;bottom:0px;top:50px;position:absolute;left:210px;right:0px;border:2px solid  #00BFFF;min-height: 560px;} 
+  #ID_INDEX_OCX{background:#000000;bottom:0px;top:50px;position:absolute;left:210px;right:0px;border:2px solid  #00BFFF;min-height: 690px;} 
   #ID_INDEX_FIRST_NAV{border-left:2px outset   #00BFFF;}
  /* #ID_INDEX_PTZTABLE{height: 100px;
 					width: 61%;
@@ -79,9 +80,14 @@
 	#ID_IMAGEBACK{
 		width: 210px;
 		border:2px solid  #000000;
-		position:absolute;
-		bottom:0px;
-		top:430px;
+		height:130px;
+		background:;
+	}
+	#ID_SNAPBACK{
+		width: 210px;
+		min-height:100px;
+		border-top:2px solid  #000000;
+		background:;
 	}
 	a{
 		color: white;text-decoration: none;
@@ -130,6 +136,14 @@
 		height:5px;
 		width:90px;
 	}
+	
+	.PluginArea{
+		min-height: 500px;
+		min-width：800;
+		margin:auto;
+		/*background:yellow;*/
+	} 
+
  </style>
  <script>
  	$(function() {
@@ -204,7 +218,7 @@
 		});
 		$( "#ID_SaturationSlibar" ).slider( "value", 50 );
 		$( "#ID_SaturationValue" ).val(50);
-		InitImageSliderBar();
+		//InitImageSliderBar();
 	});
  </script>
 <body width="100%" height="100%">
@@ -289,15 +303,80 @@
 	<div class="tagFontDiv" >对比度:</div><div id="ID_ContrastSlibar" height="20px"></div><input style="width:25px;height:15px;margin-top: 7px;margin-left: 5px;" id= "ID_ContrastValue"/>	
 	</div>
 	</div>
+	<div id="ID_INDEX_PTZTAG">抓拍</div>
+	<div id="ID_SNAPBACK">		
+	<input style="height:24px;margin-top: 3px;margin-left: 5px;" type="button" value="抓拍触发" onmousedown="Snap()"/>	
+	</div> 
 	</div>
 	<div id="ID_INDEX_OCX">
-	<object 
+	<!--<object 
 		CLASSID="CLSID:A7ED535D-FD1B-482F-8FB6-1F8E4C129E38" id="OCX" name="OCX"
 		width="100%" height="100%" codebase="AvActiveX.dll#version=1.0.0"> 
-		</object> 
+	</object>-->
+	<!-->插件区域<-->
+	<div class="VideoArea" id="id_VideoArea" >
+	 <div class="PluginArea" id="id_PluginArea">
+	 <EMBED style="margin:auto;" pluginspage="http://www.videolan.org"  
+		   type="application/x-vlc-plugin"  
+		   version="VideoLAN.VLCPlugin.2"  
+		   text="Waiting for video"
+		   toolbar="false"	 
+		   width=320
+		   height=240
+		   name="vlc"
+		   id="vlc">
+	</EMBED>
+	</div>
+	</div>	
 	</div>
 </body>	
 <script>
+	var StreamType = -1;
+	
+	function ReSizePluginArea()
+	{
+		var width = $(this).width();    
+		var height = $(this).height(); 
+		var MinWidth = 500;
+		width = width - 210 - 4; 
+		height = height - 50 - 30;
+		//console.log("width1="+width + " height1="+height);
+		/*if((width*9/16)>height){
+				width = height*16/9;
+		}else{
+				height = width*9/16;
+		}
+		if(width < MinWidth){
+			width = MinWidth;
+			height = MinWidth*9/16;
+		}*/
+		//console.log("width="+width + " height="+height);
+		$("#id_PluginArea").width(width);
+		$("#id_PluginArea").height(height);
+		PluginChanggeSize(width,height);
+	}
+		
+	function StreamChange(value)
+	{
+		if(value == StreamType){
+			return;
+		}
+		if(-1 != StreamType){
+			PluginStreamStop();
+		}
+		StreamType = value;
+		PluginStreamPlay(StreamType);
+	}
+	
+	$(function() {//页面初始化
+		setTimeout("ReSizePluginArea();",20);//延时拉取视频框
+		StreamChange(0);//初始化显示主码流	
+	});
+	
+	$(window).resize(function() {    
+		ReSizePluginArea();
+	});
+	/*
 	function GetDevIP()
 	{
 		var url = document.location.href;
@@ -306,10 +385,9 @@
 		if(ipAddr){
 			return ipAddr;
 		}
-		alert("IP获取错误!");
+		//alert("IP获取错误!");
 		return ;
 	}
-	
 	$(function() 
 	{
 		var ip; 
@@ -333,6 +411,6 @@
 			ocx.AvOpenStream(0,0);
 			//alert("插件加载完毕 ip="+ip);
 		}
-	});
+	});*/
 </script>
 </html>

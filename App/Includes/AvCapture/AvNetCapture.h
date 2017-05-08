@@ -21,7 +21,6 @@
 #include "AvPacket/AvPacket.h"
 #include "AvThread/AvThread.h"
 #include "AvCapture/AvCapture.h"
-//#include "AvProtocol/AvNetProto.h"
 #include "AvProtocol/AvNetProto.h"
 
 class CAvNetCapture:public Capture
@@ -72,13 +71,22 @@ public:
 public:
 	av_bool StartNetCapture(CAvNetProto *Handle);
 	av_bool StopNetCapture();
+	CAvNetProto *GetNetCaptureHandle(C_ProtoFormats &ProtoFormats);
 public:
 	av_bool LoadConfigs();
+	av_bool SendAlmMsgToSystem(C_AlmMsg &Msg);
+
+private:
+	av_void OnConfigNetCaptureModify(CAvConfigProtocol *ConfigProtocol, int &result);
+	CAvConfigProtocol	m_ConfigNetCapture;
+
 private:
 	TSignal3<av_int, av_int, CAvPacket *> m_StreamSignal[CHL_NR_T];
 private:
 	void ThreadProc();
 	void OnTimer(CAvTimer &Timer);
+	void PushAlmMsgToSys(av_uint Slave, AlarmStat AlmStat = AlarmStat_Start, AlarmEvent AlmE = AlarmEvent_VIDEO_Lost);
+
 private:
 	CAvTimer		m_Timer;
 	av_uint			m_TimerLastRecFrameNm[CHL_NR_T];
@@ -88,6 +96,10 @@ private:
 	av_int			m_Channel;
 	av_int			m_RemoteChannel;
 	av_uint			m_RecvFrameNm[CHL_NR_T];
+
+private:
+	av_bool			m_bMainChnOffLine;
+	av_bool			m_bSubChnOffLine;
 };
 
 

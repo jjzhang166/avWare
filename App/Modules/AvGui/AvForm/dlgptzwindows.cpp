@@ -13,7 +13,7 @@ DlgPtzWindows::DlgPtzWindows(QWidget *parent) :
 	IconComm::Instance()->SetIcon(ui->LabIco, QChar(0xf015), 12);
 
 	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool );
-	this->setAttribute(Qt::WA_DeleteOnClose);
+	//this->setAttribute(Qt::WA_DeleteOnClose);
 
 	IconComm::Instance()->SetIcon(ui->BtnPtzAuto, QChar(0xf01e), 10);
 	IconComm::Instance()->SetIcon(ui->BtnPtzLeft, QChar(0xf053), 10);
@@ -38,7 +38,7 @@ DlgPtzWindows::DlgPtzWindows(QWidget *parent) :
 	m_PtzSpeed = 50;
 	m_FormPtzAdvanced = NULL;
 	m_bFromPtzAdvancedShow = false;
-	FixUi();
+	
 }
 
 DlgPtzWindows::~DlgPtzWindows()
@@ -46,15 +46,13 @@ DlgPtzWindows::~DlgPtzWindows()
     delete ui;
 }
 
+void DlgPtzWindows::SetModiyChannel(int Channel)
+{
+	m_Channel = Channel;
+	FixUi();
+}
 void DlgPtzWindows::FixUi()
 {
-	ui->CBoxChannels->setStyleSheet("color:black");
-	ui->CBoxChannels->clear();
-	for (int i = 0; i < 32; i++){
-		ui->CBoxChannels->addItem(QString::number(i));
-	}
-	ui->CBoxChannels->setCurrentText(QString::number(0));
-	m_Channel = 0;
 	m_Capture = g_AvManCapture.GetAvCaptureInstance(m_Channel);
 
 	m_Capture->ImageGetProfile(m_ImageProfile);

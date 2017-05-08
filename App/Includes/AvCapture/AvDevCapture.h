@@ -73,6 +73,7 @@ private:
 	av_bool AlarmGetCaps(C_AlarmCaps &AlarmCaps);
 	av_bool AlarmSetProfile(C_AlarmProfile &AlmProfile);
 	av_bool AlarmGetProfile(C_AlarmProfile &AlmProfile);
+
 private:
 	av_uint m_RecvFrameNu[CHL_NR_T];
 	av_uint m_ContinuousErrFrameNu[CHL_NR_T];

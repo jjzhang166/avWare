@@ -18,32 +18,16 @@
 
 #include "Apis/AvWareCplusplus.h"
 #include "AvConfigs/AvConfigTable.h"
-
-typedef enum {
-	EAvRecord_NONE,
-	EAvRecord_Timer,
-	EAvRecord_Manul,
-	EAvRecord_Alarm,
-	EAvRecord_LAST,
-}EAvRecordType;
-
-typedef struct{
-	av_bool bEnable;
-	av_u32  tStart;
-	av_u32  tEnd;
-}RecordTime;
-
-#define RECORD_MAX_TIME_RANGE 3
-
-
+#include "Apis/AvWareStruct.h"
 
 typedef struct {
 	av_uint			RecordTypeMask;
-	av_uint			RecordChlMask;
-	RecordTime		RecordTm[RECORD_MAX_TIME_RANGE];
-}ConfigRecordFormats;
+	av_uint			RecordCHLMask;
+	av_uint			RecordPerSecond;
+	C_TimeArea		RecordTm[AvMaxWeeks][AvMaxTimeArea];
+}ConfigRecordProfile;
 
-typedef TAvConfig<ConfigRecordFormats, 0, SYS_CHN_NUM> CAvConfigRecord;
+typedef TAvConfig<ConfigRecordProfile, 0, SYS_CHN_NUM> CAvConfigRecord;
 
 
 typedef enum{
@@ -62,9 +46,9 @@ typedef struct {
 	EAvRecordLimitType	LimitType;
 	av_uint				LimitArgs;//按时间限制时，此参数为一个录相文件的秒数;按大小限制时，此参数为录相文件的字节数;
 	av_uint				LimitPrerecordSec;
-}ConfigRecordCtrlFormats;
+}ConfigRecordCtrlProfile;
 
-typedef TAvConfig<ConfigRecordCtrlFormats> CAvConfigRecordCtrl;
+typedef TAvConfig<ConfigRecordCtrlProfile> CAvConfigRecordCtrl;
 
 
 #endif

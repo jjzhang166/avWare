@@ -21,7 +21,6 @@ public:
 public:
 	I_RET  RemoteOnAvPacket(int Channel, int Slave, CAvPacket *pack);
 	CAvPacket * RemoteStreamGet(int Channel, int Slave);
-	I_RET  LocalDspGetCaps(C_DspCaps &DspCaps);
 
 	I_RET  LocalCaptureGetCaps(int Channel, C_CaptureCaps &CaptureCaps);
 	I_RET  LocalCaptureGetProfile(int Channel, C_CaptureProfile &CaptureProfile);
@@ -43,9 +42,13 @@ public:
 	I_RET  LocalPtzSetProfile(int Channel, C_PtzProfile &PtzProfile);
 	I_RET  LocalPtzSetCommand(int Channel, C_PtzCmd &PtzCmd);
 
-	I_RET LocalAdvancedSystemGetCaps(int Channel, C_AdvancedSystemCaps &AdvancedSystemCaps);
-	I_RET LocalAdvancedSystemGetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile);
-	I_RET LocalAdvancedSystemSetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile);
+	I_RET  LocalAdvancedSystemGetCaps(int Channel, C_AdvancedSystemCaps &AdvancedSystemCaps);
+	I_RET  LocalAdvancedSystemGetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile);
+	I_RET  LocalAdvancedSystemSetProfile(int Channel, C_AdvancedSystemProfile &AdvancedSystemProfile);
+
+	I_RET  LocalRecordFileSearch(int Channel, C_RecordFileSearch &RecordFileSearch);
+	I_RET  LocalRecordFileDownload(int Channel, C_RecordFileDownload &RecordFileDownload);
+	I_RET  LocalRecordFileDownloadCtrl(int Channel, C_RecordFileDownloadCtrl &RecordFileDownloadCtrl);
 
 
 	I_RET  LocalNetCommGetCaps(C_NetCommCaps &NetCommCaps);
@@ -68,6 +71,8 @@ public:
 	I_RET  LocalCheckAuthorization(const char *usrname, const char *passwd, unsigned int &UsrAccess);
 private:
 	void OnLocalPacket(int Channel, int Slave, CAvPacket *pack);
+	void OnLocalAlmMsg(C_AlmMsg &Msg);
+
 private:
 	CNetUv *OnConnect(const char *remoteAddr, const int remotePort);
 

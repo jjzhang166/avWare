@@ -395,7 +395,7 @@ void DlgAreaSelect::on_BtnFrmAreaSubmit_clicked()
 
 		C_AdvancedSystemProfile AdvancedSystemProfile;
 
-		memset(&AdvancedSystemProfile, 0x00, sizeof(C_AdvancedSystemProfile));
+		//memset(&AdvancedSystemProfile, 0x00, sizeof(C_AdvancedSystemProfile));
 		std::list<MousePoint>::iterator ilist;
 		int i = 0;
 		for (ilist = m_MousezoneList.begin(); ilist != m_MousezoneList.end(); ilist++, i++){

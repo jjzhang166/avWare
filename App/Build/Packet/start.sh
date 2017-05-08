@@ -1,7 +1,7 @@
 #!/bin/sh
 echo "Run Start"
 
-
+avWareHomeDir=/app;
 
 report_error()
 {
@@ -17,11 +17,10 @@ start_ko()
 	local script_ko;
 	local sensorsns;
 	
-	if [ ! -d "/app/ko" ]; then
+	if [ ! -d "$avWareHomeDir/ko" ]; then
 		echo "Have No Ko dir";
-		#return ;
 	else
-		cd /app/ko/;
+		cd $avWareHomeDir/ko;
 	fi
 	
 	case $sensor in
@@ -90,7 +89,6 @@ start_ko()
 			;;
 		*)
 		echo "xxxx Invalid sensor type $sensor xxxx"
-		report_error
 		;;
 	esac
 	
@@ -153,6 +151,9 @@ start_ko()
 		H36|h36)
 		./load3536 -i
 			;;
+		H3798MV100)
+		./load
+		;;
 		WIN32|win32)
 		script_ko = loadwin32;
 			;;
@@ -167,17 +168,18 @@ start_ko()
 			;;
 		AUTO|auto)
 			echo "XXXXXX Have No Platform Var"
+			if [ -x loaddefault.sh ];then
+				./loaddefault.sh
+			fi
 			;;
 		*)
 		
 		echo "xxxx Invalid platform type $platform xxxx"
-		cd -;
-		report_error
 		;;
 	esac
 	
 	
-	cd -;
+	cd $avWareHomeDir;
 	
 	
 }
@@ -193,9 +195,9 @@ system_conf()
 start_app()
 {
 
-	if [ -f /app/avWare.tar.gz ]
+	if [ -f $avWareHomeDir/avWare.tar.gz ]
 	then
-		tar -xvf /app/avWare.tar.gz -C /tmp;
+		tar -xvf $avWareHomeDir/avWare.tar.gz -C /tmp;
 		cd /tmp;
 		ulimit -s 4096;
 		./avWare &
@@ -205,18 +207,126 @@ start_app()
 		echo 2 > /proc/sys/vm/drop_caches;
 		echo 3 > /proc/sys/vm/drop_caches;
 	else
-		cd /app
+		cd $avWareHomeDir
 		./avWare &
 	fi
 
 }
 
+start_wifi()
+{
+	if [ -f /app/wifi.tar.bz2 ];then
+		tar -xvf /app/wifi.tar.bz2 -C /tmp;
+		ln -s /tmp/wifi/firmware/wlan/ /lib/firmware/wlan
+		ln -s /tmp/wifi/firmware/athwlan.bin /lib/firmware/athwlan.bin
+		ln -s /tmp/wifi/firmware/otp.bin /lib/firmware/otp.bin
+		ln -s /tmp/wifi/firmware/otp30.bin /lib/firmware/otp30.bin
+		ln -s /tmp/wifi/firmware/qca61x4.bin /lib/firmware/qca61x4.bin
+		ln -s /tmp/wifi/firmware/utf.bin /lib/firmware/utf.bin
+		ln -s /tmp/wifi/firmware/utf30.bin /lib/firmware/utf30.bin
+		ln -s /tmp/wifi/firmware/fakeboar.bin /lib/firmware/fakeboar.bin
+		ln -s /tmp/wifi/firmware/qwlan30.bin /lib/firmware/qwlan30.bin
+		echo host > /proc/ambarella/usbphy0
+		insmod /lib/modules/3.10.73/kernel/net/rfkill/rfkill.ko
+		insmod /tmp/wifi/compat.ko
+		insmod /tmp/wifi/cfg80211.ko
+		insmod /tmp/wifi/wlan.ko		
+		ifconfig wlan0 up
+
+		if [ -f /appex/hostapd.conf ];then
+			ifconfig wlan0 192.168.99.1
+			ln -s /tmp/wifi/udhcpd.conf /etc/udhcpd.conf
+			udhcpd /etc/udhcpd.conf
+			#/tmp/wifi/hostapd /appex/hostapd.conf &
+		fi
+	fi
+}
 
 start_env()
 {
-	export PATH="/app:/app/bin:$PATH"
-	export LD_LIBRARY_PATH="/app/lib:$LD_LIBRARY_PATH"
-	#ln -s /app/Lua/platform.lua /app/Lua/hardware.lua;	
+	local platform=$1;
+
+	
+		case $platform in
+		S2L22M|s2l22m)
+		;;
+		S2L33M|s2l33m)
+		/appex/CloseWatchdog;
+		;;
+		S2L55M|s2l55m)
+		;;
+		S2L65|s2l65)
+		;;
+		S2L66|s2l66)
+		/appex/CloseWatchdog;
+		;;
+		H18EV100|h18ev100)
+		;;
+		H18EV200|h18ev200)
+		;;
+		H18EV201|h18ev201)
+		;;
+		H18C|h18c)
+		;;
+		H18A|h18a)
+		;;
+		H16CV100|h16cv100)
+		;;
+		H16CV200|h16cv200)
+		;;
+		H16D|h16d)
+		;;
+		H19|h19)
+		;;
+		H20D|h20d)
+			;;
+		H35|h35)
+			;;
+		H36|h36)
+			avWareHomeDir=/tmp
+			tar -xvf /app/avWare.tar.gz -C $avWareHomeDir;
+			export QT_QPA_FONTDIR="/usr/lib/fonts"
+			export QT_QPA_PLATFORM_PLUGIN_PATH="/usr/lib/plugins"
+			export QT_QPA_PLATFORM="linuxfb:/dev/fb0"
+
+			;;
+		H3798MV100)
+			export QT_QPA_FONTDIR="/usr/lib/fonts"
+			export QT_QPA_PLATFORM_PLUGIN_PATH="/usr/lib/plugins"
+			export QT_QPA_PLATFORM="linuxfb:/dev/fb0"
+
+			;;
+		WIN32|win32)
+			;;
+		WIN64|win64)
+			;;		
+		LIN32|lin32)
+			;;		
+		LIN64|lin64)
+			;;
+		AUTO|auto)
+			##only for nvr platform (have no factory info)
+			export QT_QPA_FONTDIR="/usr/lib/fonts"
+			export QT_QPA_PLATFORM_PLUGIN_PATH="/usr/lib/plugins"
+			export QT_QPA_PLATFORM="linuxfb:/dev/fb0"
+			echo "XXXXXX Have No Platform Var"
+			;;
+		*)
+		
+		echo "xxxx Invalid platform type $platform xxxx"
+		report_error
+		;;
+	esac
+	cd $avWareHomeDir
+	export PATH="$avWareHomeDir:$avWareHomeDir/bin:$PATH"
+	export LD_LIBRARY_PATH="$avWareHomeDir/lib:/lib:/usr/lib:$LD_LIBRARY_PATH"
+
+	
+	echo ""
+	echo "#########avWare Env########################"
+	env
+	echo "###########################################"
+	echo ""
 }
 
 start_init()
@@ -231,11 +341,10 @@ if [ $# ==  0 ];then
 fi
 
 
-cd /app/
-start_env;
+
+start_env $1;
 start_ko $1 $2;
 system_conf;
+start_wifi;
 start_app;
 
-
-#.

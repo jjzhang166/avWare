@@ -7,6 +7,14 @@
 #include "AvUiComm/FloatingButton.h"
 #include "AvDevice/AvDevice.h"
 #include "AvForm/dlgabout.h"
+#include "AvForm/dlgrecordset.h"
+#include "AvForm/frmmainmenu.h"
+#include "AvSource/AvGuiStatusMachine.h"
+
+#if defined(_AV_WARE_CODE_OPENSOURCE)
+#else
+#include "AvForm/dlgmkfirmware.h"
+#endif
 FrmMainWindows::FrmMainWindows(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FrmMainWindows)
@@ -14,53 +22,73 @@ FrmMainWindows::FrmMainWindows(QWidget *parent) :
     ui->setupUi(this);
 	CAvUiComm::FormInCenter(this);
 	setWindowTitle("avWare");
+	m_WidowsMax = false;
 	m_VideoWidowsMax = false;
-// #if !defined(WIN32)
-// 	setWindowState(Qt::WindowMaximized);
-// #endif
+	m_mousePressed = false;
 
 	setWindowFlags(Qt::FramelessWindowHint);
 	setAttribute(Qt::WA_DeleteOnClose);
-	m_WidowsMax = false;
-	m_mousePressed = false;
-	m_localRect = this->geometry();
-	ui->LabTitle->installEventFilter(this);
 
-	m_bOpenedMenu = false;
-	ui->FrmMenu->hide();
-
-	m_FrmMainMenu = NULL;
-	
 	IconComm::Instance()->SetIcon(ui->BtnClose, QChar(0xf00d), 8);
-	IconComm::Instance()->SetIcon(ui->BtnMax,   QChar(0xf096), 8);
-	IconComm::Instance()->SetIcon(ui->BtnMin,   QChar(0xf068), 8);
+	IconComm::Instance()->SetIcon(ui->BtnMax, QChar(0xf096), 8);
+	IconComm::Instance()->SetIcon(ui->BtnMin, QChar(0xf068), 8);
 	IconComm::Instance()->SetIcon(ui->BtnAbout, QChar(0xf06b), 8);
 	IconComm::Instance()->SetIcon(ui->BtnVideoWindowInfo, QChar(0xf129), 8);
 	IconComm::Instance()->SetIcon(ui->LabIco, QChar(0xf015), 8);
+	IconComm::Instance()->SetIcon(ui->BtnAlarm, QChar(0xf0f3), 8);
 
-	// 	m_FloatButton = new FloatingButton(parent);
-	// 	QPoint point = this->pos();
-	// 	QRect rect = this->rect();
-	// 	point.setX(point.x() + rect.width() / 3 * 2);
-	// 	point.setY(point.y() + rect.height() / 3 * 2);
-	// 	m_FloatButton->move(point);
-	// 	QObject::connect(m_FloatButton, SIGNAL(SignalsButtonClick()), this, SLOT(on_BtnOpenMenu_clicked()));
-	// 	m_FloatButton->show();
+	m_localRect = this->geometry();
 
+
+	
+	ui->LabTitle->installEventFilter(this);
+	m_bOpenedMenu = false;
+	ui->FrmMenu->hide();
+	m_FrmMainMenu = NULL;
+	
+
+	ui->RecordShowBar->hide();
+	ui->RecordSearch->hide();
+
+	{
+		m_frmDevices = new FrmDevice;
+		QObject::connect(m_frmDevices, SIGNAL(SignalPreviewStart(int, int, bool)), ui->FrmVideoArea, SLOT(SlotOnPreviewStart(int, int, bool)), Qt::QueuedConnection);
+
+		m_DlgAlarmMessage = new DlgAlarmMessage;
+	}
+	
+	m_DlgRecordSet = new DlgRecordSet;
 
 }
 
 FrmMainWindows::~FrmMainWindows()
 {
 	AvQDebug("clear up\n");
+
     delete ui;
+}
+bool FrmMainWindows::SetWidgetWindowsMax()
+{
+	setWindowState(Qt::WindowMaximized);
+	m_WidowsMax = true;
+	IconComm::Instance()->SetIcon(ui->BtnMax, QChar(0xf079), 10);
+	ui->BtnMax->setToolTip(tr("MaxWindows"));
+	return true;
+}
+bool FrmMainWindows::SetWidgetVideoAreaMax()
+{
+	m_VideoWidowsMax = true;
+	ui->FrmVideoArea->setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+	ui->FrmVideoArea->showMaximized();
+	QRect cur = CAvUiComm::GetWindowsOnScreen();
+	ui->FrmVideoArea->setGeometry(cur);
+	return true;
 }
 
 QPoint	 FrmMainWindows::GetVideoAreaToGlobal()
 {
 
 	if (m_VideoWidowsMax == true){
-		AvQDebug("Is Max Video Windows\n");
 		return QPoint(0, 0);
 	}
 	QPoint FrmmainWindows = pos();
@@ -113,6 +141,16 @@ void FrmMainWindows::mouseReleaseEvent(QMouseEvent *e)
 	}
 	
 }
+void FrmMainWindows::SetBtnAlarmColor(bool AlmColor)
+{
+	if (AlmColor == true){
+		ui->BtnAlarm->setStyleSheet(QString("color:rgba(255, 0, 0, 255)"));
+	}
+	else{
+		ui->BtnAlarm->setStyleSheet(QString("color:rgba(255, 255, 255, 255)"));
+	}
+	
+}
 
 
 void FrmMainWindows::customEvent(QEvent* event)
@@ -128,13 +166,23 @@ void FrmMainWindows::customEvent(QEvent* event)
 		AvQDebug("Recv QavEvent \n");
 	}break;
 
+	case QAvEvent::QAvEvent_MediaInfo:{
+		AvQDebug("Media Info\n");
+		on_BtnVideoWindowInfo_clicked();
+	}break;
 	case QAvEvent::QAvEvent_ShowMainMenum:{
-		AvQDebug("Open main Menum\n");
-		if (m_FrmMainMenu == NULL){
-			m_FrmMainMenu = new FrmMainMenu;
+		if (true == CAvGuiStatus::instance()->IsEmbeddedSystem()){
+			AvQDebug("Open main Menum\n");
+			if (m_FrmMainMenu == NULL){
+				m_FrmMainMenu = new FrmMainMenu;
+			}
+			m_FrmMainMenu->show();
+			CAvUiComm::FormInCenter(m_FrmMainMenu);
 		}
-		m_FrmMainMenu->show();
-		CAvUiComm::FormInCenter(m_FrmMainMenu);
+		else{
+			on_BtnOpenMenu_clicked();
+		}
+
 	}break;
 
 	case QAvEvent::QAvEvent_MainMenuDevices_Click:{
@@ -147,11 +195,11 @@ void FrmMainWindows::customEvent(QEvent* event)
 	}break;
 	case QAvEvent::QAvEvent_MainMenuAlarm_Click:{
 		AvQDebug("Recv QavEvent MainMenuAlarm\n");
-		on_BtnAlarm_clicked();
+		//on_BtnAlarm_clicked();
 	}break;
 	case QAvEvent::QAvEvent_MainMenuSysTools_Click:{
 		AvQDebug("Recv QavEvent MainMenuSysTools\n");
-		on_BtnSysInfo_clicked();
+		//on_BtnSysInfo_clicked();
 	}break;
 	case QAvEvent::QAvEvent_MainMenuRecord_Click:{
 		AvQDebug("Recv QavEvent MainMenuRecord\n");
@@ -173,7 +221,35 @@ void FrmMainWindows::customEvent(QEvent* event)
 		ui->FrmVideoArea->setGeometry(cur);
 		
 	}break;
+	case QAvEvent::QAvEvent_SysAlarmMsg:{
+		SetBtnAlarmColor(true);
+		QAvEvent *QAve = (QAvEvent*)event;
+		C_AlmMsg Msg = *((C_AlmMsg *)QAve->UsrData());
+		m_DlgAlarmMessage->AddAlmItem(Msg);
+		//av_error("QAvEvent::QAvEvent_SysAlarmMsg\n");
+	}break;
+	case QAvEvent::QAvEvent_ShowRecordPlay:{
+		on_BtnRecordPlay_clicked();
+	}break;
 
+	case QAvEvent::QAvEvent_ShowRecordSet:{
+		on_BtnRecordSet_clicked();
+	}break;
+
+	case QAvEvent::QAvEvent_ShowDeviceSet:{
+		QAvEvent *QAve = (QAvEvent*)event;
+
+		int *pChannel = (int *)QAve->UsrData();
+		AvQDebug("IPC Setting Channel = %d\n", *pChannel);
+		m_frmDevices->DlgDeviceSetShow(*pChannel);
+
+	}break;
+
+	case QAvEvent::QAvEvent_RecordPlay_Close:{
+		AvQDebug("Recv QAvEvent_RecordPlay_Close\n");
+		ui->RecordSearch->hide();
+		ui->RecordShowBar->hide();
+	}
 	default:
 		break;
 	}
@@ -239,31 +315,21 @@ void FrmMainWindows::on_BtnOpenMenu_clicked()
 
 void FrmMainWindows::on_BtnDevices_clicked()
 {
-	FrmDevice *fWDevices = new FrmDevice;
-	QObject::connect(fWDevices, SIGNAL(SignalPreviewStart(int, int, bool)), ui->FrmVideoArea, SLOT(SlotOnPreviewStart(int, int, bool)), Qt::QueuedConnection);
-	fWDevices->exec();
+	CAvUiComm::FormInCenter(m_frmDevices);
+	m_frmDevices->exec();
 }
 
 void FrmMainWindows::on_BtnSysSet_clicked()
 {
-	DlgNetSet *DlgnetSet = new DlgNetSet;
-	DlgnetSet->exec();
-}
-
-void FrmMainWindows::on_BtnAlarm_clicked()
-{
 
 }
 
-void FrmMainWindows::on_BtnAlm_clicked()
-{
+// 
+// void FrmMainWindows::on_BtnAlm_clicked()
+// {
+// 
+// }
 
-}
-
-void FrmMainWindows::on_BtnSysInfo_clicked()
-{
-
-}
 
 void FrmMainWindows::on_BtnAlgorithm_clicked()
 {
@@ -281,4 +347,31 @@ void FrmMainWindows::on_BtnAbout_clicked()
 {
     DlgAbout *about = new DlgAbout;
     about->exec();
+}
+
+void FrmMainWindows::on_BtnAlarm_clicked()
+{
+	SetBtnAlarmColor(false);
+	m_DlgAlarmMessage->exec();
+}
+void FrmMainWindows::on_BtnRecordSet_clicked()
+{
+	 m_DlgRecordSet->exec();
+}
+
+void FrmMainWindows::on_BtnRecordPlay_clicked()
+{
+	ui->FrmMenu->hide();
+	ui->RecordSearch->show();
+	ui->RecordShowBar->show();
+}
+
+void FrmMainWindows::on_BtnTools_clicked()
+{
+#if defined(_AV_WARE_CODE_OPENSOURCE)
+#else
+	DlgMkFirmWare *mkPacket = new DlgMkFirmWare(this);
+	mkPacket->exec();
+#endif
+
 }

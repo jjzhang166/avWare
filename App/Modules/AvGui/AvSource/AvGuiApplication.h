@@ -15,7 +15,8 @@
 #include <QApplication>
 #include "QAvEvent.h"
 #include "CAvObject.h"
-
+#include "AvGui/AvGui.h"
+#include "AvUiComm/StartupWindow.h"
 
 class CAvGuiApp:public QObject
 {
@@ -29,10 +30,17 @@ public:
 	CAvGuiApp();
 private:
 	~CAvGuiApp();
-
+public:
+	bool	StartingWindow();
+	bool	StartingMessage(QString &String, int progress);
+	bool	StartingMessage(LoadingMessage m, int progress);
+	bool	StartingWindowClose();
+private:
+	//QSplashScreen *m_SplashScreen;
+	QCStartupWindows *m_SplashScreen;
 public:
 	av_bool PostQAvEvent(QAvEvent &event);
-
+	bool	ConnectFileToProgram();
 private:
 	FrmMainWindows *m_MainWindows;
 	QApplication	m_Application;

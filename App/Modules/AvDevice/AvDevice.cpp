@@ -18,21 +18,40 @@
 #include "AvLua/AvLua.h"
 #include "AvProc/AvProc.h"
 #include "Apis/AvEnuminline.h"
+C_DeviceFactoryInfo CAvDevice::m_FactoryInfo = {0};
+std::string CAvDevice::m_SStartGUID;
+CAvConfigNetComm CAvDevice::m_ConfigNetComm;
+
 SINGLETON_IMPLEMENT(CAvDevice);
 
 
-C_DeviceFactoryInfo CAvDevice::m_FactoryInfo;
-std::string CAvDevice::m_SStartGUID;
-CAvConfigNetComm CAvDevice::m_ConfigNetComm;
+CAvDevice::CAvDevice()
+{
+	m_TimerDeviceCount = 0;
+	m_TimerDeviceRebootTime = 0;
+}
+CAvDevice::~CAvDevice()
+{ 
+
+
+}
+
+
+
 av_bool CAvDevice::Initialize()
 {
-	av_msg("%s Started\n", "CAvDevice::Initialize");
+	av_msg("CAvDevice::Initialize Started\n");
 	AvSystemInit();
 	
 	{//FACTOORY
 		C_DeviceFactoryInfo FactoryInfo = { 0 };
 		GetDeviceInfo(FactoryInfo);
 	}
+
+	{
+		AvWatchDogInit(10);
+	}
+
 	{//一定要放在fac 后面，因为lua 里面有可能有auto 的选项，此时需要FAC 参数 配合。
 		InitializeLua();
 	}
@@ -70,11 +89,9 @@ av_bool CAvDevice::Initialize()
 av_bool CAvDevice::InitializeLua()
 {
 	std::string Value;
-	{//硬件属性  CHIP SENSOR at facinfo
+	{
 		Value = std::string(EnumNameAvChip(((AvChip)m_FactoryInfo.ChipType)));
 		SetEnv(std::string(EKey_Chip), Value);
-// 		Value = std::string(EnumNameAvSensor((AvSensor)m_FactoryInfo.SensorType));
-// 		SetEnv(std::string(EKey_Sensor), Value);
 	}
 	CAvLua initLua;
 	initLua.LuaLoadfile(EInitLuaFileName);
@@ -163,6 +180,11 @@ av_bool CAvDevice::InitializeLua()
 av_bool CAvDevice::InitializeConfigs()
 {
 	Start();
+
+	CAvTimer::StartTimer(1000, this, (CAvTimer::ONTIMER_PROC)&CAvDevice::OnTimer, av_true);
+	
+	
+	
 	return av_true;
 }
 
@@ -190,16 +212,75 @@ av_bool CAvDevice::DetachDeviceStatus(CAvObject *obj, SIG_PROC_DEVICESTATUS OnMo
 }
 av_bool CAvDevice::DeviceSignal(EDeviceStatus _status)
 {
+	switch (_status)
+	{
+	case CAvDevice::Upgradeing:
+		break;
+	case CAvDevice::RebootSoon:
+		m_TimerDeviceRebootTime = AvGetUpTime() + _D_AVDEVICE_REBOOT_DELAY;
+		break;
+	case CAvDevice::ModifyNetDevice:
+		break;
+	case CAvDevice::ModifySysTime:
+		break;
+	default:
+		break;
+	}
 	m_DeviceStatusSignal(_status);
 	return av_true;
 }
+av_bool CAvDevice::IsEmbeddedSystem()
+{
+	std::string Value;
+	if (av_true == CAvDevice::GetEnv(EKey_Chip, Value)){
+		AvChip avChip = AvChipStr2EnumValue(Value.c_str());
+		switch (avChip)
+		{
+		case AvChip_H18EV100:
+		case AvChip_H18EV200:
+		case AvChip_H18EV201:
+		case AvChip_H18C:
+		case AvChip_H18A:
+		case AvChip_H16CV100:
+		case AvChip_H16CV200:
+		case AvChip_H16CV300:
+		case AvChip_H16A:
+		case AvChip_H16D:
+		case AvChip_H19:
+		case AvChip_HIPC_RES_1:
+		case AvChip_HIPC_RES_2:
+		case AvChip_H20D:
+		case AvChip_H21:
+		case AvChip_H31:
+		case AvChip_H35:
+		case AvChip_H36:
+		case AvChip_H3798MV100:
+		case AvChip_HNVR_RES_2:
+		case AvChip_S2L22M:
+		case AvChip_S2L33M:
+		case AvChip_S2L55M:
+		case AvChip_S2L65:
+		case AvChip_S2L66:
+			return av_true;
 
-CAvDevice::~CAvDevice()
-{
+		case AvChip_WINDOWS_32:
+		case AvChip_WINDOWS_64:
+		case AvChip_LINUX_32:
+		case AvChip_LINUX_64:
+		case AvChip_MAC_32:
+		case AvChip_MAC_64:
+			return av_false;
+
+		case AvChip_LAST:
+			break;
+		default:
+			break;
+		}
+	}
+
+	return av_false;
 }
-CAvDevice::CAvDevice()
-{
-}
+
 
 
 static int GetCompileDateTime(char *szDateTime)
@@ -208,11 +289,16 @@ static int GetCompileDateTime(char *szDateTime)
 	#define MONTH_PRE_YEAR 12
 	const char szEnglishMonth[MONTH_PRE_YEAR][6] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 	char szMonth[12] = { 0 };
-	int iYear, iMonth, iDay, iHour, iMin, iSec;
-
-	sscanf(__DATE__, "%s %d %d", szMonth, &iDay, &iYear);
-	sscanf(__TIME__, "%d:%d:%d", &iHour, &iMin, &iSec);
-
+	int iYear =  0, iMonth = 0, iDay = 0, iHour  = 0, iMin = 0, iSec = 0;
+	int ret = 0;
+	ret = sscanf(__DATE__, "%s %d %d", szMonth, &iDay, &iYear);
+	if (ret != 3){
+		av_warning("sscanf error\n");
+	}
+	ret = sscanf(__TIME__, "%d:%d:%d", &iHour, &iMin, &iSec);
+	if (ret != 3){
+		av_warning("sscanf error\n");
+	}
 	for (int i = 0; i < MONTH_PRE_YEAR; i++)
 	{
 		if (strncmp(szMonth, szEnglishMonth[i], 3) == 0)
@@ -232,10 +318,10 @@ std::string CAvDevice::GetSoftVersionString()
 	av_char _complileDate[128];
 	GetCompileDateTime(_complileDate);
 
-	sprintf(ver, "%d.%d.%d.%s_%s", _AV_WARE_VERSION_MAJOR, _AV_WARE_VERSION_MINOR,_AV_WARE_VERSION_PATCH,
-		_complileDate, _AV_WARE_VERSION_RUNTIME);
+	sprintf(ver, "%d.%d.%d.%d %s %s", _AV_WARE_VERSION_MAJOR, _AV_WARE_VERSION_MINOR,
+		_AV_WARE_VERSION_PATCH, _AV_WARE_VERSION_INWARD, _AV_WARE_VERSION_RUNTIME, _complileDate);
 	if (0 != strlen(_AV_WARE_VERSION_OEM)){
-		strcat(ver, "_");
+		strcat(ver, " ");
 		strcat(ver, _AV_WARE_VERSION_OEM);
 	}
 
@@ -244,7 +330,7 @@ std::string CAvDevice::GetSoftVersionString()
 }
 av_u32      CAvDevice::GetSoftVersionU32()
 {
-	return _AV_WARE_VERSION_MAJOR << 16 | _AV_WARE_VERSION_MINOR << 8 | _AV_WARE_VERSION_PATCH;
+	return _AV_WARE_VERSION_MAJOR << 24 | _AV_WARE_VERSION_MINOR << 16 | _AV_WARE_VERSION_PATCH << 8| _AV_WARE_VERSION_INWARD;
 }
 
 
@@ -287,7 +373,7 @@ av_bool CAvDevice::SetEnv(std::string key, std::string &value)
 
 av_bool CAvDevice::Start()
 {
-
+	
 	{
 		//## Set NetWork
 		m_ConfigNetComm.Update();
@@ -300,25 +386,27 @@ av_bool CAvDevice::Start()
 			if (AvMask(i) & NetCommCaps.NetCommMask){
 		
 				ConfigNetComm &Formats = m_ConfigNetComm.GetConfig(i);
-				C_NetCommAttribute NetCommAttr;
-				NetCommAttr.Enable = Formats.Enable;
+				//C_NetCommAttribute NetCommAttr;
+				//NetCommAttr.Enable = Formats.Enable;
 				switch ((NetCommT)i)
 				{
 				case NetCommT_LAN0:
 				case NetCommT_LAN1:
-					NetCommAttr.LanAttr = Formats.LanAttr;
+					//NetCommAttr.LanAttr = Formats.LanAttr;
 					break;
 				case NetCommT_Wireless:
-					NetCommAttr.WirelessAttr = Formats.WirelessAttr.RouterLinkInfo[0];
+				case NetCommT_Wireless1:
+					//NetCommAttr.WirelessAttr = Formats.WirelessAttr;
 					break;
 				case NetCommT_SIM:
-					NetCommAttr.SimAttr = Formats.SimAttr;
+				case NetCommT_SIM1:
+					//NetCommAttr.SimAttr = Formats.SimAttr;
 					break;
 
 				default:
 					break;
 				}
-				av_bool ret = avNetCommSet(Formats.type, &NetCommAttr);
+				av_bool ret = avNetCommSet(&Formats);
 				if (ret != av_true){
 					av_error("Set %d NetCommDev Error\n", i);
 				}
@@ -372,24 +460,8 @@ av_bool CAvDevice::SetNetCommAttribute(NetCommT comt, C_NetCommAttribute &NetCom
 	TmpConfigNetComm.Update();
 
 	ConfigNetComm &Formats = TmpConfigNetComm.GetConfig(comt);
-	switch (comt)
-	{
-	case NetCommT_LAN0:
-		memcpy(&Formats.LanAttr, &NetCommAttribute.LanAttr, sizeof(NetCommAttribute.LanAttr));
-		TmpConfigNetComm.SettingUp();
-		break;
-	case NetCommT_LAN1:
-		break;
-	case NetCommT_Wireless:
-		break;
-	case NetCommT_SIM:
-		break;
-	case NetCommT_BlueTooth:
-		break;
-	default:
-		break;
-	}
-
+	Formats = NetCommAttribute;
+	TmpConfigNetComm.SettingUp();
 	return av_true;
 }
 av_bool CAvDevice::GetNetCommAttribute(NetCommT comt, C_NetCommAttribute &NetCommAttribute)
@@ -398,8 +470,7 @@ av_bool CAvDevice::GetNetCommAttribute(NetCommT comt, C_NetCommAttribute &NetCom
 	switch (comt)
 	{
 	case NetCommT_LAN0:
-		NetCommAttribute.Enable = Formats.Enable;
-		memcpy(&NetCommAttribute.LanAttr, &Formats.LanAttr, sizeof(NetCommAttribute.LanAttr));
+		NetCommAttribute = Formats;
 		break;
 	case NetCommT_LAN1:
 		break;
@@ -430,82 +501,92 @@ av_bool CAvDevice::GetACaptureCaps(E_AUDIO_CHL Chl, C_AudioCaps &AudioCaps)
 	memset(&AudioCaps, 0x00, sizeof(C_AudioCaps));
 	return AvACaptureCaps(Chl, &AudioCaps);
 }
+static av_bool ConfigNetCommCMP(ConfigNetComm &src, ConfigNetComm &dest)
+{
+	if (src.bEnable != dest.bEnable || src.bSupport != dest.bSupport || src.iFrNameType != dest.iFrNameType || src.mGetMode != dest.mGetMode){
+		return av_false;
+	}
+	switch (src.iFrNameType)
+	{
+	case NetCommT_LAN0:
+	case NetCommT_LAN1:
+	{
+		if (0 != strcmp(src.LanAttr.Dns1, dest.LanAttr.Dns1) || 0 != strcmp(src.LanAttr.Dns2, src.LanAttr.Dns2)
+			|| 0 != strcmp(src.LanAttr.Gateway, dest.LanAttr.Gateway) || 0 != strcmp(src.LanAttr.IpAddr, dest.LanAttr.IpAddr)
+			|| 0 != strcmp(src.LanAttr.Submask, dest.LanAttr.Submask)){
+			return av_false;
+		}
+	}
+		break;
+	case NetCommT_Wireless:
+	case NetCommT_Wireless1:
+	{
+		if (src.WirelessAttr.Mode != dest.WirelessAttr.Mode || src.WirelessAttr.WirelessPreferred != dest.WirelessAttr.WirelessPreferred){
+			return av_false;
+		}
+		if (0 != strcmp(src.WirelessAttr.WirelessApConf.SSID, dest.WirelessAttr.WirelessApConf.SSID) ||
+			0 != strcmp(src.WirelessAttr.WirelessApConf.Passwd, dest.WirelessAttr.WirelessApConf.Passwd)){
+			return av_false;
+		}
+		for (int i = 0; i < MAX_CONF_ROUTER_LINK; i++){
+			if (0 != strcmp(src.WirelessAttr.WirelessInfo[i].SSID, dest.WirelessAttr.WirelessInfo[i].SSID) ||
+				0 != strcmp(src.WirelessAttr.WirelessInfo[i].Passwd, dest.WirelessAttr.WirelessInfo[i].Passwd)){
+				return av_false;
+			}
+		}
+		if (0 != strcmp(src.WirelessAttr.WirelessConf.Dns1, dest.WirelessAttr.WirelessConf.Dns1)
+			|| 0 != strcmp(src.WirelessAttr.WirelessConf.Dns2, src.WirelessAttr.WirelessConf.Dns2)
+			|| 0 != strcmp(src.WirelessAttr.WirelessConf.Gateway, dest.WirelessAttr.WirelessConf.Gateway)
+			|| 0 != strcmp(src.WirelessAttr.WirelessConf.IpAddr, dest.WirelessAttr.WirelessConf.IpAddr)
+			|| 0 != strcmp(src.WirelessAttr.WirelessConf.Submask, dest.WirelessAttr.WirelessConf.Submask)){
+			return av_false;
+		}
+	}
+		break;
+	case NetCommT_SIM:
+	case NetCommT_SIM1:
+	{
+		if (0 != strcmp(src.SimAttr.PhoneCode, dest.SimAttr.PhoneCode)){
+			return av_false;
+		}
+	}
+		break;
+	case NetCommT_BlueTooth:
+	{
+		if (0 != strcmp(src.BluteToothAttr.SearchName, dest.BluteToothAttr.SearchName) ||
+			0 != strcmp(src.BluteToothAttr.MarkCode, dest.BluteToothAttr.MarkCode)){
+			return av_false;
+		}
+	}
+		break;
+	default:
+		break;
+	}
+	return av_true;
+}
 av_void CAvDevice::OnConfigsNetComm(CAvConfigNetComm *NetComm, int &result)
 {
 	int cmpRet = 0;
-	C_NetCommAttribute NetCommAttr;
+	//C_NetCommAttribute NetCommAttr;
 	for (int i = 0; i < NetCommT_LAST; i++)
 	{
 		ConfigNetComm &newConf = NetComm->GetConfig(i);
 		ConfigNetComm &oldConf = m_ConfigNetComm.GetConfig(i);
-		switch (i)
-		{
-		case NetCommT_LAN0:
-			cmpRet = memcmp(&newConf.LanAttr, &oldConf.LanAttr, sizeof(ConfigLanAttribute));
-			if (newConf.Enable != oldConf.Enable || cmpRet != 0){
-				m_DeviceStatusSignal(ModifyNetDevice);
-				NetCommAttr.Enable = newConf.Enable;
-				NetCommAttr.LanAttr = newConf.LanAttr;
-				avNetCommSet(NetCommT_LAN0, &NetCommAttr);
-				oldConf.Enable = newConf.Enable;
-				oldConf.LanAttr = newConf.LanAttr;
-			}
-			break;
-		case NetCommT_LAN1:
-			cmpRet = memcmp(&newConf.LanAttr, &oldConf.LanAttr, sizeof(ConfigLanAttribute));
-			if (newConf.Enable != oldConf.Enable || cmpRet != 0){
-				m_DeviceStatusSignal(ModifyNetDevice);
-				NetCommAttr.Enable = newConf.Enable;
-				NetCommAttr.LanAttr = newConf.LanAttr;
-				avNetCommSet(NetCommT_LAN1, &NetCommAttr);
-				oldConf.Enable = newConf.Enable;
-				oldConf.LanAttr = newConf.LanAttr;
-			}
-			break;
-		case NetCommT_Wireless:
-			cmpRet = memcmp(&newConf.WirelessAttr, &oldConf.WirelessAttr, sizeof(ConfigWirelessAttribute));
-			if (newConf.Enable != oldConf.Enable || cmpRet != 0){
-				m_DeviceStatusSignal(ModifyNetDevice);
-				NetCommAttr.Enable = newConf.Enable;
-				NetCommAttr.WirelessAttr = newConf.WirelessAttr.RouterLinkInfo[0];
-				avNetCommSet(NetCommT_Wireless, &NetCommAttr);
-				oldConf.Enable = newConf.Enable;
-				oldConf.WirelessAttr = newConf.WirelessAttr;
-			}
-			break;
-		case NetCommT_SIM:
-			cmpRet = memcmp(&newConf.SimAttr, &oldConf.SimAttr, sizeof(ConfigSimAttribute));
-			if (newConf.Enable != oldConf.Enable || cmpRet != 0){
-				m_DeviceStatusSignal(ModifyNetDevice);
-				NetCommAttr.Enable = newConf.Enable;
-				NetCommAttr.SimAttr = newConf.SimAttr;
-				avNetCommSet(NetCommT_SIM, &NetCommAttr);
-				oldConf.Enable = newConf.Enable;
-				oldConf.SimAttr = newConf.SimAttr;
-			}
-			break;
-		case NetCommT_BlueTooth:
-			cmpRet = memcmp(&newConf.BlueToothAttr, &oldConf.BlueToothAttr, sizeof(ConfigBlueTooth));
-			if (newConf.Enable != oldConf.Enable || cmpRet != 0){
-				m_DeviceStatusSignal(ModifyNetDevice);
-				NetCommAttr.Enable = newConf.Enable;
-				NetCommAttr.BluteToothAttr = newConf.BlueToothAttr;
-				avNetCommSet(NetCommT_BlueTooth, &NetCommAttr);
-				oldConf.Enable = newConf.Enable;
-				oldConf.BlueToothAttr = newConf.BlueToothAttr;
-			}
-			break;
-		default:
-			break;
+
+		if (av_true == ConfigNetCommCMP(newConf, oldConf)){
+			continue;
 		}
+
+		avNetCommSet(&newConf);
+		oldConf = newConf;
+		m_DeviceStatusSignal(ModifyNetDevice);
 	}
 }
 av_bool CAvDevice::Reboot()
 {
+	
 	g_AvDevice.DeviceSignal(RebootSoon);
 	g_AvDevice.Stop();
-
-	AvReboot();
 	return av_true;
 }
 
@@ -516,17 +597,35 @@ av_bool CAvDevice::GetSysTime(av_timeval &tv)
 
 av_bool CAvDevice::SetSysTime(av_timeval &tv)
 {
-	g_AvDevice.DeviceSignal(ModifySysTime);
+	struct tm *tmt = localtime((time_t *)&(tv.tv_sec));
+
+	av_warning("Set System time [%s\b]\n", asctime(tmt));
 	AvSetTimeofDay(&tv);
+	g_AvDevice.DeviceSignal(ModifySysTime);
 	return AvTimeSystem2Rtc();
 }
 
+av_bool CAvDevice::TimeUtc2Local(av_u32 &utcSec, av_u32 &localSec)
+{
+	localSec = utcSec + 8 * 3600;
+	return av_true;
+}
+av_bool CAvDevice::TimeLocal2Utc(av_u32 &utcSec, av_u32 &localSec)
+{
+	utcSec = localSec - 8 * 3600;
+	return av_true;
+}
 av_bool CAvDevice::GetDeviceInfo(C_DeviceFactoryInfo &FactoryInfo)
 {
 	if (0 == strlen(m_FactoryInfo.SerialNumber)){
 		if (av_true != AvGetDeviceInfo(&m_FactoryInfo)){
-
+			std::string bVaild = std::string(EnumNameav_bool(av_false));
+			SetEnv(std::string(EKey_BvalidFactoryInfo), bVaild);
 			av_error("GetFactoryInfo Error use default\n");
+		}
+		else{
+			std::string bVaild = std::string(EnumNameav_bool(av_true));
+			SetEnv(std::string(EKey_BvalidFactoryInfo), bVaild);
 		}
 	}
 	FactoryInfo = m_FactoryInfo;
@@ -535,8 +634,6 @@ av_bool CAvDevice::GetDeviceInfo(C_DeviceFactoryInfo &FactoryInfo)
 av_bool CAvDevice::SetDeviceInfo(C_DeviceFactoryInfo &FactoryInfo)
 {
 	m_FactoryInfo = FactoryInfo;
-	av_msg("ChipType = %d, SensorType = %d\n", m_FactoryInfo.ChipType, m_FactoryInfo.SensorType);
-
 	av_msg( "SetDeviceInfo \n"
 			"SerialNumber[%s]\n"
 			"FactoryName[%s]\n"
@@ -545,14 +642,20 @@ av_bool CAvDevice::SetDeviceInfo(C_DeviceFactoryInfo &FactoryInfo)
 			"ChipStr[%s]\n"
 			"SensorStr[%s]\n"
 			"FActoryTime[%s]\n"
-			"MaxChannel[%d]\n", 
+			"MaxChannel[%d]\n"
+			"HardInterfaceMask[%x]\n", 
 		m_FactoryInfo.SerialNumber, m_FactoryInfo.FactoryName, m_FactoryInfo.HardWareVersion, m_FactoryInfo.ProductMacAddr, 
 		EnumNameAvChip((AvChip)m_FactoryInfo.ChipType), EnumNameAvSensor((AvSensor)m_FactoryInfo.SensorType), ctime((time_t*)&m_FactoryInfo.FActoryTime), 
-		m_FactoryInfo.MaxChannel);
+		m_FactoryInfo.MaxChannel, m_FactoryInfo.HardInterfaceMask);
 
-
-	return AvSetDeviceInfo(&m_FactoryInfo);
-	return av_true;
+	av_bool bRet = AvSetDeviceInfo(&m_FactoryInfo);
+	if (bRet == av_true){
+		g_AvDevice.DeviceSignal(CAvDevice::RebootSoon);
+		return av_true;
+	}
+	else{
+		return av_false;
+	}
 }
 
 av_uint CAvDevice::GetDeviceStartUp()
@@ -579,7 +682,6 @@ av_bool CAvDevice::SystemUpgrade(av_uchar *ptr, av_uint length)
 }
 av_u32  CAvDevice::SystemUpgradeProgress()
 {
-	//av_msg("ProgressCmd = %d  Value =  %d\n", m_SystemUpgradeProgress.ProgressCmd, m_SystemUpgradeProgress.ProgressValue);
 	return (av_u32)(m_SystemUpgradeProgress.ProgressCmd << 16 | m_SystemUpgradeProgress.ProgressValue);
 }
 
@@ -596,4 +698,26 @@ av_bool CAvDevice::GetStartUpGuid(std::string &guid)
 {
 	guid = m_SStartGUID;
 	return av_true;
+}
+
+av_void CAvDevice::OnTimer(CAvTimer &Timer)
+{
+	m_TimerDeviceCount = m_TimerDeviceCount++ & 0xffffffff;
+	av_u32 CurUptime = AvGetUpTime();
+
+
+	if (m_TimerDeviceCount % 8 == 0){
+		AvWatchDogFeed();
+	}
+
+	if (m_TimerDeviceRebootTime >= CurUptime && m_TimerDeviceRebootTime != 0){
+		AvReboot();
+	}
+
+	m_PlatformTimerTask.StartTask(this, (CAvTask::CAvTaskThreadProc)&CAvDevice::PlatformTimerTask, av_false);
+}
+
+av_void CAvDevice::PlatformTimerTask()
+{
+	avSystemOnTime1s();
 }

@@ -1,0 +1,34 @@
+sudo apt-get install libxcb-xv0-dev libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev gfx1.2-dev
+sudo apt-get install build-essential subversion git-core checkinstall yasm texi2html libfaac-dev libfaad-dev libmp3lame-dev libsdl1.2-dev libtheora-dev libx11-dev zlib1g-dev
+sudo apt-get install libxcb-xv0-dev
+sudo apt-get install libxv-dev
+
+
+
+sudo apt-get install \ 
+libxv-dev \
+libxcb-xv0-dev \
+libx11-dev \
+libxcb-xv0-dev
+
+sudo apt-get install libxv-dev libxcb-xv0-dev libx11-dev libxcb-xv0-dev
+apt-get install libncurses5-dev
+
+
+sudo apt-get install \
+g++ \
+system-config-samba \
+nautilus \
+ethstatus \
+libsdl-dev \
+yasm \
+openssl \
+libssl-dev \
+tftpd tftp openbsd-inetd \
+nfs-kernel-server \
+vim \
+wireshark \
+git \
+build-essential subversion git-core checkinstall yasm texi2html libfaac-dev libfaad-dev libmp3lame-dev libsdl1.2-dev libtheora-dev libx11-dev zlib1g-dev \
+libxcb-xv0-dev \
+libncurses5-dev

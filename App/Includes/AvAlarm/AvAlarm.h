@@ -24,7 +24,7 @@
 #include "AvThread/AvTask.h"
 #include "AvConfigs/AvConfigNetService.h"
 #include "AvConfigs/AvConfigAlarm.h"
-
+#include "Apis/AvWareStruct.h"
 
 #define ALARM_QUEUE_MSG_NAME "Alm_Msg_Queue"
 
@@ -37,31 +37,9 @@ private:
 	~CAvAlarm();
 public:
 
-	enum AvAlarmStat{
-		AvAlm_Stat_NONE,
-		AvAlm_Stat_Open,
-		AvAlm_Stat_Close,
-		AvAlm_Stat_Ongoing,
-		AvAlm_Stat_NR,
-	};
-
-	typedef struct {
-		AlarmEvent				AlmType;
-		av_u32					AlmTmSec;
-		AvAlarmStat				AlmStatus;//av_ture open; av_false close
-		av_uchar				Channel;
-		av_uchar				Slave;
-
-		union 
-		{
-			av_u32	MdResult[ConfMotionDetectionLine];
-			av_u32	IoResult;
-		};
-
-	}AlmMsg;
 
 public:
-	typedef TSignal1<AlmMsg &>::SigProc OnAvAlarmSigNalFunc;
+	typedef TSignal1<C_AlmMsg &>::SigProc OnAvAlarmSigNalFunc;
 	av_bool Initialize();
 
 	av_bool Start(CAvObject *obj, OnAvAlarmSigNalFunc proc);
@@ -71,7 +49,7 @@ private:
 	av_void ThreadProc();
 	CAvQmsg m_AlarmMsg;
 
-	TSignal1<AlmMsg &> m_AlarmSignal;
+	TSignal1<C_AlmMsg &> m_AlarmSignal;
 
 
 };
@@ -90,17 +68,18 @@ public:
 	
 
 	av_void TaskJob();
-	av_bool SetAlmMsg(CAvAlarm::AlmMsg m_AlmMsg);
-	av_bool SetalmSignal(TSignal1<CAvAlarm::AlmMsg &> *signal);
+	av_bool SetAlmMsg(C_AlmMsg m_AlmMsg);
+	av_bool SetalmSignal(TSignal1<C_AlmMsg &> *signal);
 private:
 
 	av_void OnSendEmail();
 	av_void OnFtpSend();
 	av_bool CheckEmailStartUp();
+	av_void OnTestFtpUpload();
 	//av_bool CheckTimeSection(C_WeekSpan *pWeekSpan);
 	
-	CAvAlarm::AlmMsg m_AlmMsg;
-	TSignal1<CAvAlarm::AlmMsg &> *m_AlarmSignal;
+	C_AlmMsg m_AlmMsg;
+	TSignal1<C_AlmMsg &> *m_AlarmSignal;
 };
 
 

@@ -41,10 +41,6 @@ endif()
 
 set (CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR})
 
-if (${FaceDetect_LMX} STREQUAL "ON")
-target_link_libraries(${target} AvIntelligentAnalysis)
-endif()
-
 
 #Moudles
 target_link_libraries(${target} AvDevice)
@@ -62,16 +58,15 @@ endif()
 target_link_libraries(${target} AvThread)
 target_link_libraries(${target} AvPreview)
 target_link_libraries(${target} AvNetService)
-target_link_libraries(${target} AvWatchDog)
 target_link_libraries(${target} AvUart)
 target_link_libraries(${target} AvPacket)
+target_link_libraries(${target} AvIntelligentAnalysis)
 target_link_libraries(${target} AvBsp)
 target_link_libraries(${target} AvMemoryPool)
 target_link_libraries(${target} AvUser)
 target_link_libraries(${target} AvF)
 target_link_libraries(${target} AvProc)
 target_link_libraries(${target} AvProto)
-
 #LIB
 target_link_libraries(${target} uvPlusPlus)
 target_link_libraries(${target} uv)
@@ -89,7 +84,17 @@ target_link_libraries(${target} Lua)
 target_link_libraries(${target} SQLite)
 
 
+
+
+##third lib
+include ("Build/Platform/${COMPILER}/link.cmake")
+
 #UI
+
+##third lib
+include ("Build/Platform/${COMPILER}/link.cmake")
+
+
 if (${CMAKE_WITH_UI} STREQUAL "ON")
 		if (!CMAKE_QT_PATH)
 			message(FATAL_ERROR ${CMAKE_QT_PATH})
@@ -97,16 +102,13 @@ if (${CMAKE_WITH_UI} STREQUAL "ON")
 	SET(CMAKE_PREFIX_PATH ${CMAKE_QT_PATH})
 	find_package(Qt5Core)
 	find_package(Qt5Widgets)
-	find_package(Qt5Quick)
+	#find_package(qtpcre)
+	#find_package(Qt5Quick)
 	ADD_DEFINITIONS (${QT_DEFINITIONS})
-	#target_link_libraries(${target} Qt5::Widgets)
+	#target_link_libraries(${target} qtpcre)
 	#qt5_use_modules(${target} Core Widgets Gui)
 	#get_target_property(${target} Qt5::Core LOCATION)
 endif()
-
-##third lib
-include ("Build/Platform/${COMPILER}/link.cmake")
-
 
 #SYSTEM Lib
 if (WIN32)
